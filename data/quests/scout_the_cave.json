@@ -1,0 +1,27 @@
+{
+	"id": "scout_the_cave",
+	"title": "Scout the Cave",
+	"description": "The knight has received reports of a goblin cave in the area. Find the cave entrance and return with information about its location.",
+	"quest_source": "story",
+	"giver_npc_id": "wandering_knight",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "elder_moor",
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "wandering_knight",
+	"turn_in_zone": "elder_moor",
+	"objectives": [
+		{
+			"id": "find_cave",
+			"description": "Find the Goblin Cave entrance",
+			"type": "reach",
+			"target": "goblin_cave_entrance",
+			"required_count": 1,
+			"is_optional": false
+		}
+	],
+	"rewards": {
+		"gold": 75,
+		"xp": 150
+	},
+	"prerequisites": ["prove_yourself"]
+}

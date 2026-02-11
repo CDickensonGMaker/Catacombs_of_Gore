@@ -1,0 +1,30 @@
+{
+	"id": "the_letter",
+	"title": "The Letter",
+	"description": "Tharin Ironbeard has entrusted you with a sealed letter to deliver to his contact in Falkenhaften. He was vague about the contents, only mentioning it was 'royal business'. Do not open the letter.",
+	"is_main_quest": true,
+	"quest_source": "story",
+	"objectives": [
+		{
+			"id": "deliver_letter",
+			"description": "Deliver the letter to Tharin's contact in Falkenhaften",
+			"type": "reach",
+			"target": "falkenhaften_contact",
+			"zone": "falkenhaften"
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "falkenhaften_contact",
+	"turn_in_zone": "falkenhaften",
+	"rewards": {
+		"gold": 50,
+		"xp": 100
+	},
+	"required_items": [
+		{
+			"item_id": "tharins_letter",
+			"quantity": 1,
+			"consume": true
+		}
+	]
+}

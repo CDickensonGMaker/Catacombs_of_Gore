@@ -1,0 +1,279 @@
+[gd_scene load_steps=18 format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/modular_room.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://Sprite folders grab bag/stonewall.png" id="2"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/forge/furnace_large.obj" id="mesh_furnace"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/forge/anvil_large.obj" id="mesh_anvil"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/forge/quench_tank.obj" id="mesh_quench"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/forge/rack_wall.obj" id="mesh_rack"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/forge/ingot_stack.obj" id="mesh_ingots"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/bridge/pillar_ornate.obj" id="mesh_pillar"]
+
+[sub_resource type="StandardMaterial3D" id="mat_stone_floor"]
+albedo_color = Color(0.32, 0.3, 0.28, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.9
+uv1_scale = Vector3(6, 6, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_stone_wall"]
+albedo_color = Color(0.38, 0.35, 0.32, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.88
+uv1_scale = Vector3(4, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_ceiling"]
+albedo_color = Color(0.28, 0.26, 0.24, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.9
+uv1_scale = Vector3(6, 6, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_prop"]
+albedo_color = Color(0.35, 0.32, 0.3, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.85
+uv1_scale = Vector3(2, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_metal"]
+albedo_color = Color(0.4, 0.4, 0.42, 1)
+metallic = 0.7
+roughness = 0.45
+
+[sub_resource type="StandardMaterial3D" id="mat_brazier"]
+albedo_color = Color(0.42, 0.4, 0.44, 1)
+metallic = 0.4
+roughness = 0.55
+
+[sub_resource type="StandardMaterial3D" id="mat_fire"]
+albedo_color = Color(1.0, 0.5, 0.1, 1)
+emission_enabled = true
+emission = Color(1.0, 0.4, 0.05, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="StandardMaterial3D" id="mat_pillar"]
+albedo_color = Color(0.35, 0.32, 0.3, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.88
+uv1_scale = Vector3(2, 4, 1)
+texture_filter = 0
+
+[node name="KDForgeMain" type="Node3D"]
+script = ExtResource("1")
+room_id = "kd_forge_main"
+room_type = "forge"
+room_name = "Great Forge"
+room_width = 30.0
+room_depth = 25.0
+room_height = 14.0
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="Floor" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(30, 1, 25)
+material = SubResource("mat_stone_floor")
+
+[node name="Ceiling" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14, 0)
+use_collision = true
+size = Vector3(30, 0.5, 25)
+material = SubResource("mat_ceiling")
+
+[node name="WallNorth" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, -12.5)
+use_collision = true
+size = Vector3(30, 14, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthLeft" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 7, 12.5)
+use_collision = true
+size = Vector3(10, 14, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthRight" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 7, 12.5)
+use_collision = true
+size = Vector3(10, 14, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthTop" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 11, 12.5)
+use_collision = true
+size = Vector3(10, 6, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallEast" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 7, 0)
+use_collision = true
+size = Vector3(1, 14, 25)
+material = SubResource("mat_stone_wall")
+
+[node name="WallWest" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 7, 0)
+use_collision = true
+size = Vector3(1, 14, 25)
+material = SubResource("mat_stone_wall")
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="GreatForge" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -8)
+mesh = ExtResource("mesh_furnace")
+surface_material_override/0 = SubResource("mat_prop")
+
+[node name="ForgeLight" type="OmniLight3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -8)
+light_color = Color(1, 0.4, 0.1, 1)
+light_energy = 4.0
+omni_range = 18.0
+
+[node name="AnvilStation1" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 0)
+mesh = ExtResource("mesh_anvil")
+surface_material_override/0 = SubResource("mat_metal")
+
+[node name="AnvilStation2" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 8, 0, 0)
+mesh = ExtResource("mesh_anvil")
+surface_material_override/0 = SubResource("mat_metal")
+
+[node name="QuenchTrough" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 5)
+mesh = ExtResource("mesh_quench")
+surface_material_override/0 = SubResource("mat_prop")
+
+[node name="ToolRack" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 5)
+mesh = ExtResource("mesh_rack")
+surface_material_override/0 = SubResource("mat_prop")
+
+[node name="IngotPile" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, -5)
+mesh = ExtResource("mesh_ingots")
+surface_material_override/0 = SubResource("mat_metal")
+
+[node name="Pillar1" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -6)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="Pillar2" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -6)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="Pillar3" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 6)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="Pillar4" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, 6)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="Brazier1" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 0)
+
+[node name="Stand" type="CSGCylinder3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+radius = 0.35
+height = 1.0
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+radius = 0.5
+height = 0.4
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Fire" type="CSGSphere3D" parent="Lighting/Brazier1"]
+transform = Transform3D(0.7, 0, 0, 0, 0.9, 0, 0, 0, 0.7, 0, 1.6, 0)
+radius = 0.4
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+light_color = Color(1, 0.6, 0.3, 1)
+light_energy = 2.5
+omni_range = 12.0
+
+[node name="Brazier2" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 0)
+
+[node name="Stand" type="CSGCylinder3D" parent="Lighting/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+radius = 0.35
+height = 1.0
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Lighting/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+radius = 0.5
+height = 0.4
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Fire" type="CSGSphere3D" parent="Lighting/Brazier2"]
+transform = Transform3D(0.7, 0, 0, 0, 0.9, 0, 0, 0, 0.7, 0, 1.6, 0)
+radius = 0.4
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+light_color = Color(1, 0.6, 0.3, 1)
+light_energy = 2.5
+omni_range = 12.0
+
+[node name="Spawns" type="Node3D" parent="."]
+
+[node name="NPCSpawns" type="Node3D" parent="Spawns"]
+
+[node name="MasterSmith" type="Marker3D" parent="Spawns/NPCSpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 1)
+metadata/npc_type = "merchant"
+metadata/npc_name = "Master Smith Gundren"
+metadata/npc_id = "master_smith_gundren"
+metadata/archetype = "craftsman"
+metadata/shop_type = "weapons"
+metadata/quest_ids = ["kd_legendary_weapon"]
+
+[node name="Apprentice" type="Marker3D" parent="Spawns/NPCSpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 1)
+metadata/npc_type = "dwarf_civilian"
+metadata/npc_name = "Forge Apprentice"
+metadata/npc_id = "forge_apprentice_1"
+metadata/archetype = "craftsman"
+
+[node name="EnemySpawns" type="Node3D" parent="Spawns"]
+
+[node name="ChestSpawns" type="Node3D" parent="Spawns"]
+
+[node name="SmithChest" type="Marker3D" parent="Spawns/ChestSpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 8)
+metadata/chest_id = "kd_forge_chest_1"
+metadata/chest_name = "Smith's Chest"
+metadata/loot_tier = "rare"
+metadata/is_locked = true
+metadata/lock_difficulty = 14
+
+[node name="Connections" type="Node3D" parent="."]
+
+[node name="DoorPositions" type="Node3D" parent="Connections"]
+
+[node name="DoorSouth" type="Marker3D" parent="Connections/DoorPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 12)
+metadata/door_id = "door_south"
+metadata/door_label = "To Mine Entrance"
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]

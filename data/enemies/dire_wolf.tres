@@ -1,0 +1,138 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/data/enemy_attack_data.gd" id="2"]
+
+[sub_resource type="Resource" id="1"]
+script = ExtResource("2")
+id = "dire_bite"
+display_name = "Savage Bite"
+damage = Array[int]([3, 6, 2])
+damage_type = 0
+windup_time = 0.3
+active_time = 0.2
+recovery_time = 0.25
+cooldown = 1.2
+range_distance = 2.5
+is_ranged = false
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 0.0
+inflicts_condition = 0
+condition_chance = 0.0
+condition_duration = 0.0
+stagger_power = 0.8
+knockback_force = 2.5
+weight = 1.0
+min_range = 0.0
+max_range = 2.5
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[sub_resource type="Resource" id="2"]
+script = ExtResource("2")
+id = "dire_pounce"
+display_name = "Crushing Pounce"
+damage = Array[int]([3, 8, 3])
+damage_type = 0
+windup_time = 0.6
+active_time = 0.25
+recovery_time = 0.5
+cooldown = 4.0
+range_distance = 5.0
+is_ranged = false
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 0.0
+inflicts_condition = 5
+condition_chance = 0.7
+condition_duration = 2.0
+stagger_power = 1.5
+knockback_force = 4.0
+weight = 0.4
+min_range = 3.0
+max_range = 6.0
+requires_los = true
+animation_name = "pounce"
+sound_effect = ""
+
+[sub_resource type="Resource" id="3"]
+script = ExtResource("2")
+id = "pack_howl"
+display_name = "Pack Howl"
+damage = Array[int]([0, 0, 0])
+damage_type = 0
+windup_time = 1.0
+active_time = 0.5
+recovery_time = 0.5
+cooldown = 15.0
+range_distance = 0.0
+is_ranged = false
+is_aoe = true
+aoe_radius = 15.0
+projectile_speed = 0.0
+inflicts_condition = 0
+condition_chance = 0.0
+condition_duration = 0.0
+stagger_power = 0.0
+knockback_force = 0.0
+weight = 0.2
+min_range = 0.0
+max_range = 100.0
+requires_los = false
+animation_name = "howl"
+sound_effect = ""
+
+[resource]
+script = ExtResource("1")
+id = "dire_wolf"
+display_name = "Dire Wolf"
+description = "A massive alpha wolf, larger and more dangerous than its pack. Its howl rallies nearby wolves."
+max_hp = 45
+armor_value = 12
+movement_speed = 6.5
+turn_speed = 6.0
+grit = 7
+agility = 6
+will = 5
+knowledge = 3
+behavior = 0
+faction = 2
+aggro_range = 18.0
+attack_range = 2.5
+preferred_distance = 2.5
+flee_hp_threshold = 0.1
+is_boss = true
+attacks = Array[ExtResource("2")]([SubResource("1"), SubResource("2"), SubResource("3")])
+can_block = false
+block_chance = 0.0
+stagger_resistance = 0.4
+fire_resistance = 0.0
+frost_resistance = 0.3
+lightning_resistance = 0.0
+poison_resistance = 0.1
+necrotic_resistance = 0.0
+physical_resistance = 0.1
+fire_weakness = 0.25
+frost_weakness = 0.0
+lightning_weakness = 0.0
+holy_weakness = 0.0
+causes_horror = true
+horror_difficulty = 12
+loot_table_av = 4
+gold_drop = Array[int]([30, 60])
+guaranteed_drops = Array[String](["dire_wolf_pelt"])
+drop_table = {
+"wolf_fang": 0.6,
+"raw_meat": 0.8,
+"beast_heart": 0.25
+}
+xp_reward = 80
+scene_path = ""
+icon_path = ""
+scale = 1.3
+idle_sounds = Array[String]([])
+attack_sounds = Array[String]([])
+hurt_sounds = Array[String]([])
+death_sounds = Array[String]([])

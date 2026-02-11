@@ -1,0 +1,147 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/data/enemy_attack_data.gd" id="2"]
+
+[sub_resource type="Resource" id="1"]
+script = ExtResource("2")
+id = "warlord_great_blade"
+display_name = "Great Blade Cleave"
+damage = Array[int]([4, 10, 8])
+damage_type = 0
+windup_time = 0.5
+active_time = 0.3
+recovery_time = 0.4
+cooldown = 1.5
+range_distance = 3.5
+is_ranged = false
+is_aoe = true
+aoe_radius = 2.5
+projectile_speed = 0.0
+inflicts_condition = 6
+condition_chance = 0.4
+condition_duration = 8.0
+stagger_power = 1.2
+knockback_force = 5.0
+weight = 1.0
+min_range = 0.0
+max_range = 4.0
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[sub_resource type="Resource" id="2"]
+script = ExtResource("2")
+id = "warlord_war_cry"
+display_name = "War Cry"
+damage = Array[int]([0, 0, 0])
+damage_type = 0
+windup_time = 0.8
+active_time = 0.5
+recovery_time = 0.5
+cooldown = 20.0
+range_distance = 0.0
+is_ranged = false
+is_aoe = true
+aoe_radius = 15.0
+projectile_speed = 0.0
+inflicts_condition = 5
+condition_chance = 0.6
+condition_duration = 5.0
+stagger_power = 0.5
+knockback_force = 2.0
+weight = 0.15
+min_range = 0.0
+max_range = 100.0
+requires_los = false
+animation_name = "attack"
+sound_effect = ""
+
+[sub_resource type="Resource" id="3"]
+script = ExtResource("2")
+id = "warlord_devastating_charge"
+display_name = "Devastating Charge"
+damage = Array[int]([5, 12, 10])
+damage_type = 0
+windup_time = 0.8
+active_time = 0.4
+recovery_time = 0.6
+cooldown = 12.0
+range_distance = 5.0
+is_ranged = false
+is_aoe = true
+aoe_radius = 3.0
+projectile_speed = 0.0
+inflicts_condition = 1
+condition_chance = 0.7
+condition_duration = 3.0
+stagger_power = 2.0
+knockback_force = 8.0
+weight = 0.25
+min_range = 3.0
+max_range = 6.0
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[resource]
+script = ExtResource("1")
+id = "tenger_warlord"
+display_name = "Tenger Warlord"
+description = "A feared commander of the Tenger horde. These brutal leaders earned their position through countless victories and rivers of blood. They are responsible for the destruction of Windmere and Dusty Hollow."
+max_hp = 250
+armor_value = 18
+movement_speed = 5.5
+turn_speed = 4.0
+grit = 10
+agility = 7
+will = 6
+knowledge = 5
+bravery = 10
+behavior = 6
+faction = 8
+aggro_range = 30.0
+attack_range = 3.5
+preferred_distance = 3.0
+flee_hp_threshold = 0.0
+is_boss = true
+attacks = Array[ExtResource("2")]([SubResource("1"), SubResource("2"), SubResource("3")])
+can_block = true
+block_chance = 0.35
+stagger_resistance = 0.6
+fire_resistance = 0.2
+frost_resistance = 0.0
+lightning_resistance = 0.1
+poison_resistance = 0.3
+necrotic_resistance = 0.2
+physical_resistance = 0.25
+fire_weakness = 0.0
+frost_weakness = 0.1
+lightning_weakness = 0.0
+holy_weakness = 0.0
+causes_horror = true
+horror_difficulty = 16
+loot_table_av = 7
+gold_drop = Array[int]([200, 400])
+guaranteed_drops = Array[String]([])
+drop_table = {
+"health_potion": 0.5,
+"steel_ingot": 0.4,
+"mana_potion": 0.3,
+"repair_kit": 0.25
+}
+xp_reward = 500
+scene_path = ""
+icon_path = ""
+scale = 1.5
+sprite_path = ""
+attack_sprite_path = ""
+sprite_hframes = 4
+sprite_vframes = 2
+attack_hframes = 4
+attack_vframes = 2
+sprite_pixel_size = 0.045
+idle_sounds = Array[String]([])
+attack_sounds = Array[String]([])
+hurt_sounds = Array[String]([])
+death_sounds = Array[String]([])

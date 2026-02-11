@@ -1,0 +1,7 @@
+newmtl MusketMat
+Ka 0.2 0.2 0.2
+Kd 0.7 0.7 0.7
+Ks 0.05 0.05 0.05
+Ns 10.0
+d 1.0
+illum 2

@@ -1,0 +1,174 @@
+[gd_resource type="Resource" script_class="DialogueData" load_steps=30 format=3 uid="uid://dgjnjngvix4no"]
+
+[ext_resource type="Script" uid="uid://b180if7iangqj" path="res://scripts/dialogue/dialogue_data.gd" id="1_data"]
+[ext_resource type="Script" uid="uid://crflbvnhskixj" path="res://scripts/dialogue/dialogue_node.gd" id="2_node"]
+[ext_resource type="Script" uid="uid://csnc82dxff564" path="res://scripts/dialogue/dialogue_choice.gd" id="3_choice"]
+[ext_resource type="Script" uid="uid://dj6h3b0ivbfjv" path="res://scripts/dialogue/dialogue_condition.gd" id="4_cond"]
+[ext_resource type="Script" uid="uid://cidqmsbd3wwi6" path="res://scripts/dialogue/dialogue_action.gd" id="5_action"]
+
+[sub_resource type="Resource" id="choice_dangers"]
+script = ExtResource("3_choice")
+text = "What dangers should I know about?"
+next_node_id = "dangers"
+
+[sub_resource type="Resource" id="choice_quests"]
+script = ExtResource("3_choice")
+text = "Any work for an adventurer?"
+next_node_id = "quests"
+
+[sub_resource type="Resource" id="choice_bounties"]
+script = ExtResource("3_choice")
+text = "I'm looking for bounties."
+next_node_id = "bounties"
+
+[sub_resource type="Resource" id="choice_goodbye"]
+script = ExtResource("3_choice")
+text = "Stay vigilant, guard."
+next_node_id = "end"
+
+[sub_resource type="Resource" id="node_start"]
+script = ExtResource("2_node")
+id = "start"
+speaker_name = "Town Guard"
+text = "Halt! State your business, traveler. These are dangerous times, and we must be cautious of who enters our town."
+choices = Array[ExtResource("3_choice")]([SubResource("choice_dangers"), SubResource("choice_quests"), SubResource("choice_bounties"), SubResource("choice_goodbye")])
+portrait_id = "guard_stern"
+
+[sub_resource type="Resource" id="choice_wolves"]
+script = ExtResource("3_choice")
+text = "Tell me about the wolves."
+next_node_id = "danger_wolves"
+
+[sub_resource type="Resource" id="choice_bandits"]
+script = ExtResource("3_choice")
+text = "What about the bandits?"
+next_node_id = "danger_bandits"
+
+[sub_resource type="Resource" id="choice_back_start"]
+script = ExtResource("3_choice")
+text = "I had another question..."
+next_node_id = "start"
+
+[sub_resource type="Resource" id="node_dangers"]
+script = ExtResource("2_node")
+id = "dangers"
+speaker_name = "Town Guard"
+text = "Plenty to worry about beyond these walls. The roads are plagued by wolves and worse. Bandits have been raiding caravans to the south. And I've heard troubling reports from the old catacombs..."
+choices = Array[ExtResource("3_choice")]([SubResource("choice_wolves"), SubResource("choice_bandits"), SubResource("choice_back_start"), SubResource("choice_goodbye")])
+portrait_id = "guard_worried"
+
+[sub_resource type="Resource" id="node_danger_wolves"]
+script = ExtResource("2_node")
+id = "danger_wolves"
+speaker_name = "Town Guard"
+text = "The wolf packs have grown bolder this season. They've been attacking travelers on the forest road. Some say they're being driven from their territory by something even more dangerous. If you must travel through the woods, go armed and stay on the main path."
+choices = Array[ExtResource("3_choice")]([SubResource("choice_back_start"), SubResource("choice_goodbye")])
+portrait_id = "guard_neutral"
+
+[sub_resource type="Resource" id="node_danger_bandits"]
+script = ExtResource("2_node")
+id = "danger_bandits"
+speaker_name = "Town Guard"
+text = "A band of cutthroats has set up camp somewhere in the southern hills. They've been hitting merchant caravans for weeks now. The captain's been wanting to send a patrol, but we're stretched thin as it is. An adventurer who could thin their numbers would earn our gratitude."
+choices = Array[ExtResource("3_choice")]([SubResource("choice_back_start"), SubResource("choice_goodbye")])
+portrait_id = "guard_angry"
+
+[sub_resource type="Resource" id="node_quests"]
+script = ExtResource("2_node")
+id = "quests"
+speaker_name = "Town Guard"
+text = "Work? Aye, there's always something needs doing. The captain posted notices at the tavern - lost goods, missing persons, the usual. The merchants' guild pays well for escort work, if you don't mind the danger. And the temple always needs ingredients for their remedies."
+choices = Array[ExtResource("3_choice")]([SubResource("choice_back_start"), SubResource("choice_goodbye")])
+portrait_id = "guard_neutral"
+
+[sub_resource type="Resource" id="action_skill_check_persuasion"]
+script = ExtResource("5_action")
+type = 8
+param_string = "persuasion"
+param_float = 12.0
+success_node_id = "bounties_secret"
+failure_node_id = "bounties_fail"
+
+[sub_resource type="Resource" id="choice_persuade_info"]
+script = ExtResource("3_choice")
+text = "[Persuasion] Come now, surely there's something more... lucrative?"
+show_when_unavailable = true
+unavailable_reason = "Requires Persuasion skill"
+actions = Array[ExtResource("5_action")]([SubResource("action_skill_check_persuasion")])
+
+[sub_resource type="Resource" id="action_take_gold_50"]
+script = ExtResource("5_action")
+type = 4
+param_int = 50
+
+[sub_resource type="Resource" id="cond_has_gold_50"]
+script = ExtResource("4_cond")
+type = 4
+param_int = 50
+
+[sub_resource type="Resource" id="choice_bribe"]
+script = ExtResource("3_choice")
+text = "[50 Gold] Perhaps this will loosen your tongue?"
+next_node_id = "bounties_secret"
+conditions = Array[ExtResource("4_cond")]([SubResource("cond_has_gold_50")])
+show_when_unavailable = true
+unavailable_reason = "Requires 50 gold"
+actions = Array[ExtResource("5_action")]([SubResource("action_take_gold_50")])
+
+[sub_resource type="Resource" id="node_bounties"]
+script = ExtResource("2_node")
+id = "bounties"
+speaker_name = "Town Guard"
+text = "Bounties, eh? You've got the look of a hunter about you. There's standing bounties on wolf pelts - five silver each. Bandit heads fetch ten gold apiece, with proof of kill. That's the official word, anyway..."
+choices = Array[ExtResource("3_choice")]([SubResource("choice_persuade_info"), SubResource("choice_bribe"), SubResource("choice_back_start"), SubResource("choice_goodbye")])
+portrait_id = "guard_neutral"
+
+[sub_resource type="Resource" id="action_set_flag_bounty_info"]
+script = ExtResource("5_action")
+type = 6
+param_string = "guard_bounty_info_received"
+
+[sub_resource type="Resource" id="choice_accept_quest"]
+script = ExtResource("3_choice")
+text = "I'll look into it."
+next_node_id = "quest_accepted"
+actions = Array[ExtResource("5_action")]([SubResource("action_set_flag_bounty_info")])
+
+[sub_resource type="Resource" id="node_bounties_secret"]
+script = ExtResource("2_node")
+id = "bounties_secret"
+speaker_name = "Town Guard"
+text = "*lowers voice* Alright, I'll tell you something not many know. There's a special bounty - fifty gold - for the bandit leader's head. Name's Blackthorn. He's got a hideout in the caves south of the old mill. But you didn't hear it from me, understand?"
+choices = Array[ExtResource("3_choice")]([SubResource("choice_accept_quest"), SubResource("choice_back_start"), SubResource("choice_goodbye")])
+portrait_id = "guard_secretive"
+
+[sub_resource type="Resource" id="node_bounties_fail"]
+script = ExtResource("2_node")
+id = "bounties_fail"
+speaker_name = "Town Guard"
+text = "*narrows eyes* Nice try, but I'm not that easy to sway. If you want information, you'll have to earn my trust the proper way - or find someone more... agreeable to persuasion."
+choices = Array[ExtResource("3_choice")]([SubResource("choice_back_start"), SubResource("choice_goodbye")])
+portrait_id = "guard_stern"
+
+[sub_resource type="Resource" id="node_quest_accepted"]
+script = ExtResource("2_node")
+id = "quest_accepted"
+speaker_name = "Town Guard"
+text = "Good luck to you, then. Blackthorn's a nasty piece of work. Bring back proof of his death, and I'll make sure you get the full reward. And... be careful out there."
+choices = Array[ExtResource("3_choice")]([SubResource("choice_goodbye")])
+portrait_id = "guard_neutral"
+
+[sub_resource type="Resource" id="node_end"]
+script = ExtResource("2_node")
+id = "end"
+speaker_name = "Town Guard"
+text = "Stay safe out there, traveler. And keep your blade sharp."
+is_end_node = true
+portrait_id = "guard_neutral"
+
+[resource]
+script = ExtResource("1_data")
+id = "guard_generic"
+display_name = "Town Guard Dialogue"
+description = "Dialogue for town guard NPCs. Features warnings about dangers, quest tips, bounty information, and a persuasion skill check for secret bounty info."
+nodes = Array[ExtResource("2_node")]([SubResource("node_start"), SubResource("node_dangers"), SubResource("node_danger_wolves"), SubResource("node_danger_bandits"), SubResource("node_quests"), SubResource("node_bounties"), SubResource("node_bounties_secret"), SubResource("node_bounties_fail"), SubResource("node_quest_accepted"), SubResource("node_end")])

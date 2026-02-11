@@ -1,0 +1,51 @@
+{
+	"id": "kazan_dun_succession_choice",
+	"title": "A Kingdom Divided",
+	"description": "With the king's body recovered, the dwarves can finally perform proper burial rites. But who should rule? Regent Borin wishes to crown the infant prince and serve as regent until he comes of age - a practical solution that maintains the bloodline. Thane Grimjaw invokes the ancient Rite of Succession, a competition between worthy claimants that could establish a new dynasty. Both factions seek your support.",
+	"is_main_quest": true,
+	"quest_source": "story",
+	"giver_npc_id": "regent_borin",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "kazan_dun",
+	"turn_in_type": "choice",
+	"turn_in_options": ["regent_borin", "thane_grimjaw"],
+	"turn_in_zone": "kazan_dun_level_1",
+	"branching_quests": {
+		"regent_borin": "kazan_dun_traditionalist_path",
+		"thane_grimjaw": "kazan_dun_rite_seeker_path"
+	},
+	"objectives": [
+		{
+			"id": "speak_with_borin",
+			"description": "Hear Regent Borin's argument for crowning the infant prince",
+			"type": "talk",
+			"target": "regent_borin",
+			"required_count": 1,
+			"is_optional": false
+		},
+		{
+			"id": "speak_with_grimjaw",
+			"description": "Hear Thane Grimjaw's argument for the Rite of Succession",
+			"type": "talk",
+			"target": "thane_grimjaw",
+			"required_count": 1,
+			"is_optional": false
+		},
+		{
+			"id": "make_choice",
+			"description": "Declare your support for either Regent Borin or Thane Grimjaw",
+			"type": "choice",
+			"choices": ["Support Regent Borin (Traditionalist)", "Support Thane Grimjaw (Rite-Seeker)"],
+			"required_count": 1,
+			"is_optional": false
+		}
+	],
+	"rewards": {
+		"gold": 500,
+		"xp": 5000,
+		"reputation": {
+			"kazan_dun": 100
+		}
+	},
+	"prerequisites": ["kazan_dun_succession"]
+}

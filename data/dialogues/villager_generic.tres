@@ -1,0 +1,208 @@
+[gd_resource type="Resource" script_class="DialogueData" load_steps=26 format=3 uid="uid://c1villager_generic"]
+
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_node.gd" id="2_node"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_choice.gd" id="3_choice"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_condition.gd" id="4_cond"]
+
+[sub_resource type="Resource" id="choice_goodbye"]
+script = ExtResource("3_choice")
+text = "Farewell."
+next_node_id = "end"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_rumors"]
+script = ExtResource("3_choice")
+text = "Have you heard any rumors lately?"
+next_node_id = "rumors"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_troubles"]
+script = ExtResource("3_choice")
+text = "Is something troubling you?"
+next_node_id = "troubles"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_weather"]
+script = ExtResource("3_choice")
+text = "Nice weather we're having."
+next_node_id = "weather"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="cond_morning"]
+script = ExtResource("4_cond")
+type = 10
+param_string = "morning"
+param_int = 0
+param_float = 0.0
+invert = false
+
+[sub_resource type="Resource" id="cond_afternoon"]
+script = ExtResource("4_cond")
+type = 10
+param_string = "afternoon"
+param_int = 0
+param_float = 0.0
+invert = false
+
+[sub_resource type="Resource" id="cond_evening"]
+script = ExtResource("4_cond")
+type = 10
+param_string = "evening"
+param_int = 0
+param_float = 0.0
+invert = false
+
+[sub_resource type="Resource" id="cond_night"]
+script = ExtResource("4_cond")
+type = 10
+param_string = "night"
+param_int = 0
+param_float = 0.0
+invert = false
+
+[sub_resource type="Resource" id="choice_back_start"]
+script = ExtResource("3_choice")
+text = "I had another question..."
+next_node_id = "start"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_dungeon_info"]
+script = ExtResource("3_choice")
+text = "Tell me more about the catacombs."
+next_node_id = "dungeon_detail"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="cond_random_50"]
+script = ExtResource("4_cond")
+type = 11
+param_string = ""
+param_int = 0
+param_float = 0.5
+invert = false
+
+[sub_resource type="Resource" id="node_start"]
+script = ExtResource("2_node")
+id = "start"
+speaker_name = "Villager"
+text = "Good day to you, traveler. What brings you to our humble village?"
+choices = [SubResource("choice_rumors"), SubResource("choice_troubles"), SubResource("choice_weather"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "villager_neutral"
+
+[sub_resource type="Resource" id="node_start_morning"]
+script = ExtResource("2_node")
+id = "start_morning"
+speaker_name = "Villager"
+text = "Ah, good morning! Early riser, are you? The roosters just crowed not long ago."
+choices = [SubResource("choice_rumors"), SubResource("choice_troubles"), SubResource("choice_weather"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "villager_happy"
+
+[sub_resource type="Resource" id="node_start_afternoon"]
+script = ExtResource("2_node")
+id = "start_afternoon"
+speaker_name = "Villager"
+text = "Good afternoon, stranger. Taking a break from your travels?"
+choices = [SubResource("choice_rumors"), SubResource("choice_troubles"), SubResource("choice_weather"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "villager_neutral"
+
+[sub_resource type="Resource" id="node_start_evening"]
+script = ExtResource("2_node")
+id = "start_evening"
+speaker_name = "Villager"
+text = "Evening, friend. Best find shelter soon - these roads aren't safe after dark."
+choices = [SubResource("choice_rumors"), SubResource("choice_troubles"), SubResource("choice_weather"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "villager_worried"
+
+[sub_resource type="Resource" id="node_start_night"]
+script = ExtResource("2_node")
+id = "start_night"
+speaker_name = "Villager"
+text = "What are you doing out at this hour?! The creatures... they come out at night!"
+choices = [SubResource("choice_rumors"), SubResource("choice_troubles"), SubResource("choice_weather"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "villager_scared"
+
+[sub_resource type="Resource" id="node_rumors"]
+script = ExtResource("2_node")
+id = "rumors"
+speaker_name = "Villager"
+text = "Rumors? Oh, there are always rumors... They say the old catacombs to the north have been stirring again. Folks have seen lights in the night, heard unholy sounds..."
+choices = [SubResource("choice_dungeon_info"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "villager_worried"
+
+[sub_resource type="Resource" id="node_dungeon_detail"]
+script = ExtResource("2_node")
+id = "dungeon_detail"
+speaker_name = "Villager"
+text = "The catacombs? Been sealed for decades, but the seal must have broken. Some adventurers went in last week... never came back. If you're thinking of going, bring plenty of torches. And maybe write your will first."
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "villager_scared"
+
+[sub_resource type="Resource" id="node_troubles"]
+script = ExtResource("2_node")
+id = "troubles"
+speaker_name = "Villager"
+text = "Troubles? Where do I begin! Bandits on the roads, monsters in the fields, and the taxes keep going up! A man can barely make an honest living anymore. And don't get me started on those cultists in the woods..."
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "villager_angry"
+
+[sub_resource type="Resource" id="node_weather"]
+script = ExtResource("2_node")
+id = "weather"
+speaker_name = "Villager"
+text = "Aye, for now. But mark my words, there's a storm coming. I can feel it in my bones. And I don't just mean the weather, if you catch my meaning..."
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "villager_neutral"
+
+[sub_resource type="Resource" id="node_end"]
+script = ExtResource("2_node")
+id = "end"
+speaker_name = "Villager"
+text = "Safe travels, stranger. Watch yourself out there."
+choices = []
+is_end_node = true
+auto_continue_to = ""
+portrait_id = "villager_neutral"
+
+[resource]
+script = ExtResource("1_data")
+id = "villager_generic"
+display_name = "Generic Villager Dialogue"
+description = "Basic dialogue for unnamed villager NPCs. Features time-of-day greetings, rumors about dungeons, and complaints about dangers."
+start_node_id = "start"
+nodes = [SubResource("node_start"), SubResource("node_start_morning"), SubResource("node_start_afternoon"), SubResource("node_start_evening"), SubResource("node_start_night"), SubResource("node_rumors"), SubResource("node_dungeon_detail"), SubResource("node_troubles"), SubResource("node_weather"), SubResource("node_end")]

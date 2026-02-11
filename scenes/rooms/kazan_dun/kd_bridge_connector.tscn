@@ -1,0 +1,249 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/modular_room.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://Sprite folders grab bag/stonewall.png" id="2"]
+
+[sub_resource type="StandardMaterial3D" id="mat_bridge_floor"]
+albedo_color = Color(0.36, 0.34, 0.32, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.88
+uv1_scale = Vector3(4, 6, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_bridge_wall"]
+albedo_color = Color(0.4, 0.38, 0.36, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.85
+uv1_scale = Vector3(4, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_railing"]
+albedo_color = Color(0.38, 0.36, 0.34, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.86
+uv1_scale = Vector3(2, 1, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_void"]
+albedo_color = Color(0.05, 0.05, 0.08, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="mat_brazier"]
+albedo_color = Color(0.42, 0.4, 0.44, 1)
+metallic = 0.4
+roughness = 0.55
+
+[sub_resource type="StandardMaterial3D" id="mat_fire"]
+albedo_color = Color(1.0, 0.6, 0.2, 1)
+emission_enabled = true
+emission = Color(1.0, 0.5, 0.1, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="StandardMaterial3D" id="mat_chain"]
+albedo_color = Color(0.4, 0.38, 0.36, 1)
+metallic = 0.5
+roughness = 0.55
+
+[node name="KDBridgeConnector" type="Node3D"]
+script = ExtResource("1")
+room_id = "kd_bridge_connector"
+room_type = "bridge_connector"
+room_name = "Bridge Connector"
+room_width = 8.0
+room_depth = 20.0
+room_height = 25.0
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="BridgeDeck" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(8, 1, 20)
+material = SubResource("mat_bridge_floor")
+
+[node name="RailingL" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0.6, 0)
+use_collision = true
+size = Vector3(0.4, 1.2, 20)
+material = SubResource("mat_railing")
+
+[node name="RailingR" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 0.6, 0)
+use_collision = true
+size = Vector3(0.4, 1.2, 20)
+material = SubResource("mat_railing")
+
+[node name="WallNorthL" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 2.5, -10)
+use_collision = true
+size = Vector3(3, 5, 1)
+material = SubResource("mat_bridge_wall")
+
+[node name="WallNorthR" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 2.5, -10)
+use_collision = true
+size = Vector3(3, 5, 1)
+material = SubResource("mat_bridge_wall")
+
+[node name="WallNorthTop" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, -10)
+use_collision = true
+size = Vector3(2, 1, 1)
+material = SubResource("mat_bridge_wall")
+
+[node name="WallSouthL" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 2.5, 10)
+use_collision = true
+size = Vector3(3, 5, 1)
+material = SubResource("mat_bridge_wall")
+
+[node name="WallSouthR" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 2.5, 10)
+use_collision = true
+size = Vector3(3, 5, 1)
+material = SubResource("mat_bridge_wall")
+
+[node name="WallSouthTop" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 10)
+use_collision = true
+size = Vector3(2, 1, 1)
+material = SubResource("mat_bridge_wall")
+
+[node name="VoidBelow" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -12, 0)
+size = Vector3(20, 1, 25)
+material = SubResource("mat_void")
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="RailingPostL1" type="CSGBox3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0.9, -8)
+use_collision = true
+size = Vector3(0.5, 1.8, 0.5)
+material = SubResource("mat_railing")
+
+[node name="RailingPostR1" type="CSGBox3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 0.9, -8)
+use_collision = true
+size = Vector3(0.5, 1.8, 0.5)
+material = SubResource("mat_railing")
+
+[node name="RailingPostL2" type="CSGBox3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0.9, 0)
+use_collision = true
+size = Vector3(0.5, 1.8, 0.5)
+material = SubResource("mat_railing")
+
+[node name="RailingPostR2" type="CSGBox3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 0.9, 0)
+use_collision = true
+size = Vector3(0.5, 1.8, 0.5)
+material = SubResource("mat_railing")
+
+[node name="RailingPostL3" type="CSGBox3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0.9, 8)
+use_collision = true
+size = Vector3(0.5, 1.8, 0.5)
+material = SubResource("mat_railing")
+
+[node name="RailingPostR3" type="CSGBox3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 0.9, 8)
+use_collision = true
+size = Vector3(0.5, 1.8, 0.5)
+material = SubResource("mat_railing")
+
+[node name="ChainL" type="CSGCylinder3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 8, 0)
+radius = 0.12
+height = 15
+sides = 6
+material = SubResource("mat_chain")
+
+[node name="ChainR" type="CSGCylinder3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 8, 0)
+radius = 0.12
+height = 15
+sides = 6
+material = SubResource("mat_chain")
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="Brazier1" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0, -6)
+
+[node name="Stand" type="CSGCylinder3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+radius = 0.22
+height = 0.8
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+radius = 0.35
+height = 0.3
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Fire" type="CSGSphere3D" parent="Lighting/Brazier1"]
+transform = Transform3D(0.5, 0, 0, 0, 0.65, 0, 0, 0, 0.5, 0, 1.25, 0)
+radius = 0.28
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 2.0
+omni_range = 12.0
+
+[node name="Brazier2" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, 6)
+
+[node name="Stand" type="CSGCylinder3D" parent="Lighting/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+radius = 0.22
+height = 0.8
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Lighting/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+radius = 0.35
+height = 0.3
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Fire" type="CSGSphere3D" parent="Lighting/Brazier2"]
+transform = Transform3D(0.5, 0, 0, 0, 0.65, 0, 0, 0, 0.5, 0, 1.25, 0)
+radius = 0.28
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 2.0
+omni_range = 12.0
+
+[node name="Spawns" type="Node3D" parent="."]
+
+[node name="NPCSpawns" type="Node3D" parent="Spawns"]
+
+[node name="EnemySpawns" type="Node3D" parent="Spawns"]
+
+[node name="ChestSpawns" type="Node3D" parent="Spawns"]
+
+[node name="Connections" type="Node3D" parent="."]
+
+[node name="DoorPositions" type="Node3D" parent="Connections"]
+
+[node name="DoorNorth" type="Marker3D" parent="Connections/DoorPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -9.5)
+metadata/door_id = "door_north"
+metadata/door_label = "Continue"
+
+[node name="DoorSouth" type="Marker3D" parent="Connections/DoorPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 9.5)
+metadata/door_id = "door_south"
+metadata/door_label = "Continue"
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]

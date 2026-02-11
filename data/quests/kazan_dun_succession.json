@@ -1,0 +1,53 @@
+{
+	"id": "kazan_dun_succession",
+	"title": "The Weight of the Crown",
+	"description": "The Dwarf King of Kazan-Dun has fallen to the goblin invasion. His body lies captive in the goblin stronghold, where the Goblin King plans to consume it in a dark ritual. Without the king's body, the dwarves cannot perform proper burial rites - and cannot crown a new king. Recover the fallen king's body and help decide the fate of the kingdom.",
+	"is_main_quest": true,
+	"quest_source": "story",
+	"giver_npc_id": "regent_borin",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "kazan_dun",
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "regent_borin",
+	"turn_in_zone": "kazan_dun_level_1",
+	"next_quest": "kazan_dun_succession_choice",
+	"objectives": [
+		{
+			"id": "reach_deep_vaults",
+			"description": "Descend to the Deep Vaults where the Goblin King holds court",
+			"type": "reach",
+			"target": "kazan_dun_level_5",
+			"required_count": 1,
+			"is_optional": false
+		},
+		{
+			"id": "defeat_goblin_king",
+			"description": "Defeat the Goblin King",
+			"type": "kill",
+			"target": "goblin_king",
+			"required_count": 1,
+			"is_optional": false
+		},
+		{
+			"id": "recover_kings_body",
+			"description": "Recover the Dwarf King's body from the ritual cage",
+			"type": "interact",
+			"target": "kings_body_cage",
+			"required_count": 1,
+			"is_optional": false
+		},
+		{
+			"id": "return_body_to_borin",
+			"description": "Return the king's body to Regent Borin in the Great Hall",
+			"type": "talk",
+			"target": "regent_borin",
+			"required_count": 1,
+			"is_optional": false
+		}
+	],
+	"rewards": {
+		"gold": 2000,
+		"xp": 15000
+	},
+	"prerequisites": ["journey_to_kazandun"]
+}

@@ -1,0 +1,27 @@
+{
+	"id": "dungeon_clear",
+	"title": "Clear the Depths",
+	"description": "A wanderer within the dungeon asks you to clear out the undead that infest these halls.",
+	"quest_source": "story",
+	"giver_npc_id": "dungeon_wanderer",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "dungeon",
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "dungeon_wanderer",
+	"turn_in_zone": "dungeon",
+	"prerequisites": [],
+	"objectives": [
+		{
+			"id": "kill_undead",
+			"description": "Slay 3 undead creatures in this dungeon",
+			"type": "kill",
+			"target": "skeleton_shade",
+			"required_count": 3
+		}
+	],
+	"rewards": {
+		"gold": 75,
+		"xp": 100,
+		"items": []
+	}
+}

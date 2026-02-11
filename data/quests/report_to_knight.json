@@ -1,0 +1,36 @@
+{
+	"id": "report_to_knight",
+	"title": "Report to the Knight",
+	"description": "Nathan is troubled by the news from Kazan-Dun. He asks you to find his master, the Wandering Knight, and deliver a full report of what you've learned.",
+	"is_main_quest": true,
+	"quest_source": "story",
+	"giver_npc_id": "nathan_the_squire",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "dalhurst",
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "wandering_knight",
+	"turn_in_zone": "elder_moor",
+	"objectives": [
+		{
+			"id": "return_to_elder_moor",
+			"description": "Return to Elder Moor",
+			"type": "reach",
+			"target": "city_elder_moor",
+			"required_count": 1,
+			"is_optional": false
+		},
+		{
+			"id": "report_to_knight",
+			"description": "Report to the Wandering Knight",
+			"type": "talk",
+			"target": "wandering_knight",
+			"required_count": 1,
+			"is_optional": false
+		}
+	],
+	"rewards": {
+		"gold": 750,
+		"xp": 8000
+	},
+	"prerequisites": ["report_to_nathan"]
+}

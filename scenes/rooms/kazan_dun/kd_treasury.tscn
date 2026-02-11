@@ -1,0 +1,347 @@
+[gd_scene load_steps=20 format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/modular_room.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://Sprite folders grab bag/stonewall.png" id="2"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/vault/door_vault_ornate.obj" id="mesh_vault_door"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/vault/treasure_mixed.obj" id="mesh_treasure"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/vault/chest_large.obj" id="mesh_chest"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/vault/treasure_gems.obj" id="mesh_gems"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/bridge/pillar_ornate.obj" id="mesh_pillar"]
+[ext_resource type="Script" path="res://scripts/world/treasure_pile.gd" id="script_treasure_pile"]
+
+[sub_resource type="StandardMaterial3D" id="mat_stone_floor"]
+albedo_color = Color(0.4, 0.38, 0.35, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.85
+uv1_scale = Vector3(5, 5, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_stone_wall"]
+albedo_color = Color(0.45, 0.42, 0.38, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.82
+uv1_scale = Vector3(4, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_ceiling"]
+albedo_color = Color(0.35, 0.33, 0.3, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.85
+uv1_scale = Vector3(5, 5, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_vault"]
+albedo_color = Color(0.48, 0.46, 0.42, 1)
+metallic = 0.5
+roughness = 0.45
+
+[sub_resource type="StandardMaterial3D" id="mat_treasure"]
+albedo_color = Color(0.9, 0.75, 0.3, 1)
+metallic = 0.7
+roughness = 0.25
+
+[sub_resource type="StandardMaterial3D" id="mat_chest"]
+albedo_color = Color(0.55, 0.45, 0.3, 1)
+metallic = 0.3
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="mat_pillar"]
+albedo_color = Color(0.42, 0.4, 0.38, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.8
+uv1_scale = Vector3(2, 4, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_brazier"]
+albedo_color = Color(0.45, 0.43, 0.48, 1)
+metallic = 0.45
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="mat_fire"]
+albedo_color = Color(1.0, 0.6, 0.2, 1)
+emission_enabled = true
+emission = Color(1.0, 0.5, 0.1, 1)
+emission_energy_multiplier = 2.5
+
+[sub_resource type="BoxShape3D" id="shape_treasure_pile"]
+size = Vector3(1.5, 1.0, 1.5)
+
+[node name="KDTreasury" type="Node3D"]
+script = ExtResource("1")
+room_id = "kd_treasury"
+room_type = "vault"
+room_name = "Treasury"
+room_width = 25.0
+room_depth = 20.0
+room_height = 10.0
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="Floor" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(25, 1, 20)
+material = SubResource("mat_stone_floor")
+
+[node name="Ceiling" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 0)
+use_collision = true
+size = Vector3(25, 0.5, 20)
+material = SubResource("mat_ceiling")
+
+[node name="WallNorth" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, -10)
+use_collision = true
+size = Vector3(25, 10, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthLeft" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 5, 10)
+use_collision = true
+size = Vector3(9, 10, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthRight" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 5, 10)
+use_collision = true
+size = Vector3(9, 10, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthTop" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 10)
+use_collision = true
+size = Vector3(7, 4, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallEast" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 5, 0)
+use_collision = true
+size = Vector3(1, 10, 20)
+material = SubResource("mat_stone_wall")
+
+[node name="WallWest" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.5, 5, 0)
+use_collision = true
+size = Vector3(1, 10, 20)
+material = SubResource("mat_stone_wall")
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="VaultDoor" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -9)
+mesh = ExtResource("mesh_vault_door")
+surface_material_override/0 = SubResource("mat_vault")
+
+[node name="TreasurePile1" type="Area3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -4)
+collision_layer = 256
+collision_mask = 0
+script = ExtResource("script_treasure_pile")
+pile_type = 0
+pile_id = "kd_treasury_gold_pile_1"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Props/TreasurePile1"]
+mesh = ExtResource("mesh_treasure")
+surface_material_override/0 = SubResource("mat_treasure")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Props/TreasurePile1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("shape_treasure_pile")
+
+[node name="TreasurePile2" type="Area3D" parent="Props"]
+transform = Transform3D(0.9, 0, 0, 0, 0.8, 0, 0, 0, 0.9, 6, 0, -4)
+collision_layer = 256
+collision_mask = 0
+script = ExtResource("script_treasure_pile")
+pile_type = 0
+pile_id = "kd_treasury_gold_pile_2"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Props/TreasurePile2"]
+mesh = ExtResource("mesh_treasure")
+surface_material_override/0 = SubResource("mat_treasure")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Props/TreasurePile2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("shape_treasure_pile")
+
+[node name="TreasureChest1" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 0)
+mesh = ExtResource("mesh_chest")
+surface_material_override/0 = SubResource("mat_chest")
+
+[node name="TreasureChest2" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 0)
+mesh = ExtResource("mesh_chest")
+surface_material_override/0 = SubResource("mat_chest")
+
+[node name="TreasureChest3" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
+mesh = ExtResource("mesh_chest")
+surface_material_override/0 = SubResource("mat_chest")
+
+[node name="GemCluster1" type="Area3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 3)
+collision_layer = 256
+collision_mask = 0
+script = ExtResource("script_treasure_pile")
+pile_type = 1
+pile_id = "kd_treasury_silver_pile_1"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Props/GemCluster1"]
+mesh = ExtResource("mesh_gems")
+surface_material_override/0 = SubResource("mat_treasure")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Props/GemCluster1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("shape_treasure_pile")
+
+[node name="GemCluster2" type="Area3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -3)
+collision_layer = 256
+collision_mask = 0
+script = ExtResource("script_treasure_pile")
+pile_type = 1
+pile_id = "kd_treasury_silver_pile_2"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Props/GemCluster2"]
+mesh = ExtResource("mesh_gems")
+surface_material_override/0 = SubResource("mat_treasure")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Props/GemCluster2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("shape_treasure_pile")
+
+[node name="Pillar1" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -6)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="Pillar2" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -6)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="Pillar3" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 6)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="Pillar4" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 6)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="Brazier1" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0)
+
+[node name="Stand" type="CSGCylinder3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+radius = 0.35
+height = 1.2
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+radius = 0.55
+height = 0.5
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Fire" type="CSGSphere3D" parent="Lighting/Brazier1"]
+transform = Transform3D(0.75, 0, 0, 0, 0.95, 0, 0, 0, 0.75, 0, 1.9, 0)
+radius = 0.45
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 3.5
+omni_range = 12.0
+
+[node name="Brazier2" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
+
+[node name="Stand" type="CSGCylinder3D" parent="Lighting/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+radius = 0.35
+height = 1.2
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Lighting/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+radius = 0.55
+height = 0.5
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Fire" type="CSGSphere3D" parent="Lighting/Brazier2"]
+transform = Transform3D(0.75, 0, 0, 0, 0.95, 0, 0, 0, 0.75, 0, 1.9, 0)
+radius = 0.45
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 3.5
+omni_range = 12.0
+
+[node name="Spawns" type="Node3D" parent="."]
+
+[node name="NPCSpawns" type="Node3D" parent="Spawns"]
+
+[node name="TreasuryGuard1" type="Marker3D" parent="Spawns/NPCSpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 7)
+metadata/npc_type = "dwarf_guard"
+metadata/npc_name = "Treasury Guard"
+metadata/npc_id = "kd_treasury_guard_1"
+metadata/archetype = "guard"
+
+[node name="TreasuryGuard2" type="Marker3D" parent="Spawns/NPCSpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 7)
+metadata/npc_type = "dwarf_guard"
+metadata/npc_name = "Treasury Guard"
+metadata/npc_id = "kd_treasury_guard_2"
+metadata/archetype = "guard"
+
+[node name="EnemySpawns" type="Node3D" parent="Spawns"]
+
+[node name="ChestSpawns" type="Node3D" parent="Spawns"]
+
+[node name="TreasuryChest1" type="Marker3D" parent="Spawns/ChestSpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 0)
+metadata/chest_id = "kd_treasury_chest_1"
+metadata/chest_name = "Treasury Chest"
+metadata/loot_tier = "epic"
+metadata/is_locked = true
+metadata/lock_difficulty = 20
+
+[node name="TreasuryChest2" type="Marker3D" parent="Spawns/ChestSpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 0)
+metadata/chest_id = "kd_treasury_chest_2"
+metadata/chest_name = "Gem Vault"
+metadata/loot_tier = "rare"
+metadata/is_locked = true
+metadata/lock_difficulty = 18
+
+[node name="TreasuryChest3" type="Marker3D" parent="Spawns/ChestSpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
+metadata/chest_id = "kd_treasury_chest_3"
+metadata/chest_name = "Gold Reserve"
+metadata/loot_tier = "rare"
+metadata/is_locked = true
+metadata/lock_difficulty = 15
+
+[node name="Connections" type="Node3D" parent="."]
+
+[node name="DoorPositions" type="Node3D" parent="Connections"]
+
+[node name="DoorSouth" type="Marker3D" parent="Connections/DoorPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 9.5)
+metadata/door_id = "door_south"
+metadata/door_label = "To Command Center"
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]

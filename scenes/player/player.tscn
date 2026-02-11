@@ -1,0 +1,120 @@
+[gd_scene load_steps=8 format=3 uid="uid://player_scene"]
+
+[ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/player/camera_pivot.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/combat/hitbox.gd" id="3"]
+[ext_resource type="Script" path="res://scripts/combat/hurtbox.gd" id="4"]
+[ext_resource type="Script" path="res://scripts/combat/spell_caster.gd" id="5"]
+[ext_resource type="Script" path="res://scripts/player/third_person_weapon.gd" id="6"]
+
+[sub_resource type="CapsuleShape3D" id="1"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="BoxShape3D" id="2"]
+size = Vector3(1.5, 1.0, 2.0)
+
+[sub_resource type="CapsuleShape3D" id="3"]
+radius = 0.5
+height = 1.6
+
+[sub_resource type="SphereShape3D" id="4"]
+radius = 3.0
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_body"]
+radius = 0.35
+height = 1.6
+
+[sub_resource type="SphereMesh" id="SphereMesh_head"]
+radius = 0.2
+
+[node name="Player" type="CharacterBody3D" groups=["player"]]
+collision_layer = 2
+collision_mask = 13
+script = ExtResource("1")
+camera_pivot = NodePath("CameraPivot")
+mesh_root = NodePath("MeshRoot")
+animation_player = NodePath("AnimationPlayer")
+melee_hitbox = NodePath("MeshRoot/MeleeHitbox")
+hurtbox = NodePath("Hurtbox")
+interaction_ray = NodePath("MeshRoot/InteractionRay")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("1")
+
+[node name="MeshRoot" type="Node3D" parent="."]
+
+[node name="BodyPlaceholder" type="MeshInstance3D" parent="MeshRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("CapsuleMesh_body")
+
+[node name="HeadPlaceholder" type="MeshInstance3D" parent="MeshRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
+mesh = SubResource("SphereMesh_head")
+
+[node name="WeaponAttachment" type="Node3D" parent="MeshRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.8, -0.1)
+script = ExtResource("6")
+
+[node name="MeleeHitbox" type="Area3D" parent="MeshRoot" groups=["player_hitbox", "hitbox"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, -1.0)
+collision_layer = 8
+collision_mask = 64
+monitoring = false
+script = ExtResource("3")
+damage = 10
+damage_type = 0
+stagger_power = 1.0
+knockback_force = 5.0
+
+[node name="HitboxShape" type="CollisionShape3D" parent="MeshRoot/MeleeHitbox"]
+shape = SubResource("2")
+
+[node name="InteractionRay" type="RayCast3D" parent="MeshRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+target_position = Vector3(0, 0, -3)
+collision_mask = 256
+collide_with_areas = true
+collide_with_bodies = true
+
+[node name="CastOrigin" type="Node3D" parent="MeshRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, -0.5)
+
+[node name="CameraPivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+script = ExtResource("2")
+spring_arm = NodePath("SpringArm3D")
+camera = NodePath("SpringArm3D/Camera3D")
+player = NodePath("..")
+player_mesh = NodePath("../MeshRoot")
+
+[node name="SpringArm3D" type="SpringArm3D" parent="CameraPivot"]
+transform = Transform3D(1, 0, 0, 0, 0.939693, 0.34202, 0, -0.34202, 0.939693, 0, 0, 0)
+collision_mask = 1
+spring_length = 4.0
+margin = 0.2
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot/SpringArm3D"]
+current = true
+fov = 70.0
+near = 0.1
+far = 100.0
+
+[node name="Hurtbox" type="Area3D" parent="." groups=["player_hurtbox", "hurtbox"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+collision_layer = 32
+collision_mask = 16
+monitorable = true
+monitoring = true
+script = ExtResource("4")
+
+[node name="HurtboxShape" type="CollisionShape3D" parent="Hurtbox"]
+shape = SubResource("3")
+
+[node name="SpellCaster" type="Node" parent="."]
+script = ExtResource("5")
+owner_entity = NodePath("..")
+cast_origin = NodePath("../MeshRoot/CastOrigin")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]

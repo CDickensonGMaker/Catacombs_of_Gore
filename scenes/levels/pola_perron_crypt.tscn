@@ -1,0 +1,1571 @@
+[gd_scene load_steps=17 format=3 uid="uid://pola_perron_crypt_001"]
+
+[ext_resource type="Script" path="res://scripts/levels/pola_perron_crypt.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/undeadwraith_magic.png" id="4"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/gore_dungeon_wall.png" id="5"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/hanging_gore_totem1.png" id="6"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/hanging_gore_totem2.png" id="7"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/hanging_gore_totem3.png" id="8"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/statue_decay1.png" id="9"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/statue_decay2.png" id="10"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/statue_decay3.png.png" id="11"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/statue_decay4.png" id="12"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/statue_decay5.png" id="13"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/statue_decay6.png" id="14"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/rat_moving.png" id="15"]
+
+[sub_resource type="Environment" id="Environment_crypt"]
+background_mode = 1
+background_color = Color(0.05, 0.04, 0.06, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.25, 0.22, 0.28, 1)
+ambient_light_energy = 0.3
+fog_enabled = true
+fog_light_color = Color(0.15, 0.12, 0.18, 1)
+fog_density = 0.025
+fog_sky_affect = 0.0
+
+[sub_resource type="StandardMaterial3D" id="mat_crypt"]
+albedo_color = Color(0.28, 0.26, 0.24, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="mat_floor"]
+albedo_color = Color(0.25, 0.23, 0.2, 1)
+roughness = 0.98
+
+[sub_resource type="StandardMaterial3D" id="mat_ceiling"]
+albedo_color = Color(0.2, 0.18, 0.16, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="mat_niche"]
+albedo_color = Color(0.15, 0.13, 0.11, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="mat_sarcophagus"]
+albedo_color = Color(0.35, 0.33, 0.3, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_lid"]
+albedo_color = Color(0.38, 0.35, 0.32, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="mat_fire"]
+albedo_color = Color(0.8, 0.4, 0.15, 1)
+emission_enabled = true
+emission = Color(0.9, 0.4, 0.1, 1)
+emission_energy_multiplier = 1.0
+
+[sub_resource type="StandardMaterial3D" id="mat_bone"]
+albedo_color = Color(0.75, 0.72, 0.65, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="mat_skull"]
+albedo_color = Color(0.8, 0.78, 0.7, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_evil"]
+albedo_color = Color(0.15, 0.12, 0.18, 1)
+roughness = 0.92
+
+[sub_resource type="StandardMaterial3D" id="mat_evil_floor"]
+albedo_color = Color(0.12, 0.1, 0.14, 1)
+roughness = 0.98
+
+[sub_resource type="StandardMaterial3D" id="mat_altar"]
+albedo_color = Color(0.1, 0.08, 0.12, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_evil_glow"]
+albedo_color = Color(0.6, 0.1, 0.4, 1)
+emission_enabled = true
+emission = Color(0.7, 0.1, 0.4, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="StandardMaterial3D" id="mat_ritual"]
+albedo_color = Color(0.5, 0.1, 0.2, 1)
+emission_enabled = true
+emission = Color(0.4, 0.05, 0.15, 1)
+emission_energy_multiplier = 0.5
+
+[sub_resource type="StandardMaterial3D" id="mat_ossuary_altar"]
+albedo_color = Color(0.2, 0.18, 0.16, 1)
+roughness = 0.9
+
+[node name="PolaPerronCrypt" type="Node3D"]
+script = ExtResource("1")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_crypt")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866, -0.433, 0.25, 0, 0.5, 0.866, -0.5, -0.75, 0.433, 0, 30, 0)
+light_color = Color(0.6, 0.55, 0.65, 1)
+light_energy = 0.3
+shadow_enabled = true
+shadow_bias = 0.02
+directional_shadow_max_distance = 80.0
+
+[node name="Player" parent="." instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 22)
+
+[node name="HUD" parent="." instance=ExtResource("3")]
+
+;; ============== LEVEL 1: BURIAL CHAMBERS ==============
+[node name="Level1_BurialChambers" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="EntryFloor" type="CSGBox3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(40, 1, 60)
+material = SubResource("mat_floor")
+
+[node name="Ceiling" type="CSGBox3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.5, 0)
+use_collision = true
+size = Vector3(40, 1, 60)
+material = SubResource("mat_ceiling")
+
+[node name="NorthWallLeft" type="CSGBox3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 3, 30)
+use_collision = true
+size = Vector3(15, 6, 2)
+material = SubResource("mat_crypt")
+
+[node name="NorthWallRight" type="CSGBox3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 3, 30)
+use_collision = true
+size = Vector3(15, 6, 2)
+material = SubResource("mat_crypt")
+
+[node name="SouthWall" type="CSGBox3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -30)
+use_collision = true
+size = Vector3(40, 6, 2)
+material = SubResource("mat_crypt")
+
+[node name="EastWall" type="CSGBox3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 3, 0)
+use_collision = true
+size = Vector3(2, 6, 60)
+material = SubResource("mat_crypt")
+
+[node name="WestWall" type="CSGBox3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 3, 0)
+use_collision = true
+size = Vector3(2, 6, 60)
+material = SubResource("mat_crypt")
+
+;; Burial Niches West
+[node name="WestNiche_0" type="CSGBox3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.5, 2.5, 20)
+use_collision = true
+size = Vector3(0.8, 2.5, 2.5)
+material = SubResource("mat_niche")
+
+[node name="WestNiche_1" type="CSGBox3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.5, 2.5, 14)
+use_collision = true
+size = Vector3(0.8, 2.5, 2.5)
+material = SubResource("mat_niche")
+
+[node name="WestNiche_2" type="CSGBox3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.5, 2.5, 8)
+use_collision = true
+size = Vector3(0.8, 2.5, 2.5)
+material = SubResource("mat_niche")
+
+[node name="WestNiche_3" type="CSGBox3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.5, 2.5, 2)
+use_collision = true
+size = Vector3(0.8, 2.5, 2.5)
+material = SubResource("mat_niche")
+
+[node name="WestNiche_4" type="CSGBox3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.5, 2.5, -4)
+use_collision = true
+size = Vector3(0.8, 2.5, 2.5)
+material = SubResource("mat_niche")
+
+[node name="WestNiche_5" type="CSGBox3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.5, 2.5, -10)
+use_collision = true
+size = Vector3(0.8, 2.5, 2.5)
+material = SubResource("mat_niche")
+
+[node name="WestNiche_6" type="CSGBox3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.5, 2.5, -16)
+use_collision = true
+size = Vector3(0.8, 2.5, 2.5)
+material = SubResource("mat_niche")
+
+[node name="WestNiche_7" type="CSGBox3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.5, 2.5, -22)
+use_collision = true
+size = Vector3(0.8, 2.5, 2.5)
+material = SubResource("mat_niche")
+
+;; Burial Niches East
+[node name="EastNiche_0" type="CSGBox3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.5, 2.5, 20)
+use_collision = true
+size = Vector3(0.8, 2.5, 2.5)
+material = SubResource("mat_niche")
+
+[node name="EastNiche_1" type="CSGBox3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.5, 2.5, 14)
+use_collision = true
+size = Vector3(0.8, 2.5, 2.5)
+material = SubResource("mat_niche")
+
+[node name="EastNiche_2" type="CSGBox3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.5, 2.5, 8)
+use_collision = true
+size = Vector3(0.8, 2.5, 2.5)
+material = SubResource("mat_niche")
+
+[node name="EastNiche_3" type="CSGBox3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.5, 2.5, 2)
+use_collision = true
+size = Vector3(0.8, 2.5, 2.5)
+material = SubResource("mat_niche")
+
+[node name="EastNiche_4" type="CSGBox3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.5, 2.5, -4)
+use_collision = true
+size = Vector3(0.8, 2.5, 2.5)
+material = SubResource("mat_niche")
+
+[node name="EastNiche_5" type="CSGBox3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.5, 2.5, -10)
+use_collision = true
+size = Vector3(0.8, 2.5, 2.5)
+material = SubResource("mat_niche")
+
+[node name="EastNiche_6" type="CSGBox3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.5, 2.5, -16)
+use_collision = true
+size = Vector3(0.8, 2.5, 2.5)
+material = SubResource("mat_niche")
+
+[node name="EastNiche_7" type="CSGBox3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.5, 2.5, -22)
+use_collision = true
+size = Vector3(0.8, 2.5, 2.5)
+material = SubResource("mat_niche")
+
+;; Sarcophagi
+[node name="Sarcophagus_0" type="Node3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 10)
+
+[node name="Base" type="CSGBox3D" parent="Level1_BurialChambers/Sarcophagus_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+use_collision = true
+size = Vector3(2.5, 1.2, 4)
+material = SubResource("mat_sarcophagus")
+
+[node name="Lid" type="CSGBox3D" parent="Level1_BurialChambers/Sarcophagus_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+use_collision = true
+size = Vector3(2.6, 0.4, 4.1)
+material = SubResource("mat_lid")
+
+[node name="Sarcophagus_1" type="Node3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, 10)
+
+[node name="Base" type="CSGBox3D" parent="Level1_BurialChambers/Sarcophagus_1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+use_collision = true
+size = Vector3(2.5, 1.2, 4)
+material = SubResource("mat_sarcophagus")
+
+[node name="Lid" type="CSGBox3D" parent="Level1_BurialChambers/Sarcophagus_1"]
+transform = Transform3D(0.98, 0, 0.2, 0, 1, 0, -0.2, 0, 0.98, 1.2, 1.4, 0.3)
+use_collision = true
+size = Vector3(2.6, 0.4, 4.1)
+material = SubResource("mat_lid")
+
+[node name="Sarcophagus_2" type="Node3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -5)
+
+[node name="Base" type="CSGBox3D" parent="Level1_BurialChambers/Sarcophagus_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+use_collision = true
+size = Vector3(2.5, 1.2, 4)
+material = SubResource("mat_sarcophagus")
+
+[node name="Lid" type="CSGBox3D" parent="Level1_BurialChambers/Sarcophagus_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+use_collision = true
+size = Vector3(2.6, 0.4, 4.1)
+material = SubResource("mat_lid")
+
+[node name="Sarcophagus_3" type="Node3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -5)
+
+[node name="Base" type="CSGBox3D" parent="Level1_BurialChambers/Sarcophagus_3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+use_collision = true
+size = Vector3(2.5, 1.2, 4)
+material = SubResource("mat_sarcophagus")
+
+[node name="Lid" type="CSGBox3D" parent="Level1_BurialChambers/Sarcophagus_3"]
+transform = Transform3D(0.97, 0, -0.24, 0, 1, 0, 0.24, 0, 0.97, 1.1, 1.4, -0.2)
+use_collision = true
+size = Vector3(2.6, 0.4, 4.1)
+material = SubResource("mat_lid")
+
+[node name="Sarcophagus_4" type="Node3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 15)
+
+[node name="Base" type="CSGBox3D" parent="Level1_BurialChambers/Sarcophagus_4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+use_collision = true
+size = Vector3(2.5, 1.2, 4)
+material = SubResource("mat_sarcophagus")
+
+[node name="Lid" type="CSGBox3D" parent="Level1_BurialChambers/Sarcophagus_4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+use_collision = true
+size = Vector3(2.6, 0.4, 4.1)
+material = SubResource("mat_lid")
+
+[node name="Sarcophagus_5" type="Node3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="Base" type="CSGBox3D" parent="Level1_BurialChambers/Sarcophagus_5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+use_collision = true
+size = Vector3(2.5, 1.2, 4)
+material = SubResource("mat_sarcophagus")
+
+[node name="Lid" type="CSGBox3D" parent="Level1_BurialChambers/Sarcophagus_5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+use_collision = true
+size = Vector3(2.6, 0.4, 4.1)
+material = SubResource("mat_lid")
+
+;; Level 1 Torches
+[node name="Torch_0" type="Node3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 3, 25)
+
+[node name="Flame" type="CSGSphere3D" parent="Level1_BurialChambers/Torch_0"]
+radius = 0.15
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Level1_BurialChambers/Torch_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+light_color = Color(1.0, 0.6, 0.3, 1)
+light_energy = 0.8
+omni_range = 8.0
+
+[node name="Torch_1" type="Node3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 3, 25)
+
+[node name="Flame" type="CSGSphere3D" parent="Level1_BurialChambers/Torch_1"]
+radius = 0.15
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Level1_BurialChambers/Torch_1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+light_color = Color(1.0, 0.6, 0.3, 1)
+light_energy = 0.8
+omni_range = 8.0
+
+[node name="Torch_2" type="Node3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 3, 10)
+
+[node name="Flame" type="CSGSphere3D" parent="Level1_BurialChambers/Torch_2"]
+radius = 0.15
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Level1_BurialChambers/Torch_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+light_color = Color(1.0, 0.6, 0.3, 1)
+light_energy = 0.8
+omni_range = 8.0
+
+[node name="Torch_3" type="Node3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 3, 10)
+
+[node name="Flame" type="CSGSphere3D" parent="Level1_BurialChambers/Torch_3"]
+radius = 0.15
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Level1_BurialChambers/Torch_3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+light_color = Color(1.0, 0.6, 0.3, 1)
+light_energy = 0.8
+omni_range = 8.0
+
+[node name="Torch_4" type="Node3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 3, -5)
+
+[node name="Flame" type="CSGSphere3D" parent="Level1_BurialChambers/Torch_4"]
+radius = 0.15
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Level1_BurialChambers/Torch_4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+light_color = Color(1.0, 0.6, 0.3, 1)
+light_energy = 0.8
+omni_range = 8.0
+
+[node name="Torch_5" type="Node3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 3, -5)
+
+[node name="Flame" type="CSGSphere3D" parent="Level1_BurialChambers/Torch_5"]
+radius = 0.15
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Level1_BurialChambers/Torch_5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+light_color = Color(1.0, 0.6, 0.3, 1)
+light_energy = 0.8
+omni_range = 8.0
+
+[node name="Torch_6" type="Node3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 3, -20)
+
+[node name="Flame" type="CSGSphere3D" parent="Level1_BurialChambers/Torch_6"]
+radius = 0.15
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Level1_BurialChambers/Torch_6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+light_color = Color(1.0, 0.6, 0.3, 1)
+light_energy = 0.8
+omni_range = 8.0
+
+[node name="Torch_7" type="Node3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 3, -20)
+
+[node name="Flame" type="CSGSphere3D" parent="Level1_BurialChambers/Torch_7"]
+radius = 0.15
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Level1_BurialChambers/Torch_7"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+light_color = Color(1.0, 0.6, 0.3, 1)
+light_energy = 0.8
+omni_range = 8.0
+
+;; Stairs to Level 2
+[node name="StairsToLevel2" type="Node3D" parent="Level1_BurialChambers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -25)
+
+[node name="Step_0" type="CSGBox3D" parent="Level1_BurialChambers/StairsToLevel2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
+use_collision = true
+size = Vector3(4, 0.4, 1)
+material = SubResource("mat_floor")
+
+[node name="Step_5" type="CSGBox3D" parent="Level1_BurialChambers/StairsToLevel2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.2, -4)
+use_collision = true
+size = Vector3(4, 0.4, 1)
+material = SubResource("mat_floor")
+
+[node name="Step_10" type="CSGBox3D" parent="Level1_BurialChambers/StairsToLevel2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4.2, -8)
+use_collision = true
+size = Vector3(4, 0.4, 1)
+material = SubResource("mat_floor")
+
+[node name="Step_15" type="CSGBox3D" parent="Level1_BurialChambers/StairsToLevel2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -6.2, -12)
+use_collision = true
+size = Vector3(4, 0.4, 1)
+material = SubResource("mat_floor")
+
+[node name="Step_20" type="CSGBox3D" parent="Level1_BurialChambers/StairsToLevel2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -8.2, -16)
+use_collision = true
+size = Vector3(4, 0.4, 1)
+material = SubResource("mat_floor")
+
+[node name="Step_25" type="CSGBox3D" parent="Level1_BurialChambers/StairsToLevel2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -10.2, -20)
+use_collision = true
+size = Vector3(4, 0.4, 1)
+material = SubResource("mat_floor")
+
+;; ============== LEVEL 2: OSSUARY ==============
+[node name="Level2_Ossuary" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -12, 0)
+
+[node name="OssuaryFloor" type="CSGBox3D" parent="Level2_Ossuary"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -20)
+use_collision = true
+size = Vector3(50, 1, 50)
+material = SubResource("mat_floor")
+
+[node name="Ceiling" type="CSGBox3D" parent="Level2_Ossuary"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.5, -20)
+use_collision = true
+size = Vector3(50, 1, 50)
+material = SubResource("mat_crypt")
+
+[node name="NorthWall" type="CSGBox3D" parent="Level2_Ossuary"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 5)
+use_collision = true
+size = Vector3(50, 5, 2)
+material = SubResource("mat_crypt")
+
+[node name="SouthWall" type="CSGBox3D" parent="Level2_Ossuary"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -45)
+use_collision = true
+size = Vector3(50, 5, 2)
+material = SubResource("mat_crypt")
+
+[node name="EastWall" type="CSGBox3D" parent="Level2_Ossuary"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 2.5, -20)
+use_collision = true
+size = Vector3(2, 5, 50)
+material = SubResource("mat_crypt")
+
+[node name="WestWall" type="CSGBox3D" parent="Level2_Ossuary"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 2.5, -20)
+use_collision = true
+size = Vector3(2, 5, 50)
+material = SubResource("mat_crypt")
+
+;; Bone Piles
+[node name="BonePile_0" type="CSGSphere3D" parent="Level2_Ossuary"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0.5, -15)
+use_collision = true
+radius = 1.5
+material = SubResource("mat_bone")
+
+[node name="BonePile_1" type="CSGSphere3D" parent="Level2_Ossuary"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0.5, -10)
+use_collision = true
+radius = 1.2
+material = SubResource("mat_bone")
+
+[node name="BonePile_2" type="CSGSphere3D" parent="Level2_Ossuary"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.5, -30)
+use_collision = true
+radius = 1.8
+material = SubResource("mat_bone")
+
+[node name="BonePile_3" type="CSGSphere3D" parent="Level2_Ossuary"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.5, -35)
+use_collision = true
+radius = 1.4
+material = SubResource("mat_bone")
+
+[node name="BonePile_4" type="CSGSphere3D" parent="Level2_Ossuary"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -25)
+use_collision = true
+radius = 1.6
+material = SubResource("mat_bone")
+
+;; Ossuary Altar
+[node name="OssuaryAltar" type="Node3D" parent="Level2_Ossuary"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)
+
+[node name="AltarBase" type="CSGBox3D" parent="Level2_Ossuary/OssuaryAltar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+use_collision = true
+size = Vector3(5, 1, 3)
+material = SubResource("mat_ossuary_altar")
+
+[node name="AltarSlab" type="CSGBox3D" parent="Level2_Ossuary/OssuaryAltar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+use_collision = true
+size = Vector3(4, 0.3, 2.5)
+material = SubResource("mat_ossuary_altar")
+
+[node name="AltarGlow" type="OmniLight3D" parent="Level2_Ossuary/OssuaryAltar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+light_color = Color(0.4, 0.2, 0.5, 1)
+light_energy = 1.5
+omni_range = 8.0
+
+;; Stairs to Level 3
+[node name="StairsToLevel3" type="Node3D" parent="Level2_Ossuary"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -40)
+
+[node name="Step_0" type="CSGBox3D" parent="Level2_Ossuary/StairsToLevel3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
+use_collision = true
+size = Vector3(4, 0.4, 1)
+material = SubResource("mat_floor")
+
+[node name="Step_5" type="CSGBox3D" parent="Level2_Ossuary/StairsToLevel3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.2, -4)
+use_collision = true
+size = Vector3(4, 0.4, 1)
+material = SubResource("mat_floor")
+
+[node name="Step_10" type="CSGBox3D" parent="Level2_Ossuary/StairsToLevel3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4.2, -8)
+use_collision = true
+size = Vector3(4, 0.4, 1)
+material = SubResource("mat_floor")
+
+[node name="Step_15" type="CSGBox3D" parent="Level2_Ossuary/StairsToLevel3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -6.2, -12)
+use_collision = true
+size = Vector3(4, 0.4, 1)
+material = SubResource("mat_floor")
+
+[node name="Step_20" type="CSGBox3D" parent="Level2_Ossuary/StairsToLevel3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -8.2, -16)
+use_collision = true
+size = Vector3(4, 0.4, 1)
+material = SubResource("mat_floor")
+
+[node name="Step_25" type="CSGBox3D" parent="Level2_Ossuary/StairsToLevel3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -10.2, -20)
+use_collision = true
+size = Vector3(4, 0.4, 1)
+material = SubResource("mat_floor")
+
+;; ============== LEVEL 3: ANCIENT EVIL ==============
+[node name="Level3_AncientEvil" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -24, 0)
+
+[node name="BossFloor" type="CSGCylinder3D" parent="Level3_AncientEvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -30)
+use_collision = true
+radius = 25.0
+height = 1.0
+sides = 16
+material = SubResource("mat_evil_floor")
+
+[node name="DomeCeiling" type="CSGCylinder3D" parent="Level3_AncientEvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, -30)
+use_collision = true
+radius = 26.0
+height = 1.0
+sides = 16
+material = SubResource("mat_evil")
+
+;; Pillar Ring
+[node name="Pillar_0" type="CSGCylinder3D" parent="Level3_AncientEvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.5, -10)
+use_collision = true
+radius = 1.5
+height = 11.0
+sides = 8
+material = SubResource("mat_evil")
+
+[node name="PillarCap_0" type="CSGBox3D" parent="Level3_AncientEvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 11.4, -10)
+use_collision = true
+size = Vector3(4, 0.8, 4)
+material = SubResource("mat_evil")
+
+[node name="Pillar_1" type="CSGCylinder3D" parent="Level3_AncientEvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.14, 5.5, -15.86)
+use_collision = true
+radius = 1.5
+height = 11.0
+sides = 8
+material = SubResource("mat_evil")
+
+[node name="PillarCap_1" type="CSGBox3D" parent="Level3_AncientEvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.14, 11.4, -15.86)
+use_collision = true
+size = Vector3(4, 0.8, 4)
+material = SubResource("mat_evil")
+
+[node name="Pillar_2" type="CSGCylinder3D" parent="Level3_AncientEvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 5.5, -30)
+use_collision = true
+radius = 1.5
+height = 11.0
+sides = 8
+material = SubResource("mat_evil")
+
+[node name="PillarCap_2" type="CSGBox3D" parent="Level3_AncientEvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 11.4, -30)
+use_collision = true
+size = Vector3(4, 0.8, 4)
+material = SubResource("mat_evil")
+
+[node name="Pillar_3" type="CSGCylinder3D" parent="Level3_AncientEvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.14, 5.5, -44.14)
+use_collision = true
+radius = 1.5
+height = 11.0
+sides = 8
+material = SubResource("mat_evil")
+
+[node name="PillarCap_3" type="CSGBox3D" parent="Level3_AncientEvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.14, 11.4, -44.14)
+use_collision = true
+size = Vector3(4, 0.8, 4)
+material = SubResource("mat_evil")
+
+[node name="Pillar_4" type="CSGCylinder3D" parent="Level3_AncientEvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.5, -50)
+use_collision = true
+radius = 1.5
+height = 11.0
+sides = 8
+material = SubResource("mat_evil")
+
+[node name="PillarCap_4" type="CSGBox3D" parent="Level3_AncientEvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 11.4, -50)
+use_collision = true
+size = Vector3(4, 0.8, 4)
+material = SubResource("mat_evil")
+
+[node name="Pillar_5" type="CSGCylinder3D" parent="Level3_AncientEvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.14, 5.5, -44.14)
+use_collision = true
+radius = 1.5
+height = 11.0
+sides = 8
+material = SubResource("mat_evil")
+
+[node name="PillarCap_5" type="CSGBox3D" parent="Level3_AncientEvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.14, 11.4, -44.14)
+use_collision = true
+size = Vector3(4, 0.8, 4)
+material = SubResource("mat_evil")
+
+[node name="Pillar_6" type="CSGCylinder3D" parent="Level3_AncientEvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 5.5, -30)
+use_collision = true
+radius = 1.5
+height = 11.0
+sides = 8
+material = SubResource("mat_evil")
+
+[node name="PillarCap_6" type="CSGBox3D" parent="Level3_AncientEvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 11.4, -30)
+use_collision = true
+size = Vector3(4, 0.8, 4)
+material = SubResource("mat_evil")
+
+[node name="Pillar_7" type="CSGCylinder3D" parent="Level3_AncientEvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.14, 5.5, -15.86)
+use_collision = true
+radius = 1.5
+height = 11.0
+sides = 8
+material = SubResource("mat_evil")
+
+[node name="PillarCap_7" type="CSGBox3D" parent="Level3_AncientEvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.14, 11.4, -15.86)
+use_collision = true
+size = Vector3(4, 0.8, 4)
+material = SubResource("mat_evil")
+
+;; Evil Altar
+[node name="EvilAltar" type="Node3D" parent="Level3_AncientEvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -30)
+
+[node name="AltarBase1" type="CSGCylinder3D" parent="Level3_AncientEvil/EvilAltar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+use_collision = true
+radius = 5.0
+height = 0.8
+sides = 8
+material = SubResource("mat_altar")
+
+[node name="AltarBase2" type="CSGCylinder3D" parent="Level3_AncientEvil/EvilAltar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+use_collision = true
+radius = 3.5
+height = 0.8
+sides = 8
+material = SubResource("mat_altar")
+
+[node name="CentralPillar" type="CSGCylinder3D" parent="Level3_AncientEvil/EvilAltar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, 0)
+use_collision = true
+radius = 0.8
+height = 3.0
+sides = 8
+material = SubResource("mat_altar")
+
+[node name="EvilOrb" type="CSGSphere3D" parent="Level3_AncientEvil/EvilAltar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.2, 0)
+radius = 0.8
+material = SubResource("mat_evil_glow")
+
+[node name="EvilLight" type="OmniLight3D" parent="Level3_AncientEvil/EvilAltar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.5, 0)
+light_color = Color(0.8, 0.2, 0.5, 1)
+light_energy = 4.0
+omni_range = 20.0
+
+;; Ritual Circle
+[node name="RitualCircleOuter" type="CSGCylinder3D" parent="Level3_AncientEvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, -30)
+radius = 12.0
+height = 0.05
+sides = 32
+material = SubResource("mat_ritual")
+
+;; Entrance Corridor
+[node name="EntranceCorridor" type="CSGBox3D" parent="Level3_AncientEvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(6, 1, 20)
+material = SubResource("mat_evil_floor")
+
+[node name="CorridorWallLeft" type="CSGBox3D" parent="Level3_AncientEvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 4, 0)
+use_collision = true
+size = Vector3(1, 8, 20)
+material = SubResource("mat_evil")
+
+[node name="CorridorWallRight" type="CSGBox3D" parent="Level3_AncientEvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 4, 0)
+use_collision = true
+size = Vector3(1, 8, 20)
+material = SubResource("mat_evil")
+
+[node name="CorridorCeiling" type="CSGBox3D" parent="Level3_AncientEvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.5, 0)
+use_collision = true
+size = Vector3(6, 1, 20)
+material = SubResource("mat_evil")
+
+;; ============== GHOSTLY DECORATIONS (PRE-PLACED) ==============
+[node name="GhostlyDecorations" type="Node3D" parent="."]
+
+[node name="Level1_Wisp_0" type="Sprite3D" parent="GhostlyDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 1.5, 12)
+modulate = Color(0.6, 0.8, 1, 0.7)
+pixel_size = 0.035
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("4")
+
+[node name="Level1_Wisp_1" type="Sprite3D" parent="GhostlyDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 1.5, -5)
+modulate = Color(0.6, 0.8, 1, 0.7)
+pixel_size = 0.035
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("4")
+
+[node name="Level1_Wisp_2" type="Sprite3D" parent="GhostlyDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 1.5, -18)
+modulate = Color(0.6, 0.8, 1, 0.7)
+pixel_size = 0.035
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("4")
+
+[node name="Level1_Wisp_3" type="Sprite3D" parent="GhostlyDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1.5, 18)
+modulate = Color(0.6, 0.8, 1, 0.7)
+pixel_size = 0.035
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("4")
+
+[node name="Level2_Wisp_0" type="Sprite3D" parent="GhostlyDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, -10.5, -18)
+modulate = Color(0.6, 0.8, 1, 0.7)
+pixel_size = 0.035
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("4")
+
+[node name="Level2_Wisp_1" type="Sprite3D" parent="GhostlyDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, -10.5, -15)
+modulate = Color(0.6, 0.8, 1, 0.7)
+pixel_size = 0.035
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("4")
+
+[node name="Level2_Wisp_2" type="Sprite3D" parent="GhostlyDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, -10.5, -32)
+modulate = Color(0.6, 0.8, 1, 0.7)
+pixel_size = 0.035
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("4")
+
+[node name="Level2_Wisp_3" type="Sprite3D" parent="GhostlyDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, -10.5, -28)
+modulate = Color(0.6, 0.8, 1, 0.7)
+pixel_size = 0.035
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("4")
+
+[node name="Level2_Wisp_4" type="Sprite3D" parent="GhostlyDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -10, -20)
+modulate = Color(0.6, 0.8, 1, 0.7)
+pixel_size = 0.035
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("4")
+
+[node name="Level3_Wisp_0" type="Sprite3D" parent="GhostlyDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, -22, -20)
+modulate = Color(0.6, 0.8, 1, 0.7)
+pixel_size = 0.035
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("4")
+
+[node name="Level3_Wisp_1" type="Sprite3D" parent="GhostlyDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, -22, -20)
+modulate = Color(0.6, 0.8, 1, 0.7)
+pixel_size = 0.035
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("4")
+
+[node name="Level3_Wisp_2" type="Sprite3D" parent="GhostlyDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, -22, -35)
+modulate = Color(0.6, 0.8, 1, 0.7)
+pixel_size = 0.035
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("4")
+
+[node name="Level3_Wisp_3" type="Sprite3D" parent="GhostlyDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, -22, -35)
+modulate = Color(0.6, 0.8, 1, 0.7)
+pixel_size = 0.035
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("4")
+
+[node name="Level3_Wisp_4" type="Sprite3D" parent="GhostlyDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, -21.5, -40)
+modulate = Color(0.6, 0.8, 1, 0.7)
+pixel_size = 0.035
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("4")
+
+[node name="Level3_Wisp_5" type="Sprite3D" parent="GhostlyDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, -21.5, -40)
+modulate = Color(0.6, 0.8, 1, 0.7)
+pixel_size = 0.035
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("4")
+
+[node name="Level3_Wisp_6" type="Sprite3D" parent="GhostlyDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, -21, -30)
+modulate = Color(0.6, 0.8, 1, 0.7)
+pixel_size = 0.035
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("4")
+
+[node name="Level3_Wisp_7" type="Sprite3D" parent="GhostlyDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, -21, -30)
+modulate = Color(0.6, 0.8, 1, 0.7)
+pixel_size = 0.035
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("4")
+
+;; ============== GORE DECORATIONS (PRE-PLACED) ==============
+[node name="GoreDecorations" type="Node3D" parent="."]
+
+[node name="Level1_GoreWall_0" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 1.5, 5)
+pixel_size = 0.02
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("5")
+
+[node name="Level1_GoreWall_1" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 1.5, -5)
+pixel_size = 0.02
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("5")
+
+[node name="Level1_HangingGore_0" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 2.5, -15)
+pixel_size = 0.018
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("6")
+
+[node name="Level1_HangingGore_1" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2.5, 15)
+pixel_size = 0.018
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("7")
+
+[node name="Level2_GoreWall_0" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, -10.5, -25)
+pixel_size = 0.02
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("5")
+
+[node name="Level2_GoreWall_1" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, -10.5, -22)
+pixel_size = 0.02
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("5")
+
+[node name="Level2_HangingGore_0" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -9.5, -28)
+pixel_size = 0.018
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("8")
+
+[node name="Level3_GoreWall_0" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, -21, -25)
+pixel_size = 0.02
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("5")
+
+[node name="Level3_GoreWall_1" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, -21, -38)
+pixel_size = 0.02
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("5")
+
+[node name="Level3_HangingGore_0" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, -20, -38)
+pixel_size = 0.018
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("6")
+
+[node name="Level3_HangingGore_1" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, -20, -42)
+pixel_size = 0.018
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("7")
+
+;; ============== DECAYING STATUES & RATS ==============
+[node name="Decorations" type="Node3D" parent="."]
+
+;; Level 1 - Burial Chambers (4-6 statues, 3-4 rats)
+[node name="L1_Statue1" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 1.5, 18)
+pixel_size = 0.025
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("9")
+
+[node name="L1_Statue2" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 1.5, 18)
+pixel_size = 0.025
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("10")
+
+[node name="L1_Statue3" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 1.5, 5)
+pixel_size = 0.025
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("11")
+
+[node name="L1_Statue4" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 1.5, 5)
+pixel_size = 0.025
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("12")
+
+[node name="L1_Statue5" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 1.5, -12)
+pixel_size = 0.025
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("13")
+
+[node name="L1_Statue6" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 1.5, -12)
+pixel_size = 0.025
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("14")
+
+[node name="L1_Rat1" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 0.2, 22)
+pixel_size = 0.012
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("15")
+
+[node name="L1_Rat2" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0.2, 8)
+pixel_size = 0.012
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("15")
+
+[node name="L1_Rat3" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0.2, -8)
+pixel_size = 0.012
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("15")
+
+[node name="L1_Rat4" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0.2, -20)
+pixel_size = 0.012
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("15")
+
+;; Level 2 - Ossuary (6-8 statues, 5-6 rats)
+[node name="L2_Statue1" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, -10.5, -12)
+pixel_size = 0.025
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("9")
+
+[node name="L2_Statue2" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, -10.5, -12)
+pixel_size = 0.025
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("10")
+
+[node name="L2_Statue3" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, -10.5, -25)
+pixel_size = 0.025
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("11")
+
+[node name="L2_Statue4" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, -10.5, -25)
+pixel_size = 0.025
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("12")
+
+[node name="L2_Statue5" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, -10.5, -38)
+pixel_size = 0.025
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("13")
+
+[node name="L2_Statue6" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, -10.5, -38)
+pixel_size = 0.025
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("14")
+
+[node name="L2_Statue7" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, -10.5, -42)
+pixel_size = 0.025
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("9")
+
+[node name="L2_Statue8" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, -10.5, -42)
+pixel_size = 0.025
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("10")
+
+[node name="L2_Rat1" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23, -11.8, -10)
+pixel_size = 0.012
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("15")
+
+[node name="L2_Rat2" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23, -11.8, -18)
+pixel_size = 0.012
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("15")
+
+[node name="L2_Rat3" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, -11.8, -30)
+pixel_size = 0.012
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("15")
+
+[node name="L2_Rat4" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, -11.8, -35)
+pixel_size = 0.012
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("15")
+
+[node name="L2_Rat5" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, -11.8, -40)
+pixel_size = 0.012
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("15")
+
+[node name="L2_Rat6" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, -11.8, -28)
+pixel_size = 0.012
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("15")
+
+;; Level 3 - Ancient Evil (8-10 statues around ritual area, rats)
+[node name="L3_Statue1" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, -22.5, -18)
+pixel_size = 0.028
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("9")
+
+[node name="L3_Statue2" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, -22.5, -18)
+pixel_size = 0.028
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("10")
+
+[node name="L3_Statue3" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, -22.5, -25)
+pixel_size = 0.028
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("11")
+
+[node name="L3_Statue4" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, -22.5, -25)
+pixel_size = 0.028
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("12")
+
+[node name="L3_Statue5" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, -22.5, -35)
+pixel_size = 0.028
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("13")
+
+[node name="L3_Statue6" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, -22.5, -35)
+pixel_size = 0.028
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("14")
+
+[node name="L3_Statue7" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, -22.5, -42)
+pixel_size = 0.028
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("9")
+
+[node name="L3_Statue8" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, -22.5, -42)
+pixel_size = 0.028
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("10")
+
+[node name="L3_Statue9" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -22.5, -45)
+pixel_size = 0.028
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("11")
+
+[node name="L3_Statue10" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -22.5, -15)
+pixel_size = 0.028
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("12")
+
+[node name="L3_Rat1" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, -23.8, -20)
+pixel_size = 0.012
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("15")
+
+[node name="L3_Rat2" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, -23.8, -22)
+pixel_size = 0.012
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("15")
+
+[node name="L3_Rat3" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, -23.8, -38)
+pixel_size = 0.012
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("15")
+
+[node name="L3_Rat4" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, -23.8, -40)
+pixel_size = 0.012
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("15")
+
+[node name="L3_Rat5" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, -23.8, -48)
+pixel_size = 0.012
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("15")
+
+[node name="L3_Rat6" type="Sprite3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, -23.8, -48)
+pixel_size = 0.012
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("15")
+
+;; ============== SPAWN POINTS ==============
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="SpawnPoint_default" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 22)
+
+[node name="SpawnPoint_from_monastery" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 24)
+
+;; ============== ENEMY SPAWN POINTS ==============
+[node name="EnemySpawnPoints" type="Node3D" parent="."]
+
+;; Level 1 Spawns
+[node name="Level1_Spawn_0" type="Marker3D" parent="EnemySpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 15)
+
+[node name="Level1_Spawn_1" type="Marker3D" parent="EnemySpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 15)
+
+[node name="Level1_Spawn_2" type="Marker3D" parent="EnemySpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 0)
+
+[node name="Level1_Spawn_3" type="Marker3D" parent="EnemySpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 0)
+
+[node name="Level1_Spawn_4" type="Marker3D" parent="EnemySpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -15)
+
+;; Level 2 Spawns
+[node name="Level2_Spawn_0" type="Marker3D" parent="EnemySpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, -12, -15)
+
+[node name="Level2_Spawn_1" type="Marker3D" parent="EnemySpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, -12, -15)
+
+[node name="Level2_Spawn_2" type="Marker3D" parent="EnemySpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, -12, -30)
+
+[node name="Level2_Spawn_3" type="Marker3D" parent="EnemySpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, -12, -30)
+
+[node name="Level2_Spawn_4" type="Marker3D" parent="EnemySpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -12, -35)
+
+[node name="Level2_Spawn_5" type="Marker3D" parent="EnemySpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, -12, -25)
+
+[node name="Level2_Spawn_6" type="Marker3D" parent="EnemySpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, -12, -25)
+
+;; Level 3 Spawns
+[node name="Level3_Spawn_0" type="Marker3D" parent="EnemySpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, -24, -20)
+
+[node name="Level3_Spawn_1" type="Marker3D" parent="EnemySpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, -24, -20)
+
+[node name="Level3_Spawn_2" type="Marker3D" parent="EnemySpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, -24, -35)
+
+[node name="Level3_Spawn_3" type="Marker3D" parent="EnemySpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, -24, -35)
+
+[node name="Level3_Spawn_4" type="Marker3D" parent="EnemySpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, -24, -42)
+
+[node name="Level3_Spawn_5" type="Marker3D" parent="EnemySpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, -24, -42)
+
+[node name="BossSpawn" type="Marker3D" parent="EnemySpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -24, -25)
+
+;; ============== CHEST POSITIONS ==============
+[node name="ChestPositions" type="Node3D" parent="."]
+
+[node name="Chest_Level1_0" type="Marker3D" parent="ChestPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, 20)
+
+[node name="Chest_Level1_1" type="Marker3D" parent="ChestPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, -10)
+
+[node name="Chest_Level2_0" type="Marker3D" parent="ChestPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, -12, -35)
+
+[node name="Chest_Level2_1" type="Marker3D" parent="ChestPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, -12, -15)
+
+[node name="Chest_Level3_Boss" type="Marker3D" parent="ChestPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -24, -45)
+
+;; ============== INTERACTABLES ==============
+[node name="Interactables" type="Node3D" parent="."]
+
+[node name="DoorPosition_Monastery" type="Marker3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 28)
+
+;; ============== NAVIGATION ==============
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]

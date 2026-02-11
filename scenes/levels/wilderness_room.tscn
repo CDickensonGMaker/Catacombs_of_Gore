@@ -1,0 +1,36 @@
+[gd_scene load_steps=4 format=3 uid="uid://crxx23up5dc68"]
+
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="2"]
+[ext_resource type="Script" uid="uid://54h1kvdud16p" path="res://scripts/generation/wilderness_room.gd" id="3"]
+
+[node name="WildernessRoom" type="Node3D"]
+script = ExtResource("3")
+
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="DefaultSpawn" type="Node3D" parent="SpawnPoints" groups=["default_spawn", "spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="from_north" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -35)
+
+[node name="from_south" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 35)
+
+[node name="from_east" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 0.5, 0)
+
+[node name="from_west" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35, 0.5, 0)
+
+[node name="from_town_west" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35, 0.5, 0)
+
+[node name="from_town_east" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 0.5, 0)
+
+[node name="Player" parent="." instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="HUD" parent="." instance=ExtResource("2")]

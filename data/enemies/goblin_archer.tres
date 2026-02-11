@@ -1,0 +1,118 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/data/enemy_attack_data.gd" id="2"]
+
+[sub_resource type="Resource" id="1"]
+script = ExtResource("2")
+id = "goblin_arrow"
+display_name = "Arrow Shot"
+damage = Array[int]([2, 8, 2])
+damage_type = 1
+windup_time = 0.4
+active_time = 0.1
+recovery_time = 0.3
+cooldown = 1.5
+range_distance = 30.0
+is_ranged = true
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 18.0
+inflicts_condition = 0
+condition_chance = 0.0
+condition_duration = 0.0
+stagger_power = 0.3
+knockback_force = 1.0
+weight = 1.0
+min_range = 4.0
+max_range = 30.0
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[sub_resource type="Resource" id="2"]
+script = ExtResource("2")
+id = "goblin_kick"
+display_name = "Desperate Kick"
+damage = Array[int]([1, 4, 0])
+damage_type = 0
+windup_time = 0.2
+active_time = 0.1
+recovery_time = 0.3
+cooldown = 2.0
+range_distance = 2.0
+is_ranged = false
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 0.0
+inflicts_condition = 0
+condition_chance = 0.0
+condition_duration = 0.0
+stagger_power = 0.8
+knockback_force = 4.0
+weight = 0.3
+min_range = 0.0
+max_range = 2.0
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[resource]
+script = ExtResource("1")
+id = "goblin_archer"
+display_name = "Goblin Archer"
+description = "A cunning goblin wielding a crude crossbow. Prefers to attack from a distance and will flee if cornered."
+max_hp = 20
+armor_value = 4
+movement_speed = 5.0
+turn_speed = 6.0
+grit = 3
+agility = 8
+will = 2
+knowledge = 2
+behavior = 1
+faction = 1
+aggro_range = 35.0
+attack_range = 30.0
+preferred_distance = 20.0
+flee_hp_threshold = 0.25
+is_boss = false
+attacks = Array[ExtResource("2")]([SubResource("1"), SubResource("2")])
+can_block = false
+block_chance = 0.0
+stagger_resistance = -0.1
+fire_resistance = 0.0
+frost_resistance = 0.0
+lightning_resistance = 0.0
+poison_resistance = 0.0
+necrotic_resistance = 0.0
+physical_resistance = -0.1
+fire_weakness = 0.1
+frost_weakness = 0.0
+lightning_weakness = 0.0
+holy_weakness = 0.0
+causes_horror = false
+horror_difficulty = 8
+loot_table_av = 2
+gold_drop = Array[int]([8, 35])
+guaranteed_drops = Array[String]([])
+drop_table = {
+"arrow_bundle": 0.3,
+"health_potion": 0.1,
+"goblin_war_horn": 0.05
+}
+xp_reward = 45
+scene_path = ""
+icon_path = ""
+scale = 0.85
+sprite_path = "res://Sprite folders grab bag/goblin_archer.png"
+attack_sprite_path = ""
+sprite_hframes = 4
+sprite_vframes = 2
+attack_hframes = 4
+attack_vframes = 2
+sprite_pixel_size = 0.025
+idle_sounds = Array[String]([])
+attack_sounds = Array[String]([])
+hurt_sounds = Array[String]([])
+death_sounds = Array[String]([])

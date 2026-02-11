@@ -1,0 +1,90 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/data/enemy_attack_data.gd" id="2"]
+
+[sub_resource type="Resource" id="1"]
+script = ExtResource("2")
+id = "goblin_slash"
+display_name = "Slash"
+damage = Array[int]([2, 6, 0])
+damage_type = 0
+windup_time = 0.3
+active_time = 0.15
+recovery_time = 0.2
+cooldown = 1.0
+range_distance = 2.0
+is_ranged = false
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 15.0
+inflicts_condition = 0
+condition_chance = 0.0
+condition_duration = 0.0
+stagger_power = 0.5
+knockback_force = 2.0
+weight = 1.0
+min_range = 0.0
+max_range = 2.5
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[resource]
+script = ExtResource("1")
+id = "goblin_soldier"
+display_name = "Goblin Soldier"
+description = "A small but vicious creature armed with a rusty shortsword."
+max_hp = 25
+armor_value = 8
+movement_speed = 4.5
+turn_speed = 5.0
+grit = 4
+agility = 6
+will = 2
+knowledge = 1
+behavior = 0
+faction = 1
+aggro_range = 12.0
+attack_range = 2.0
+preferred_distance = 2.0
+flee_hp_threshold = 0.15
+is_boss = false
+attacks = Array[ExtResource("2")]([SubResource("1")])
+can_block = false
+block_chance = 0.2
+stagger_resistance = 0.0
+fire_resistance = 0.0
+frost_resistance = 0.0
+lightning_resistance = 0.0
+poison_resistance = 0.0
+necrotic_resistance = 0.0
+physical_resistance = 0.0
+fire_weakness = 0.0
+frost_weakness = 0.0
+lightning_weakness = 0.0
+holy_weakness = 0.0
+causes_horror = false
+horror_difficulty = 10
+loot_table_av = 2
+gold_drop = Array[int]([10, 40])
+guaranteed_drops = Array[String]([])
+drop_table = {
+"health_potion": 0.15,
+"goblin_war_horn": 0.08
+}
+xp_reward = 50
+scene_path = ""
+icon_path = ""
+scale = 0.8
+sprite_path = "res://Sprite folders grab bag/goblin_sword.png"
+attack_sprite_path = ""
+sprite_hframes = 4
+sprite_vframes = 2
+attack_hframes = 4
+attack_vframes = 2
+sprite_pixel_size = 0.025
+idle_sounds = Array[String]([])
+attack_sounds = Array[String]([])
+hurt_sounds = Array[String]([])
+death_sounds = Array[String]([])

@@ -1,0 +1,437 @@
+[gd_scene load_steps=9 format=3 uid="uid://ckazan_dun_exit"]
+
+[ext_resource type="Script" path="res://scripts/levels/kazan_dun_exit.gd" id="1_exit"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3_hud"]
+[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://Sprite folders grab bag/stonewall.png" id="2_stone"]
+[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://Sprite folders grab bag/stonewall.png" id="3_rock"]
+[ext_resource type="PackedScene" path="res://scenes/world/zone_door_instance.tscn" id="4_door"]
+
+[sub_resource type="Environment" id="Environment_exit"]
+background_mode = 1
+background_color = Color(0.12, 0.11, 0.1, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.45, 0.4, 0.35, 1)
+ambient_light_energy = 0.35
+fog_enabled = true
+fog_light_color = Color(0.25, 0.22, 0.2, 1)
+fog_density = 0.02
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_stone"]
+albedo_texture = ExtResource("2_stone")
+uv1_scale = Vector3(4, 4, 4)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rock"]
+albedo_texture = ExtResource("3_rock")
+uv1_scale = Vector3(8, 8, 8)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_metal"]
+albedo_color = Color(0.3, 0.3, 0.35, 1)
+metallic = 0.8
+roughness = 0.3
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_brazier_fire"]
+albedo_color = Color(1, 0.5, 0.1, 1)
+emission_enabled = true
+emission = Color(1, 0.4, 0.05, 1)
+emission_energy_multiplier = 3.0
+texture_filter = 0
+
+[node name="KazanDunExit" type="Node3D"]
+script = ExtResource("1_exit")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_exit")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866, -0.433, 0.25, 0, 0.5, 0.866, -0.5, -0.75, 0.433, 0, 20, 0)
+light_color = Color(0.8, 0.75, 0.7, 1)
+light_energy = 0.3
+shadow_enabled = true
+shadow_bias = 0.02
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="Floor" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(60, 1, 60)
+material = SubResource("StandardMaterial3D_rock")
+
+[node name="ExitRamp" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 0.9848, 0.1736, 0, -0.1736, 0.9848, 30, 2, 0)
+use_collision = true
+size = Vector3(10, 1, 20)
+material = SubResource("StandardMaterial3D_rock")
+
+[node name="Walls" type="Node3D" parent="."]
+
+[node name="NorthWall" type="CSGBox3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -30)
+use_collision = true
+size = Vector3(60, 10, 2)
+material = SubResource("StandardMaterial3D_stone")
+
+[node name="SouthWall" type="CSGBox3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 30)
+use_collision = true
+size = Vector3(60, 10, 2)
+material = SubResource("StandardMaterial3D_stone")
+
+[node name="WestWall" type="CSGBox3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 4, 0)
+use_collision = true
+size = Vector3(2, 10, 60)
+material = SubResource("StandardMaterial3D_stone")
+
+[node name="EastWallLeft" type="CSGBox3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 4, -20)
+use_collision = true
+size = Vector3(2, 10, 20)
+material = SubResource("StandardMaterial3D_stone")
+
+[node name="EastWallRight" type="CSGBox3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 4, 20)
+use_collision = true
+size = Vector3(2, 10, 20)
+material = SubResource("StandardMaterial3D_stone")
+
+[node name="Ceiling" type="CSGBox3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9, 0)
+use_collision = true
+size = Vector3(60, 1, 60)
+material = SubResource("StandardMaterial3D_stone")
+
+[node name="Structures" type="Node3D" parent="."]
+
+[node name="GateFrame" type="Node3D" parent="Structures"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 0, 0)
+
+[node name="LeftPost" type="CSGBox3D" parent="Structures/GateFrame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -5)
+use_collision = true
+size = Vector3(3, 8, 3)
+material = SubResource("StandardMaterial3D_stone")
+
+[node name="RightPost" type="CSGBox3D" parent="Structures/GateFrame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 5)
+use_collision = true
+size = Vector3(3, 8, 3)
+material = SubResource("StandardMaterial3D_stone")
+
+[node name="Lintel" type="CSGBox3D" parent="Structures/GateFrame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+use_collision = true
+size = Vector3(3, 2, 14)
+material = SubResource("StandardMaterial3D_stone")
+
+[node name="GuardPost" type="Node3D" parent="Structures"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, 0)
+
+[node name="Platform" type="CSGBox3D" parent="Structures/GuardPost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+use_collision = true
+size = Vector3(8, 0.5, 8)
+material = SubResource("StandardMaterial3D_stone")
+
+[node name="BackWall" type="CSGBox3D" parent="Structures/GuardPost"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -3.5)
+use_collision = true
+size = Vector3(8, 4, 1)
+material = SubResource("StandardMaterial3D_stone")
+
+[node name="SupplyArea" type="Node3D" parent="Structures"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)
+
+[node name="Crate1" type="CSGBox3D" parent="Structures/SupplyArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.75, 0)
+use_collision = true
+size = Vector3(1.5, 1.5, 1.5)
+material = SubResource("StandardMaterial3D_stone")
+
+[node name="Crate2" type="CSGBox3D" parent="Structures/SupplyArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+use_collision = true
+size = Vector3(1.5, 1.5, 1.5)
+material = SubResource("StandardMaterial3D_stone")
+
+[node name="Crate3" type="CSGBox3D" parent="Structures/SupplyArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.75, 0)
+use_collision = true
+size = Vector3(1.5, 1.5, 1.5)
+material = SubResource("StandardMaterial3D_stone")
+
+[node name="Barrel1" type="CSGCylinder3D" parent="Structures/SupplyArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.75, 2)
+use_collision = true
+radius = 0.5
+height = 1.5
+material = SubResource("StandardMaterial3D_stone")
+
+[node name="Barrel2" type="CSGCylinder3D" parent="Structures/SupplyArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.75, 2)
+use_collision = true
+radius = 0.5
+height = 1.5
+material = SubResource("StandardMaterial3D_stone")
+
+[node name="Decorations" type="Node3D" parent="."]
+
+[node name="Brazier1" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, -10)
+
+[node name="Stand" type="CSGCylinder3D" parent="Decorations/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+use_collision = true
+radius = 0.3
+height = 1.5
+material = SubResource("StandardMaterial3D_metal")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Decorations/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+radius = 0.5
+height = 0.4
+material = SubResource("StandardMaterial3D_metal")
+
+[node name="Fire" type="CSGSphere3D" parent="Decorations/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+radius = 0.4
+material = SubResource("StandardMaterial3D_brazier_fire")
+
+[node name="Light1" type="OmniLight3D" parent="Decorations/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 2.0
+omni_range = 12
+
+[node name="Brazier2" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, 10)
+
+[node name="Stand" type="CSGCylinder3D" parent="Decorations/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+use_collision = true
+radius = 0.3
+height = 1.5
+material = SubResource("StandardMaterial3D_metal")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Decorations/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+radius = 0.5
+height = 0.4
+material = SubResource("StandardMaterial3D_metal")
+
+[node name="Fire" type="CSGSphere3D" parent="Decorations/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+radius = 0.4
+material = SubResource("StandardMaterial3D_brazier_fire")
+
+[node name="Light2" type="OmniLight3D" parent="Decorations/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 2.0
+omni_range = 12
+
+[node name="WallTorch1" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28, 3, -15)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorch1"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("StandardMaterial3D_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorch1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.3, 0)
+radius = 0.2
+material = SubResource("StandardMaterial3D_brazier_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorch1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.3, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.0
+omni_range = 8
+
+[node name="WallTorch2" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28, 3, 15)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorch2"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("StandardMaterial3D_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorch2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.3, 0)
+radius = 0.2
+material = SubResource("StandardMaterial3D_brazier_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorch2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.3, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.0
+omni_range = 8
+
+[node name="WallTorch3" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -28)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorch3"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("StandardMaterial3D_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorch3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0.4)
+radius = 0.2
+material = SubResource("StandardMaterial3D_brazier_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorch3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0.4)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10
+
+[node name="WallTorch4" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 28)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorch4"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("StandardMaterial3D_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorch4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, -0.4)
+radius = 0.2
+material = SubResource("StandardMaterial3D_brazier_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorch4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, -0.4)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10
+
+[node name="WallTorch5" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 3, -15)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorch5"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("StandardMaterial3D_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorch5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.3, 0)
+radius = 0.2
+material = SubResource("StandardMaterial3D_brazier_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorch5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.3, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10
+
+[node name="WallTorch6" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 3, 15)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorch6"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("StandardMaterial3D_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorch6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.3, 0)
+radius = 0.2
+material = SubResource("StandardMaterial3D_brazier_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorch6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.3, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10
+
+[node name="WallTorch7" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 3, -28)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorch7"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("StandardMaterial3D_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorch7"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0.4)
+radius = 0.2
+material = SubResource("StandardMaterial3D_brazier_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorch7"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0.4)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10
+
+[node name="WallTorch8" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 3, -28)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorch8"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("StandardMaterial3D_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorch8"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0.4)
+radius = 0.2
+material = SubResource("StandardMaterial3D_brazier_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorch8"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0.4)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10
+
+[node name="RockPile1" type="CSGSphere3D" parent="Decorations"]
+transform = Transform3D(1.5, 0, 0, 0, 0.8, 0, 0, 0, 1.2, 10, 0.5, 25)
+use_collision = true
+radius = 1.0
+material = SubResource("StandardMaterial3D_rock")
+
+[node name="RockPile2" type="CSGSphere3D" parent="Decorations"]
+transform = Transform3D(1.2, 0, 0, 0, 0.6, 0, 0, 0, 1.0, -8, 0.4, 22)
+use_collision = true
+radius = 0.8
+material = SubResource("StandardMaterial3D_rock")
+
+[node name="NPCs" type="Node3D" parent="."]
+
+[node name="Interactables" type="Node3D" parent="."]
+
+[node name="Doors" type="Node3D" parent="."]
+
+[node name="DoorToLevel5" parent="Doors" instance=ExtResource("4_door")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -28, 0, 0)
+target_scene = "res://scenes/levels/kazan_dun_level_5.tscn"
+spawn_point_id = "from_exit"
+door_label = "To Deep Vaults"
+
+[node name="DoorToSouthRoad" parent="Doors" instance=ExtResource("4_door")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 4, 0)
+target_scene = "res://scenes/levels/kazan_dun_south_road.tscn"
+spawn_point_id = "from_exit"
+door_label = "To Southern Road"
+
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="from_level_5" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 0, 0)
+
+[node name="from_wilderness" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 25, 4, 0)
+
+[node name="default" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="HUD" parent="." instance=ExtResource("3_hud")]

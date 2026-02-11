@@ -1,0 +1,37 @@
+{
+	"id": "road_to_dalhurst",
+	"title": "Road to Dalhurst",
+	"description": "The Wandering Knight thanks you for clearing the road. He asks you to travel south to Dalhurst and find his squire, Nathan, who has been gathering information about a growing threat.",
+	"is_main_quest": true,
+	"quest_source": "story",
+	"giver_npc_id": "wandering_knight",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "elder_moor",
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "nathan_the_squire",
+	"turn_in_zone": "dalhurst",
+	"next_quest": "journey_to_kazandun",
+	"objectives": [
+		{
+			"id": "travel_to_dalhurst",
+			"description": "Travel to Dalhurst",
+			"type": "reach",
+			"target": "city_dalhurst",
+			"required_count": 1,
+			"is_optional": false
+		},
+		{
+			"id": "find_nathan",
+			"description": "Find Nathan the Squire in Dalhurst",
+			"type": "talk",
+			"target": "nathan_the_squire",
+			"required_count": 1,
+			"is_optional": false
+		}
+	],
+	"rewards": {
+		"gold": 250,
+		"xp": 4000
+	},
+	"prerequisites": ["knight_intro"]
+}

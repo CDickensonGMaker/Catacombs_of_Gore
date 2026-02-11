@@ -1,0 +1,37 @@
+{
+	"id": "journey_to_kazandun",
+	"title": "The Mountain Road",
+	"description": "Nathan has concerning news - something stirs in the mountains near the dwarven hold. He asks you to travel south to Kazan-Dun and speak with Tharin, a dwarf who guards the outer approach.",
+	"is_main_quest": true,
+	"quest_source": "story",
+	"giver_npc_id": "nathan_the_squire",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "dalhurst",
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "tharin_the_dwarf",
+	"turn_in_zone": "kazan_dun",
+	"next_quest": "report_to_nathan",
+	"objectives": [
+		{
+			"id": "travel_to_kazandun",
+			"description": "Travel south toward Kazan-Dun",
+			"type": "reach",
+			"target": "city_kazan_dun",
+			"required_count": 1,
+			"is_optional": false
+		},
+		{
+			"id": "find_tharin",
+			"description": "Find Tharin outside the dwarven hold",
+			"type": "talk",
+			"target": "tharin_the_dwarf",
+			"required_count": 1,
+			"is_optional": false
+		}
+	],
+	"rewards": {
+		"gold": 400,
+		"xp": 5000
+	},
+	"prerequisites": ["road_to_dalhurst"]
+}

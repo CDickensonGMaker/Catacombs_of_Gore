@@ -1,0 +1,257 @@
+[gd_resource type="Resource" script_class="DialogueData" load_steps=30 format=3 uid="uid://c3blacksmith_greeting"]
+
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_node.gd" id="2_node"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_choice.gd" id="3_choice"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_condition.gd" id="4_cond"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_action.gd" id="5_action"]
+
+[sub_resource type="Resource" id="choice_goodbye"]
+script = ExtResource("3_choice")
+text = "I'll be on my way. Thanks."
+next_node_id = "end"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="action_open_shop"]
+script = ExtResource("5_action")
+type = 13
+param_string = "blacksmith_shop"
+param_int = 0
+param_float = 0.0
+success_node_id = ""
+failure_node_id = ""
+
+[sub_resource type="Resource" id="choice_browse"]
+script = ExtResource("3_choice")
+text = "Let me see your wares."
+next_node_id = "shop_open"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = [SubResource("action_open_shop")]
+
+[sub_resource type="Resource" id="choice_recommend"]
+script = ExtResource("3_choice")
+text = "What would you recommend for a traveler?"
+next_node_id = "recommendations"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_repairs"]
+script = ExtResource("3_choice")
+text = "Can you repair my equipment?"
+next_node_id = "repairs"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_small_talk"]
+script = ExtResource("3_choice")
+text = "How's business been?"
+next_node_id = "small_talk"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_back_start"]
+script = ExtResource("3_choice")
+text = "Actually, I had another question..."
+next_node_id = "start"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_recommend_light"]
+script = ExtResource("3_choice")
+text = "Something light and fast."
+next_node_id = "recommend_light"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_recommend_heavy"]
+script = ExtResource("3_choice")
+text = "I prefer something with weight behind it."
+next_node_id = "recommend_heavy"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_recommend_armor"]
+script = ExtResource("3_choice")
+text = "What about armor?"
+next_node_id = "recommend_armor"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="cond_has_item_broken_sword"]
+script = ExtResource("4_cond")
+type = 3
+param_string = "broken_sword"
+param_int = 1
+param_float = 0.0
+invert = false
+
+[sub_resource type="Resource" id="cond_has_gold_25"]
+script = ExtResource("4_cond")
+type = 4
+param_string = ""
+param_int = 25
+param_float = 0.0
+invert = false
+
+[sub_resource type="Resource" id="action_take_broken_sword"]
+script = ExtResource("5_action")
+type = 2
+param_string = "broken_sword"
+param_int = 1
+param_float = 0.0
+success_node_id = ""
+failure_node_id = ""
+
+[sub_resource type="Resource" id="action_take_gold_25"]
+script = ExtResource("5_action")
+type = 4
+param_string = ""
+param_int = 25
+param_float = 0.0
+success_node_id = ""
+failure_node_id = ""
+
+[sub_resource type="Resource" id="action_give_repaired_sword"]
+script = ExtResource("5_action")
+type = 1
+param_string = "iron_sword"
+param_int = 1
+param_float = 0.0
+success_node_id = ""
+failure_node_id = ""
+
+[sub_resource type="Resource" id="choice_repair_sword"]
+script = ExtResource("3_choice")
+text = "[Broken Sword + 25 Gold] Repair my sword."
+next_node_id = "repair_complete"
+conditions = [SubResource("cond_has_item_broken_sword"), SubResource("cond_has_gold_25")]
+show_when_unavailable = true
+unavailable_reason = "Requires a broken sword and 25 gold"
+actions = [SubResource("action_take_broken_sword"), SubResource("action_take_gold_25"), SubResource("action_give_repaired_sword")]
+
+[sub_resource type="Resource" id="node_start"]
+script = ExtResource("2_node")
+id = "start"
+speaker_name = "Blacksmith"
+text = "*wipes brow with a soot-covered hand* Welcome to my forge, traveler! Name's Harken. Finest steel this side of the mountains, if I do say so myself. What can I do for you?"
+choices = [SubResource("choice_browse"), SubResource("choice_recommend"), SubResource("choice_repairs"), SubResource("choice_small_talk"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "blacksmith_friendly"
+
+[sub_resource type="Resource" id="node_shop_open"]
+script = ExtResource("2_node")
+id = "shop_open"
+speaker_name = "Blacksmith"
+text = "Take your time and browse. Everything you see is handcrafted right here in this forge. Let me know if anything catches your eye."
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "blacksmith_friendly"
+
+[sub_resource type="Resource" id="node_recommendations"]
+script = ExtResource("2_node")
+id = "recommendations"
+speaker_name = "Blacksmith"
+text = "Depends on your style of fighting, really. What are you looking for?"
+choices = [SubResource("choice_recommend_light"), SubResource("choice_recommend_heavy"), SubResource("choice_recommend_armor"), SubResource("choice_back_start")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "blacksmith_thinking"
+
+[sub_resource type="Resource" id="node_recommend_light"]
+script = ExtResource("2_node")
+id = "recommend_light"
+speaker_name = "Blacksmith"
+text = "Ah, a swift fighter! I'd suggest a short sword or a dagger. Quick to draw, easy to handle, and deadly in the right hands. My short swords are balanced for thrusting and slashing both. And if you're the sneaky type, I've got throwing knives that fly true."
+choices = [SubResource("choice_browse"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "blacksmith_enthusiastic"
+
+[sub_resource type="Resource" id="node_recommend_heavy"]
+script = ExtResource("2_node")
+id = "recommend_heavy"
+speaker_name = "Blacksmith"
+text = "A person after my own heart! There's nothing quite like the satisfying crunch of a good warhammer. I've got maces, axes, and longswords that'll cleave through armor like butter. Cost a bit more, but they're built to last - and to hurt."
+choices = [SubResource("choice_browse"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "blacksmith_enthusiastic"
+
+[sub_resource type="Resource" id="node_recommend_armor"]
+script = ExtResource("2_node")
+id = "recommend_armor"
+speaker_name = "Blacksmith"
+text = "Smart thinking! The best offense is not dying, as I always say. I've got chainmail for flexibility, plate for protection, and leather for those who prefer to dodge. For the catacombs, I'd recommend something sturdy - those undead don't tire, and you will."
+choices = [SubResource("choice_browse"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "blacksmith_serious"
+
+[sub_resource type="Resource" id="node_repairs"]
+script = ExtResource("2_node")
+id = "repairs"
+speaker_name = "Blacksmith"
+text = "Repairs? Of course! Bring me anything metal and I can fix it up. Costs depend on the damage and the quality of the piece. A simple sword straightening is cheap, but reforging a shattered blade... that takes time and coin."
+choices = [SubResource("choice_repair_sword"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "blacksmith_neutral"
+
+[sub_resource type="Resource" id="node_repair_complete"]
+script = ExtResource("2_node")
+id = "repair_complete"
+speaker_name = "Blacksmith"
+text = "*examines the blade and nods* Good steel, this. Just needed some love. *works the forge* There - good as new! She'll serve you well. Anything else you need?"
+choices = [SubResource("choice_browse"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "blacksmith_proud"
+
+[sub_resource type="Resource" id="node_small_talk"]
+script = ExtResource("2_node")
+id = "small_talk"
+speaker_name = "Blacksmith"
+text = "Business? *laughs* Never been better, sad to say. With all the trouble lately - bandits, monsters, that cursed catacomb stirring up - everyone needs weapons and armor. I barely get time to sleep! Not that I'm complaining. A busy forge is a happy forge."
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "blacksmith_laughing"
+
+[sub_resource type="Resource" id="node_end"]
+script = ExtResource("2_node")
+id = "end"
+speaker_name = "Blacksmith"
+text = "Stay sharp out there, friend! And remember - a well-maintained blade is a life-saving blade. Come back anytime!"
+choices = []
+is_end_node = true
+auto_continue_to = ""
+portrait_id = "blacksmith_friendly"
+
+[resource]
+script = ExtResource("1_data")
+id = "blacksmith_greeting"
+display_name = "Blacksmith Greeting Dialogue"
+description = "Dialogue for the town blacksmith. Features shop interaction, weapon recommendations based on player preference, repair services with item/gold exchange, and friendly banter."
+start_node_id = "start"
+nodes = [SubResource("node_start"), SubResource("node_shop_open"), SubResource("node_recommendations"), SubResource("node_recommend_light"), SubResource("node_recommend_heavy"), SubResource("node_recommend_armor"), SubResource("node_repairs"), SubResource("node_repair_complete"), SubResource("node_small_talk"), SubResource("node_end")]

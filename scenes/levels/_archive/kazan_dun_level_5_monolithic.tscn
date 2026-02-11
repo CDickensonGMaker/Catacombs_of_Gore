@@ -1,0 +1,1136 @@
+[gd_scene load_steps=34 format=3 uid="uid://kazandun_level5_001"]
+
+[ext_resource type="Script" path="res://scripts/levels/kazan_dun_level_5.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
+[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://Sprite folders grab bag/stonewall.png" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/world/zone_door_instance.tscn" id="5"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/gore_dungeon_wall.png" id="6"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/hanging_gore_totem1.png" id="7"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/hanging_gore_totem2.png" id="8"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/hanging_gore_totem3.png" id="9"]
+
+[sub_resource type="Environment" id="Environment_level5"]
+background_mode = 1
+background_color = Color(0.06, 0.05, 0.05, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.35, 0.32, 0.3, 1)
+ambient_light_energy = 0.2
+fog_enabled = true
+fog_light_color = Color(0.15, 0.12, 0.1, 1)
+fog_density = 0.025
+
+[sub_resource type="StandardMaterial3D" id="mat_ancient_floor"]
+albedo_color = Color(0.35, 0.33, 0.3, 1)
+albedo_texture = ExtResource("4")
+roughness = 0.85
+uv1_scale = Vector3(20, 20, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_ancient_wall"]
+albedo_color = Color(0.38, 0.35, 0.32, 1)
+albedo_texture = ExtResource("4")
+roughness = 0.88
+uv1_scale = Vector3(6, 4, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_vault_door"]
+albedo_color = Color(0.5, 0.48, 0.45, 1)
+metallic = 0.4
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="mat_gold"]
+albedo_color = Color(0.85, 0.7, 0.25, 1)
+metallic = 0.8
+roughness = 0.2
+
+[sub_resource type="StandardMaterial3D" id="mat_treasure"]
+albedo_color = Color(0.9, 0.75, 0.3, 1)
+metallic = 0.7
+roughness = 0.25
+
+[sub_resource type="StandardMaterial3D" id="mat_gem_red"]
+albedo_color = Color(0.8, 0.2, 0.2, 1)
+emission_enabled = true
+emission = Color(0.4, 0.1, 0.1, 1)
+emission_energy_multiplier = 0.5
+metallic = 0.3
+roughness = 0.2
+
+[sub_resource type="StandardMaterial3D" id="mat_gem_blue"]
+albedo_color = Color(0.2, 0.4, 0.9, 1)
+emission_enabled = true
+emission = Color(0.1, 0.2, 0.5, 1)
+emission_energy_multiplier = 0.5
+metallic = 0.3
+roughness = 0.2
+
+[sub_resource type="StandardMaterial3D" id="mat_ancient_pillar"]
+albedo_color = Color(0.42, 0.4, 0.38, 1)
+albedo_texture = ExtResource("4")
+roughness = 0.85
+uv1_scale = Vector3(2, 5, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_rune_glow"]
+albedo_color = Color(0.4, 0.6, 0.8, 1)
+emission_enabled = true
+emission = Color(0.3, 0.5, 0.7, 1)
+emission_energy_multiplier = 1.5
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="mat_metal"]
+albedo_color = Color(0.45, 0.45, 0.5, 1)
+metallic = 0.6
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="mat_brazier_fire"]
+albedo_color = Color(1.0, 0.6, 0.2, 1)
+emission_enabled = true
+emission = Color(1.0, 0.5, 0.1, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="StandardMaterial3D" id="mat_goblin_throne"]
+albedo_color = Color(0.25, 0.2, 0.15, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_bone"]
+albedo_color = Color(0.85, 0.8, 0.7, 1)
+roughness = 0.75
+
+[sub_resource type="StandardMaterial3D" id="mat_cage_metal"]
+albedo_color = Color(0.3, 0.3, 0.35, 1)
+metallic = 0.5
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="mat_ritual_blood"]
+albedo_color = Color(0.5, 0.1, 0.08, 1)
+emission_enabled = true
+emission = Color(0.3, 0.05, 0.02, 1)
+emission_energy_multiplier = 0.5
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="mat_ritual_glow"]
+albedo_color = Color(0.6, 0.2, 0.8, 1)
+emission_enabled = true
+emission = Color(0.5, 0.1, 0.6, 1)
+emission_energy_multiplier = 2.0
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="mat_dwarf_royal"]
+albedo_color = Color(0.6, 0.5, 0.35, 1)
+metallic = 0.4
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="mat_goblin_banner"]
+albedo_color = Color(0.3, 0.15, 0.1, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_looted_gold"]
+albedo_color = Color(0.85, 0.7, 0.25, 1)
+metallic = 0.8
+roughness = 0.2
+
+[sub_resource type="StandardMaterial3D" id="mat_ceiling"]
+albedo_color = Color(0.28, 0.26, 0.24, 1)
+albedo_texture = ExtResource("4")
+roughness = 0.9
+uv1_scale = Vector3(20, 20, 1)
+texture_filter = 0
+
+[node name="KazanDunLevel5" type="Node3D"]
+script = ExtResource("1")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_level5")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866, -0.433, 0.25, 0, 0.5, 0.866, -0.5, -0.75, 0.433, 0, 20, 0)
+light_color = Color(0.7, 0.65, 0.6, 1)
+light_energy = 0.1
+shadow_enabled = true
+shadow_bias = 0.02
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="Floor" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(80, 1, 80)
+material = SubResource("mat_ancient_floor")
+
+[node name="Ceiling" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
+use_collision = true
+size = Vector3(80, 0.5, 80)
+material = SubResource("mat_ceiling")
+
+[node name="Walls" type="Node3D" parent="Terrain"]
+
+[node name="WallNorth" type="CSGBox3D" parent="Terrain/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -40)
+use_collision = true
+size = Vector3(80, 8, 2)
+material = SubResource("mat_ancient_wall")
+
+[node name="WallSouthLeft" type="CSGBox3D" parent="Terrain/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28, 4, 40)
+use_collision = true
+size = Vector3(24, 8, 2)
+material = SubResource("mat_ancient_wall")
+
+[node name="WallSouthRight" type="CSGBox3D" parent="Terrain/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 4, 40)
+use_collision = true
+size = Vector3(24, 8, 2)
+material = SubResource("mat_ancient_wall")
+
+[node name="WallSouthTop" type="CSGBox3D" parent="Terrain/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 40)
+use_collision = true
+size = Vector3(32, 2, 2)
+material = SubResource("mat_ancient_wall")
+
+[node name="WallEastTop" type="CSGBox3D" parent="Terrain/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 7, 0)
+use_collision = true
+size = Vector3(2, 2, 80)
+material = SubResource("mat_ancient_wall")
+
+[node name="WallEastBottom" type="CSGBox3D" parent="Terrain/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 2.5, -15)
+use_collision = true
+size = Vector3(2, 5, 50)
+material = SubResource("mat_ancient_wall")
+
+[node name="WallEastSouth" type="CSGBox3D" parent="Terrain/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 2.5, 32)
+use_collision = true
+size = Vector3(2, 5, 16)
+material = SubResource("mat_ancient_wall")
+
+[node name="WallWest" type="CSGBox3D" parent="Terrain/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40, 4, 0)
+use_collision = true
+size = Vector3(2, 8, 80)
+material = SubResource("mat_ancient_wall")
+
+[node name="WallNorthDoorLeft" type="CSGBox3D" parent="Terrain/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28, 4, -40)
+use_collision = true
+size = Vector3(24, 8, 2)
+material = SubResource("mat_ancient_wall")
+
+[node name="WallNorthDoorRight" type="CSGBox3D" parent="Terrain/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 4, -40)
+use_collision = true
+size = Vector3(24, 8, 2)
+material = SubResource("mat_ancient_wall")
+
+[node name="WallNorthDoorTop" type="CSGBox3D" parent="Terrain/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, -40)
+use_collision = true
+size = Vector3(32, 2, 2)
+material = SubResource("mat_ancient_wall")
+
+[node name="Structures" type="Node3D" parent="."]
+
+[node name="AncientPillars" type="Node3D" parent="Structures"]
+
+[node name="Pillar1" type="CSGCylinder3D" parent="Structures/AncientPillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 3.75, -25)
+use_collision = true
+radius = 1.8
+height = 7.5
+sides = 8
+material = SubResource("mat_ancient_pillar")
+
+[node name="Pillar2" type="CSGCylinder3D" parent="Structures/AncientPillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 3.75, -25)
+use_collision = true
+radius = 1.8
+height = 7.5
+sides = 8
+material = SubResource("mat_ancient_pillar")
+
+[node name="Pillar3" type="CSGCylinder3D" parent="Structures/AncientPillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 3.75, 0)
+use_collision = true
+radius = 1.8
+height = 7.5
+sides = 8
+material = SubResource("mat_ancient_pillar")
+
+[node name="Pillar4" type="CSGCylinder3D" parent="Structures/AncientPillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 3.75, 0)
+use_collision = true
+radius = 1.8
+height = 7.5
+sides = 8
+material = SubResource("mat_ancient_pillar")
+
+[node name="Pillar5" type="CSGCylinder3D" parent="Structures/AncientPillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 3.75, 25)
+use_collision = true
+radius = 1.8
+height = 7.5
+sides = 8
+material = SubResource("mat_ancient_pillar")
+
+[node name="Pillar6" type="CSGCylinder3D" parent="Structures/AncientPillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 3.75, 25)
+use_collision = true
+radius = 1.8
+height = 7.5
+sides = 8
+material = SubResource("mat_ancient_pillar")
+
+[node name="TreasuryVault" type="Node3D" parent="Structures"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)
+
+[node name="VaultFloor" type="CSGBox3D" parent="Structures/TreasuryVault"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+use_collision = true
+size = Vector3(20, 0.2, 15)
+material = SubResource("mat_gold")
+
+[node name="VaultWallL" type="CSGBox3D" parent="Structures/TreasuryVault"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 2, 0)
+use_collision = true
+size = Vector3(1, 4, 15)
+material = SubResource("mat_vault_door")
+
+[node name="VaultWallR" type="CSGBox3D" parent="Structures/TreasuryVault"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2, 0)
+use_collision = true
+size = Vector3(1, 4, 15)
+material = SubResource("mat_vault_door")
+
+[node name="VaultBack" type="CSGBox3D" parent="Structures/TreasuryVault"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -7)
+use_collision = true
+size = Vector3(20, 4, 1)
+material = SubResource("mat_vault_door")
+
+[node name="TreasurePile1" type="Node3D" parent="Structures/TreasuryVault"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -3)
+
+[node name="GoldPile" type="CSGSphere3D" parent="Structures/TreasuryVault/TreasurePile1"]
+transform = Transform3D(1.5, 0, 0, 0, 0.6, 0, 0, 0, 1.2, 0, 0.3, 0)
+radius = 1.0
+material = SubResource("mat_treasure")
+
+[node name="Gem1" type="CSGSphere3D" parent="Structures/TreasuryVault/TreasurePile1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.8, 0.3)
+radius = 0.15
+material = SubResource("mat_gem_red")
+
+[node name="Gem2" type="CSGSphere3D" parent="Structures/TreasuryVault/TreasurePile1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 0.75, -0.2)
+radius = 0.12
+material = SubResource("mat_gem_blue")
+
+[node name="TreasurePile2" type="Node3D" parent="Structures/TreasuryVault"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.2, -3)
+
+[node name="GoldPile" type="CSGSphere3D" parent="Structures/TreasuryVault/TreasurePile2"]
+transform = Transform3D(1.3, 0, 0, 0, 0.5, 0, 0, 0, 1.0, 0, 0.25, 0)
+radius = 0.9
+material = SubResource("mat_treasure")
+
+[node name="Gem1" type="CSGSphere3D" parent="Structures/TreasuryVault/TreasurePile2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 0.65, 0.2)
+radius = 0.13
+material = SubResource("mat_gem_blue")
+
+[node name="TreasureChest1" type="CSGBox3D" parent="Structures/TreasuryVault"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+use_collision = true
+size = Vector3(1.5, 0.8, 1)
+material = SubResource("mat_gold")
+
+[node name="TreasureChest2" type="CSGBox3D" parent="Structures/TreasuryVault"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0.4, 2)
+use_collision = true
+size = Vector3(1.5, 0.8, 1)
+material = SubResource("mat_gold")
+
+[node name="TreasureChest3" type="CSGBox3D" parent="Structures/TreasuryVault"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0.4, 2)
+use_collision = true
+size = Vector3(1.5, 0.8, 1)
+material = SubResource("mat_gold")
+
+[node name="GoblinKingThrone" type="Node3D" parent="Structures"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -25)
+
+[node name="ThroneBase" type="CSGBox3D" parent="Structures/GoblinKingThrone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+use_collision = true
+size = Vector3(8, 1, 6)
+material = SubResource("mat_goblin_throne")
+
+[node name="ThroneSeat" type="CSGBox3D" parent="Structures/GoblinKingThrone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -1)
+use_collision = true
+size = Vector3(5, 2, 4)
+material = SubResource("mat_goblin_throne")
+
+[node name="ThroneBack" type="CSGBox3D" parent="Structures/GoblinKingThrone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, -2.5)
+use_collision = true
+size = Vector3(6, 5, 1)
+material = SubResource("mat_goblin_throne")
+
+[node name="SkullDecor1" type="CSGSphere3D" parent="Structures/GoblinKingThrone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 5.5, -2.5)
+radius = 0.4
+material = SubResource("mat_bone")
+
+[node name="SkullDecor2" type="CSGSphere3D" parent="Structures/GoblinKingThrone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 5.5, -2.5)
+radius = 0.4
+material = SubResource("mat_bone")
+
+[node name="SkullDecor3" type="CSGSphere3D" parent="Structures/GoblinKingThrone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.5, -2.5)
+radius = 0.5
+material = SubResource("mat_bone")
+
+[node name="BoneSpikes" type="Node3D" parent="Structures/GoblinKingThrone"]
+
+[node name="Spike1" type="CSGCylinder3D" parent="Structures/GoblinKingThrone/BoneSpikes"]
+transform = Transform3D(0.966, 0.259, 0, -0.259, 0.966, 0, 0, 0, 1, -3.5, 4, -2.5)
+radius = 0.15
+height = 2
+sides = 6
+material = SubResource("mat_bone")
+
+[node name="Spike2" type="CSGCylinder3D" parent="Structures/GoblinKingThrone/BoneSpikes"]
+transform = Transform3D(0.966, -0.259, 0, 0.259, 0.966, 0, 0, 0, 1, 3.5, 4, -2.5)
+radius = 0.15
+height = 2
+sides = 6
+material = SubResource("mat_bone")
+
+[node name="GoblinKingSpawn" type="Node3D" parent="Structures/GoblinKingThrone" groups=["boss_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+
+[node name="KingsBodyCage" type="Node3D" parent="Structures"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
+
+[node name="CageBase" type="CSGCylinder3D" parent="Structures/KingsBodyCage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+use_collision = true
+radius = 3.0
+height = 0.3
+sides = 8
+material = SubResource("mat_cage_metal")
+
+[node name="CageBar1" type="CSGCylinder3D" parent="Structures/KingsBodyCage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 1.5, 0)
+use_collision = true
+radius = 0.1
+height = 3
+sides = 6
+material = SubResource("mat_cage_metal")
+
+[node name="CageBar2" type="CSGCylinder3D" parent="Structures/KingsBodyCage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 1.5, 0)
+use_collision = true
+radius = 0.1
+height = 3
+sides = 6
+material = SubResource("mat_cage_metal")
+
+[node name="CageBar3" type="CSGCylinder3D" parent="Structures/KingsBodyCage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 2.5)
+use_collision = true
+radius = 0.1
+height = 3
+sides = 6
+material = SubResource("mat_cage_metal")
+
+[node name="CageBar4" type="CSGCylinder3D" parent="Structures/KingsBodyCage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -2.5)
+use_collision = true
+radius = 0.1
+height = 3
+sides = 6
+material = SubResource("mat_cage_metal")
+
+[node name="CageBar5" type="CSGCylinder3D" parent="Structures/KingsBodyCage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.77, 1.5, 1.77)
+use_collision = true
+radius = 0.1
+height = 3
+sides = 6
+material = SubResource("mat_cage_metal")
+
+[node name="CageBar6" type="CSGCylinder3D" parent="Structures/KingsBodyCage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.77, 1.5, 1.77)
+use_collision = true
+radius = 0.1
+height = 3
+sides = 6
+material = SubResource("mat_cage_metal")
+
+[node name="CageBar7" type="CSGCylinder3D" parent="Structures/KingsBodyCage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.77, 1.5, -1.77)
+use_collision = true
+radius = 0.1
+height = 3
+sides = 6
+material = SubResource("mat_cage_metal")
+
+[node name="CageBar8" type="CSGCylinder3D" parent="Structures/KingsBodyCage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.77, 1.5, -1.77)
+use_collision = true
+radius = 0.1
+height = 3
+sides = 6
+material = SubResource("mat_cage_metal")
+
+[node name="CageTop" type="CSGCylinder3D" parent="Structures/KingsBodyCage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, 0)
+use_collision = true
+radius = 3.0
+height = 0.2
+sides = 8
+material = SubResource("mat_cage_metal")
+
+[node name="DwarfKingBody" type="Node3D" parent="Structures/KingsBodyCage"]
+transform = Transform3D(1, 0, 0, 0, 0.2, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="Torso" type="CSGBox3D" parent="Structures/KingsBodyCage/DwarfKingBody"]
+size = Vector3(1.4, 2, 0.8)
+material = SubResource("mat_dwarf_royal")
+
+[node name="Crown" type="CSGCylinder3D" parent="Structures/KingsBodyCage/DwarfKingBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+radius = 0.35
+height = 0.3
+sides = 8
+material = SubResource("mat_looted_gold")
+
+[node name="KingsBodyInteract" type="Node3D" parent="Structures/KingsBodyCage" groups=["interactable_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 3.5)
+
+[node name="RitualCircle" type="Node3D" parent="Structures"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
+
+[node name="CircleBase" type="CSGCylinder3D" parent="Structures/RitualCircle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+radius = 10.0
+height = 0.1
+sides = 16
+material = SubResource("mat_ritual_blood")
+
+[node name="InnerRing" type="CSGTorus3D" parent="Structures/RitualCircle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+inner_radius = 4.0
+outer_radius = 5.0
+sides = 16
+ring_sides = 8
+material = SubResource("mat_ritual_glow")
+
+[node name="OuterRing" type="CSGTorus3D" parent="Structures/RitualCircle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+inner_radius = 8.5
+outer_radius = 9.5
+sides = 16
+ring_sides = 8
+material = SubResource("mat_ritual_glow")
+
+[node name="RitualCandle1" type="Node3D" parent="Structures/RitualCircle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, 0)
+
+[node name="CandleBase" type="CSGCylinder3D" parent="Structures/RitualCircle/RitualCandle1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+radius = 0.25
+height = 0.8
+sides = 6
+material = SubResource("mat_bone")
+
+[node name="Flame" type="CSGSphere3D" parent="Structures/RitualCircle/RitualCandle1"]
+transform = Transform3D(0.5, 0, 0, 0, 0.8, 0, 0, 0, 0.5, 0, 1, 0)
+radius = 0.2
+material = SubResource("mat_ritual_glow")
+
+[node name="RitualCandle2" type="Node3D" parent="Structures/RitualCircle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, 0)
+
+[node name="CandleBase" type="CSGCylinder3D" parent="Structures/RitualCircle/RitualCandle2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+radius = 0.25
+height = 0.8
+sides = 6
+material = SubResource("mat_bone")
+
+[node name="Flame" type="CSGSphere3D" parent="Structures/RitualCircle/RitualCandle2"]
+transform = Transform3D(0.5, 0, 0, 0, 0.8, 0, 0, 0, 0.5, 0, 1, 0)
+radius = 0.2
+material = SubResource("mat_ritual_glow")
+
+[node name="RitualCandle3" type="Node3D" parent="Structures/RitualCircle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 7)
+
+[node name="CandleBase" type="CSGCylinder3D" parent="Structures/RitualCircle/RitualCandle3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+radius = 0.25
+height = 0.8
+sides = 6
+material = SubResource("mat_bone")
+
+[node name="Flame" type="CSGSphere3D" parent="Structures/RitualCircle/RitualCandle3"]
+transform = Transform3D(0.5, 0, 0, 0, 0.8, 0, 0, 0, 0.5, 0, 1, 0)
+radius = 0.2
+material = SubResource("mat_ritual_glow")
+
+[node name="RitualCandle4" type="Node3D" parent="Structures/RitualCircle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -7)
+
+[node name="CandleBase" type="CSGCylinder3D" parent="Structures/RitualCircle/RitualCandle4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+radius = 0.25
+height = 0.8
+sides = 6
+material = SubResource("mat_bone")
+
+[node name="Flame" type="CSGSphere3D" parent="Structures/RitualCircle/RitualCandle4"]
+transform = Transform3D(0.5, 0, 0, 0, 0.8, 0, 0, 0, 0.5, 0, 1, 0)
+radius = 0.2
+material = SubResource("mat_ritual_glow")
+
+[node name="RitualLight" type="OmniLight3D" parent="Structures/RitualCircle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+light_color = Color(0.6, 0.2, 0.8, 1)
+light_energy = 4.0
+omni_range = 15.0
+
+[node name="LootedTreasury" type="Node3D" parent="Structures"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 0, 0)
+
+[node name="ScatteredGold1" type="CSGSphere3D" parent="Structures/LootedTreasury"]
+transform = Transform3D(1.5, 0, 0, 0, 0.4, 0, 0, 0, 1.2, 0, 0.2, 0)
+radius = 1.0
+material = SubResource("mat_looted_gold")
+
+[node name="ScatteredGold2" type="CSGSphere3D" parent="Structures/LootedTreasury"]
+transform = Transform3D(1.0, 0, 0, 0, 0.3, 0, 0, 0, 0.8, 3, 0.15, 2)
+radius = 0.7
+material = SubResource("mat_looted_gold")
+
+[node name="OpenChest" type="CSGBox3D" parent="Structures/LootedTreasury"]
+transform = Transform3D(0.966, 0, 0.259, 0, 1, 0, -0.259, 0, 0.966, -2, 0.35, -3)
+use_collision = true
+size = Vector3(1.5, 0.7, 1)
+material = SubResource("mat_gold")
+
+[node name="ChestLid" type="CSGBox3D" parent="Structures/LootedTreasury"]
+transform = Transform3D(0.966, -0.259, 0, 0.259, 0.966, 0, 0, 0, 1, -2, 1, -3.8)
+size = Vector3(1.5, 0.15, 1)
+material = SubResource("mat_gold")
+
+[node name="GoblinBanners" type="Node3D" parent="Structures"]
+
+[node name="Banner1" type="CSGBox3D" parent="Structures/GoblinBanners"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38, 4, -25)
+size = Vector3(0.2, 6, 4)
+material = SubResource("mat_goblin_banner")
+
+[node name="Banner2" type="CSGBox3D" parent="Structures/GoblinBanners"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 4, -25)
+size = Vector3(0.2, 6, 4)
+material = SubResource("mat_goblin_banner")
+
+[node name="Banner3" type="CSGBox3D" parent="Structures/GoblinBanners"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0, 4, -38)
+size = Vector3(0.2, 5, 3)
+material = SubResource("mat_goblin_banner")
+
+[node name="Decorations" type="Node3D" parent="."]
+
+[node name="Braziers" type="Node3D" parent="Decorations"]
+
+[node name="Brazier1" type="Node3D" parent="Decorations/Braziers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 0, -25)
+
+[node name="Stand" type="CSGCylinder3D" parent="Decorations/Braziers/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+radius = 0.4
+height = 2.0
+sides = 6
+material = SubResource("mat_metal")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Decorations/Braziers/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3, 0)
+radius = 0.7
+height = 0.7
+sides = 6
+material = SubResource("mat_metal")
+
+[node name="Fire" type="CSGSphere3D" parent="Decorations/Braziers/Brazier1"]
+transform = Transform3D(0.9, 0, 0, 0, 1.1, 0, 0, 0, 0.9, 0, 2.9, 0)
+radius = 0.55
+material = SubResource("mat_brazier_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/Braziers/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 3.0
+omni_range = 12.0
+
+[node name="Brazier2" type="Node3D" parent="Decorations/Braziers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 0, -25)
+
+[node name="Stand" type="CSGCylinder3D" parent="Decorations/Braziers/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+radius = 0.4
+height = 2.0
+sides = 6
+material = SubResource("mat_metal")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Decorations/Braziers/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3, 0)
+radius = 0.7
+height = 0.7
+sides = 6
+material = SubResource("mat_metal")
+
+[node name="Fire" type="CSGSphere3D" parent="Decorations/Braziers/Brazier2"]
+transform = Transform3D(0.9, 0, 0, 0, 1.1, 0, 0, 0, 0.9, 0, 2.9, 0)
+radius = 0.55
+material = SubResource("mat_brazier_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/Braziers/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 3.0
+omni_range = 12.0
+
+[node name="Brazier3" type="Node3D" parent="Decorations/Braziers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 0, 0)
+
+[node name="Stand" type="CSGCylinder3D" parent="Decorations/Braziers/Brazier3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+radius = 0.4
+height = 2.0
+sides = 6
+material = SubResource("mat_metal")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Decorations/Braziers/Brazier3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3, 0)
+radius = 0.7
+height = 0.7
+sides = 6
+material = SubResource("mat_metal")
+
+[node name="Fire" type="CSGSphere3D" parent="Decorations/Braziers/Brazier3"]
+transform = Transform3D(0.9, 0, 0, 0, 1.1, 0, 0, 0, 0.9, 0, 2.9, 0)
+radius = 0.55
+material = SubResource("mat_brazier_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/Braziers/Brazier3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 3.0
+omni_range = 12.0
+
+[node name="Brazier4" type="Node3D" parent="Decorations/Braziers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 0, 0)
+
+[node name="Stand" type="CSGCylinder3D" parent="Decorations/Braziers/Brazier4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+radius = 0.4
+height = 2.0
+sides = 6
+material = SubResource("mat_metal")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Decorations/Braziers/Brazier4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3, 0)
+radius = 0.7
+height = 0.7
+sides = 6
+material = SubResource("mat_metal")
+
+[node name="Fire" type="CSGSphere3D" parent="Decorations/Braziers/Brazier4"]
+transform = Transform3D(0.9, 0, 0, 0, 1.1, 0, 0, 0, 0.9, 0, 2.9, 0)
+radius = 0.55
+material = SubResource("mat_brazier_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/Braziers/Brazier4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 3.0
+omni_range = 12.0
+
+[node name="Brazier5" type="Node3D" parent="Decorations/Braziers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 0, 25)
+
+[node name="Stand" type="CSGCylinder3D" parent="Decorations/Braziers/Brazier5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+radius = 0.4
+height = 2.0
+sides = 6
+material = SubResource("mat_metal")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Decorations/Braziers/Brazier5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3, 0)
+radius = 0.7
+height = 0.7
+sides = 6
+material = SubResource("mat_metal")
+
+[node name="Fire" type="CSGSphere3D" parent="Decorations/Braziers/Brazier5"]
+transform = Transform3D(0.9, 0, 0, 0, 1.1, 0, 0, 0, 0.9, 0, 2.9, 0)
+radius = 0.55
+material = SubResource("mat_brazier_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/Braziers/Brazier5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 3.0
+omni_range = 12.0
+
+[node name="Brazier6" type="Node3D" parent="Decorations/Braziers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 0, 25)
+
+[node name="Stand" type="CSGCylinder3D" parent="Decorations/Braziers/Brazier6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+radius = 0.4
+height = 2.0
+sides = 6
+material = SubResource("mat_metal")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Decorations/Braziers/Brazier6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3, 0)
+radius = 0.7
+height = 0.7
+sides = 6
+material = SubResource("mat_metal")
+
+[node name="Fire" type="CSGSphere3D" parent="Decorations/Braziers/Brazier6"]
+transform = Transform3D(0.9, 0, 0, 0, 1.1, 0, 0, 0, 0.9, 0, 2.9, 0)
+radius = 0.55
+material = SubResource("mat_brazier_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/Braziers/Brazier6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 3.0
+omni_range = 12.0
+
+[node name="WallTorches" type="Node3D" parent="Decorations"]
+
+[node name="WallTorchN1" type="Node3D" parent="Decorations/WallTorches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 3, -38)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorches/WallTorchN1"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorches/WallTorchN1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0.4)
+radius = 0.2
+material = SubResource("mat_brazier_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorches/WallTorchN1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0.4)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10
+
+[node name="WallTorchN2" type="Node3D" parent="Decorations/WallTorches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 3, -38)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorches/WallTorchN2"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorches/WallTorchN2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0.4)
+radius = 0.2
+material = SubResource("mat_brazier_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorches/WallTorchN2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0.4)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10
+
+[node name="WallTorchE1" type="Node3D" parent="Decorations/WallTorches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 3, -15)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorches/WallTorchE1"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorches/WallTorchE1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.3, 0)
+radius = 0.2
+material = SubResource("mat_brazier_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorches/WallTorchE1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.3, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10
+
+[node name="WallTorchE2" type="Node3D" parent="Decorations/WallTorches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 3, 30)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorches/WallTorchE2"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorches/WallTorchE2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.3, 0)
+radius = 0.2
+material = SubResource("mat_brazier_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorches/WallTorchE2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.3, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10
+
+[node name="WallTorchW1" type="Node3D" parent="Decorations/WallTorches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38, 3, -15)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorches/WallTorchW1"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorches/WallTorchW1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.3, 0)
+radius = 0.2
+material = SubResource("mat_brazier_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorches/WallTorchW1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.3, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10
+
+[node name="WallTorchW2" type="Node3D" parent="Decorations/WallTorches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38, 3, 15)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorches/WallTorchW2"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorches/WallTorchW2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.3, 0)
+radius = 0.2
+material = SubResource("mat_brazier_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorches/WallTorchW2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.3, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10
+
+[node name="WallTorchS1" type="Node3D" parent="Decorations/WallTorches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 3, 38)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorches/WallTorchS1"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorches/WallTorchS1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, -0.4)
+radius = 0.2
+material = SubResource("mat_brazier_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorches/WallTorchS1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, -0.4)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10
+
+[node name="WallTorchS2" type="Node3D" parent="Decorations/WallTorches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 3, 38)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorches/WallTorchS2"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorches/WallTorchS2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, -0.4)
+radius = 0.2
+material = SubResource("mat_brazier_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorches/WallTorchS2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, -0.4)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10
+
+[node name="NPCs" type="Node3D" parent="."]
+
+[node name="GoblinEliteGuards" type="Node3D" parent="NPCs"]
+
+[node name="EliteGuard1" type="Node3D" parent="NPCs/GoblinEliteGuards" groups=["enemy_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -20)
+
+[node name="EliteGuard2" type="Node3D" parent="NPCs/GoblinEliteGuards" groups=["enemy_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -20)
+
+[node name="EliteGuard3" type="Node3D" parent="NPCs/GoblinEliteGuards" groups=["enemy_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -15)
+
+[node name="EliteGuard4" type="Node3D" parent="NPCs/GoblinEliteGuards" groups=["enemy_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -15)
+
+[node name="GoblinRitualGuards" type="Node3D" parent="NPCs"]
+
+[node name="RitualGuard1" type="Node3D" parent="NPCs/GoblinRitualGuards" groups=["enemy_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 5)
+
+[node name="RitualGuard2" type="Node3D" parent="NPCs/GoblinRitualGuards" groups=["enemy_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 5)
+
+[node name="RitualGuard3" type="Node3D" parent="NPCs/GoblinRitualGuards" groups=["enemy_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 15)
+
+[node name="RitualGuard4" type="Node3D" parent="NPCs/GoblinRitualGuards" groups=["enemy_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 15)
+
+[node name="GoblinTreasuryLooters" type="Node3D" parent="NPCs"]
+
+[node name="Looter1" type="Node3D" parent="NPCs/GoblinTreasuryLooters" groups=["enemy_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 0, 5)
+
+[node name="Looter2" type="Node3D" parent="NPCs/GoblinTreasuryLooters" groups=["enemy_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28, 0, -5)
+
+[node name="GoblinShaman" type="Node3D" parent="NPCs"]
+
+[node name="ShamanSpawn" type="Node3D" parent="NPCs/GoblinShaman" groups=["enemy_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 20)
+
+[node name="Interactables" type="Node3D" parent="."]
+
+[node name="Doors" type="Node3D" parent="."]
+
+[node name="Level4Door" parent="Doors" instance=ExtResource("5")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 38)
+target_scene = "res://scenes/levels/kazan_dun_level_4.tscn"
+spawn_point_id = "from_level_5"
+door_name = "Ascend to Mining Tunnels"
+
+[node name="ExitDoor" parent="Doors" instance=ExtResource("5")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 38, 0, 18)
+target_scene = "res://scenes/levels/kazan_dun_exit.tscn"
+spawn_point_id = "from_level_5"
+door_name = "Passage to Mountain Exit"
+
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="from_level_4" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 35)
+
+[node name="from_exit" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 0.1, 18)
+
+[node name="default" type="Node3D" parent="SpawnPoints" groups=["default_spawn", "spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 35)
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+
+[node name="Player" parent="." instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 35)
+
+[node name="HUD" parent="." instance=ExtResource("3")]
+
+[node name="GoreDecorations" type="Node3D" parent="."]
+
+[node name="GoreWall_0" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38, 2, -20)
+pixel_size = 0.025
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("6")
+
+[node name="GoreWall_1" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 2, -15)
+pixel_size = 0.025
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("6")
+
+[node name="GoreWall_2" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38, 2, 25)
+pixel_size = 0.025
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("6")
+
+[node name="GoreWall_3" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 2, 20)
+pixel_size = 0.025
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("6")
+
+[node name="HangingGore_0" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 4, -38)
+pixel_size = 0.022
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("7")
+
+[node name="HangingGore_1" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 4, -38)
+pixel_size = 0.022
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("8")
+
+[node name="HangingGore_2" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -38)
+pixel_size = 0.022
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("9")
+
+[node name="HangingGore_3" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 4, 38)
+pixel_size = 0.022
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("7")
+
+[node name="HangingGore_4" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 4, 38)
+pixel_size = 0.022
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("8")

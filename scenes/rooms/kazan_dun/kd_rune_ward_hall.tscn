@@ -1,0 +1,335 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/modular_room.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://Sprite folders grab bag/stonewall.png" id="2"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/bridge/pillar_ornate.obj" id="mesh_pillar"]
+
+[sub_resource type="StandardMaterial3D" id="mat_stone_floor"]
+albedo_color = Color(0.34, 0.32, 0.3, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.88
+uv1_scale = Vector3(5, 5, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_stone_wall"]
+albedo_color = Color(0.38, 0.36, 0.34, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.85
+uv1_scale = Vector3(4, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_ceiling"]
+albedo_color = Color(0.3, 0.28, 0.26, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.88
+uv1_scale = Vector3(5, 5, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_rune_stone"]
+albedo_color = Color(0.25, 0.25, 0.3, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.75
+uv1_scale = Vector3(2, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_rune_glow"]
+albedo_color = Color(0.3, 0.5, 0.9, 1)
+emission_enabled = true
+emission = Color(0.2, 0.4, 0.8, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="StandardMaterial3D" id="mat_pillar"]
+albedo_color = Color(0.36, 0.34, 0.32, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.85
+uv1_scale = Vector3(2, 4, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_brazier"]
+albedo_color = Color(0.42, 0.4, 0.44, 1)
+metallic = 0.4
+roughness = 0.55
+
+[sub_resource type="StandardMaterial3D" id="mat_fire"]
+albedo_color = Color(1.0, 0.6, 0.2, 1)
+emission_enabled = true
+emission = Color(1.0, 0.5, 0.1, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="StandardMaterial3D" id="mat_crystal"]
+transparency = 1
+albedo_color = Color(0.4, 0.6, 0.9, 0.8)
+metallic = 0.2
+roughness = 0.2
+emission_enabled = true
+emission = Color(0.3, 0.5, 0.8, 1)
+emission_energy_multiplier = 0.8
+
+[sub_resource type="StandardMaterial3D" id="mat_altar"]
+albedo_color = Color(0.28, 0.26, 0.32, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.8
+uv1_scale = Vector3(2, 2, 1)
+texture_filter = 0
+
+[node name="KDRuneWardHall" type="Node3D"]
+script = ExtResource("1")
+room_id = "kd_rune_ward_hall"
+room_type = "rune_ward_hall"
+room_name = "Rune Ward Hall"
+room_width = 22.0
+room_depth = 22.0
+room_height = 12.0
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="Floor" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(22, 1, 22)
+material = SubResource("mat_stone_floor")
+
+[node name="Ceiling" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, 0)
+use_collision = true
+size = Vector3(22, 0.5, 22)
+material = SubResource("mat_ceiling")
+
+[node name="WallNorth" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, -11)
+use_collision = true
+size = Vector3(22, 12, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthLeft" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.5, 6, 11)
+use_collision = true
+size = Vector3(7, 12, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthRight" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 6, 11)
+use_collision = true
+size = Vector3(7, 12, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthTop" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.5, 11)
+use_collision = true
+size = Vector3(8, 5, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallEast" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 6, 0)
+use_collision = true
+size = Vector3(1, 12, 22)
+material = SubResource("mat_stone_wall")
+
+[node name="WallWest" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 6, 0)
+use_collision = true
+size = Vector3(1, 12, 22)
+material = SubResource("mat_stone_wall")
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="CentralAltar" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="Base" type="CSGCylinder3D" parent="Props/CentralAltar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+use_collision = true
+radius = 2.5
+height = 0.8
+sides = 8
+material = SubResource("mat_altar")
+
+[node name="Platform" type="CSGCylinder3D" parent="Props/CentralAltar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
+use_collision = true
+radius = 1.8
+height = 0.4
+sides = 8
+material = SubResource("mat_rune_stone")
+
+[node name="Crystal" type="CSGCylinder3D" parent="Props/CentralAltar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+radius = 0.4
+height = 2.5
+sides = 6
+material = SubResource("mat_crystal")
+
+[node name="CrystalLight" type="OmniLight3D" parent="Props/CentralAltar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
+light_color = Color(0.4, 0.6, 0.9, 1)
+light_energy = 3.0
+omni_range = 15.0
+
+[node name="RuneStone1" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -6)
+
+[node name="Stone" type="CSGBox3D" parent="Props/RuneStone1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+size = Vector3(1.2, 3, 0.6)
+material = SubResource("mat_rune_stone")
+
+[node name="Rune" type="CSGBox3D" parent="Props/RuneStone1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0.32)
+size = Vector3(0.6, 1.2, 0.05)
+material = SubResource("mat_rune_glow")
+
+[node name="RuneStone2" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -6)
+
+[node name="Stone" type="CSGBox3D" parent="Props/RuneStone2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+size = Vector3(1.2, 3, 0.6)
+material = SubResource("mat_rune_stone")
+
+[node name="Rune" type="CSGBox3D" parent="Props/RuneStone2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0.32)
+size = Vector3(0.6, 1.2, 0.05)
+material = SubResource("mat_rune_glow")
+
+[node name="RuneStone3" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 6)
+
+[node name="Stone" type="CSGBox3D" parent="Props/RuneStone3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+size = Vector3(1.2, 3, 0.6)
+material = SubResource("mat_rune_stone")
+
+[node name="Rune" type="CSGBox3D" parent="Props/RuneStone3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0.32)
+size = Vector3(0.6, 1.2, 0.05)
+material = SubResource("mat_rune_glow")
+
+[node name="RuneStone4" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 6)
+
+[node name="Stone" type="CSGBox3D" parent="Props/RuneStone4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+size = Vector3(1.2, 3, 0.6)
+material = SubResource("mat_rune_stone")
+
+[node name="Rune" type="CSGBox3D" parent="Props/RuneStone4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0.32)
+size = Vector3(0.6, 1.2, 0.05)
+material = SubResource("mat_rune_glow")
+
+[node name="Pillar1" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -8)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="Pillar2" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -8)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="Pillar3" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 8)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="Pillar4" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 8)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="Brazier1" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0)
+
+[node name="Stand" type="CSGCylinder3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+radius = 0.3
+height = 1.0
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+radius = 0.45
+height = 0.4
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Fire" type="CSGSphere3D" parent="Lighting/Brazier1"]
+transform = Transform3D(0.65, 0, 0, 0, 0.8, 0, 0, 0, 0.65, 0, 1.55, 0)
+radius = 0.35
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 2.0
+omni_range = 10.0
+
+[node name="Brazier2" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
+
+[node name="Stand" type="CSGCylinder3D" parent="Lighting/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+radius = 0.3
+height = 1.0
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Lighting/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+radius = 0.45
+height = 0.4
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Fire" type="CSGSphere3D" parent="Lighting/Brazier2"]
+transform = Transform3D(0.65, 0, 0, 0, 0.8, 0, 0, 0, 0.65, 0, 1.55, 0)
+radius = 0.35
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 2.0
+omni_range = 10.0
+
+[node name="Spawns" type="Node3D" parent="."]
+
+[node name="NPCSpawns" type="Node3D" parent="Spawns"]
+
+[node name="RuneKeeper" type="Marker3D" parent="Spawns/NPCSpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4)
+metadata/npc_type = "quest_giver"
+metadata/npc_name = "Rune Keeper Aldrik"
+metadata/npc_id = "rune_keeper_aldrik"
+metadata/archetype = "mage"
+metadata/quest_ids = ["kd_restore_wards", "kd_ancient_runes"]
+
+[node name="EnemySpawns" type="Node3D" parent="Spawns"]
+
+[node name="ChestSpawns" type="Node3D" parent="Spawns"]
+
+[node name="RuneChest" type="Marker3D" parent="Spawns/ChestSpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 0)
+metadata/chest_id = "kd_rune_ward_chest_1"
+metadata/chest_name = "Rune Keeper's Chest"
+metadata/loot_tier = "rare"
+metadata/is_locked = true
+metadata/lock_difficulty = 15
+
+[node name="Connections" type="Node3D" parent="."]
+
+[node name="DoorPositions" type="Node3D" parent="Connections"]
+
+[node name="DoorSouth" type="Marker3D" parent="Connections/DoorPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10.5)
+metadata/door_id = "door_south"
+metadata/door_label = "To Corridor"
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]

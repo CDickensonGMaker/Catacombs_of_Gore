@@ -1,0 +1,153 @@
+[gd_scene load_steps=11 format=3 uid="uid://b803ngtwcm606"]
+
+[ext_resource type="Script" uid="uid://hdweyu457cvo" path="res://scripts/levels/kazan_dun_level_1.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/world/zone_door_instance.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/kazan_dun/kd_feast_hall.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/kazan_dun/kd_council_chamber.tscn" id="6"]
+[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://Sprite folders grab bag/stonewall.png" id="6_gl53g"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/kazan_dun/kd_kitchen.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/kazan_dun/kd_great_hall_corridor.tscn" id="8"]
+
+[sub_resource type="StandardMaterial3D" id="mat_stone_wall"]
+albedo_color = Color(0.42, 0.38, 0.35, 1)
+albedo_texture = ExtResource("6_gl53g")
+roughness = 0.9
+uv1_scale = Vector3(4, 2, 1)
+texture_filter = 0
+
+[node name="KazanDunLevel1Modular" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Rooms" type="Node3D" parent="."]
+
+[node name="FeastHall" parent="Rooms" instance=ExtResource("5")]
+
+[node name="Ceiling" parent="Rooms/FeastHall/Terrain" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.043002, 0)
+
+[node name="WallNorth" parent="Rooms/FeastHall/Terrain" index="2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.6096525, -12.5)
+size = Vector3(30, 2.8666992, 1)
+
+[node name="WallEast" parent="Rooms/FeastHall/Terrain" index="6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 3.0430021, 0)
+
+[node name="WallWestTop" parent="Rooms/FeastHall/Terrain" index="7"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 3.0430021, -5)
+
+[node name="CouncilChamber" parent="Rooms" instance=ExtResource("6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -45)
+
+[node name="Kitchen" parent="Rooms" instance=ExtResource("7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.53261, 0.008132219, 0.0033435822)
+
+[node name="Floor" parent="Rooms/Kitchen/Terrain" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6376, -0.5, -1.4622557)
+
+[node name="Ceiling" parent="Rooms/Kitchen/Terrain" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6376, 8, -1.4622557)
+
+[node name="WallNorth" parent="Rooms/Kitchen/Terrain" index="2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6376, 3.9999998, -8.9622555)
+
+[node name="WallSouth" parent="Rooms/Kitchen/Terrain" index="3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6376, 3.9999998, 6.0377445)
+
+[node name="WallEastTop" parent="Rooms/Kitchen/Terrain" index="4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.6376, 3.9999998, -3.4622557)
+
+[node name="WallEastBottom" parent="Rooms/Kitchen/Terrain" index="5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.838097, 3.9999998, 6.6646776)
+size = Vector3(0.001, 8, 0.001)
+
+[node name="WallEastDoorTop" parent="Rooms/Kitchen/Terrain" index="6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.6376, 6.5, 1.0377443)
+
+[node name="WallWest" parent="Rooms/Kitchen/Terrain" index="7"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.362398, 3.9999998, -1.4622557)
+
+[node name="Hearth" parent="Rooms/Kitchen/Props" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6376, 0, -7.4622555)
+
+[node name="BarrelStorage" parent="Rooms/Kitchen/Props" index="2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.3623981, 0, 1.5377443)
+
+[node name="SackPile" parent="Rooms/Kitchen/Props" index="3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.6376, 0, 2.5377443)
+
+[node name="PrepCounter" parent="Rooms/Kitchen/Props" index="4"]
+mesh = null
+
+[node name="Bracket" parent="Rooms/Kitchen/Lighting/WallTorchW" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6376, 0, -1.4622557)
+
+[node name="Flame" parent="Rooms/Kitchen/Lighting/WallTorchW" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.0376015, 0.3000002, -1.4622557)
+
+[node name="Bracket" parent="Rooms/Kitchen/Lighting/WallTorchS" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6376, 0, -1.4622555)
+
+[node name="Flame" parent="Rooms/Kitchen/Lighting/WallTorchS" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6376, 0.3000002, -1.862256)
+
+[node name="Cook" parent="Rooms/Kitchen/Spawns/NPCSpawns" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6376, 0, -4.4622555)
+
+[node name="KitchenHelper" parent="Rooms/Kitchen/Spawns/NPCSpawns" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.6376, 0, -3.4622557)
+
+[node name="DoorEast" parent="Rooms/Kitchen/Connections/DoorPositions" index="0"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 13.1376, 0, 1.0377443)
+
+[node name="GreatHallCorridor" parent="Rooms" instance=ExtResource("8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -25)
+
+[node name="WallSouthLeft2" type="CSGBox3D" parent="Rooms/GreatHallCorridor/Terrain" index="8"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.926912, 4, 15)
+use_collision = true
+size = Vector3(10.461914, 8, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthLeft3" type="CSGBox3D" parent="Rooms/GreatHallCorridor/Terrain" index="9"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.666649, 4, 15)
+use_collision = true
+size = Vector3(12.833618, 8, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="Doors" type="Node3D" parent="."]
+
+[node name="EntranceDoor" parent="Doors" instance=ExtResource("4")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 12)
+target_scene = "res://scenes/levels/kazan_dun_entrance.tscn"
+spawn_point_id = "from_level_1"
+door_name = "Return to Entrance Hall"
+
+[node name="Level2Door" parent="Doors" instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.763533, 0.100742936, -53.915943)
+target_scene = "res://scenes/levels/kazan_dun_level_2.tscn"
+spawn_point_id = "from_level_1"
+door_name = "Descend to Residential Level"
+
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="from_entrance" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 10)
+
+[node name="from_level_2" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.1, -52)
+
+[node name="default" type="Marker3D" parent="SpawnPoints" groups=["default_spawn", "spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 10)
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+
+[node name="Player" parent="." instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 10)
+
+[node name="HUD" parent="." instance=ExtResource("3")]
+
+[editable path="Rooms/FeastHall"]
+[editable path="Rooms/Kitchen"]
+[editable path="Rooms/GreatHallCorridor"]

@@ -1,0 +1,119 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/data/enemy_attack_data.gd" id="2"]
+
+[sub_resource type="Resource" id="1"]
+script = ExtResource("2")
+id = "club_smash"
+display_name = "Club Smash"
+damage = Array[int]([2, 12, 4])
+damage_type = 0
+windup_time = 0.8
+active_time = 0.3
+recovery_time = 0.6
+cooldown = 2.0
+range_distance = 3.0
+is_ranged = false
+is_aoe = true
+aoe_radius = 2.0
+projectile_speed = 0.0
+inflicts_condition = 0
+condition_chance = 0.0
+condition_duration = 0.0
+stagger_power = 1.5
+knockback_force = 4.0
+weight = 1.0
+min_range = 0.0
+max_range = 3.0
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[sub_resource type="Resource" id="2"]
+script = ExtResource("2")
+id = "boulder_throw"
+display_name = "Boulder Throw"
+damage = Array[int]([3, 10, 0])
+damage_type = 0
+windup_time = 1.2
+active_time = 0.2
+recovery_time = 0.8
+cooldown = 5.0
+range_distance = 12.0
+is_ranged = true
+is_aoe = true
+aoe_radius = 2.5
+projectile_speed = 15.0
+inflicts_condition = 5
+condition_chance = 0.5
+condition_duration = 2.0
+stagger_power = 2.0
+knockback_force = 5.0
+weight = 0.4
+min_range = 4.0
+max_range = 12.0
+requires_los = true
+animation_name = "throw"
+sound_effect = ""
+
+[resource]
+script = ExtResource("1")
+id = "troll"
+display_name = "Bridge Troll"
+description = "A massive, regenerating beast that claims bridges as its territory. Weak to fire, which stops its healing."
+max_hp = 150
+armor_value = 20
+movement_speed = 3.5
+turn_speed = 3.0
+grit = 12
+agility = 3
+will = 4
+knowledge = 2
+behavior = 0
+faction = 2
+aggro_range = 15.0
+attack_range = 3.0
+preferred_distance = 3.0
+flee_hp_threshold = 0.0
+is_boss = true
+attacks = Array[ExtResource("2")]([SubResource("1"), SubResource("2")])
+can_block = false
+block_chance = 0.0
+stagger_resistance = 0.7
+fire_resistance = -0.5
+frost_resistance = 0.2
+lightning_resistance = 0.0
+poison_resistance = 0.5
+necrotic_resistance = 0.3
+physical_resistance = 0.2
+fire_weakness = 0.75
+frost_weakness = 0.0
+lightning_weakness = 0.0
+holy_weakness = 0.0
+causes_horror = true
+horror_difficulty = 14
+loot_table_av = 8
+gold_drop = Array[int]([150, 300])
+guaranteed_drops = Array[String](["troll_hide"])
+drop_table = {
+"troll_blood": 0.6,
+"beast_heart": 0.4,
+"crude_club": 0.3,
+"rare_gem": 0.15
+}
+xp_reward = 400
+scene_path = ""
+icon_path = "res://Sprite folders grab bag/troll.png"
+scale = 2.0
+sprite_path = "res://Sprite folders grab bag/troll.png"
+attack_sprite_path = ""
+sprite_hframes = 1
+sprite_vframes = 1
+attack_hframes = 1
+attack_vframes = 1
+sprite_pixel_size = 0.018
+idle_sounds = Array[String]([])
+attack_sounds = Array[String]([])
+hurt_sounds = Array[String]([])
+death_sounds = Array[String]([])

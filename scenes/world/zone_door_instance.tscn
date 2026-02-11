@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://zone_door_instance_001"]
+
+[ext_resource type="Script" path="res://scripts/world/zone_door.gd" id="1"]
+
+[node name="ZoneDoor" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1")
+target_scene = ""
+spawn_point_id = "default"
+door_name = "Door"
+is_locked = false
+lock_difficulty = 0
+show_frame = true
+return_to_previous = false

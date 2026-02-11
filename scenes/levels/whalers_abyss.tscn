@@ -1,0 +1,715 @@
+[gd_scene load_steps=20 format=3 uid="uid://whalers_abyss_001"]
+
+[ext_resource type="Script" path="res://scripts/levels/whalers_abyss.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
+[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://Sprite folders grab bag/stonewall.png" id="4"]
+[ext_resource type="Texture2D" uid="uid://dyhj3smpg4g87" path="res://Sprite folders grab bag/woodenfloor.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://stonefloor_001" path="res://Sprite folders grab bag/stonefloor.png" id="6"]
+
+[sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
+sky_top_color = Color(0.35, 0.4, 0.5, 1)
+sky_horizon_color = Color(0.5, 0.52, 0.58, 1)
+ground_bottom_color = Color(0.2, 0.22, 0.25, 1)
+ground_horizon_color = Color(0.38, 0.4, 0.45, 1)
+
+[sub_resource type="Sky" id="sky"]
+sky_material = SubResource("sky_mat")
+
+[sub_resource type="Environment" id="Environment_whalers_abyss"]
+background_mode = 2
+sky = SubResource("sky")
+ambient_light_source = 2
+ambient_light_color = Color(0.45, 0.5, 0.58, 1)
+ambient_light_energy = 0.5
+fog_enabled = true
+fog_light_color = Color(0.35, 0.38, 0.45, 1)
+fog_density = 0.02
+fog_sky_affect = 0.5
+fog_height = 5.0
+fog_height_density = 0.15
+
+[sub_resource type="StandardMaterial3D" id="mat_cliff"]
+albedo_color = Color(0.32, 0.28, 0.25, 1)
+albedo_texture = ExtResource("4")
+roughness = 1.0
+uv1_scale = Vector3(10, 15, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_abyss"]
+albedo_color = Color(0.08, 0.06, 0.05, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="mat_platform"]
+albedo_color = Color(0.48, 0.44, 0.4, 1)
+albedo_texture = ExtResource("6")
+roughness = 0.9
+uv1_scale = Vector3(6, 6, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_support"]
+albedo_color = Color(0.35, 0.32, 0.28, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="mat_plank"]
+albedo_color = Color(0.38, 0.3, 0.22, 1)
+albedo_texture = ExtResource("5")
+roughness = 0.9
+uv1_scale = Vector3(4, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_rope"]
+albedo_color = Color(0.32, 0.26, 0.18, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="mat_stone_building"]
+albedo_color = Color(0.48, 0.43, 0.38, 1)
+albedo_texture = ExtResource("4")
+roughness = 0.9
+uv1_scale = Vector3(3, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_wood_building"]
+albedo_color = Color(0.4, 0.32, 0.24, 1)
+albedo_texture = ExtResource("5")
+roughness = 0.85
+uv1_scale = Vector3(3, 3, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_roof"]
+albedo_color = Color(0.35, 0.28, 0.2, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_wood_stair"]
+albedo_color = Color(0.4, 0.32, 0.24, 1)
+roughness = 0.9
+
+[node name="WhalersAbyss" type="Node3D"]
+script = ExtResource("1")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_whalers_abyss")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866, -0.433, 0.25, 0, 0.5, 0.866, -0.5, -0.75, 0.433, 0, 60, 0)
+light_color = Color(0.78, 0.8, 0.85, 1)
+light_energy = 0.7
+shadow_enabled = true
+shadow_bias = 0.02
+directional_shadow_max_distance = 200.0
+
+[node name="Player" parent="." instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -36)
+
+[node name="HUD" parent="." instance=ExtResource("3")]
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="AbyssFloor" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -60, 0)
+use_collision = true
+size = Vector3(40, 5, 100)
+material = SubResource("mat_abyss")
+
+[node name="WestCliff" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -37, 0, 0)
+use_collision = true
+size = Vector3(35, 80, 100)
+material = SubResource("mat_cliff")
+
+[node name="EastCliff" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37, 0, 0)
+use_collision = true
+size = Vector3(35, 80, 100)
+material = SubResource("mat_cliff")
+
+[node name="NorthCliff" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 55)
+use_collision = true
+size = Vector3(110, 80, 20)
+material = SubResource("mat_cliff")
+
+[node name="SouthCliffLeft" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35, 0, -55)
+use_collision = true
+size = Vector3(40, 80, 20)
+material = SubResource("mat_cliff")
+
+[node name="SouthCliffRight" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 0, -55)
+use_collision = true
+size = Vector3(40, 80, 20)
+material = SubResource("mat_cliff")
+
+[node name="Platforms" type="Node3D" parent="."]
+
+[node name="WestLowerPlatform" type="Node3D" parent="Platforms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, -30)
+
+[node name="Floor" type="CSGBox3D" parent="Platforms/WestLowerPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.75, 0)
+use_collision = true
+size = Vector3(15, 1.5, 20)
+material = SubResource("mat_platform")
+
+[node name="Support_0" type="CSGBox3D" parent="Platforms/WestLowerPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.75, -31.25, 0)
+use_collision = true
+size = Vector3(1.5, 61.5, 1.5)
+material = SubResource("mat_support")
+
+[node name="Support_1" type="CSGBox3D" parent="Platforms/WestLowerPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.75, -31.25, 0)
+use_collision = true
+size = Vector3(1.5, 61.5, 1.5)
+material = SubResource("mat_support")
+
+[node name="FrontRailing" type="CSGBox3D" parent="Platforms/WestLowerPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 9.925)
+use_collision = true
+size = Vector3(15, 1.2, 0.15)
+material = SubResource("mat_support")
+
+[node name="BackRailing" type="CSGBox3D" parent="Platforms/WestLowerPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, -9.925)
+use_collision = true
+size = Vector3(15, 1.2, 0.15)
+material = SubResource("mat_support")
+
+[node name="WestMiddlePlatform1" type="Node3D" parent="Platforms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 12, -10)
+
+[node name="Floor" type="CSGBox3D" parent="Platforms/WestMiddlePlatform1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.75, 0)
+use_collision = true
+size = Vector3(12, 1.5, 18)
+material = SubResource("mat_platform")
+
+[node name="Support_0" type="CSGBox3D" parent="Platforms/WestMiddlePlatform1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, -37.25, 0)
+use_collision = true
+size = Vector3(1.5, 73.5, 1.5)
+material = SubResource("mat_support")
+
+[node name="Support_1" type="CSGBox3D" parent="Platforms/WestMiddlePlatform1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, -37.25, 0)
+use_collision = true
+size = Vector3(1.5, 73.5, 1.5)
+material = SubResource("mat_support")
+
+[node name="FrontRailing" type="CSGBox3D" parent="Platforms/WestMiddlePlatform1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 8.925)
+use_collision = true
+size = Vector3(12, 1.2, 0.15)
+material = SubResource("mat_support")
+
+[node name="BackRailing" type="CSGBox3D" parent="Platforms/WestMiddlePlatform1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, -8.925)
+use_collision = true
+size = Vector3(12, 1.2, 0.15)
+material = SubResource("mat_support")
+
+[node name="WestMiddlePlatform2" type="Node3D" parent="Platforms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 12, 20)
+
+[node name="Floor" type="CSGBox3D" parent="Platforms/WestMiddlePlatform2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.75, 0)
+use_collision = true
+size = Vector3(10, 1.5, 15)
+material = SubResource("mat_platform")
+
+[node name="Support_0" type="CSGBox3D" parent="Platforms/WestMiddlePlatform2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, -37.25, 0)
+use_collision = true
+size = Vector3(1.5, 73.5, 1.5)
+material = SubResource("mat_support")
+
+[node name="Support_1" type="CSGBox3D" parent="Platforms/WestMiddlePlatform2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, -37.25, 0)
+use_collision = true
+size = Vector3(1.5, 73.5, 1.5)
+material = SubResource("mat_support")
+
+[node name="FrontRailing" type="CSGBox3D" parent="Platforms/WestMiddlePlatform2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 7.425)
+use_collision = true
+size = Vector3(10, 1.2, 0.15)
+material = SubResource("mat_support")
+
+[node name="BackRailing" type="CSGBox3D" parent="Platforms/WestMiddlePlatform2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, -7.425)
+use_collision = true
+size = Vector3(10, 1.2, 0.15)
+material = SubResource("mat_support")
+
+[node name="WestUpperPlatform" type="Node3D" parent="Platforms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 24, 5)
+
+[node name="Floor" type="CSGBox3D" parent="Platforms/WestUpperPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.75, 0)
+use_collision = true
+size = Vector3(10, 1.5, 12)
+material = SubResource("mat_platform")
+
+[node name="Support_0" type="CSGBox3D" parent="Platforms/WestUpperPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, -43.25, 0)
+use_collision = true
+size = Vector3(1.5, 85.5, 1.5)
+material = SubResource("mat_support")
+
+[node name="Support_1" type="CSGBox3D" parent="Platforms/WestUpperPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, -43.25, 0)
+use_collision = true
+size = Vector3(1.5, 85.5, 1.5)
+material = SubResource("mat_support")
+
+[node name="FrontRailing" type="CSGBox3D" parent="Platforms/WestUpperPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 5.925)
+use_collision = true
+size = Vector3(10, 1.2, 0.15)
+material = SubResource("mat_support")
+
+[node name="BackRailing" type="CSGBox3D" parent="Platforms/WestUpperPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, -5.925)
+use_collision = true
+size = Vector3(10, 1.2, 0.15)
+material = SubResource("mat_support")
+
+[node name="EastLowerPlatform" type="Node3D" parent="Platforms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, -25)
+
+[node name="Floor" type="CSGBox3D" parent="Platforms/EastLowerPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.75, 0)
+use_collision = true
+size = Vector3(14, 1.5, 18)
+material = SubResource("mat_platform")
+
+[node name="Support_0" type="CSGBox3D" parent="Platforms/EastLowerPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, -31.25, 0)
+use_collision = true
+size = Vector3(1.5, 61.5, 1.5)
+material = SubResource("mat_support")
+
+[node name="Support_1" type="CSGBox3D" parent="Platforms/EastLowerPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, -31.25, 0)
+use_collision = true
+size = Vector3(1.5, 61.5, 1.5)
+material = SubResource("mat_support")
+
+[node name="FrontRailing" type="CSGBox3D" parent="Platforms/EastLowerPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 8.925)
+use_collision = true
+size = Vector3(14, 1.2, 0.15)
+material = SubResource("mat_support")
+
+[node name="BackRailing" type="CSGBox3D" parent="Platforms/EastLowerPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, -8.925)
+use_collision = true
+size = Vector3(14, 1.2, 0.15)
+material = SubResource("mat_support")
+
+[node name="EastMiddlePlatform1" type="Node3D" parent="Platforms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 12, 5)
+
+[node name="Floor" type="CSGBox3D" parent="Platforms/EastMiddlePlatform1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.75, 0)
+use_collision = true
+size = Vector3(12, 1.5, 16)
+material = SubResource("mat_platform")
+
+[node name="Support_0" type="CSGBox3D" parent="Platforms/EastMiddlePlatform1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, -37.25, 0)
+use_collision = true
+size = Vector3(1.5, 73.5, 1.5)
+material = SubResource("mat_support")
+
+[node name="Support_1" type="CSGBox3D" parent="Platforms/EastMiddlePlatform1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, -37.25, 0)
+use_collision = true
+size = Vector3(1.5, 73.5, 1.5)
+material = SubResource("mat_support")
+
+[node name="FrontRailing" type="CSGBox3D" parent="Platforms/EastMiddlePlatform1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 7.925)
+use_collision = true
+size = Vector3(12, 1.2, 0.15)
+material = SubResource("mat_support")
+
+[node name="BackRailing" type="CSGBox3D" parent="Platforms/EastMiddlePlatform1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, -7.925)
+use_collision = true
+size = Vector3(12, 1.2, 0.15)
+material = SubResource("mat_support")
+
+[node name="EastMiddlePlatform2" type="Node3D" parent="Platforms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 12, 28)
+
+[node name="Floor" type="CSGBox3D" parent="Platforms/EastMiddlePlatform2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.75, 0)
+use_collision = true
+size = Vector3(11, 1.5, 14)
+material = SubResource("mat_platform")
+
+[node name="Support_0" type="CSGBox3D" parent="Platforms/EastMiddlePlatform2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.75, -37.25, 0)
+use_collision = true
+size = Vector3(1.5, 73.5, 1.5)
+material = SubResource("mat_support")
+
+[node name="Support_1" type="CSGBox3D" parent="Platforms/EastMiddlePlatform2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.75, -37.25, 0)
+use_collision = true
+size = Vector3(1.5, 73.5, 1.5)
+material = SubResource("mat_support")
+
+[node name="FrontRailing" type="CSGBox3D" parent="Platforms/EastMiddlePlatform2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 6.925)
+use_collision = true
+size = Vector3(11, 1.2, 0.15)
+material = SubResource("mat_support")
+
+[node name="BackRailing" type="CSGBox3D" parent="Platforms/EastMiddlePlatform2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, -6.925)
+use_collision = true
+size = Vector3(11, 1.2, 0.15)
+material = SubResource("mat_support")
+
+[node name="EastUpperPlatform" type="Node3D" parent="Platforms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 24, 15)
+
+[node name="Floor" type="CSGBox3D" parent="Platforms/EastUpperPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.75, 0)
+use_collision = true
+size = Vector3(10, 1.5, 10)
+material = SubResource("mat_platform")
+
+[node name="Support_0" type="CSGBox3D" parent="Platforms/EastUpperPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, -43.25, 0)
+use_collision = true
+size = Vector3(1.5, 85.5, 1.5)
+material = SubResource("mat_support")
+
+[node name="Support_1" type="CSGBox3D" parent="Platforms/EastUpperPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, -43.25, 0)
+use_collision = true
+size = Vector3(1.5, 85.5, 1.5)
+material = SubResource("mat_support")
+
+[node name="FrontRailing" type="CSGBox3D" parent="Platforms/EastUpperPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 4.925)
+use_collision = true
+size = Vector3(10, 1.2, 0.15)
+material = SubResource("mat_support")
+
+[node name="BackRailing" type="CSGBox3D" parent="Platforms/EastUpperPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, -4.925)
+use_collision = true
+size = Vector3(10, 1.2, 0.15)
+material = SubResource("mat_support")
+
+[node name="CentralPlatform" type="Node3D" parent="Platforms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9, 0)
+
+[node name="Floor" type="CSGBox3D" parent="Platforms/CentralPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+use_collision = true
+size = Vector3(8, 2, 8)
+material = SubResource("mat_platform")
+
+[node name="Support_0" type="CSGBox3D" parent="Platforms/CentralPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, -35.5, 0)
+use_collision = true
+size = Vector3(1.5, 70, 1.5)
+material = SubResource("mat_support")
+
+[node name="Support_1" type="CSGBox3D" parent="Platforms/CentralPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, -35.5, 0)
+use_collision = true
+size = Vector3(1.5, 70, 1.5)
+material = SubResource("mat_support")
+
+[node name="FrontRailing" type="CSGBox3D" parent="Platforms/CentralPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 3.925)
+use_collision = true
+size = Vector3(8, 1.2, 0.15)
+material = SubResource("mat_support")
+
+[node name="BackRailing" type="CSGBox3D" parent="Platforms/CentralPlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, -3.925)
+use_collision = true
+size = Vector3(8, 1.2, 0.15)
+material = SubResource("mat_support")
+
+[node name="Buildings" type="Node3D" parent="."]
+
+[node name="GeneralStore" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 12.75, -12)
+
+[node name="Walls" type="CSGBox3D" parent="Buildings/GeneralStore"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.25, 0)
+use_collision = true
+size = Vector3(8, 4.5, 7)
+material = SubResource("mat_stone_building")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/GeneralStore"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.7, 0)
+use_collision = true
+size = Vector3(8.5, 0.4, 7.5)
+material = SubResource("mat_roof")
+
+[node name="InteriorLight" type="OmniLight3D" parent="Buildings/GeneralStore"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+light_color = Color(1, 0.85, 0.6, 1)
+light_energy = 1.2
+omni_range = 6.0
+
+[node name="WestHouse1" type="Node3D" parent="Buildings"]
+transform = Transform3D(0.999, 0, -0.045, 0, 1, 0, 0.045, 0, 0.999, -15, 12.75, 18)
+
+[node name="Walls" type="CSGBox3D" parent="Buildings/WestHouse1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+use_collision = true
+size = Vector3(6, 4, 5)
+material = SubResource("mat_stone_building")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/WestHouse1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.2, 0)
+use_collision = true
+size = Vector3(6.5, 0.4, 5.5)
+material = SubResource("mat_roof")
+
+[node name="InteriorLight" type="OmniLight3D" parent="Buildings/WestHouse1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
+light_color = Color(1, 0.85, 0.6, 1)
+light_energy = 1.2
+omni_range = 6.0
+
+[node name="OverlookTower" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 24.75, 5)
+
+[node name="TowerBase" type="CSGCylinder3D" parent="Buildings/OverlookTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+use_collision = true
+radius = 4.0
+height = 10.0
+sides = 8
+material = SubResource("mat_stone_building")
+
+[node name="ViewingPlatform" type="CSGCylinder3D" parent="Buildings/OverlookTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10.4, 0)
+use_collision = true
+radius = 5.0
+height = 0.8
+sides = 8
+material = SubResource("mat_stone_building")
+
+[node name="Beacon" type="OmniLight3D" parent="Buildings/OverlookTower"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, 0)
+light_color = Color(1, 0.7, 0.3, 1)
+light_energy = 3.0
+omni_range = 20.0
+
+[node name="AbyssTavern" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0.75, -28)
+
+[node name="TavernWalls" type="CSGBox3D" parent="Buildings/AbyssTavern"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+use_collision = true
+size = Vector3(12, 5, 10)
+material = SubResource("mat_stone_building")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/AbyssTavern"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.25, 0)
+use_collision = true
+size = Vector3(13, 0.5, 11)
+material = SubResource("mat_roof")
+
+[node name="TavernSign" type="CSGBox3D" parent="Buildings/AbyssTavern"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 4.5, 0)
+size = Vector3(0.2, 1.2, 3)
+material = SubResource("mat_wood_building")
+
+[node name="TavernLight" type="OmniLight3D" parent="Buildings/AbyssTavern"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+light_color = Color(1, 0.75, 0.45, 1)
+light_energy = 2.5
+omni_range = 12.0
+
+[node name="Blacksmith" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 12.75, 3)
+
+[node name="Walls" type="CSGBox3D" parent="Buildings/Blacksmith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.25, 0)
+use_collision = true
+size = Vector3(9, 4.5, 8)
+material = SubResource("mat_stone_building")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/Blacksmith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.7, 0)
+use_collision = true
+size = Vector3(9.5, 0.4, 8.5)
+material = SubResource("mat_roof")
+
+[node name="InteriorLight" type="OmniLight3D" parent="Buildings/Blacksmith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+light_color = Color(1, 0.85, 0.6, 1)
+light_energy = 1.2
+omni_range = 6.0
+
+[node name="AbyssInn" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 12.75, 26)
+
+[node name="InnWalls" type="CSGBox3D" parent="Buildings/AbyssInn"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.75, 0)
+use_collision = true
+size = Vector3(10, 5.5, 8)
+material = SubResource("mat_stone_building")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/AbyssInn"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.75, 0)
+use_collision = true
+size = Vector3(10.8, 0.5, 8.8)
+material = SubResource("mat_roof")
+
+[node name="InnLight" type="OmniLight3D" parent="Buildings/AbyssInn"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+light_color = Color(1, 0.85, 0.6, 1)
+light_energy = 1.8
+omni_range = 8.0
+
+[node name="Torches" type="Node3D" parent="."]
+
+[node name="Torch_0" type="OmniLight3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 3, -35)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.5
+omni_range = 8.0
+
+[node name="Torch_1" type="OmniLight3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 3, -25)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.5
+omni_range = 8.0
+
+[node name="Torch_2" type="OmniLight3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 3, -32)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.5
+omni_range = 8.0
+
+[node name="Torch_3" type="OmniLight3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 3, -20)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.5
+omni_range = 8.0
+
+[node name="Torch_4" type="OmniLight3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 15, -5)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.5
+omni_range = 8.0
+
+[node name="Torch_5" type="OmniLight3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 15, 15)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.5
+omni_range = 8.0
+
+[node name="Torch_6" type="OmniLight3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 15, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.5
+omni_range = 8.0
+
+[node name="Torch_7" type="OmniLight3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 15, 25)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.5
+omni_range = 8.0
+
+[node name="Torch_8" type="OmniLight3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 27, 8)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.5
+omni_range = 8.0
+
+[node name="Torch_9" type="OmniLight3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 27, 18)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.5
+omni_range = 8.0
+
+[node name="Torch_10" type="OmniLight3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 11, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.5
+omni_range = 8.0
+
+[node name="Torch_11" type="OmniLight3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 11, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.5
+omni_range = 8.0
+
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="SpawnPoint_default" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, -36)
+
+[node name="SpawnPoint_from_aberdeen" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, -38)
+
+[node name="SpawnPoint_from_pola_perron" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 12.85, 38)
+
+[node name="SpawnPoint_from_inn" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 12.85, 26)
+
+[node name="NPCSpawnPoints" type="Node3D" parent="."]
+
+[node name="NPC_OldTersa" type="Marker3D" parent="NPCSpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.75, -28)
+
+[node name="NPC_FinnDeepdelve" type="Marker3D" parent="NPCSpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 12.75, 5)
+
+[node name="NPC_Civilian1" type="Marker3D" parent="NPCSpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 12.75, -8)
+
+[node name="NPC_Civilian2" type="Marker3D" parent="NPCSpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0.75, -25)
+
+[node name="NPC_Civilian3" type="Marker3D" parent="NPCSpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 24.75, 6)
+
+[node name="MerchantPositions" type="Node3D" parent="."]
+
+[node name="Merchant_GeneralStore" type="Marker3D" parent="MerchantPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 12.75, -12)
+
+[node name="Merchant_Blacksmith" type="Marker3D" parent="MerchantPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 12.75, 3)
+
+[node name="Interactables" type="Node3D" parent="."]
+
+[node name="BountyBoard" type="Marker3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.75, -31)
+
+[node name="RestSpot" type="Marker3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0.75, -25)
+
+[node name="FastTravelShrine" type="Marker3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.75, 0)
+
+[node name="DoorPositions" type="Node3D" parent="."]
+
+[node name="Door_Aberdeen" type="Marker3D" parent="DoorPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, -42)
+
+[node name="Door_PolaPerron" type="Marker3D" parent="DoorPositions"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -12, 12.75, 42)
+
+[node name="Door_Inn" type="Marker3D" parent="DoorPositions"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 9, 12.75, 26)
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]

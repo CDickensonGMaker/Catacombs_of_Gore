@@ -1,0 +1,311 @@
+[gd_resource type="Resource" script_class="ConversationResponsePool" load_steps=23 format=3 uid="uid://c1weather_pool"]
+
+[ext_resource type="Script" path="res://scripts/dialogue/conversation_response_pool.gd" id="1_pool"]
+[ext_resource type="Script" path="res://scripts/dialogue/conversation_response.gd" id="2_resp"]
+
+# =============================================================================
+# CURRENT WEATHER OBSERVATIONS
+# =============================================================================
+
+[sub_resource type="Resource" id="weather_observe_1"]
+script = ExtResource("2_resp")
+text = "Gray skies again today. Can't remember the last time I saw the sun properly."
+topic_type = 5
+personality_affinity = ["melancholy", "observant"]
+min_disposition = 0
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "weather_observe_1"
+
+[sub_resource type="Resource" id="weather_observe_2"]
+script = ExtResource("2_resp")
+text = "Fine weather for traveling, if you're heading out. Roads should be dry enough."
+topic_type = 5
+personality_affinity = ["friendly", "helpful"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "weather_observe_2"
+
+[sub_resource type="Resource" id="weather_observe_3"]
+script = ExtResource("2_resp")
+text = "Bit of a chill in the air. Winter's coming early this year, I reckon."
+topic_type = 5
+personality_affinity = ["practical", "observant"]
+min_disposition = 0
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "weather_observe_3"
+
+# =============================================================================
+# WEATHER PREDICTIONS / OMENS
+# =============================================================================
+
+[sub_resource type="Resource" id="weather_omen_1"]
+script = ExtResource("2_resp")
+text = "Red sky at dawn this morning. Mark my words - storm's coming before nightfall."
+topic_type = 5
+personality_affinity = ["superstitious", "wise"]
+min_disposition = 30
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "weather_omen_1"
+
+[sub_resource type="Resource" id="weather_omen_2"]
+script = ExtResource("2_resp")
+text = "The crows are flying low today. Old folk say that means rain within the week."
+topic_type = 5
+personality_affinity = ["superstitious", "observant"]
+min_disposition = 30
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "weather_omen_2"
+
+[sub_resource type="Resource" id="weather_omen_3"]
+script = ExtResource("2_resp")
+text = "My bones ache something fierce. Bad weather's on the way - never fails."
+topic_type = 5
+personality_affinity = ["elderly", "grumpy"]
+min_disposition = 0
+max_disposition = 100
+required_knowledge = []
+weight = 0.9
+actions = []
+conditions = []
+response_id = "weather_omen_3"
+
+# =============================================================================
+# WEATHER AFFECTS WORK (FARMERS, MERCHANTS, GUARDS)
+# =============================================================================
+
+[sub_resource type="Resource" id="weather_work_1"]
+script = ExtResource("2_resp")
+text = "If this dry spell holds, the harvest will be thin. Pray for rain, friend."
+topic_type = 5
+personality_affinity = ["worried", "agricultural"]
+min_disposition = 30
+max_disposition = 100
+required_knowledge = ["farming"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "weather_work_1"
+
+[sub_resource type="Resource" id="weather_work_2"]
+script = ExtResource("2_resp")
+text = "Bad weather means fewer travelers. Fewer travelers means less coin in the till."
+topic_type = 5
+personality_affinity = ["mercantile", "practical"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["trade"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "weather_work_2"
+
+[sub_resource type="Resource" id="weather_work_3"]
+script = ExtResource("2_resp")
+text = "Standing watch in the rain is misery. At least when it's cold, the troublemakers stay home."
+topic_type = 5
+personality_affinity = ["grumpy", "guard"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["guard"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "weather_work_3"
+
+[sub_resource type="Resource" id="weather_work_4"]
+script = ExtResource("2_resp")
+text = "Good weather means more caravans, more caravans means more bandits. Keeps us busy."
+topic_type = 5
+personality_affinity = ["pragmatic", "guard"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["guard"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "weather_work_4"
+
+# =============================================================================
+# ELDER MOOR SWAMP WEATHER SPECIFICS
+# =============================================================================
+
+[sub_resource type="Resource" id="weather_moor_1"]
+script = ExtResource("2_resp")
+text = "The mist never fully lifts here in Elder Moor. You get used to it. Eventually."
+topic_type = 5
+personality_affinity = ["resigned", "local"]
+min_disposition = 0
+max_disposition = 100
+required_knowledge = ["elder_moor"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "weather_moor_1"
+
+[sub_resource type="Resource" id="weather_moor_2"]
+script = ExtResource("2_resp")
+text = "The fog rolls in thick off the swamp most mornings. Can't see your hand in front of your face sometimes."
+topic_type = 5
+personality_affinity = ["observant", "cautious"]
+min_disposition = 30
+max_disposition = 100
+required_knowledge = ["elder_moor"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "weather_moor_2"
+
+[sub_resource type="Resource" id="weather_moor_3"]
+script = ExtResource("2_resp")
+text = "Humidity's the worst part of living near the swamp. Everything feels damp. Clothes, bedding, your very soul."
+topic_type = 5
+personality_affinity = ["grumpy", "local"]
+min_disposition = 0
+max_disposition = 100
+required_knowledge = ["elder_moor"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "weather_moor_3"
+
+[sub_resource type="Resource" id="weather_moor_4"]
+script = ExtResource("2_resp")
+text = "When the mist turns green-tinged, stay indoors. That's swamp gas mixing in. Not safe to breathe."
+topic_type = 5
+personality_affinity = ["helpful", "wise"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["elder_moor"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "weather_moor_4"
+
+# =============================================================================
+# SEASONAL COMMENTS
+# =============================================================================
+
+[sub_resource type="Resource" id="weather_season_1"]
+script = ExtResource("2_resp")
+text = "Spring's finally here. About time too - thought the frost would never break."
+topic_type = 5
+personality_affinity = ["cheerful", "hopeful"]
+min_disposition = 30
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "weather_season_1"
+
+[sub_resource type="Resource" id="weather_season_2"]
+script = ExtResource("2_resp")
+text = "Summer heat's been brutal this year. Folk are getting short-tempered in the sun."
+topic_type = 5
+personality_affinity = ["observant", "practical"]
+min_disposition = 0
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "weather_season_2"
+
+[sub_resource type="Resource" id="weather_season_3"]
+script = ExtResource("2_resp")
+text = "The leaves are turning. Harvest time approaches. Gaela willing, we'll have enough to last the winter."
+topic_type = 5
+personality_affinity = ["devout", "hopeful"]
+min_disposition = 30
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "weather_season_3"
+
+# =============================================================================
+# SUPERSTITIONS ABOUT WEATHER
+# =============================================================================
+
+[sub_resource type="Resource" id="weather_superstition_1"]
+script = ExtResource("2_resp")
+text = "Thunder without lightning means the old gods are angry. Best make an offering at the temple."
+topic_type = 5
+personality_affinity = ["superstitious", "devout"]
+min_disposition = 30
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "weather_superstition_1"
+
+[sub_resource type="Resource" id="weather_superstition_2"]
+script = ExtResource("2_resp")
+text = "My grandmother said if it rains on a new moon, the dead walk closer to the living. I believe her."
+topic_type = 5
+personality_affinity = ["superstitious", "nervous"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = []
+weight = 0.9
+actions = []
+conditions = []
+response_id = "weather_superstition_2"
+
+# =============================================================================
+# WEATHER-RELATED COMPLAINTS
+# =============================================================================
+
+[sub_resource type="Resource" id="weather_complaint_1"]
+script = ExtResource("2_resp")
+text = "This weather is miserable. Can't work, can't travel, can't do a bloody thing."
+topic_type = 5
+personality_affinity = ["grumpy", "frustrated"]
+min_disposition = 0
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "weather_complaint_1"
+
+[sub_resource type="Resource" id="weather_complaint_2"]
+script = ExtResource("2_resp")
+text = "Too hot, too cold, too wet, too dry - there's no pleasing me, I know. But still."
+topic_type = 5
+personality_affinity = ["self-aware", "grumpy"]
+min_disposition = 0
+max_disposition = 100
+required_knowledge = []
+weight = 0.8
+actions = []
+conditions = []
+response_id = "weather_complaint_2"
+
+[resource]
+script = ExtResource("1_pool")
+responses = [SubResource("weather_observe_1"), SubResource("weather_observe_2"), SubResource("weather_observe_3"), SubResource("weather_omen_1"), SubResource("weather_omen_2"), SubResource("weather_omen_3"), SubResource("weather_work_1"), SubResource("weather_work_2"), SubResource("weather_work_3"), SubResource("weather_work_4"), SubResource("weather_moor_1"), SubResource("weather_moor_2"), SubResource("weather_moor_3"), SubResource("weather_moor_4"), SubResource("weather_season_1"), SubResource("weather_season_2"), SubResource("weather_season_3"), SubResource("weather_superstition_1"), SubResource("weather_superstition_2"), SubResource("weather_complaint_1"), SubResource("weather_complaint_2")]
+pool_id = "weather"
+description = "WEATHER topic responses including current observations, predictions and omens, work-related weather comments (farming, trade, guard duty), Elder Moor swamp-specific weather (fog, mist, humidity), seasonal comments, superstitions, and general weather complaints"

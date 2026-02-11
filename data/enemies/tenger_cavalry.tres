@@ -1,0 +1,121 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/data/enemy_attack_data.gd" id="2"]
+
+[sub_resource type="Resource" id="1"]
+script = ExtResource("2")
+id = "mounted_bow_shot"
+display_name = "Mounted Bow Shot"
+damage = Array[int]([3, 8, 4])
+damage_type = 0
+windup_time = 0.4
+active_time = 0.2
+recovery_time = 0.3
+cooldown = 1.5
+range_distance = 28.0
+is_ranged = true
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 35.0
+inflicts_condition = 6
+condition_chance = 0.25
+condition_duration = 5.0
+stagger_power = 0.5
+knockback_force = 2.0
+weight = 1.0
+min_range = 8.0
+max_range = 30.0
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[sub_resource type="Resource" id="2"]
+script = ExtResource("2")
+id = "rain_of_arrows"
+display_name = "Rain of Arrows"
+damage = Array[int]([2, 6, 3])
+damage_type = 0
+windup_time = 0.8
+active_time = 0.5
+recovery_time = 0.6
+cooldown = 8.0
+range_distance = 25.0
+is_ranged = true
+is_aoe = true
+aoe_radius = 4.0
+projectile_speed = 30.0
+inflicts_condition = 6
+condition_chance = 0.4
+condition_duration = 6.0
+stagger_power = 0.3
+knockback_force = 1.0
+weight = 0.25
+min_range = 10.0
+max_range = 28.0
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[resource]
+script = ExtResource("1")
+id = "tenger_horse_archer"
+display_name = "Tenger Horse Archer"
+description = "Elite Tenger mounted archers who rain death from horseback. These swift riders circle their prey, loosing arrows with deadly precision while staying out of melee range."
+max_hp = 75
+armor_value = 10
+movement_speed = 9.0
+turn_speed = 6.0
+grit = 6
+agility = 10
+will = 5
+knowledge = 4
+bravery = 8
+behavior = 0
+faction = 8
+aggro_range = 35.0
+attack_range = 28.0
+preferred_distance = 22.0
+flee_hp_threshold = 0.05
+is_boss = false
+attacks = Array[ExtResource("2")]([SubResource("1"), SubResource("2")])
+can_block = true
+block_chance = 0.25
+stagger_resistance = 0.4
+fire_resistance = 0.1
+frost_resistance = -0.1
+lightning_resistance = 0.0
+poison_resistance = 0.15
+necrotic_resistance = 0.0
+physical_resistance = 0.2
+fire_weakness = 0.0
+frost_weakness = 0.1
+lightning_weakness = 0.0
+holy_weakness = 0.0
+causes_horror = false
+horror_difficulty = 14
+loot_table_av = 6
+gold_drop = Array[int]([60, 150])
+guaranteed_drops = Array[String]([])
+drop_table = {
+"health_potion": 0.3,
+"cooked_meat": 0.35,
+"leather": 0.25,
+"iron_ingot": 0.15,
+"steel_ingot": 0.1
+}
+xp_reward = 160
+scene_path = ""
+icon_path = ""
+scale = 1.4
+sprite_path = "res://Sprite folders grab bag/tegner_on_horse.png"
+attack_sprite_path = "res://Sprite folders grab bag/tegner_on_horse_shooting.png"
+sprite_hframes = 4
+sprite_vframes = 1
+attack_hframes = 4
+attack_vframes = 1
+sprite_pixel_size = 0.045
+idle_sounds = Array[String]([])
+attack_sounds = Array[String]([])
+hurt_sounds = Array[String]([])
+death_sounds = Array[String]([])

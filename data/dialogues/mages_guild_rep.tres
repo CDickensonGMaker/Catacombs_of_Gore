@@ -1,0 +1,236 @@
+[gd_resource type="Resource" script_class="DialogueData" load_steps=32 format=3 uid="uid://mages_guild_rep"]
+
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_node.gd" id="2_node"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_choice.gd" id="3_choice"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_condition.gd" id="4_cond"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_action.gd" id="5_action"]
+
+# ============================================================================
+# CHOICES
+# ============================================================================
+
+[sub_resource type="Resource" id="choice_goodbye"]
+script = ExtResource("3_choice")
+text = "I must go. May knowledge guide you."
+next_node_id = "end"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_back_start"]
+script = ExtResource("3_choice")
+text = "I had another question..."
+next_node_id = "start"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_about_guild"]
+script = ExtResource("3_choice")
+text = "Tell me about the Mages Guild."
+next_node_id = "about_guild"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_training"]
+script = ExtResource("3_choice")
+text = "I seek magical training."
+next_node_id = "training_offer"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_quests"]
+script = ExtResource("3_choice")
+text = "Do you have any tasks for a mage?"
+next_node_id = "arcane_quests"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_join_guild"]
+script = ExtResource("3_choice")
+text = "How do I join the Mages Guild?"
+next_node_id = "join_info"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_accept_training"]
+script = ExtResource("3_choice")
+text = "Yes, teach me the arcane arts."
+next_node_id = "training_begin"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_decline_training"]
+script = ExtResource("3_choice")
+text = "Perhaps another time."
+next_node_id = "training_declined"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_elemental_magic"]
+script = ExtResource("3_choice")
+text = "Tell me about elemental magic."
+next_node_id = "elemental_training"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_restoration_magic"]
+script = ExtResource("3_choice")
+text = "What about healing magic?"
+next_node_id = "restoration_training"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_philosophy"]
+script = ExtResource("3_choice")
+text = "What is the mage's code?"
+next_node_id = "mage_philosophy"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+# ============================================================================
+# NODES
+# ============================================================================
+
+[sub_resource type="Resource" id="node_start"]
+script = ExtResource("2_node")
+id = "start"
+speaker_name = "Archmage Verendil"
+text = "*an elderly mage in deep blue robes looks up from a tome, arcane symbols faintly glowing around her fingers* Ah, a seeker of knowledge. I sense... potential within you. The Mages Guild welcomes those who wish to understand the mysteries of magic. What draws you to our hall?"
+choices = [SubResource("choice_about_guild"), SubResource("choice_training"), SubResource("choice_quests"), SubResource("choice_join_guild"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "mage_neutral"
+
+[sub_resource type="Resource" id="node_about_guild"]
+script = ExtResource("2_node")
+id = "about_guild"
+speaker_name = "Archmage Verendil"
+text = "The Mages Guild is a sanctuary for magical knowledge. We preserve ancient texts, research new spells, and train those with the gift. Unlike some... less reputable practitioners, we bind ourselves to the Arcane Compact - magic is not to be used for personal domination or raising the dead. We share knowledge freely among members, for hoarded wisdom benefits no one."
+choices = [SubResource("choice_philosophy"), SubResource("choice_join_guild"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "mage_proud"
+
+[sub_resource type="Resource" id="node_training_offer"]
+script = ExtResource("2_node")
+id = "training_offer"
+speaker_name = "Archmage Verendil"
+text = "*she sets down her tome* Training in magic requires patience and an open mind. I can guide you in the elemental arts, healing magics, and the fundamental principles of spellcasting. The gift is within you - it merely needs to be awakened and refined. Do you wish to begin your studies?"
+choices = [SubResource("choice_accept_training"), SubResource("choice_elemental_magic"), SubResource("choice_restoration_magic"), SubResource("choice_decline_training")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "mage_teaching"
+
+[sub_resource type="Resource" id="node_training_begin"]
+script = ExtResource("2_node")
+id = "training_begin"
+speaker_name = "Archmage Verendil"
+text = "*she smiles warmly* Excellent. Magic is not merely power - it is understanding. Return to me with coin and time, and I shall teach you. But remember the first lesson: magic demands concentration. A distracted mind casts wild spells, and wild spells harm friend and foe alike. Meditate daily, and your casting will grow stronger."
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "mage_ready"
+
+[sub_resource type="Resource" id="node_training_declined"]
+script = ExtResource("2_node")
+id = "training_declined"
+speaker_name = "Archmage Verendil"
+text = "*she returns to her reading* The path of magic is not for everyone. Should you change your mind, the guild's doors remain open to seekers of knowledge."
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "mage_neutral"
+
+[sub_resource type="Resource" id="node_elemental_training"]
+script = ExtResource("2_node")
+id = "elemental_training"
+speaker_name = "Archmage Verendil"
+text = "Elemental magic channels the raw forces of nature - fire, lightning, frost, and earth. It is the most common form of combat magic and the easiest to learn, but do not mistake 'easy' for 'simple'. A master of elements can devastate armies or gently warm a cold hearth. Control is everything."
+choices = [SubResource("choice_restoration_magic"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "mage_teaching"
+
+[sub_resource type="Resource" id="node_restoration_training"]
+script = ExtResource("2_node")
+id = "restoration_training"
+speaker_name = "Archmage Verendil"
+text = "Restoration magic mends wounds, cures diseases, and shields against harm. It is often overlooked by young mages eager for destruction, but mark my words - healers are far rarer and more valued than firebrands. A skilled healer can turn a losing battle into victory simply by keeping warriors on their feet."
+choices = [SubResource("choice_elemental_magic"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "mage_thoughtful"
+
+[sub_resource type="Resource" id="node_arcane_quests"]
+script = ExtResource("2_node")
+id = "arcane_quests"
+speaker_name = "Archmage Verendil"
+text = "*she pulls out a leather-bound ledger* The guild has many needs. We seek ancient texts lost in ruins, rare ingredients for our research, and assistance dealing with magical threats. Rogue mages, summoned creatures that escaped their masters, cursed artifacts - these require a careful hand. The work is dangerous but the rewards are substantial."
+choices = [SubResource("choice_training"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "mage_serious"
+
+[sub_resource type="Resource" id="node_join_info"]
+script = ExtResource("2_node")
+id = "join_info"
+speaker_name = "Archmage Verendil"
+text = "To join, you must demonstrate basic magical aptitude and swear to the Arcane Compact. No necromancy, no mind control, no magic used for personal tyranny. Complete a few tasks for the guild and show you can be trusted with arcane knowledge. Members gain access to our libraries, spell research facilities, and the collective wisdom of centuries."
+choices = [SubResource("choice_about_guild"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "mage_stern"
+
+[sub_resource type="Resource" id="node_mage_philosophy"]
+script = ExtResource("2_node")
+id = "mage_philosophy"
+speaker_name = "Archmage Verendil"
+text = "*her voice grows reverent* Knowledge illuminates. This is our creed. Magic is neither good nor evil - it is a tool, like a blade. The wielder determines its purpose. We seek to understand the world's mysteries not for power, but for wisdom. True mastery of magic comes from humility, from knowing how much you do not know."
+choices = [SubResource("choice_about_guild"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "mage_wise"
+
+[sub_resource type="Resource" id="node_end"]
+script = ExtResource("2_node")
+id = "end"
+speaker_name = "Archmage Verendil"
+text = "*she traces a symbol in the air that glows briefly* May wisdom guide your path, seeker. The mysteries await those who have eyes to see."
+choices = []
+is_end_node = true
+auto_continue_to = ""
+portrait_id = "mage_farewell"
+
+# ============================================================================
+# RESOURCE
+# ============================================================================
+
+[resource]
+script = ExtResource("1_data")
+id = "mages_guild_rep"
+display_name = "Mages Guild Representative"
+description = "Dialogue for Archmage Verendil, representative of the Mages Guild. Offers magical training and arcane quests."
+start_node_id = "start"
+nodes = [SubResource("node_start"), SubResource("node_about_guild"), SubResource("node_training_offer"), SubResource("node_training_begin"), SubResource("node_training_declined"), SubResource("node_elemental_training"), SubResource("node_restoration_training"), SubResource("node_arcane_quests"), SubResource("node_join_info"), SubResource("node_mage_philosophy"), SubResource("node_end")]

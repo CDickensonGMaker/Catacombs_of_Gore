@@ -1,0 +1,1184 @@
+[gd_resource type="Resource" script_class="ConversationResponsePool" load_steps=82 format=3 uid="uid://c1personal_pool"]
+
+[ext_resource type="Script" path="res://scripts/dialogue/conversation_response_pool.gd" id="1_pool"]
+[ext_resource type="Script" path="res://scripts/dialogue/conversation_response.gd" id="2_resp"]
+
+# =============================================================================
+# FARMER PERSONAL RESPONSES
+# =============================================================================
+
+[sub_resource type="Resource" id="personal_farmer_1"]
+script = ExtResource("2_resp")
+text = "Me? Just a simple farmer. Been working this land since my father's time."
+topic_type = 2
+personality_affinity = ["humble", "hardworking"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["farmer"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "personal_farmer_1"
+
+[sub_resource type="Resource" id="personal_farmer_2"]
+script = ExtResource("2_resp")
+text = "The crops have been good this year, gods willing. Wheat's coming in strong."
+topic_type = 2
+personality_affinity = ["optimistic", "hardworking"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["farmer"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "personal_farmer_2"
+
+[sub_resource type="Resource" id="personal_farmer_3"]
+script = ExtResource("2_resp")
+text = "Honest work, farming. Hard on the back, but it feeds the family."
+topic_type = 2
+personality_affinity = ["practical", "stoic"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["farmer"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "personal_farmer_3"
+
+[sub_resource type="Resource" id="personal_farmer_4"]
+script = ExtResource("2_resp")
+text = "Lost half my flock to wolves last season. It's been hard, but we manage."
+topic_type = 2
+personality_affinity = ["resilient", "honest"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["farmer"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "personal_farmer_4"
+
+[sub_resource type="Resource" id="personal_farmer_5"]
+script = ExtResource("2_resp")
+text = "My grandfather settled this plot when Elder Moor was just a handful of huts in the swamp. We've been here ever since."
+topic_type = 2
+personality_affinity = ["proud", "traditional"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = ["farmer"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "personal_farmer_5"
+
+[sub_resource type="Resource" id="personal_farmer_6"]
+script = ExtResource("2_resp")
+text = "I dream of saving enough coin to buy the field next to mine. Double my harvest, leave something real for my children."
+topic_type = 2
+personality_affinity = ["ambitious", "family-oriented"]
+min_disposition = 55
+max_disposition = 100
+required_knowledge = ["farmer"]
+weight = 0.8
+actions = []
+conditions = []
+response_id = "personal_farmer_6"
+
+[sub_resource type="Resource" id="personal_farmer_7"]
+script = ExtResource("2_resp")
+text = "Used to be you could leave tools in the field overnight. Now? Thieves and worse. Times have changed."
+topic_type = 2
+personality_affinity = ["nostalgic", "worried"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["farmer"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "personal_farmer_7"
+
+# =============================================================================
+# GUARD PERSONAL RESPONSES
+# =============================================================================
+
+[sub_resource type="Resource" id="personal_guard_1"]
+script = ExtResource("2_resp")
+text = "I serve {town_name} as best I can. It's my duty to protect these people."
+topic_type = 2
+personality_affinity = ["dutiful", "proud"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["guard"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "personal_guard_1"
+
+[sub_resource type="Resource" id="personal_guard_2"]
+script = ExtResource("2_resp")
+text = "Night watch again tonight. The things I've seen in the dark... you don't want to know."
+topic_type = 2
+personality_affinity = ["weary", "experienced"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["guard"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "personal_guard_2"
+
+[sub_resource type="Resource" id="personal_guard_3"]
+script = ExtResource("2_resp")
+text = "Twenty years I've kept this post. Seen a lot of trouble come and go."
+topic_type = 2
+personality_affinity = ["veteran", "stoic"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["guard"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "personal_guard_3"
+
+[sub_resource type="Resource" id="personal_guard_4"]
+script = ExtResource("2_resp")
+text = "The pay's not much, but someone has to stand between the darkness and the townsfolk."
+topic_type = 2
+personality_affinity = ["noble", "resigned"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["guard"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "personal_guard_4"
+
+[sub_resource type="Resource" id="personal_guard_5"]
+script = ExtResource("2_resp")
+text = "My father was a guard. His father before him. It's in the blood, I suppose."
+topic_type = 2
+personality_affinity = ["traditional", "proud"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["guard"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "personal_guard_5"
+
+[sub_resource type="Resource" id="personal_guard_6"]
+script = ExtResource("2_resp")
+text = "I remember when the worst we dealt with was drunken brawls. Now there's things crawling out of the moors that shouldn't exist."
+topic_type = 2
+personality_affinity = ["worried", "experienced"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = ["guard"]
+weight = 0.85
+actions = []
+conditions = []
+response_id = "personal_guard_6"
+
+[sub_resource type="Resource" id="personal_guard_7"]
+script = ExtResource("2_resp")
+text = "Got a wife and two little ones at home. They're why I stand this post, even when every bone aches."
+topic_type = 2
+personality_affinity = ["family-oriented", "devoted"]
+min_disposition = 55
+max_disposition = 100
+required_knowledge = ["guard"]
+weight = 0.85
+actions = []
+conditions = []
+response_id = "personal_guard_7"
+
+[sub_resource type="Resource" id="personal_guard_8"]
+script = ExtResource("2_resp")
+text = "Once I've saved enough, I'm getting out. Maybe open a smithy in Dalhurst. Somewhere quiet."
+topic_type = 2
+personality_affinity = ["tired", "hopeful"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = ["guard"]
+weight = 0.8
+actions = []
+conditions = []
+response_id = "personal_guard_8"
+
+# =============================================================================
+# MERCHANT PERSONAL RESPONSES
+# =============================================================================
+
+[sub_resource type="Resource" id="personal_merchant_1"]
+script = ExtResource("2_resp")
+text = "Trade's been slow lately. Too much danger on the roads keeps the caravans away."
+topic_type = 2
+personality_affinity = ["worried", "mercantile"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["merchant", "trade"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "personal_merchant_1"
+
+[sub_resource type="Resource" id="personal_merchant_2"]
+script = ExtResource("2_resp")
+text = "I've traveled from the eastern kingdoms to the western shores. Settled here for the quiet life."
+topic_type = 2
+personality_affinity = ["worldly", "experienced"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["merchant"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "personal_merchant_2"
+
+[sub_resource type="Resource" id="personal_merchant_3"]
+script = ExtResource("2_resp")
+text = "Coin is what makes the world turn, friend. Everything has a price."
+topic_type = 2
+personality_affinity = ["pragmatic", "mercantile"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["merchant"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "personal_merchant_3"
+
+[sub_resource type="Resource" id="personal_merchant_4"]
+script = ExtResource("2_resp")
+text = "My family has been in trade for generations. It's in the blood, you might say."
+topic_type = 2
+personality_affinity = ["proud", "traditional"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["merchant"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "personal_merchant_4"
+
+[sub_resource type="Resource" id="personal_merchant_5"]
+script = ExtResource("2_resp")
+text = "Started with nothing but a handcart and determination. Built all this myself, coin by coin."
+topic_type = 2
+personality_affinity = ["proud", "hardworking"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = ["merchant"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "personal_merchant_5"
+
+[sub_resource type="Resource" id="personal_merchant_6"]
+script = ExtResource("2_resp")
+text = "I worry about my son. He wants to be an adventurer. Told him there's no profit in dying young."
+topic_type = 2
+personality_affinity = ["worried", "family-oriented"]
+min_disposition = 55
+max_disposition = 100
+required_knowledge = ["merchant"]
+weight = 0.85
+actions = []
+conditions = []
+response_id = "personal_merchant_6"
+
+[sub_resource type="Resource" id="personal_merchant_7"]
+script = ExtResource("2_resp")
+text = "One day I'll have enough to retire. A little cottage by the lake, away from all this haggling."
+topic_type = 2
+personality_affinity = ["tired", "hopeful"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = ["merchant"]
+weight = 0.8
+actions = []
+conditions = []
+response_id = "personal_merchant_7"
+
+[sub_resource type="Resource" id="personal_merchant_8"]
+script = ExtResource("2_resp")
+text = "The taxes! Every year they find new ways to squeeze us. A merchant can barely make an honest living."
+topic_type = 2
+personality_affinity = ["frustrated", "complaining"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["merchant"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "personal_merchant_8"
+
+# =============================================================================
+# INNKEEPER PERSONAL RESPONSES
+# =============================================================================
+
+[sub_resource type="Resource" id="personal_innkeeper_1"]
+script = ExtResource("2_resp")
+text = "{npc_name}'s the name. Been running this place for nigh on fifteen years now."
+topic_type = 2
+personality_affinity = ["friendly", "talkative"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["innkeeper"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "personal_innkeeper_1"
+
+[sub_resource type="Resource" id="personal_innkeeper_2"]
+script = ExtResource("2_resp")
+text = "You meet all sorts running an inn. Merchants, soldiers, pilgrims... even adventurers like yourself."
+topic_type = 2
+personality_affinity = ["friendly", "observant"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["innkeeper", "travelers"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "personal_innkeeper_2"
+
+[sub_resource type="Resource" id="personal_innkeeper_3"]
+script = ExtResource("2_resp")
+text = "The stories I could tell you... but most are best saved for after a few drinks."
+topic_type = 2
+personality_affinity = ["talkative", "secretive"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = ["innkeeper", "rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "personal_innkeeper_3"
+
+[sub_resource type="Resource" id="personal_innkeeper_4"]
+script = ExtResource("2_resp")
+text = "The inn keeps me busy from dawn to well past midnight. Wouldn't have it any other way."
+topic_type = 2
+personality_affinity = ["hardworking", "content"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["innkeeper"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "personal_innkeeper_4"
+
+[sub_resource type="Resource" id="personal_innkeeper_5"]
+script = ExtResource("2_resp")
+text = "Inherited this place from my uncle. He had no children of his own, so it fell to me. Best thing that ever happened."
+topic_type = 2
+personality_affinity = ["grateful", "nostalgic"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = ["innkeeper"]
+weight = 0.85
+actions = []
+conditions = []
+response_id = "personal_innkeeper_5"
+
+[sub_resource type="Resource" id="personal_innkeeper_6"]
+script = ExtResource("2_resp")
+text = "My daughter helps with the cooking now. Makes a better stew than I ever did, truth be told."
+topic_type = 2
+personality_affinity = ["proud", "family-oriented"]
+min_disposition = 55
+max_disposition = 100
+required_knowledge = ["innkeeper"]
+weight = 0.85
+actions = []
+conditions = []
+response_id = "personal_innkeeper_6"
+
+# =============================================================================
+# SCHOLAR PERSONAL RESPONSES
+# =============================================================================
+
+[sub_resource type="Resource" id="personal_scholar_1"]
+script = ExtResource("2_resp")
+text = "I've dedicated my life to the pursuit of knowledge. There is always more to learn."
+topic_type = 2
+personality_affinity = ["curious", "devoted"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["scholar"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "personal_scholar_1"
+
+[sub_resource type="Resource" id="personal_scholar_2"]
+script = ExtResource("2_resp")
+text = "My research into the old texts has revealed fascinating connections. The ancients knew much we have forgotten."
+topic_type = 2
+personality_affinity = ["verbose", "curious"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = ["scholar", "history"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "personal_scholar_2"
+
+[sub_resource type="Resource" id="personal_scholar_3"]
+script = ExtResource("2_resp")
+text = "Books are my companions, friend. They never lie, never betray. Knowledge is the truest treasure."
+topic_type = 2
+personality_affinity = ["bookish", "philosophical"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["scholar", "lore"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "personal_scholar_3"
+
+[sub_resource type="Resource" id="personal_scholar_4"]
+script = ExtResource("2_resp")
+text = "I recently made a breakthrough in my studies. The implications are... considerable."
+topic_type = 2
+personality_affinity = ["excited", "secretive"]
+min_disposition = 55
+max_disposition = 100
+required_knowledge = ["scholar", "magic"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "personal_scholar_4"
+
+[sub_resource type="Resource" id="personal_scholar_5"]
+script = ExtResource("2_resp")
+text = "I came to Elder Moor for the archives. They say texts survived here that were lost elsewhere in the Burning."
+topic_type = 2
+personality_affinity = ["curious", "determined"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = ["scholar"]
+weight = 0.85
+actions = []
+conditions = []
+response_id = "personal_scholar_5"
+
+[sub_resource type="Resource" id="personal_scholar_6"]
+script = ExtResource("2_resp")
+text = "My wife says I love my books more than her. She's not entirely wrong, but don't tell her I said that."
+topic_type = 2
+personality_affinity = ["honest", "humorous"]
+min_disposition = 60
+max_disposition = 100
+required_knowledge = ["scholar"]
+weight = 0.8
+actions = []
+conditions = []
+response_id = "personal_scholar_6"
+
+# =============================================================================
+# BLACKSMITH PERSONAL RESPONSES
+# =============================================================================
+
+[sub_resource type="Resource" id="personal_blacksmith_1"]
+script = ExtResource("2_resp")
+text = "I've worked the forge since I was tall enough to hold a hammer. It's all I know."
+topic_type = 2
+personality_affinity = ["gruff", "hardworking"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["blacksmith"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "personal_blacksmith_1"
+
+[sub_resource type="Resource" id="personal_blacksmith_2"]
+script = ExtResource("2_resp")
+text = "Every blade I forge is a piece of myself. Good steel deserves good craftsmanship."
+topic_type = 2
+personality_affinity = ["proud", "perfectionist"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["blacksmith", "weapons"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "personal_blacksmith_2"
+
+[sub_resource type="Resource" id="personal_blacksmith_3"]
+script = ExtResource("2_resp")
+text = "The fire, the metal, the rhythm of the hammer... there's a peace in it most folk don't understand."
+topic_type = 2
+personality_affinity = ["philosophical", "stoic"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = ["blacksmith", "metals"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "personal_blacksmith_3"
+
+[sub_resource type="Resource" id="personal_blacksmith_4"]
+script = ExtResource("2_resp")
+text = "My armor has saved more lives than I can count. That's payment enough for these old hands."
+topic_type = 2
+personality_affinity = ["humble", "proud"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = ["blacksmith", "armor"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "personal_blacksmith_4"
+
+[sub_resource type="Resource" id="personal_blacksmith_5"]
+script = ExtResource("2_resp")
+text = "Learned from a dwarf smith, I did. Spent three years in Kazan-Dun as an apprentice. Best education there is."
+topic_type = 2
+personality_affinity = ["proud", "experienced"]
+min_disposition = 55
+max_disposition = 100
+required_knowledge = ["blacksmith"]
+weight = 0.85
+actions = []
+conditions = []
+response_id = "personal_blacksmith_5"
+
+[sub_resource type="Resource" id="personal_blacksmith_6"]
+script = ExtResource("2_resp")
+text = "My boy has no interest in the forge. Wants to be a bard. Can you imagine? All this, and no one to pass it to."
+topic_type = 2
+personality_affinity = ["disappointed", "resigned"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = ["blacksmith"]
+weight = 0.8
+actions = []
+conditions = []
+response_id = "personal_blacksmith_6"
+
+# =============================================================================
+# PRIEST PERSONAL RESPONSES
+# =============================================================================
+
+[sub_resource type="Resource" id="personal_priest_1"]
+script = ExtResource("2_resp")
+text = "I serve the gods with all my heart. Their wisdom guides my every step."
+topic_type = 2
+personality_affinity = ["devout", "humble"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["priest"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "personal_priest_1"
+
+[sub_resource type="Resource" id="personal_priest_2"]
+script = ExtResource("2_resp")
+text = "I heard the calling when I was young. A vision from Chronos himself, showing me my path."
+topic_type = 2
+personality_affinity = ["devout", "mystical"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = ["priest", "chronos"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "personal_priest_2"
+
+[sub_resource type="Resource" id="personal_priest_3"]
+script = ExtResource("2_resp")
+text = "Gaela teaches us that patience and nurturing bring the greatest rewards. I try to live by her example."
+topic_type = 2
+personality_affinity = ["gentle", "patient"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["priest", "gaela"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "personal_priest_3"
+
+[sub_resource type="Resource" id="personal_priest_4"]
+script = ExtResource("2_resp")
+text = "Morthane's teachings are misunderstood by many. Death is not an ending, but a transformation. I find comfort in that."
+topic_type = 2
+personality_affinity = ["philosophical", "devout"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = ["priest", "morthane"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "personal_priest_4"
+
+[sub_resource type="Resource" id="personal_priest_5"]
+script = ExtResource("2_resp")
+text = "I gave up a comfortable life to serve. My family had wealth, lands. But the gods called, and I answered."
+topic_type = 2
+personality_affinity = ["devoted", "humble"]
+min_disposition = 55
+max_disposition = 100
+required_knowledge = ["priest"]
+weight = 0.85
+actions = []
+conditions = []
+response_id = "personal_priest_5"
+
+[sub_resource type="Resource" id="personal_priest_6"]
+script = ExtResource("2_resp")
+text = "Sometimes I wonder if I'm truly worthy. The doubts come at night, when the temple is quiet."
+topic_type = 2
+personality_affinity = ["honest", "vulnerable"]
+min_disposition = 60
+max_disposition = 100
+required_knowledge = ["priest"]
+weight = 0.75
+actions = []
+conditions = []
+response_id = "personal_priest_6"
+
+[sub_resource type="Resource" id="personal_priest_7"]
+script = ExtResource("2_resp")
+text = "I dream of building a great cathedral someday. A place where all three gods are honored equally."
+topic_type = 2
+personality_affinity = ["ambitious", "devout"]
+min_disposition = 55
+max_disposition = 100
+required_knowledge = ["priest"]
+weight = 0.8
+actions = []
+conditions = []
+response_id = "personal_priest_7"
+
+[sub_resource type="Resource" id="personal_priest_8"]
+script = ExtResource("2_resp")
+text = "The offerings have been thin this season. People forget the gods when times are hard, though that's when they need them most."
+topic_type = 2
+personality_affinity = ["worried", "disappointed"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["priest"]
+weight = 0.85
+actions = []
+conditions = []
+response_id = "personal_priest_8"
+
+# =============================================================================
+# CIVILIAN BACKSTORY RESPONSES (Why they live in Elder Moor)
+# =============================================================================
+
+[sub_resource type="Resource" id="personal_civilian_backstory_1"]
+script = ExtResource("2_resp")
+text = "Born here, raised here, and I'll die here. Elder Moor is in my bones."
+topic_type = 2
+personality_affinity = ["loyal", "traditional"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = []
+weight = 0.9
+actions = []
+conditions = []
+response_id = "personal_civilian_backstory_1"
+
+[sub_resource type="Resource" id="personal_civilian_backstory_2"]
+script = ExtResource("2_resp")
+text = "Fled the wars up north. Elder Moor was far enough that the fighting never reached us. Thank the gods."
+topic_type = 2
+personality_affinity = ["grateful", "weary"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = []
+weight = 0.85
+actions = []
+conditions = []
+response_id = "personal_civilian_backstory_2"
+
+[sub_resource type="Resource" id="personal_civilian_backstory_3"]
+script = ExtResource("2_resp")
+text = "Came here following work. The moors need draining, the town needs building. There's always something that needs doing."
+topic_type = 2
+personality_affinity = ["practical", "hardworking"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = []
+weight = 0.9
+actions = []
+conditions = []
+response_id = "personal_civilian_backstory_3"
+
+[sub_resource type="Resource" id="personal_civilian_backstory_4"]
+script = ExtResource("2_resp")
+text = "My husband was from here. I followed him for love. He's gone now, but this is home."
+topic_type = 2
+personality_affinity = ["melancholy", "resilient"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = []
+weight = 0.8
+actions = []
+conditions = []
+response_id = "personal_civilian_backstory_4"
+
+[sub_resource type="Resource" id="personal_civilian_backstory_5"]
+script = ExtResource("2_resp")
+text = "The swamp may stink, but the people here are good. That counts for something."
+topic_type = 2
+personality_affinity = ["optimistic", "loyal"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = []
+weight = 0.9
+actions = []
+conditions = []
+response_id = "personal_civilian_backstory_5"
+
+[sub_resource type="Resource" id="personal_civilian_backstory_6"]
+script = ExtResource("2_resp")
+text = "Had some trouble in Dalhurst. The kind that follows you. Came here to start fresh where no one knew my name."
+topic_type = 2
+personality_affinity = ["secretive", "cautious"]
+min_disposition = 55
+max_disposition = 100
+required_knowledge = []
+weight = 0.75
+actions = []
+conditions = []
+response_id = "personal_civilian_backstory_6"
+
+# =============================================================================
+# FAMILY MENTION RESPONSES
+# =============================================================================
+
+[sub_resource type="Resource" id="personal_family_1"]
+script = ExtResource("2_resp")
+text = "My children are my whole world. Everything I do, I do for them."
+topic_type = 2
+personality_affinity = ["family-oriented", "devoted"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = []
+weight = 0.85
+actions = []
+conditions = []
+response_id = "personal_family_1"
+
+[sub_resource type="Resource" id="personal_family_2"]
+script = ExtResource("2_resp")
+text = "Lost my mother last winter. The house feels empty without her."
+topic_type = 2
+personality_affinity = ["melancholy", "honest"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = []
+weight = 0.75
+actions = []
+conditions = []
+response_id = "personal_family_2"
+
+[sub_resource type="Resource" id="personal_family_3"]
+script = ExtResource("2_resp")
+text = "My brother went off adventuring years ago. Haven't heard from him since. I pray he's still alive."
+topic_type = 2
+personality_affinity = ["worried", "hopeful"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = []
+weight = 0.8
+actions = []
+conditions = []
+response_id = "personal_family_3"
+
+[sub_resource type="Resource" id="personal_family_4"]
+script = ExtResource("2_resp")
+text = "The wife and I have been together thirty years now. Still makes me smile when I see her."
+topic_type = 2
+personality_affinity = ["content", "romantic"]
+min_disposition = 55
+max_disposition = 100
+required_knowledge = []
+weight = 0.8
+actions = []
+conditions = []
+response_id = "personal_family_4"
+
+[sub_resource type="Resource" id="personal_family_5"]
+script = ExtResource("2_resp")
+text = "My eldest just had her first child. I'm a grandmother now. Makes me feel old, but proud."
+topic_type = 2
+personality_affinity = ["proud", "content"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = []
+weight = 0.8
+actions = []
+conditions = []
+response_id = "personal_family_5"
+
+# =============================================================================
+# DREAMS AND ASPIRATIONS RESPONSES
+# =============================================================================
+
+[sub_resource type="Resource" id="personal_dreams_1"]
+script = ExtResource("2_resp")
+text = "Someday I'd like to see the ocean. They say it goes on forever, beyond where the eye can see."
+topic_type = 2
+personality_affinity = ["dreamy", "curious"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = []
+weight = 0.85
+actions = []
+conditions = []
+response_id = "personal_dreams_1"
+
+[sub_resource type="Resource" id="personal_dreams_2"]
+script = ExtResource("2_resp")
+text = "I'm saving every coin I can. One day I'll own my own shop, be my own master."
+topic_type = 2
+personality_affinity = ["ambitious", "determined"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = []
+weight = 0.85
+actions = []
+conditions = []
+response_id = "personal_dreams_2"
+
+[sub_resource type="Resource" id="personal_dreams_3"]
+script = ExtResource("2_resp")
+text = "When I was young, I wanted to be a knight. Life had other plans, but a man can still dream."
+topic_type = 2
+personality_affinity = ["nostalgic", "wistful"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = []
+weight = 0.8
+actions = []
+conditions = []
+response_id = "personal_dreams_3"
+
+[sub_resource type="Resource" id="personal_dreams_4"]
+script = ExtResource("2_resp")
+text = "I just want peace. A quiet life where I don't have to worry about monsters or wars or empty bellies."
+topic_type = 2
+personality_affinity = ["weary", "hopeful"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = []
+weight = 0.9
+actions = []
+conditions = []
+response_id = "personal_dreams_4"
+
+[sub_resource type="Resource" id="personal_dreams_5"]
+script = ExtResource("2_resp")
+text = "I hope to learn to read someday. They say knowledge is power, and I've been powerless long enough."
+topic_type = 2
+personality_affinity = ["humble", "ambitious"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = []
+weight = 0.8
+actions = []
+conditions = []
+response_id = "personal_dreams_5"
+
+# =============================================================================
+# COMPLAINTS AND CONCERNS RESPONSES
+# =============================================================================
+
+[sub_resource type="Resource" id="personal_complaints_1"]
+script = ExtResource("2_resp")
+text = "The smell of the moor never truly leaves you. Gets into your clothes, your hair, everything."
+topic_type = 2
+personality_affinity = ["complaining", "honest"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = []
+weight = 0.9
+actions = []
+conditions = []
+response_id = "personal_complaints_1"
+
+[sub_resource type="Resource" id="personal_complaints_2"]
+script = ExtResource("2_resp")
+text = "The guards do their best, but there's too few of them. I don't feel safe after dark anymore."
+topic_type = 2
+personality_affinity = ["worried", "nervous"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = []
+weight = 0.85
+actions = []
+conditions = []
+response_id = "personal_complaints_2"
+
+[sub_resource type="Resource" id="personal_complaints_3"]
+script = ExtResource("2_resp")
+text = "Prices keep going up, but wages stay the same. How's a honest person supposed to survive?"
+topic_type = 2
+personality_affinity = ["frustrated", "practical"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = []
+weight = 0.9
+actions = []
+conditions = []
+response_id = "personal_complaints_3"
+
+[sub_resource type="Resource" id="personal_complaints_4"]
+script = ExtResource("2_resp")
+text = "The roads are getting worse. Used to be the lord would fix them, but he hasn't been seen in months."
+topic_type = 2
+personality_affinity = ["observant", "worried"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = []
+weight = 0.85
+actions = []
+conditions = []
+response_id = "personal_complaints_4"
+
+[sub_resource type="Resource" id="personal_complaints_5"]
+script = ExtResource("2_resp")
+text = "My back aches, my feet hurt, and I'm not as young as I used to be. But I keep going. What choice is there?"
+topic_type = 2
+personality_affinity = ["stoic", "tired"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = []
+weight = 0.85
+actions = []
+conditions = []
+response_id = "personal_complaints_5"
+
+# =============================================================================
+# MEMORIES RESPONSES (Better/Worse Times)
+# =============================================================================
+
+[sub_resource type="Resource" id="personal_memories_1"]
+script = ExtResource("2_resp")
+text = "I remember when the festivals lasted three days. Music, dancing, feasting. We don't celebrate like that anymore."
+topic_type = 2
+personality_affinity = ["nostalgic", "melancholy"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = []
+weight = 0.85
+actions = []
+conditions = []
+response_id = "personal_memories_1"
+
+[sub_resource type="Resource" id="personal_memories_2"]
+script = ExtResource("2_resp")
+text = "Things are better now than when I was young. We had nothing then. At least now there's food on the table."
+topic_type = 2
+personality_affinity = ["grateful", "realistic"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = []
+weight = 0.85
+actions = []
+conditions = []
+response_id = "personal_memories_2"
+
+[sub_resource type="Resource" id="personal_memories_3"]
+script = ExtResource("2_resp")
+text = "The plague took so many. I still remember the pyres burning day and night. We survived, but we lost much."
+topic_type = 2
+personality_affinity = ["somber", "resilient"]
+min_disposition = 55
+max_disposition = 100
+required_knowledge = []
+weight = 0.75
+actions = []
+conditions = []
+response_id = "personal_memories_3"
+
+[sub_resource type="Resource" id="personal_memories_4"]
+script = ExtResource("2_resp")
+text = "Before the troubles started, you could walk the moors at night without fear. Those days are gone."
+topic_type = 2
+personality_affinity = ["nostalgic", "worried"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = []
+weight = 0.85
+actions = []
+conditions = []
+response_id = "personal_memories_4"
+
+[sub_resource type="Resource" id="personal_memories_5"]
+script = ExtResource("2_resp")
+text = "I've seen {town_name} grow from a dozen huts to what it is now. Change is slow, but it comes."
+topic_type = 2
+personality_affinity = ["observant", "patient"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = []
+weight = 0.8
+actions = []
+conditions = []
+response_id = "personal_memories_5"
+
+# =============================================================================
+# GENERIC PERSONAL RESPONSES (No specific archetype)
+# =============================================================================
+
+[sub_resource type="Resource" id="personal_generic_1"]
+script = ExtResource("2_resp")
+text = "Not much to tell. I live simply, keep to myself mostly."
+topic_type = 2
+personality_affinity = ["reserved", "humble"]
+min_disposition = 30
+max_disposition = 100
+required_knowledge = []
+weight = 0.8
+actions = []
+conditions = []
+response_id = "personal_generic_1"
+
+[sub_resource type="Resource" id="personal_generic_2"]
+script = ExtResource("2_resp")
+text = "Life's hard here, but it's home. Can't imagine living anywhere else."
+topic_type = 2
+personality_affinity = ["content", "loyal"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = []
+weight = 0.8
+actions = []
+conditions = []
+response_id = "personal_generic_2"
+
+[sub_resource type="Resource" id="personal_generic_3"]
+script = ExtResource("2_resp")
+text = "I have my worries, same as anyone. But we get by."
+topic_type = 2
+personality_affinity = ["realistic", "resilient"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = []
+weight = 0.8
+actions = []
+conditions = []
+response_id = "personal_generic_3"
+
+[sub_resource type="Resource" id="personal_generic_4"]
+script = ExtResource("2_resp")
+text = "Family's all that matters in the end. I do what I can to provide for them."
+topic_type = 2
+personality_affinity = ["family-oriented", "devoted"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = []
+weight = 0.8
+actions = []
+conditions = []
+response_id = "personal_generic_4"
+
+[sub_resource type="Resource" id="personal_generic_5"]
+script = ExtResource("2_resp")
+text = "I try to be a good neighbor. Help when I can, mind my business when I can't."
+topic_type = 2
+personality_affinity = ["friendly", "practical"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = []
+weight = 0.8
+actions = []
+conditions = []
+response_id = "personal_generic_5"
+
+[sub_resource type="Resource" id="personal_generic_6"]
+script = ExtResource("2_resp")
+text = "Every day's a blessing. At least that's what my mother used to say."
+topic_type = 2
+personality_affinity = ["optimistic", "grateful"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = []
+weight = 0.8
+actions = []
+conditions = []
+response_id = "personal_generic_6"
+
+# =============================================================================
+# HOSTILE/UNFRIENDLY PERSONAL RESPONSES
+# =============================================================================
+
+[sub_resource type="Resource" id="personal_hostile"]
+script = ExtResource("2_resp")
+text = "My business is my own. I don't share with strangers."
+topic_type = 2
+personality_affinity = ["secretive", "suspicious"]
+min_disposition = 0
+max_disposition = 30
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "personal_hostile"
+
+[sub_resource type="Resource" id="personal_dismissive"]
+script = ExtResource("2_resp")
+text = "Why do you care? We're not friends."
+topic_type = 2
+personality_affinity = ["cold", "dismissive"]
+min_disposition = 15
+max_disposition = 40
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "personal_dismissive"
+
+[sub_resource type="Resource" id="personal_nervous"]
+script = ExtResource("2_resp")
+text = "I... I'd rather not say. Please, I have to go."
+topic_type = 2
+personality_affinity = ["nervous", "secretive"]
+min_disposition = 20
+max_disposition = 45
+required_knowledge = []
+weight = 0.7
+actions = []
+conditions = []
+response_id = "personal_nervous"
+
+[sub_resource type="Resource" id="personal_hostile_2"]
+script = ExtResource("2_resp")
+text = "You think I owe you my life story? Think again."
+topic_type = 2
+personality_affinity = ["hostile", "proud"]
+min_disposition = 0
+max_disposition = 25
+required_knowledge = []
+weight = 0.9
+actions = []
+conditions = []
+response_id = "personal_hostile_2"
+
+[sub_resource type="Resource" id="personal_dismissive_2"]
+script = ExtResource("2_resp")
+text = "I've got nothing to say to you. Move along."
+topic_type = 2
+personality_affinity = ["cold", "impatient"]
+min_disposition = 10
+max_disposition = 35
+required_knowledge = []
+weight = 0.9
+actions = []
+conditions = []
+response_id = "personal_dismissive_2"
+
+[resource]
+script = ExtResource("1_pool")
+responses = [SubResource("personal_farmer_1"), SubResource("personal_farmer_2"), SubResource("personal_farmer_3"), SubResource("personal_farmer_4"), SubResource("personal_farmer_5"), SubResource("personal_farmer_6"), SubResource("personal_farmer_7"), SubResource("personal_guard_1"), SubResource("personal_guard_2"), SubResource("personal_guard_3"), SubResource("personal_guard_4"), SubResource("personal_guard_5"), SubResource("personal_guard_6"), SubResource("personal_guard_7"), SubResource("personal_guard_8"), SubResource("personal_merchant_1"), SubResource("personal_merchant_2"), SubResource("personal_merchant_3"), SubResource("personal_merchant_4"), SubResource("personal_merchant_5"), SubResource("personal_merchant_6"), SubResource("personal_merchant_7"), SubResource("personal_merchant_8"), SubResource("personal_innkeeper_1"), SubResource("personal_innkeeper_2"), SubResource("personal_innkeeper_3"), SubResource("personal_innkeeper_4"), SubResource("personal_innkeeper_5"), SubResource("personal_innkeeper_6"), SubResource("personal_scholar_1"), SubResource("personal_scholar_2"), SubResource("personal_scholar_3"), SubResource("personal_scholar_4"), SubResource("personal_scholar_5"), SubResource("personal_scholar_6"), SubResource("personal_blacksmith_1"), SubResource("personal_blacksmith_2"), SubResource("personal_blacksmith_3"), SubResource("personal_blacksmith_4"), SubResource("personal_blacksmith_5"), SubResource("personal_blacksmith_6"), SubResource("personal_priest_1"), SubResource("personal_priest_2"), SubResource("personal_priest_3"), SubResource("personal_priest_4"), SubResource("personal_priest_5"), SubResource("personal_priest_6"), SubResource("personal_priest_7"), SubResource("personal_priest_8"), SubResource("personal_civilian_backstory_1"), SubResource("personal_civilian_backstory_2"), SubResource("personal_civilian_backstory_3"), SubResource("personal_civilian_backstory_4"), SubResource("personal_civilian_backstory_5"), SubResource("personal_civilian_backstory_6"), SubResource("personal_family_1"), SubResource("personal_family_2"), SubResource("personal_family_3"), SubResource("personal_family_4"), SubResource("personal_family_5"), SubResource("personal_dreams_1"), SubResource("personal_dreams_2"), SubResource("personal_dreams_3"), SubResource("personal_dreams_4"), SubResource("personal_dreams_5"), SubResource("personal_complaints_1"), SubResource("personal_complaints_2"), SubResource("personal_complaints_3"), SubResource("personal_complaints_4"), SubResource("personal_complaints_5"), SubResource("personal_memories_1"), SubResource("personal_memories_2"), SubResource("personal_memories_3"), SubResource("personal_memories_4"), SubResource("personal_memories_5"), SubResource("personal_generic_1"), SubResource("personal_generic_2"), SubResource("personal_generic_3"), SubResource("personal_generic_4"), SubResource("personal_generic_5"), SubResource("personal_generic_6"), SubResource("personal_hostile"), SubResource("personal_dismissive"), SubResource("personal_nervous"), SubResource("personal_hostile_2"), SubResource("personal_dismissive_2")]
+pool_id = "personal"
+description = "PERSONAL topic responses by archetype (farmer, guard, merchant, innkeeper, scholar, blacksmith, priest) plus civilian backstories, family mentions, dreams/aspirations, complaints/concerns, memories, generic and hostile variants"

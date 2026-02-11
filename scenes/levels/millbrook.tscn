@@ -1,0 +1,724 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://scripts/levels/millbrook.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/cat_animiation.png" id="4"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/cow animiation.png" id="5"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/grass.png" id="6_grass"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/woodenfloor.png" id="7_wood"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/stonewall.png" id="8_stone"]
+
+[sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
+sky_top_color = Color(0.45, 0.55, 0.75, 1)
+sky_horizon_color = Color(0.7, 0.75, 0.82, 1)
+ground_bottom_color = Color(0.35, 0.42, 0.3, 1)
+ground_horizon_color = Color(0.55, 0.6, 0.52, 1)
+
+[sub_resource type="Sky" id="sky"]
+sky_material = SubResource("sky_mat")
+
+[sub_resource type="Environment" id="Environment_millbrook"]
+background_mode = 2
+sky = SubResource("sky")
+ambient_light_source = 2
+ambient_light_color = Color(0.65, 0.7, 0.62, 1)
+ambient_light_energy = 0.7
+fog_enabled = true
+fog_light_color = Color(0.65, 0.68, 0.6, 1)
+fog_density = 0.004
+fog_sky_affect = 0.2
+
+[sub_resource type="StandardMaterial3D" id="mat_ground"]
+albedo_color = Color(0.4, 0.48, 0.32, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="mat_path"]
+albedo_color = Color(0.5, 0.42, 0.32, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="mat_wheat"]
+albedo_color = Color(0.7, 0.6, 0.35, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="mat_water"]
+albedo_color = Color(0.25, 0.4, 0.55, 0.75)
+transparency = 1
+roughness = 0.1
+
+[sub_resource type="StandardMaterial3D" id="mat_riverbed"]
+albedo_color = Color(0.35, 0.32, 0.28, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="mat_bank"]
+albedo_color = Color(0.35, 0.45, 0.28, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="mat_bridge"]
+albedo_color = Color(0.45, 0.35, 0.25, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="mat_railing"]
+albedo_color = Color(0.4, 0.3, 0.2, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_wood"]
+albedo_color = Color(0.5, 0.4, 0.3, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="mat_stone"]
+albedo_color = Color(0.5, 0.48, 0.45, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_roof"]
+albedo_color = Color(0.35, 0.28, 0.2, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_wheel"]
+albedo_color = Color(0.4, 0.32, 0.22, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_storage_wood"]
+albedo_color = Color(0.55, 0.45, 0.35, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="mat_storage_roof"]
+albedo_color = Color(0.38, 0.3, 0.22, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_sack"]
+albedo_color = Color(0.6, 0.55, 0.4, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="mat_farmhouse"]
+albedo_color = Color(0.52, 0.42, 0.32, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="mat_thatch"]
+albedo_color = Color(0.5, 0.45, 0.3, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="mat_chimney"]
+albedo_color = Color(0.45, 0.4, 0.38, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_fence"]
+albedo_color = Color(0.45, 0.35, 0.25, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="mat_hay"]
+albedo_color = Color(0.7, 0.6, 0.35, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="mat_cart_wheel"]
+albedo_color = Color(0.35, 0.28, 0.2, 1)
+roughness = 0.85
+
+[node name="Millbrook" type="Node3D"]
+script = ExtResource("1")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_millbrook")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866, -0.433, 0.25, 0, 0.5, 0.866, -0.5, -0.75, 0.433, 0, 25, 0)
+light_color = Color(1.0, 0.95, 0.85, 1)
+light_energy = 1.2
+shadow_enabled = true
+shadow_bias = 0.02
+
+[node name="Player" parent="." instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 5)
+
+[node name="HUD" parent="." instance=ExtResource("3")]
+
+;; ============== TERRAIN ==============
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="Ground" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(40, 1, 40)
+material = SubResource("mat_ground")
+
+[node name="MainPath" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 0)
+size = Vector3(40, 0.05, 4)
+material = SubResource("mat_path")
+
+[node name="MillPath" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.025, -8)
+size = Vector3(3, 0.05, 12)
+material = SubResource("mat_path")
+
+[node name="WheatField_0" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0.05, -10)
+size = Vector3(10, 0.1, 8)
+material = SubResource("mat_wheat")
+
+[node name="WheatField_1" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0.05, 10)
+size = Vector3(10, 0.1, 8)
+material = SubResource("mat_wheat")
+
+[node name="WheatField_2" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0.05, 12)
+size = Vector3(10, 0.1, 8)
+material = SubResource("mat_wheat")
+
+;; ============== BROOK ==============
+[node name="Brook" type="Node3D" parent="."]
+
+[node name="BrookRiverbed" type="CSGBox3D" parent="Brook"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, -0.25, -5)
+use_collision = true
+size = Vector3(4, 0.5, 30)
+material = SubResource("mat_riverbed")
+
+[node name="BrookWater" type="CSGBox3D" parent="Brook"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, -0.05, -5)
+size = Vector3(3.5, 0.3, 28)
+material = SubResource("mat_water")
+
+[node name="EastBank" type="CSGBox3D" parent="Brook"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0.2, -5)
+use_collision = true
+size = Vector3(1.5, 0.4, 30)
+material = SubResource("mat_bank")
+
+[node name="WestBank" type="CSGBox3D" parent="Brook"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 0.2, -5)
+use_collision = true
+size = Vector3(1.5, 0.4, 30)
+material = SubResource("mat_bank")
+
+[node name="WoodenBridge" type="CSGBox3D" parent="Brook"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.15, 0)
+use_collision = true
+size = Vector3(6, 0.3, 5)
+material = SubResource("mat_bridge")
+
+[node name="BridgeRailingNorth" type="CSGBox3D" parent="Brook"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.7, -2.3)
+use_collision = true
+size = Vector3(6, 0.8, 0.15)
+material = SubResource("mat_railing")
+
+[node name="BridgeRailingSouth" type="CSGBox3D" parent="Brook"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.7, 2.3)
+use_collision = true
+size = Vector3(6, 0.8, 0.15)
+material = SubResource("mat_railing")
+
+;; ============== BUILDINGS ==============
+[node name="Buildings" type="Node3D" parent="."]
+
+;; Water Mill
+[node name="WaterMill" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -14)
+
+[node name="Foundation" type="CSGBox3D" parent="Buildings/WaterMill"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+use_collision = true
+size = Vector3(8, 1.5, 7)
+material = SubResource("mat_stone")
+
+[node name="MillBuilding" type="CSGBox3D" parent="Buildings/WaterMill"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+use_collision = true
+size = Vector3(7, 5, 6)
+material = SubResource("mat_wood")
+
+[node name="MillRoof" type="CSGBox3D" parent="Buildings/WaterMill"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.1, 0)
+use_collision = true
+size = Vector3(8, 1.2, 7)
+material = SubResource("mat_roof")
+
+[node name="UpperRoof" type="CSGBox3D" parent="Buildings/WaterMill"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
+use_collision = true
+size = Vector3(5, 0.8, 4.5)
+material = SubResource("mat_roof")
+
+[node name="WaterWheel" type="CSGCylinder3D" parent="Buildings/WaterMill"]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -4.5, 2, 0)
+use_collision = true
+radius = 3.0
+height = 1.0
+sides = 12
+material = SubResource("mat_wheel")
+
+[node name="WheelHub" type="CSGCylinder3D" parent="Buildings/WaterMill"]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -4.5, 2, 0)
+use_collision = true
+radius = 0.4
+height = 1.5
+sides = 8
+material = SubResource("mat_wheel")
+
+[node name="MillLight" type="OmniLight3D" parent="Buildings/WaterMill"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+light_color = Color(1.0, 0.85, 0.6, 1)
+light_energy = 1.5
+omni_range = 10.0
+
+;; Grain Storage
+[node name="GrainStorage" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -12)
+
+[node name="StorageBuilding" type="CSGBox3D" parent="Buildings/GrainStorage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+use_collision = true
+size = Vector3(8, 5, 6)
+material = SubResource("mat_storage_wood")
+
+[node name="StorageRoof" type="CSGBox3D" parent="Buildings/GrainStorage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.75, 0)
+use_collision = true
+size = Vector3(9, 1.5, 7)
+material = SubResource("mat_storage_roof")
+
+[node name="GrainSack_0" type="CSGCylinder3D" parent="Buildings/GrainStorage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.4, 0)
+use_collision = true
+radius = 0.4
+height = 0.8
+sides = 8
+material = SubResource("mat_sack")
+
+[node name="GrainSack_1" type="CSGCylinder3D" parent="Buildings/GrainStorage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 0.4, 0.5)
+use_collision = true
+radius = 0.4
+height = 0.8
+sides = 8
+material = SubResource("mat_sack")
+
+[node name="GrainSack_2" type="CSGCylinder3D" parent="Buildings/GrainStorage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2, 0.4, -0.3)
+use_collision = true
+radius = 0.4
+height = 0.8
+sides = 8
+material = SubResource("mat_sack")
+
+;; Miller's House (largest farmhouse)
+[node name="MillerHouse" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
+
+[node name="Building" type="CSGBox3D" parent="Buildings/MillerHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+use_collision = true
+size = Vector3(6, 4, 5)
+material = SubResource("mat_farmhouse")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/MillerHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.4, 0)
+use_collision = true
+size = Vector3(6.8, 0.8, 5.8)
+material = SubResource("mat_thatch")
+
+[node name="Chimney" type="CSGBox3D" parent="Buildings/MillerHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 5.2, 0)
+use_collision = true
+size = Vector3(0.8, 1.5, 0.8)
+material = SubResource("mat_chimney")
+
+[node name="HouseLight" type="OmniLight3D" parent="Buildings/MillerHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+light_color = Color(1.0, 0.85, 0.6, 1)
+light_energy = 1.2
+omni_range = 8.0
+
+;; Farmer House 1
+[node name="FarmerHouse1" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, 5)
+
+[node name="Building" type="CSGBox3D" parent="Buildings/FarmerHouse1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, 0)
+use_collision = true
+size = Vector3(5, 3.5, 4.5)
+material = SubResource("mat_farmhouse")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/FarmerHouse1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.9, 0)
+use_collision = true
+size = Vector3(5.8, 0.8, 5.3)
+material = SubResource("mat_thatch")
+
+[node name="HouseLight" type="OmniLight3D" parent="Buildings/FarmerHouse1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
+light_color = Color(1.0, 0.85, 0.6, 1)
+light_energy = 1.2
+omni_range = 8.0
+
+;; Farmer House 2
+[node name="FarmerHouse2" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0, 8)
+
+[node name="Building" type="CSGBox3D" parent="Buildings/FarmerHouse2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, 0)
+use_collision = true
+size = Vector3(5, 3.5, 4.5)
+material = SubResource("mat_farmhouse")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/FarmerHouse2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.9, 0)
+use_collision = true
+size = Vector3(5.8, 0.8, 5.3)
+material = SubResource("mat_thatch")
+
+[node name="HouseLight" type="OmniLight3D" parent="Buildings/FarmerHouse2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
+light_color = Color(1.0, 0.85, 0.6, 1)
+light_energy = 1.2
+omni_range = 8.0
+
+;; Farmer House 3
+[node name="FarmerHouse3" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, -5)
+
+[node name="Building" type="CSGBox3D" parent="Buildings/FarmerHouse3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+size = Vector3(4.5, 3, 4)
+material = SubResource("mat_farmhouse")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/FarmerHouse3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.4, 0)
+use_collision = true
+size = Vector3(5.3, 0.8, 4.8)
+material = SubResource("mat_thatch")
+
+[node name="HouseLight" type="OmniLight3D" parent="Buildings/FarmerHouse3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+light_color = Color(1.0, 0.85, 0.6, 1)
+light_energy = 1.2
+omni_range = 8.0
+
+;; ============== DECORATIONS ==============
+[node name="Decorations" type="Node3D" parent="."]
+
+;; Fence Posts
+[node name="FencePost_0" type="CSGBox3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0.6, -14)
+use_collision = true
+size = Vector3(0.15, 1.2, 0.15)
+material = SubResource("mat_fence")
+
+[node name="FencePost_1" type="CSGBox3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.6, -14)
+use_collision = true
+size = Vector3(0.15, 1.2, 0.15)
+material = SubResource("mat_fence")
+
+[node name="FencePost_2" type="CSGBox3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0.6, -14)
+use_collision = true
+size = Vector3(0.15, 1.2, 0.15)
+material = SubResource("mat_fence")
+
+[node name="FencePost_3" type="CSGBox3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0.6, -6)
+use_collision = true
+size = Vector3(0.15, 1.2, 0.15)
+material = SubResource("mat_fence")
+
+[node name="FencePost_4" type="CSGBox3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.6, -6)
+use_collision = true
+size = Vector3(0.15, 1.2, 0.15)
+material = SubResource("mat_fence")
+
+[node name="FencePost_5" type="CSGBox3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0.6, -6)
+use_collision = true
+size = Vector3(0.15, 1.2, 0.15)
+material = SubResource("mat_fence")
+
+[node name="FencePost_6" type="CSGBox3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 0.6, -10)
+use_collision = true
+size = Vector3(0.15, 1.2, 0.15)
+material = SubResource("mat_fence")
+
+[node name="FencePost_7" type="CSGBox3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 0.6, -8)
+use_collision = true
+size = Vector3(0.15, 1.2, 0.15)
+material = SubResource("mat_fence")
+
+;; Fence Rails
+[node name="FenceRail_0" type="CSGBox3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.8, -14)
+size = Vector3(4, 0.1, 0.08)
+material = SubResource("mat_fence")
+
+[node name="FenceRail_1" type="CSGBox3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.4, -14)
+size = Vector3(4, 0.1, 0.08)
+material = SubResource("mat_fence")
+
+[node name="FenceRail_2" type="CSGBox3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.8, -6)
+size = Vector3(4, 0.1, 0.08)
+material = SubResource("mat_fence")
+
+[node name="FenceRail_3" type="CSGBox3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.4, -6)
+size = Vector3(4, 0.1, 0.08)
+material = SubResource("mat_fence")
+
+;; Haystacks
+[node name="Haystack_0" type="CSGCylinder3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0.9, 12)
+use_collision = true
+radius = 1.2
+height = 1.8
+sides = 8
+material = SubResource("mat_hay")
+
+[node name="Haystack_1" type="CSGCylinder3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 0.9, 11)
+use_collision = true
+radius = 1.2
+height = 1.8
+sides = 8
+material = SubResource("mat_hay")
+
+[node name="Haystack_2" type="CSGCylinder3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.9, 15)
+use_collision = true
+radius = 1.2
+height = 1.8
+sides = 8
+material = SubResource("mat_hay")
+
+;; Cart
+[node name="Cart" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -8)
+
+[node name="CartBed" type="CSGBox3D" parent="Decorations/Cart"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+use_collision = true
+size = Vector3(2.5, 0.2, 1.5)
+material = SubResource("mat_fence")
+
+[node name="CartSide1" type="CSGBox3D" parent="Decorations/Cart"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, -0.7)
+use_collision = true
+size = Vector3(2.5, 0.5, 0.1)
+material = SubResource("mat_fence")
+
+[node name="CartSide2" type="CSGBox3D" parent="Decorations/Cart"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0.7)
+use_collision = true
+size = Vector3(2.5, 0.5, 0.1)
+material = SubResource("mat_fence")
+
+[node name="CartWheel_0" type="CSGCylinder3D" parent="Decorations/Cart"]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -0.9, 0.4, -0.85)
+use_collision = true
+radius = 0.4
+height = 0.1
+sides = 8
+material = SubResource("mat_cart_wheel")
+
+[node name="CartWheel_1" type="CSGCylinder3D" parent="Decorations/Cart"]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -0.9, 0.4, 0.85)
+use_collision = true
+radius = 0.4
+height = 0.1
+sides = 8
+material = SubResource("mat_cart_wheel")
+
+[node name="CartWheel_2" type="CSGCylinder3D" parent="Decorations/Cart"]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0.9, 0.4, -0.85)
+use_collision = true
+radius = 0.4
+height = 0.1
+sides = 8
+material = SubResource("mat_cart_wheel")
+
+[node name="CartWheel_3" type="CSGCylinder3D" parent="Decorations/Cart"]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0.9, 0.4, 0.85)
+use_collision = true
+radius = 0.4
+height = 0.1
+sides = 8
+material = SubResource("mat_cart_wheel")
+
+;; Well
+[node name="Well" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 3)
+
+[node name="WellBase" type="CSGCylinder3D" parent="Decorations/Well"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+use_collision = true
+radius = 1.0
+height = 0.8
+sides = 8
+material = SubResource("mat_stone")
+
+[node name="WellPost_0" type="CSGBox3D" parent="Decorations/Well"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 1.25, -0.6)
+use_collision = true
+size = Vector3(0.15, 2.5, 0.15)
+material = SubResource("mat_fence")
+
+[node name="WellPost_1" type="CSGBox3D" parent="Decorations/Well"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 1.25, -0.6)
+use_collision = true
+size = Vector3(0.15, 2.5, 0.15)
+material = SubResource("mat_fence")
+
+[node name="WellCrossbeam" type="CSGBox3D" parent="Decorations/Well"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -0.6)
+use_collision = true
+size = Vector3(1.4, 0.15, 0.15)
+material = SubResource("mat_fence")
+
+;; ============== BILLBOARDS ==============
+[node name="Billboards" type="Node3D" parent="."]
+
+[node name="Cat_0" type="Sprite3D" parent="Billboards"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.3, 3)
+pixel_size = 0.01
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+hframes = 5
+texture = ExtResource("4")
+
+[node name="Cat_1" type="Sprite3D" parent="Billboards"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.3, -2)
+pixel_size = 0.01
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+hframes = 5
+frame = 3
+texture = ExtResource("4")
+
+[node name="Bull_0" type="Sprite3D" parent="Billboards"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0.5, 15)
+pixel_size = 0.02
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+hframes = 5
+texture = ExtResource("5")
+
+[node name="Bull_1" type="Sprite3D" parent="Billboards"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 0.5, 12)
+pixel_size = 0.02
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+hframes = 5
+frame = 1
+texture = ExtResource("5")
+
+[node name="Bull_2" type="Sprite3D" parent="Billboards"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0.5, 18)
+pixel_size = 0.02
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+hframes = 5
+frame = 2
+texture = ExtResource("5")
+
+[node name="Bull_3" type="Sprite3D" parent="Billboards"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0.5, 10)
+pixel_size = 0.02
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+hframes = 5
+frame = 3
+texture = ExtResource("5")
+
+[node name="Bull_4" type="Sprite3D" parent="Billboards"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 0.5, 8)
+pixel_size = 0.02
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+hframes = 5
+frame = 4
+texture = ExtResource("5")
+
+;; ============== LIGHTS ==============
+[node name="Lights" type="Node3D" parent="."]
+
+;; ============== SPAWN POINTS ==============
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="SpawnPoint_default" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 5)
+
+[node name="SpawnPoint_from_fast_travel" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.1, 2)
+
+[node name="SpawnPoint_from_wilderness" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 5)
+
+[node name="SpawnPoint_from_open_world" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 5)
+
+[node name="SpawnPoint_from_dalhurst" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 0.1, 0)
+
+[node name="SpawnPoint_from_west" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 0.1, 0)
+
+[node name="SpawnPoint_from_kazan_dun" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0.1, 0)
+
+[node name="SpawnPoint_from_east" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0.1, 0)
+
+[node name="SpawnPoint_from_north" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -18)
+
+[node name="SpawnPoint_from_south" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 18)
+
+;; ============== NPC SPAWN POINTS ==============
+[node name="NPCSpawnPoints" type="Node3D" parent="."]
+
+[node name="NPC_MillerOswin" type="Marker3D" parent="NPCSpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -10)
+
+[node name="NPC_FarmerEdda" type="Marker3D" parent="NPCSpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 8)
+
+[node name="NPC_Merchant" type="Marker3D" parent="NPCSpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 6)
+
+;; ============== INTERACTABLES ==============
+[node name="Interactables" type="Node3D" parent="."]
+
+[node name="FastTravelShrine" type="Marker3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 2)
+
+[node name="RestSpot" type="Marker3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 8)
+
+[node name="DoorPosition_West" type="Marker3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, 0)
+
+[node name="DoorPosition_East" type="Marker3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, 0)
+
+;; ============== NAVIGATION ==============
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]

@@ -1,0 +1,147 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/data/enemy_attack_data.gd" id="2"]
+
+[sub_resource type="Resource" id="1"]
+script = ExtResource("2")
+id = "tenger_spirit_bolt"
+display_name = "Spirit Bolt"
+damage = Array[int]([3, 6, 4])
+damage_type = 5
+windup_time = 0.6
+active_time = 0.15
+recovery_time = 0.4
+cooldown = 2.0
+range_distance = 25.0
+is_ranged = true
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 16.0
+inflicts_condition = 0
+condition_chance = 0.0
+condition_duration = 0.0
+stagger_power = 0.5
+knockback_force = 2.0
+weight = 1.0
+min_range = 4.0
+max_range = 25.0
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[sub_resource type="Resource" id="2"]
+script = ExtResource("2")
+id = "tenger_blood_curse"
+display_name = "Blood Curse"
+damage = Array[int]([2, 8, 6])
+damage_type = 5
+windup_time = 1.0
+active_time = 0.2
+recovery_time = 0.6
+cooldown = 10.0
+range_distance = 20.0
+is_ranged = true
+is_aoe = true
+aoe_radius = 4.0
+projectile_speed = 12.0
+inflicts_condition = 6
+condition_chance = 0.6
+condition_duration = 8.0
+stagger_power = 0.8
+knockback_force = 3.0
+weight = 0.3
+min_range = 0.0
+max_range = 20.0
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[sub_resource type="Resource" id="3"]
+script = ExtResource("2")
+id = "tenger_ritual_dagger"
+display_name = "Ritual Dagger"
+damage = Array[int]([2, 4, 2])
+damage_type = 0
+windup_time = 0.25
+active_time = 0.15
+recovery_time = 0.2
+cooldown = 1.5
+range_distance = 2.0
+is_ranged = false
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 0.0
+inflicts_condition = 2
+condition_chance = 0.25
+condition_duration = 6.0
+stagger_power = 0.3
+knockback_force = 1.0
+weight = 0.2
+min_range = 0.0
+max_range = 2.5
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[resource]
+script = ExtResource("1")
+id = "tenger_shaman"
+display_name = "Tenger Shaman"
+description = "A keeper of dark spirits and blood magic from the southern wastes. Tenger shamans commune with angry ancestor spirits and can curse their enemies with terrible afflictions."
+max_hp = 50
+armor_value = 7
+movement_speed = 4.0
+turn_speed = 5.0
+grit = 3
+agility = 5
+will = 9
+knowledge = 7
+bravery = 6
+behavior = 3
+faction = 8
+aggro_range = 30.0
+attack_range = 25.0
+preferred_distance = 18.0
+flee_hp_threshold = 0.25
+is_boss = false
+attacks = Array[ExtResource("2")]([SubResource("1"), SubResource("2"), SubResource("3")])
+can_block = false
+block_chance = 0.0
+stagger_resistance = 0.05
+fire_resistance = 0.2
+frost_resistance = 0.0
+lightning_resistance = 0.1
+poison_resistance = 0.3
+necrotic_resistance = 0.4
+physical_resistance = -0.1
+fire_weakness = 0.0
+frost_weakness = 0.15
+lightning_weakness = 0.0
+holy_weakness = 0.3
+causes_horror = true
+horror_difficulty = 14
+loot_table_av = 5
+gold_drop = Array[int]([45, 120])
+guaranteed_drops = Array[String]([])
+drop_table = {
+"mana_potion": 0.3,
+"scroll_soul_drain": 0.1,
+"corrupted_totem_shard": 0.2,
+"red_herb": 0.25
+}
+xp_reward = 130
+scene_path = ""
+icon_path = ""
+scale = 1.0
+sprite_path = ""
+attack_sprite_path = ""
+sprite_hframes = 4
+sprite_vframes = 2
+attack_hframes = 4
+attack_vframes = 2
+sprite_pixel_size = 0.03
+idle_sounds = Array[String]([])
+attack_sounds = Array[String]([])
+hurt_sounds = Array[String]([])
+death_sounds = Array[String]([])

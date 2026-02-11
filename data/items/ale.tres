@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "ale"
+display_name = "Ale"
+description = "A mug of hearty ale. Grants liquid courage: +2 Grit for 60 seconds."
+item_type = 0
+is_stackable = true
+max_stack = 10
+consumable_effect = 5
+effect_value = Array[int]([0, 0, 2])
+effect_duration = 60.0
+effect_percent = 0.0
+teaches_spell_id = ""
+requires_literacy = false
+literacy_dc = 10
+base_value = 10
+weight = 0.4
+icon_path = ""
+mesh_path = ""
+use_sound = ""

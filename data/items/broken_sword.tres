@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "broken_sword"
+display_name = "Broken Sword"
+description = "A damaged sword, its blade chipped and bent. A skilled blacksmith might be able to repair it."
+item_type = 2
+is_stackable = false
+max_stack = 1
+shop_bundle_size = 1
+consumable_effect = 0
+effect_value = Array[int]([0, 0, 0])
+effect_duration = 0.0
+effect_percent = 0.0
+teaches_spell_id = ""
+requires_literacy = false
+literacy_dc = 10
+repair_amount = 0
+repairs_quality = false
+base_value = 5
+weight = 2.0
+icon_path = ""
+mesh_path = ""
+use_sound = ""

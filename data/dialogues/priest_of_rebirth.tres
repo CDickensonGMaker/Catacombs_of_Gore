@@ -1,0 +1,283 @@
+[gd_resource type="Resource" script_class="DialogueData" load_steps=46 format=3 uid="uid://priest_of_rebirth"]
+
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_node.gd" id="2_node"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_choice.gd" id="3_choice"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_condition.gd" id="4_cond"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_action.gd" id="5_action"]
+
+# ============================================================================
+# CHOICES
+# ============================================================================
+
+[sub_resource type="Resource" id="choice_goodbye"]
+script = ExtResource("3_choice")
+text = "I should go. Thank you for your words."
+next_node_id = "end"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_back_start"]
+script = ExtResource("3_choice")
+text = "There is something else I wish to know..."
+next_node_id = "start"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_learn_god"]
+script = ExtResource("3_choice")
+text = "Tell me of the god you serve."
+next_node_id = "about_morthane"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_seek_blessing"]
+script = ExtResource("3_choice")
+text = "I wish to receive a blessing."
+next_node_id = "blessing_offer"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_life_advice"]
+script = ExtResource("3_choice")
+text = "I face many dangers. What counsel can you give?"
+next_node_id = "wisdom_death"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_faith"]
+script = ExtResource("3_choice")
+text = "How does one come to serve Death?"
+next_node_id = "personal_faith"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+# Action to set the blessing flag
+[sub_resource type="Resource" id="action_set_blessed"]
+script = ExtResource("5_action")
+type = 7
+param_string = "blessed_by_rebirth"
+param_int = 0
+param_float = 0.0
+success_node_id = ""
+failure_node_id = ""
+
+# Condition: already blessed
+[sub_resource type="Resource" id="cond_already_blessed"]
+script = ExtResource("4_cond")
+type = 5
+param_string = "blessed_by_rebirth"
+param_int = 0
+param_float = 0.0
+invert = false
+
+# Condition: not blessed
+[sub_resource type="Resource" id="cond_not_blessed"]
+script = ExtResource("4_cond")
+type = 5
+param_string = "blessed_by_rebirth"
+param_int = 0
+param_float = 0.0
+invert = true
+
+[sub_resource type="Resource" id="choice_accept_blessing"]
+script = ExtResource("3_choice")
+text = "I am ready. Grant me Morthane's blessing."
+next_node_id = "blessing_granted"
+conditions = [SubResource("cond_not_blessed")]
+show_when_unavailable = true
+unavailable_reason = "You already walk with Morthane's favor"
+actions = [SubResource("action_set_blessed")]
+
+[sub_resource type="Resource" id="choice_decline_blessing"]
+script = ExtResource("3_choice")
+text = "I am not ready to face such mysteries."
+next_node_id = "blessing_declined"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_fear_death"]
+script = ExtResource("3_choice")
+text = "Is it wrong to fear death?"
+next_node_id = "on_fear"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_undead"]
+script = ExtResource("3_choice")
+text = "What of the undead that plague these lands?"
+next_node_id = "on_undead"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_other_gods"]
+script = ExtResource("3_choice")
+text = "Where does Morthane stand among the Three?"
+next_node_id = "other_gods"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_afterlife"]
+script = ExtResource("3_choice")
+text = "What awaits us after death?"
+next_node_id = "afterlife"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+# ============================================================================
+# NODES
+# ============================================================================
+
+[sub_resource type="Resource" id="node_start"]
+script = ExtResource("2_node")
+id = "start"
+speaker_name = "Priest Morwen"
+text = "*a figure in deep purple robes turns from the altar, pale features serene beneath a white hood* Do not be afraid. I am Morwen, keeper of the Threshold. Those who seek me often carry heavy burdens - loss, fear, or questions that have no easy answers. Which weighs upon you, traveler?"
+choices = [SubResource("choice_learn_god"), SubResource("choice_seek_blessing"), SubResource("choice_life_advice"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_calm"
+
+[sub_resource type="Resource" id="node_about_morthane"]
+script = ExtResource("2_node")
+id = "about_morthane"
+speaker_name = "Priest Morwen"
+text = "Morthane is the Guardian of the Threshold, the god of endings and new beginnings. Many fear the name, but Morthane is not cruel. Death is merely a door, and Morthane ensures all who pass through find what awaits beyond. The god also governs rebirth - for nothing truly ends, it only transforms."
+choices = [SubResource("choice_fear_death"), SubResource("choice_afterlife"), SubResource("choice_other_gods"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_teaching"
+
+[sub_resource type="Resource" id="node_on_fear"]
+script = ExtResource("2_node")
+id = "on_fear"
+speaker_name = "Priest Morwen"
+text = "Fear of death is natural - it is the soul's instinct to cling to what it knows. But consider: do you fear sleep? Each night you surrender consciousness, trusting you will wake. Death is much the same. Morthane teaches that what we call the end is merely a deeper sleep, from which we wake into something greater."
+choices = [SubResource("choice_afterlife"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_gentle"
+
+[sub_resource type="Resource" id="node_afterlife"]
+script = ExtResource("2_node")
+id = "afterlife"
+speaker_name = "Priest Morwen"
+text = "The soul passes through the Threshold into the Eternal Garden, where Gaela's seasons never end. There, time moves as Chronos wills - you may spend ages with lost loved ones in what feels like moments. The wicked face their deeds and must grow beyond them. The righteous find peace. All eventually return, reborn into new flesh."
+choices = [SubResource("choice_undead"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_serene"
+
+[sub_resource type="Resource" id="node_on_undead"]
+script = ExtResource("2_node")
+id = "on_undead"
+speaker_name = "Priest Morwen"
+text = "*their expression hardens* The undead are an abomination against Morthane's sacred charge. They are souls ripped from the Threshold, denied rest and rebirth by foul magic. To destroy them is mercy, not murder. You free the trapped soul to continue its journey. Never hesitate to grant that release."
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_stern"
+
+[sub_resource type="Resource" id="node_other_gods"]
+script = ExtResource("2_node")
+id = "other_gods"
+speaker_name = "Priest Morwen"
+text = "Chronos measures the span of mortal life. Gaela fills that span with growth and experience. And when the span is complete, Morthane receives what they have cultivated. We are the final note in the song, the last page of the chapter. But we are also the silence before the next song begins."
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_thoughtful"
+
+[sub_resource type="Resource" id="node_blessing_offer"]
+script = ExtResource("2_node")
+id = "blessing_offer"
+speaker_name = "Priest Morwen"
+text = "*they produce a small vial of pale, luminescent liquid* Morthane's blessing is not taken lightly. It grants resilience against the corruption of undeath, clarity when facing mortal peril, and... when your time truly comes, a peaceful passage. Are you prepared to accept this solemn gift?"
+choices = [SubResource("choice_accept_blessing"), SubResource("choice_decline_blessing")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_solemn"
+
+[sub_resource type="Resource" id="node_blessing_granted"]
+script = ExtResource("2_node")
+id = "blessing_granted"
+speaker_name = "Priest Morwen"
+text = "*they anoint your temples with the cold liquid, speaking in a resonant whisper* By the Threshold and all who have crossed it, by the darkness that births new light, I mark you as Morthane's own. Death shall not take you before your time, and when it does, the passage shall be gentle. Rise, walker between worlds."
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_blessing"
+
+[sub_resource type="Resource" id="node_blessing_declined"]
+script = ExtResource("2_node")
+id = "blessing_declined"
+speaker_name = "Priest Morwen"
+text = "*they incline their head, understanding* Morthane asks nothing of those unready to face the mysteries. When the question of mortality weighs heavier upon you, return. The Threshold is patient - it awaits us all, in time."
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_understanding"
+
+[sub_resource type="Resource" id="node_wisdom_death"]
+script = ExtResource("2_node")
+id = "wisdom_death"
+speaker_name = "Priest Morwen"
+text = "You walk among dangers? Then hear this: fight fiercely, but without hatred. Kill when you must, but grant quick ends where possible. And remember - every foe you face was once a child, loved by someone. If you must take life, do not take dignity. This is how warriors remain whole in spirit."
+choices = [SubResource("choice_faith"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_wise"
+
+[sub_resource type="Resource" id="node_personal_faith"]
+script = ExtResource("2_node")
+id = "personal_faith"
+speaker_name = "Priest Morwen"
+text = "I died once. Bandits left me for dead on the road. I felt myself slipping away, and at the Threshold, Morthane spoke. 'Not yet,' the god said. 'You have work to do.' I woke in a healer's hut, three days later. Since then, I have no fear of death - only the desire to help others face it with the same peace I found."
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_reflective"
+
+[sub_resource type="Resource" id="node_end"]
+script = ExtResource("2_node")
+id = "end"
+speaker_name = "Priest Morwen"
+text = "Walk without fear, traveler. The Threshold awaits us all, but not today. Not for you. When the darkness comes - and it will come - know that it is merely a door. May Morthane guide your steps until we meet again."
+choices = []
+is_end_node = true
+auto_continue_to = ""
+portrait_id = "priest_farewell"
+
+# ============================================================================
+# RESOURCE
+# ============================================================================
+
+[resource]
+script = ExtResource("1_data")
+id = "priest_of_rebirth"
+display_name = "Priest of Death and Rebirth Dialogue"
+description = "Dialogue for Priest Morwen, servant of Morthane the Guardian of the Threshold. Offers blessing of rebirth and wisdom about death, the afterlife, and facing mortality with courage."
+start_node_id = "start"
+nodes = [SubResource("node_start"), SubResource("node_about_morthane"), SubResource("node_on_fear"), SubResource("node_afterlife"), SubResource("node_on_undead"), SubResource("node_other_gods"), SubResource("node_blessing_offer"), SubResource("node_blessing_granted"), SubResource("node_blessing_declined"), SubResource("node_wisdom_death"), SubResource("node_personal_faith"), SubResource("node_end")]

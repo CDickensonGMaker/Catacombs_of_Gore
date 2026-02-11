@@ -1,0 +1,101 @@
+[gd_scene load_steps=8 format=3 uid="uid://enemy_base_scene"]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_base.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/combat/hitbox.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/combat/hurtbox.gd" id="3"]
+[ext_resource type="PackedScene" uid="uid://enemy_health_bar_3d" path="res://scenes/ui/enemy_health_bar_3d.tscn" id="4"]
+
+[sub_resource type="CapsuleShape3D" id="1"]
+radius = 0.4
+height = 1.6
+
+[sub_resource type="BoxShape3D" id="2"]
+size = Vector3(1.5, 1.0, 2.5)
+
+[sub_resource type="CapsuleShape3D" id="3"]
+radius = 0.45
+height = 1.5
+
+[sub_resource type="SphereShape3D" id="4"]
+radius = 12.0
+
+[sub_resource type="StandardMaterial3D" id="5"]
+albedo_color = Color(0.4, 0.5, 0.3, 1)
+
+[sub_resource type="CapsuleMesh" id="enemy_body_mesh"]
+radius = 0.35
+height = 1.4
+
+[sub_resource type="SphereMesh" id="enemy_head_mesh"]
+radius = 0.18
+
+[node name="EnemyBase" type="CharacterBody3D" groups=["enemies"]]
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("1")
+mesh_root = NodePath("MeshRoot")
+animation_player = NodePath("AnimationPlayer")
+nav_agent = NodePath("NavigationAgent3D")
+hitbox = NodePath("MeshRoot/Hitbox")
+hurtbox = NodePath("Hurtbox")
+aggro_area = NodePath("AggroArea")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+shape = SubResource("1")
+
+[node name="MeshRoot" type="Node3D" parent="."]
+
+[node name="BodyPlaceholder" type="MeshInstance3D" parent="MeshRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("enemy_body_mesh")
+material_override = SubResource("5")
+
+[node name="HeadPlaceholder" type="MeshInstance3D" parent="MeshRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+mesh = SubResource("enemy_head_mesh")
+material_override = SubResource("5")
+
+[node name="Hitbox" type="Area3D" parent="MeshRoot" groups=["enemy_hitbox", "hitbox"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, -0.8)
+collision_layer = 16
+collision_mask = 32
+monitoring = false
+script = ExtResource("2")
+damage = 10
+damage_type = 0
+stagger_power = 1.0
+knockback_force = 3.0
+
+[node name="HitboxShape" type="CollisionShape3D" parent="MeshRoot/Hitbox"]
+shape = SubResource("2")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
+path_desired_distance = 0.5
+target_desired_distance = 1.0
+avoidance_enabled = true
+radius = 0.5
+
+[node name="Hurtbox" type="Area3D" parent="." groups=["enemy_hurtbox", "hurtbox"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+collision_layer = 64
+collision_mask = 8
+monitorable = true
+monitoring = true
+script = ExtResource("3")
+
+[node name="HurtboxShape" type="CollisionShape3D" parent="Hurtbox"]
+shape = SubResource("3")
+
+[node name="AggroArea" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 2
+monitoring = true
+
+[node name="AggroShape" type="CollisionShape3D" parent="AggroArea"]
+shape = SubResource("4")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+
+[node name="HealthBar" parent="." instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)

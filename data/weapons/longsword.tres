@@ -1,0 +1,45 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "longsword"
+display_name = "Longsword"
+description = "A versatile blade balanced for both offense and defense."
+weapon_type = 1
+weapon_class = 1
+two_handed = false
+base_damage = Array[int]([3, 6, 4])
+damage_type = 0
+secondary_damage_type = 0
+secondary_damage = Array[int]([0, 0, 0])
+attack_speed = 1.0
+reach = 2.0
+stagger_power = 1.0
+armor_pierce = 0.0
+crit_chance = 0.05
+crit_multiplier = 2.0
+is_ranged = false
+projectile_speed = 30.0
+max_range = 320.0
+reload_time = 0.0
+ammo_type = ""
+inflicts_condition = 0
+condition_chance = 0.0
+condition_duration = 0.0
+lifesteal_percent = 0.0
+is_homing = false
+required_grit = 4
+required_agility = 0
+required_knowledge = 0
+base_value = 150
+weight = 3.0
+mesh_path = ""
+icon_path = ""
+attack_animation = "attack_slash"
+heavy_attack_animation = "attack_heavy_slash"
+fps_sprite_path = "res://Sprite folders grab bag/arm swing 4x4fixed.png"
+fps_h_frames = 4
+fps_v_frames = 4
+fps_sprite_size = Vector2(322, 322)

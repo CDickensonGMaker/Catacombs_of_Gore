@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://tharin_ironbeard_instance_001"]
+
+[ext_resource type="Script" path="res://scripts/npcs/tharin_ironbeard.gd" id="1"]
+
+[node name="TharinIronbeard" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1")
+npc_id = "tharin_ironbeard"
+display_name = "Tharin Ironbeard"

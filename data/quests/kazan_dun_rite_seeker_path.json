@@ -1,0 +1,61 @@
+{
+	"id": "kazan_dun_rite_seeker_path",
+	"title": "The Ancient Rite",
+	"description": "You have declared support for Thane Grimjaw and the Rite of Succession. The Rite-Seekers rejoice, but the competition cannot begin without the sacred Hammer of the First King - an artifact that legitimizes any claim to the throne. Grimjaw believes it still rests in the Deep Vaults, protected by ancient wards that the goblins could not breach.",
+	"is_main_quest": true,
+	"quest_source": "story",
+	"giver_npc_id": "thane_grimjaw",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "kazan_dun",
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "thane_grimjaw",
+	"turn_in_zone": "kazan_dun_level_1",
+	"objectives": [
+		{
+			"id": "find_sealed_chamber",
+			"description": "Find the sealed chamber in the Deep Vaults",
+			"type": "reach",
+			"target": "kazan_dun_level_5_sealed_chamber",
+			"required_count": 1,
+			"is_optional": false
+		},
+		{
+			"id": "solve_ward_puzzle",
+			"description": "Deactivate the ancient wards protecting the Hammer",
+			"type": "interact",
+			"target": "ancient_ward_puzzle",
+			"required_count": 1,
+			"is_optional": false
+		},
+		{
+			"id": "recover_hammer",
+			"description": "Recover the Hammer of the First King",
+			"type": "collect",
+			"target": "hammer_of_first_king",
+			"required_count": 1,
+			"is_optional": false
+		},
+		{
+			"id": "return_hammer",
+			"description": "Return the Hammer to Thane Grimjaw",
+			"type": "talk",
+			"target": "thane_grimjaw",
+			"required_count": 1,
+			"is_optional": false
+		}
+	],
+	"rewards": {
+		"gold": 3000,
+		"xp": 20000,
+		"items": ["thanes_favor_amulet"],
+		"reputation": {
+			"kazan_dun_rite_seekers": 500,
+			"kazan_dun_traditionalists": -200
+		}
+	},
+	"prerequisites": ["kazan_dun_succession_choice"],
+	"faction_outcome": {
+		"faction": "rite_seekers",
+		"result": "The Rite of Succession begins. Borin and Grimjaw compete in trials of wisdom, strength, and leadership. The outcome will reshape Kazan-Dun for generations - and you have earned a place of honor regardless of who wins."
+	}
+}

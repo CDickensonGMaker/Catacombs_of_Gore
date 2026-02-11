@@ -1,0 +1,246 @@
+[gd_scene load_steps=16 format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/modular_room.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://Sprite folders grab bag/stonewall.png" id="2"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/residential/bed_double.obj" id="mesh_bed"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/residential/shelf_wall.obj" id="mesh_bookshelf"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/residential/table_work.obj" id="mesh_desk"]
+
+[sub_resource type="StandardMaterial3D" id="mat_stone_floor"]
+albedo_color = Color(0.4, 0.37, 0.34, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.88
+uv1_scale = Vector3(5, 5, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_stone_wall"]
+albedo_color = Color(0.45, 0.42, 0.38, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.86
+uv1_scale = Vector3(4, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_ceiling"]
+albedo_color = Color(0.35, 0.33, 0.3, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.88
+uv1_scale = Vector3(5, 5, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_prop"]
+albedo_color = Color(0.4, 0.35, 0.3, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.85
+uv1_scale = Vector3(2, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_rug"]
+albedo_color = Color(0.5, 0.3, 0.25, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="mat_brazier"]
+albedo_color = Color(0.42, 0.4, 0.44, 1)
+metallic = 0.4
+roughness = 0.55
+
+[sub_resource type="StandardMaterial3D" id="mat_fire"]
+albedo_color = Color(1.0, 0.6, 0.2, 1)
+emission_enabled = true
+emission = Color(1.0, 0.5, 0.1, 1)
+emission_energy_multiplier = 2.5
+
+[sub_resource type="StandardMaterial3D" id="mat_tapestry"]
+albedo_color = Color(0.55, 0.35, 0.25, 1)
+roughness = 0.92
+
+[node name="KDNobleQuarters" type="Node3D"]
+script = ExtResource("1")
+room_id = "kd_noble_quarters"
+room_type = "residential"
+room_name = "Noble Quarters"
+room_width = 25.0
+room_depth = 20.0
+room_height = 8.0
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="Floor" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(25, 1, 20)
+material = SubResource("mat_stone_floor")
+
+[node name="Ceiling" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
+use_collision = true
+size = Vector3(25, 0.5, 20)
+material = SubResource("mat_ceiling")
+
+[node name="WallNorth" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -10)
+use_collision = true
+size = Vector3(25, 8, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthLeft" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 4, 10)
+use_collision = true
+size = Vector3(9, 8, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthRight" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 4, 10)
+use_collision = true
+size = Vector3(9, 8, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthTop" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.5, 10)
+use_collision = true
+size = Vector3(7, 3, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallEast" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 4, 0)
+use_collision = true
+size = Vector3(1, 8, 20)
+material = SubResource("mat_stone_wall")
+
+[node name="WallWest" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.5, 4, 0)
+use_collision = true
+size = Vector3(1, 8, 20)
+material = SubResource("mat_stone_wall")
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="CenterRug" type="CSGBox3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+size = Vector3(10, 0.04, 8)
+material = SubResource("mat_rug")
+
+[node name="Bed1" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -6)
+mesh = ExtResource("mesh_bed")
+surface_material_override/0 = SubResource("mat_prop")
+
+[node name="Bed2" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 8, 0, -6)
+mesh = ExtResource("mesh_bed")
+surface_material_override/0 = SubResource("mat_prop")
+
+[node name="BookshelfW" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -11, 0, 0)
+mesh = ExtResource("mesh_bookshelf")
+surface_material_override/0 = SubResource("mat_prop")
+
+[node name="BookshelfE" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 11, 0, 0)
+mesh = ExtResource("mesh_bookshelf")
+surface_material_override/0 = SubResource("mat_prop")
+
+[node name="Desk" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5)
+mesh = ExtResource("mesh_desk")
+surface_material_override/0 = SubResource("mat_prop")
+
+[node name="TapestryN1" type="CSGBox3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 4.5, -9.5)
+size = Vector3(4, 5, 0.1)
+material = SubResource("mat_tapestry")
+
+[node name="TapestryN2" type="CSGBox3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 4.5, -9.5)
+size = Vector3(4, 5, 0.1)
+material = SubResource("mat_tapestry")
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="Brazier1" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0)
+
+[node name="Stand" type="CSGCylinder3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+radius = 0.3
+height = 1.0
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+radius = 0.45
+height = 0.4
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Fire" type="CSGSphere3D" parent="Lighting/Brazier1"]
+transform = Transform3D(0.65, 0, 0, 0, 0.8, 0, 0, 0, 0.65, 0, 1.55, 0)
+radius = 0.35
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 2.5
+omni_range = 10.0
+
+[node name="Brazier2" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
+
+[node name="Stand" type="CSGCylinder3D" parent="Lighting/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+radius = 0.3
+height = 1.0
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Lighting/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+radius = 0.45
+height = 0.4
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Fire" type="CSGSphere3D" parent="Lighting/Brazier2"]
+transform = Transform3D(0.65, 0, 0, 0, 0.8, 0, 0, 0, 0.65, 0, 1.55, 0)
+radius = 0.35
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 2.5
+omni_range = 10.0
+
+[node name="Spawns" type="Node3D" parent="."]
+
+[node name="NPCSpawns" type="Node3D" parent="Spawns"]
+
+[node name="Noble1" type="Marker3D" parent="Spawns/NPCSpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 2)
+metadata/npc_type = "dwarf_civilian"
+metadata/npc_name = "Noble Thrain"
+metadata/npc_id = "kd_noble_thrain"
+metadata/archetype = "noble"
+
+[node name="Noble2" type="Marker3D" parent="Spawns/NPCSpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 3)
+metadata/npc_type = "dwarf_civilian"
+metadata/npc_name = "Noble Durga"
+metadata/npc_id = "kd_noble_durga"
+metadata/archetype = "noble"
+
+[node name="EnemySpawns" type="Node3D" parent="Spawns"]
+
+[node name="ChestSpawns" type="Node3D" parent="Spawns"]
+
+[node name="Connections" type="Node3D" parent="."]
+
+[node name="DoorPositions" type="Node3D" parent="Connections"]
+
+[node name="DoorSouth" type="Marker3D" parent="Connections/DoorPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 9.5)
+metadata/door_id = "door_south"
+metadata/door_label = "To Corridor"
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="NPCKnowledgeProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/dialogue/npc_knowledge_profile.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+archetype = 0
+personality_traits = Array[String](["neutral", "curious"])
+knowledge_tags = Array[String](["local_area", "rumors", "elder_moor"])
+base_disposition = 50
+speech_style = "casual"

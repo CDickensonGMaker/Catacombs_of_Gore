@@ -1,0 +1,205 @@
+[gd_scene load_steps=17 format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/modular_room.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://Sprite folders grab bag/stonewall.png" id="2"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/residential/hearth_cooking.obj" id="mesh_hearth"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/residential/barrel_stack.obj" id="mesh_barrel_stack"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/market/sack_pile.obj" id="mesh_sack_pile"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/residential/counter_prep.obj" id="mesh_counter"]
+
+[sub_resource type="StandardMaterial3D" id="mat_stone_floor"]
+albedo_color = Color(0.36, 0.34, 0.32, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.94
+uv1_scale = Vector3(4, 4, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_stone_wall"]
+albedo_color = Color(0.4, 0.37, 0.34, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.92
+uv1_scale = Vector3(3, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_ceiling"]
+albedo_color = Color(0.3, 0.28, 0.26, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.94
+uv1_scale = Vector3(4, 4, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_prop"]
+albedo_color = Color(0.42, 0.35, 0.28, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.85
+uv1_scale = Vector3(2, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_fire"]
+albedo_color = Color(1.0, 0.6, 0.2, 1)
+emission_enabled = true
+emission = Color(1.0, 0.5, 0.1, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="StandardMaterial3D" id="mat_brazier"]
+albedo_color = Color(0.38, 0.36, 0.4, 1)
+metallic = 0.4
+roughness = 0.55
+
+[node name="KDKitchen" type="Node3D"]
+script = ExtResource("1")
+room_id = "kd_kitchen"
+room_type = "kitchen"
+room_name = "Kitchen"
+room_width = 20.0
+room_depth = 15.0
+room_height = 8.0
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="Floor" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(20, 1, 15)
+material = SubResource("mat_stone_floor")
+
+[node name="Ceiling" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
+use_collision = true
+size = Vector3(20, 0.5, 15)
+material = SubResource("mat_ceiling")
+
+[node name="WallNorth" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -7.5)
+use_collision = true
+size = Vector3(20, 8, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouth" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 7.5)
+use_collision = true
+size = Vector3(20, 8, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallEastTop" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 4, -2)
+use_collision = true
+size = Vector3(1, 8, 11)
+material = SubResource("mat_stone_wall")
+
+[node name="WallEastBottom" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 4, 5.5)
+use_collision = true
+size = Vector3(1, 8, 4)
+material = SubResource("mat_stone_wall")
+
+[node name="WallEastDoorTop" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 6.5, 2.5)
+use_collision = true
+size = Vector3(1, 3, 2)
+material = SubResource("mat_stone_wall")
+
+[node name="WallWest" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 4, 0)
+use_collision = true
+size = Vector3(1, 8, 15)
+material = SubResource("mat_stone_wall")
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="Hearth" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
+mesh = ExtResource("mesh_hearth")
+surface_material_override/0 = SubResource("mat_prop")
+
+[node name="HearthLight" type="OmniLight3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -5.5)
+light_color = Color(1, 0.55, 0.15, 1)
+light_energy = 5.0
+omni_range = 12.0
+
+[node name="BarrelStorage" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, 3)
+mesh = ExtResource("mesh_barrel_stack")
+surface_material_override/0 = SubResource("mat_prop")
+
+[node name="SackPile" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, 4)
+mesh = ExtResource("mesh_sack_pile")
+surface_material_override/0 = SubResource("mat_prop")
+
+[node name="PrepCounter" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -3)
+mesh = ExtResource("mesh_counter")
+surface_material_override/0 = SubResource("mat_prop")
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="WallTorchW" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 4, 0)
+
+[node name="Bracket" type="CSGBox3D" parent="Lighting/WallTorchW"]
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_brazier")
+
+[node name="Flame" type="CSGSphere3D" parent="Lighting/WallTorchW"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.3, 0)
+radius = 0.2
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/WallTorchW"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.3, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 8.0
+
+[node name="WallTorchS" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 7)
+
+[node name="Bracket" type="CSGBox3D" parent="Lighting/WallTorchS"]
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_brazier")
+
+[node name="Flame" type="CSGSphere3D" parent="Lighting/WallTorchS"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, -0.4)
+radius = 0.2
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/WallTorchS"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, -0.4)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 8.0
+
+[node name="Spawns" type="Node3D" parent="."]
+
+[node name="NPCSpawns" type="Node3D" parent="Spawns"]
+
+[node name="Cook" type="Marker3D" parent="Spawns/NPCSpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
+metadata/npc_type = "dwarf_civilian"
+metadata/npc_name = "Grumli the Cook"
+metadata/npc_id = "kd_cook_grumli"
+metadata/archetype = "merchant"
+
+[node name="KitchenHelper" type="Marker3D" parent="Spawns/NPCSpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -2)
+metadata/npc_type = "dwarf_civilian"
+metadata/npc_name = "Kitchen Helper"
+metadata/npc_id = "kd_kitchen_helper_1"
+metadata/archetype = "commoner"
+
+[node name="EnemySpawns" type="Node3D" parent="Spawns"]
+
+[node name="ChestSpawns" type="Node3D" parent="Spawns"]
+
+[node name="Connections" type="Node3D" parent="."]
+
+[node name="DoorPositions" type="Node3D" parent="Connections"]
+
+[node name="DoorEast" type="Marker3D" parent="Connections/DoorPositions"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 9.5, 0, 2.5)
+metadata/door_id = "door_east"
+metadata/door_label = "To Feast Hall"
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]

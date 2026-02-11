@@ -1,0 +1,371 @@
+[gd_scene load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/modular_room.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://Sprite folders grab bag/stonewall.png" id="2"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/bridge/pillar_simple.obj" id="mesh_pillar"]
+
+[sub_resource type="StandardMaterial3D" id="mat_bloody_floor"]
+albedo_color = Color(0.25, 0.18, 0.16, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.95
+uv1_scale = Vector3(5, 5, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_dark_wall"]
+albedo_color = Color(0.28, 0.24, 0.22, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.92
+uv1_scale = Vector3(4, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_ceiling"]
+albedo_color = Color(0.2, 0.18, 0.16, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.95
+uv1_scale = Vector3(5, 5, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_altar"]
+albedo_color = Color(0.2, 0.15, 0.12, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.85
+uv1_scale = Vector3(2, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_blood"]
+albedo_color = Color(0.4, 0.08, 0.05, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="mat_skull"]
+albedo_color = Color(0.72, 0.68, 0.6, 1)
+roughness = 0.78
+
+[sub_resource type="StandardMaterial3D" id="mat_candle"]
+albedo_color = Color(0.75, 0.7, 0.6, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_flame"]
+albedo_color = Color(0.7, 0.35, 0.1, 1)
+emission_enabled = true
+emission = Color(0.6, 0.25, 0.05, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="StandardMaterial3D" id="mat_green_glow"]
+albedo_color = Color(0.2, 0.5, 0.15, 1)
+emission_enabled = true
+emission = Color(0.15, 0.4, 0.1, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="StandardMaterial3D" id="mat_pillar"]
+albedo_color = Color(0.26, 0.23, 0.2, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.9
+uv1_scale = Vector3(2, 4, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_bone"]
+albedo_color = Color(0.68, 0.65, 0.58, 1)
+roughness = 0.82
+
+[node name="KDRitualChamber" type="Node3D"]
+script = ExtResource("1")
+room_id = "kd_ritual_chamber"
+room_type = "ritual_chamber"
+room_name = "Ritual Chamber"
+room_width = 22.0
+room_depth = 22.0
+room_height = 14.0
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="Floor" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(22, 1, 22)
+material = SubResource("mat_bloody_floor")
+
+[node name="Ceiling" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14, 0)
+use_collision = true
+size = Vector3(22, 0.5, 22)
+material = SubResource("mat_ceiling")
+
+[node name="WallNorth" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, -11)
+use_collision = true
+size = Vector3(22, 14, 1)
+material = SubResource("mat_dark_wall")
+
+[node name="WallSouthLeft" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.5, 7, 11)
+use_collision = true
+size = Vector3(7, 14, 1)
+material = SubResource("mat_dark_wall")
+
+[node name="WallSouthRight" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 7, 11)
+use_collision = true
+size = Vector3(7, 14, 1)
+material = SubResource("mat_dark_wall")
+
+[node name="WallSouthTop" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 11.5, 11)
+use_collision = true
+size = Vector3(8, 5, 1)
+material = SubResource("mat_dark_wall")
+
+[node name="WallEast" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 7, 0)
+use_collision = true
+size = Vector3(1, 14, 22)
+material = SubResource("mat_dark_wall")
+
+[node name="WallWest" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 7, 0)
+use_collision = true
+size = Vector3(1, 14, 22)
+material = SubResource("mat_dark_wall")
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="CentralAltar" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
+
+[node name="AltarBase" type="CSGBox3D" parent="Props/CentralAltar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+use_collision = true
+size = Vector3(5, 1.5, 2.5)
+material = SubResource("mat_altar")
+
+[node name="AltarTop" type="CSGBox3D" parent="Props/CentralAltar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+size = Vector3(5.2, 0.2, 2.7)
+material = SubResource("mat_altar")
+
+[node name="BloodPool" type="CSGCylinder3D" parent="Props/CentralAltar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.72, 0)
+radius = 0.8
+height = 0.05
+sides = 8
+material = SubResource("mat_blood")
+
+[node name="Skull1" type="CSGSphere3D" parent="Props/CentralAltar"]
+transform = Transform3D(0.65, 0, 0, 0, 0.75, 0, 0, 0, 0.55, -1.8, 1.85, 0)
+radius = 0.2
+material = SubResource("mat_skull")
+
+[node name="Skull2" type="CSGSphere3D" parent="Props/CentralAltar"]
+transform = Transform3D(0.65, 0, 0, 0, 0.75, 0, 0, 0, 0.55, 1.8, 1.85, 0)
+radius = 0.2
+material = SubResource("mat_skull")
+
+[node name="RitualCircle" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+
+[node name="Circle" type="CSGCylinder3D" parent="Props/RitualCircle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+radius = 4
+height = 0.04
+sides = 16
+material = SubResource("mat_blood")
+
+[node name="InnerCircle" type="CSGCylinder3D" parent="Props/RitualCircle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+operation = 2
+radius = 3.5
+height = 0.05
+sides = 16
+material = SubResource("mat_blood")
+
+[node name="Rune1" type="CSGBox3D" parent="Props/RitualCircle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, -2.5)
+size = Vector3(0.5, 0.02, 0.8)
+material = SubResource("mat_green_glow")
+
+[node name="Rune2" type="CSGBox3D" parent="Props/RitualCircle"]
+transform = Transform3D(0.866, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866, 2.17, 0.03, -1.25)
+size = Vector3(0.5, 0.02, 0.8)
+material = SubResource("mat_green_glow")
+
+[node name="Rune3" type="CSGBox3D" parent="Props/RitualCircle"]
+transform = Transform3D(0.866, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866, 2.17, 0.03, 1.25)
+size = Vector3(0.5, 0.02, 0.8)
+material = SubResource("mat_green_glow")
+
+[node name="Rune4" type="CSGBox3D" parent="Props/RitualCircle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 2.5)
+size = Vector3(0.5, 0.02, 0.8)
+material = SubResource("mat_green_glow")
+
+[node name="Rune5" type="CSGBox3D" parent="Props/RitualCircle"]
+transform = Transform3D(0.866, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866, -2.17, 0.03, 1.25)
+size = Vector3(0.5, 0.02, 0.8)
+material = SubResource("mat_green_glow")
+
+[node name="Rune6" type="CSGBox3D" parent="Props/RitualCircle"]
+transform = Transform3D(0.866, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866, -2.17, 0.03, -1.25)
+size = Vector3(0.5, 0.02, 0.8)
+material = SubResource("mat_green_glow")
+
+[node name="GlowLight" type="OmniLight3D" parent="Props/RitualCircle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+light_color = Color(0.2, 0.5, 0.15, 1)
+light_energy = 2.0
+omni_range = 8.0
+
+[node name="CandleCircle1" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 2)
+
+[node name="Candle" type="CSGCylinder3D" parent="Props/CandleCircle1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+radius = 0.1
+height = 0.6
+sides = 6
+material = SubResource("mat_candle")
+
+[node name="Flame" type="CSGSphere3D" parent="Props/CandleCircle1"]
+transform = Transform3D(0.5, 0, 0, 0, 0.8, 0, 0, 0, 0.5, 0, 0.7, 0)
+radius = 0.1
+material = SubResource("mat_flame")
+
+[node name="CandleCircle2" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 2)
+
+[node name="Candle" type="CSGCylinder3D" parent="Props/CandleCircle2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+radius = 0.1
+height = 0.6
+sides = 6
+material = SubResource("mat_candle")
+
+[node name="Flame" type="CSGSphere3D" parent="Props/CandleCircle2"]
+transform = Transform3D(0.5, 0, 0, 0, 0.8, 0, 0, 0, 0.5, 0, 0.7, 0)
+radius = 0.1
+material = SubResource("mat_flame")
+
+[node name="CandleCircle3" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 6)
+
+[node name="Candle" type="CSGCylinder3D" parent="Props/CandleCircle3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+radius = 0.1
+height = 0.6
+sides = 6
+material = SubResource("mat_candle")
+
+[node name="Flame" type="CSGSphere3D" parent="Props/CandleCircle3"]
+transform = Transform3D(0.5, 0, 0, 0, 0.8, 0, 0, 0, 0.5, 0, 0.7, 0)
+radius = 0.1
+material = SubResource("mat_flame")
+
+[node name="BonePile" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, -7)
+
+[node name="Bone1" type="CSGBox3D" parent="Props/BonePile"]
+transform = Transform3D(0.866, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866, 0, 0.1, 0)
+size = Vector3(0.9, 0.12, 0.12)
+material = SubResource("mat_bone")
+
+[node name="Bone2" type="CSGBox3D" parent="Props/BonePile"]
+transform = Transform3D(0.5, 0, -0.866, 0, 1, 0, 0.866, 0, 0.5, 0.3, 0.15, 0.2)
+size = Vector3(0.7, 0.1, 0.1)
+material = SubResource("mat_bone")
+
+[node name="Skull" type="CSGSphere3D" parent="Props/BonePile"]
+transform = Transform3D(0.7, 0, 0, 0, 0.8, 0, 0, 0, 0.6, -0.3, 0.2, 0.3)
+radius = 0.22
+material = SubResource("mat_skull")
+
+[node name="Pillar1" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, -7)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="Pillar2" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, -7)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="Pillar3" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, 7)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="Pillar4" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, 7)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="AltarLight" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -5)
+light_color = Color(0.6, 0.25, 0.15, 1)
+light_energy = 2.5
+omni_range = 10.0
+
+[node name="CandleLight1" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 1, 2)
+light_color = Color(1, 0.5, 0.2, 1)
+light_energy = 1.0
+omni_range = 5.0
+
+[node name="CandleLight2" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1, 2)
+light_color = Color(1, 0.5, 0.2, 1)
+light_energy = 1.0
+omni_range = 5.0
+
+[node name="CandleLight3" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 6)
+light_color = Color(1, 0.5, 0.2, 1)
+light_energy = 1.0
+omni_range = 5.0
+
+[node name="Spawns" type="Node3D" parent="."]
+
+[node name="NPCSpawns" type="Node3D" parent="Spawns"]
+
+[node name="EnemySpawns" type="Node3D" parent="Spawns"]
+
+[node name="GoblinShaman" type="Marker3D" parent="Spawns/EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
+metadata/enemy_data = "res://data/enemies/goblin_shaman.tres"
+metadata/sprite_path = "res://assets/sprites/enemies/goblin_shaman.png"
+metadata/h_frames = 4
+metadata/v_frames = 4
+
+[node name="GoblinAcolyte1" type="Marker3D" parent="Spawns/EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 2)
+metadata/enemy_data = "res://data/enemies/goblin_acolyte.tres"
+metadata/sprite_path = "res://assets/sprites/enemies/goblin_acolyte.png"
+metadata/h_frames = 4
+metadata/v_frames = 4
+
+[node name="GoblinAcolyte2" type="Marker3D" parent="Spawns/EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 2)
+metadata/enemy_data = "res://data/enemies/goblin_acolyte.tres"
+metadata/sprite_path = "res://assets/sprites/enemies/goblin_acolyte.png"
+metadata/h_frames = 4
+metadata/v_frames = 4
+
+[node name="ChestSpawns" type="Node3D" parent="Spawns"]
+
+[node name="RitualChest" type="Marker3D" parent="Spawns/ChestSpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -8)
+metadata/chest_id = "kd_ritual_chest_1"
+metadata/chest_name = "Ritual Offerings"
+metadata/loot_tier = "rare"
+metadata/is_locked = true
+metadata/lock_difficulty = 16
+
+[node name="Connections" type="Node3D" parent="."]
+
+[node name="DoorPositions" type="Node3D" parent="Connections"]
+
+[node name="DoorSouth" type="Marker3D" parent="Connections/DoorPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10.5)
+metadata/door_id = "door_south"
+metadata/door_label = "To Goblin Tunnels"
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]

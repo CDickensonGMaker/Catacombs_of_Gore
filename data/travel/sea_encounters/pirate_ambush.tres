@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="SeaEncounter" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/travel/sea_encounter.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "pirate_ambush"
+display_name = "Pirate Ambush"
+description = "A crew of desperate pirates emerges from the mist, seeking plunder. Their weathered ship bears scars of many battles."
+encounter_type = 0
+is_combat = true
+can_flee = true
+flee_difficulty = 5
+enemy_spawns = Array[String](["human_bandit"])
+enemy_counts = Array[Vector2i]([Vector2i(2, 4)])
+is_wave_encounter = false
+wave_count = 1
+npc_spawns = Array[String]([])
+gold_reward = Vector2i(75, 200)
+guaranteed_loot = Array[String]([])
+loot_tier = 2
+loot_rolls = 2
+xp_reward = 150
+difficulty_rating = 3
+min_player_level = 1
+max_player_level = 0
+intro_dialogue_id = ""
+peaceful_dialogue_id = ""
+can_resolve_peacefully = true
+peaceful_skill = 13
+peaceful_skill_dc = 14
+storm_damage = 0
+cargo_loss_chance = 0.0
+storm_duration_hours = 0.0
+discovered_location_id = ""
+island_coords = Vector2i(-999, -999)
+procedural_island = true
+encounter_scene_path = ""
+background_path = ""
+icon_path = ""
+music_track = ""
+ambient_sound = ""

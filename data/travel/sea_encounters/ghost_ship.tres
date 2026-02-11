@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="SeaEncounter" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/travel/sea_encounter.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "ghost_ship"
+display_name = "The Phantom Vessel"
+description = "A spectral ship materializes from the fog, its tattered sails glowing with an otherworldly light. The undead crew stares with hollow eyes, seeking to add more souls to their eternal voyage."
+encounter_type = 1
+is_combat = true
+can_flee = true
+flee_difficulty = 7
+enemy_spawns = Array[String](["skeleton_warrior", "skeleton_shade"])
+enemy_counts = Array[Vector2i]([Vector2i(2, 3), Vector2i(1, 2)])
+is_wave_encounter = true
+wave_count = 2
+npc_spawns = Array[String]([])
+gold_reward = Vector2i(150, 350)
+guaranteed_loot = Array[String](["broken_sword"])
+loot_tier = 3
+loot_rolls = 3
+xp_reward = 300
+difficulty_rating = 6
+min_player_level = 4
+max_player_level = 0
+intro_dialogue_id = ""
+peaceful_dialogue_id = ""
+can_resolve_peacefully = false
+peaceful_skill = 22
+peaceful_skill_dc = 20
+storm_damage = 0
+cargo_loss_chance = 0.0
+storm_duration_hours = 0.0
+discovered_location_id = ""
+island_coords = Vector2i(-999, -999)
+procedural_island = true
+encounter_scene_path = ""
+background_path = ""
+icon_path = ""
+music_track = ""
+ambient_sound = ""

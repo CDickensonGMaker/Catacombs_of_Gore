@@ -1,0 +1,45 @@
+# Godot 4+ specific ignores
+.godot/
+
+# Godot-specific ignores
+*.translation
+
+# Imported textures, meshes, etc.
+*.import
+
+# Build/export folders
+/build/
+/export/
+/android/
+/ios/
+
+# IDE-specific folders
+.vs/
+.vscode/
+*.code-workspace
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# User-specific settings
+*.user
+
+# Logs
+*.log
+logs/
+
+# Backup files
+*.bak
+*.tmp
+*~
+
+# Claude AI session data (personal notes, not part of game)
+.claude/
+
+# Reference images (large files, not needed in repo)
+reference/
+
+# Generated files that can be recreated
+*.uid

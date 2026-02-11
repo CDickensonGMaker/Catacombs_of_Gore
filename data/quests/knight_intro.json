@@ -1,0 +1,23 @@
+{
+	"id": "knight_intro",
+	"title": "Road to Dalhurst",
+	"description": "The Wandering Knight has directed you to seek out Nathan in Dalhurst.",
+	"is_main_quest": true,
+	"quest_source": "story",
+	"objectives": [
+		{
+			"id": "find_nathan",
+			"description": "Find Nathan in Dalhurst",
+			"type": "talk",
+			"target": "nathan",
+			"zone": "dalhurst"
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "nathan",
+	"turn_in_zone": "dalhurst",
+	"next_quest": "road_to_dalhurst",
+	"rewards": {
+		"xp": 50
+	}
+}

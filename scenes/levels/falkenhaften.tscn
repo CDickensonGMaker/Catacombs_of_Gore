@@ -1,0 +1,1447 @@
+[gd_scene load_steps=35 format=3]
+
+[ext_resource type="Script" path="res://scripts/levels/falkenhaften.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/cat_animiation.png" id="4"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/stonefloor.png" id="5"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/stonewall.png" id="6"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/woodenfloor.png" id="7"]
+
+[sub_resource type="Environment" id="Environment_falkenhaften"]
+background_mode = 2
+background_energy_multiplier = 1.0
+ambient_light_source = 3
+ambient_light_color = Color(0.9, 0.92, 1.0, 1)
+ambient_light_energy = 0.8
+fog_enabled = true
+fog_light_color = Color(0.75, 0.78, 0.85, 1)
+fog_density = 0.002
+fog_sky_affect = 0.25
+
+[sub_resource type="StandardMaterial3D" id="CobbleMat"]
+albedo_color = Color(0.55, 0.52, 0.48, 1)
+albedo_texture = ExtResource("5")
+roughness = 0.9
+texture_filter = 0
+uv1_scale = Vector3(30, 30, 1)
+
+[sub_resource type="StandardMaterial3D" id="BoulevardMat"]
+albedo_color = Color(0.48, 0.45, 0.42, 1)
+albedo_texture = ExtResource("5")
+roughness = 0.85
+texture_filter = 0
+uv1_scale = Vector3(7, 40, 1)
+
+[sub_resource type="StandardMaterial3D" id="GrassMat"]
+albedo_color = Color(0.35, 0.5, 0.3, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="WallMat"]
+albedo_color = Color(0.5, 0.48, 0.45, 1)
+albedo_texture = ExtResource("6")
+roughness = 0.85
+texture_filter = 0
+uv1_scale = Vector3(20, 4, 1)
+
+[sub_resource type="StandardMaterial3D" id="RoofMat"]
+albedo_color = Color(0.3, 0.28, 0.25, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="BannerMat"]
+albedo_color = Color(0.6, 0.15, 0.15, 1)
+
+[sub_resource type="StandardMaterial3D" id="PlazaMat"]
+albedo_color = Color(0.62, 0.6, 0.58, 1)
+albedo_texture = ExtResource("5")
+roughness = 0.8
+texture_filter = 0
+uv1_scale = Vector3(12, 12, 1)
+
+[sub_resource type="StandardMaterial3D" id="MonumentBaseMat"]
+albedo_color = Color(0.5, 0.48, 0.45, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="PillarMat"]
+albedo_color = Color(0.7, 0.68, 0.65, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="GoldMat"]
+albedo_color = Color(0.85, 0.7, 0.3, 1)
+metallic = 0.6
+roughness = 0.3
+
+[sub_resource type="StandardMaterial3D" id="StoneFountainMat"]
+albedo_color = Color(0.55, 0.52, 0.5, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="WaterMat"]
+transparency = 1
+albedo_color = Color(0.2, 0.4, 0.6, 0.7)
+roughness = 0.1
+
+[sub_resource type="StandardMaterial3D" id="MetalMat"]
+albedo_color = Color(0.25, 0.22, 0.2, 1)
+metallic = 0.5
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="TrunkMat"]
+albedo_color = Color(0.35, 0.25, 0.15, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="LeavesMat"]
+albedo_color = Color(0.25, 0.45, 0.2, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="MarketWallMat"]
+albedo_color = Color(0.6, 0.55, 0.5, 1)
+albedo_texture = ExtResource("6")
+roughness = 0.9
+texture_filter = 0
+uv1_scale = Vector3(3, 2, 1)
+
+[sub_resource type="StandardMaterial3D" id="MarketRoofMat"]
+albedo_color = Color(0.4, 0.32, 0.25, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="WoodMat"]
+albedo_color = Color(0.45, 0.35, 0.25, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="NobleWallMat"]
+albedo_color = Color(0.65, 0.62, 0.58, 1)
+albedo_texture = ExtResource("6")
+roughness = 0.85
+texture_filter = 0
+uv1_scale = Vector3(4, 3, 1)
+
+[sub_resource type="StandardMaterial3D" id="NobleRoofMat"]
+albedo_color = Color(0.25, 0.22, 0.3, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="CraftsmanWallMat"]
+albedo_color = Color(0.5, 0.42, 0.35, 1)
+albedo_texture = ExtResource("7")
+roughness = 0.9
+texture_filter = 0
+uv1_scale = Vector3(3, 2, 1)
+
+[sub_resource type="StandardMaterial3D" id="CraftsmanRoofMat"]
+albedo_color = Color(0.35, 0.28, 0.2, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="TimeWallMat"]
+albedo_color = Color(0.6, 0.62, 0.68, 1)
+albedo_texture = ExtResource("6")
+roughness = 0.8
+texture_filter = 0
+uv1_scale = Vector3(4, 3, 1)
+
+[sub_resource type="StandardMaterial3D" id="TimeRoofMat"]
+albedo_color = Color(0.45, 0.48, 0.55, 1)
+metallic = 0.2
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="TimeAccentMat"]
+albedo_color = Color(0.3, 0.45, 0.7, 1)
+roughness = 0.6
+emission_enabled = true
+emission = Color(0.15, 0.25, 0.5, 1)
+emission_energy_multiplier = 0.8
+
+[sub_resource type="NavigationMesh" id="NavMesh"]
+geometry_parsed_geometry_type = 1
+geometry_collision_mask = 1
+cell_size = 0.25
+cell_height = 0.25
+agent_height = 2.0
+agent_radius = 0.5
+agent_max_climb = 0.5
+agent_max_slope = 45.0
+
+[node name="Falkenhaften" type="Node3D"]
+script = ExtResource("1")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_falkenhaften")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866, -0.433, 0.25, 0, 0.5, 0.866, -0.5, -0.75, 0.433, 0, 30, 0)
+light_color = Color(1, 0.97, 0.92, 1)
+light_energy = 1.4
+shadow_enabled = true
+shadow_bias = 0.02
+directional_shadow_max_distance = 150.0
+
+[node name="Player" parent="." instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 70)
+
+[node name="HUD" parent="." instance=ExtResource("3")]
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="CityGround" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(180, 1, 160)
+material = SubResource("CobbleMat")
+
+[node name="MainBoulevard" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+size = Vector3(14, 0.06, 160)
+material = SubResource("BoulevardMat")
+
+[node name="CrossBoulevard" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+size = Vector3(180, 0.06, 12)
+material = SubResource("BoulevardMat")
+
+[node name="SecondaryStreet_WestMerchant" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45, 0.02, 0)
+size = Vector3(8, 0.04, 100)
+material = SubResource("BoulevardMat")
+
+[node name="SecondaryStreet_EastGuild" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, 0.02, 0)
+size = Vector3(8, 0.04, 100)
+material = SubResource("BoulevardMat")
+
+[node name="SecondaryStreet_NorthCross" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 50)
+size = Vector3(120, 0.04, 6)
+material = SubResource("BoulevardMat")
+
+[node name="SecondaryStreet_SouthCross" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -50)
+size = Vector3(120, 0.04, 6)
+material = SubResource("BoulevardMat")
+
+[node name="Garden_NW" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -60, 0.02, 55)
+size = Vector3(20, 0.1, 20)
+material = SubResource("GrassMat")
+
+[node name="Garden_NE" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, 0.02, 55)
+size = Vector3(20, 0.1, 20)
+material = SubResource("GrassMat")
+
+[node name="Garden_SW" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -60, 0.02, -55)
+size = Vector3(20, 0.1, 20)
+material = SubResource("GrassMat")
+
+[node name="Garden_SE" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, 0.02, -55)
+size = Vector3(20, 0.1, 20)
+material = SubResource("GrassMat")
+
+[node name="GrandPlaza" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+use_collision = true
+size = Vector3(50, 0.5, 50)
+material = SubResource("PlazaMat")
+
+[node name="Buildings" type="Node3D" parent="."]
+
+[node name="CityWalls" type="Node3D" parent="Buildings"]
+
+[node name="SouthWallLeft" type="CSGBox3D" parent="Buildings/CityWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -49, 6, 80)
+use_collision = true
+size = Vector3(82, 12, 2)
+material = SubResource("WallMat")
+
+[node name="SouthWallRight" type="CSGBox3D" parent="Buildings/CityWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49, 6, 80)
+use_collision = true
+size = Vector3(82, 12, 2)
+material = SubResource("WallMat")
+
+[node name="NorthWallLeft" type="CSGBox3D" parent="Buildings/CityWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -47.5, 6, -80)
+use_collision = true
+size = Vector3(85, 12, 2)
+material = SubResource("WallMat")
+
+[node name="NorthWallRight" type="CSGBox3D" parent="Buildings/CityWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 47.5, 6, -80)
+use_collision = true
+size = Vector3(85, 12, 2)
+material = SubResource("WallMat")
+
+[node name="EastWall" type="CSGBox3D" parent="Buildings/CityWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90, 6, 0)
+use_collision = true
+size = Vector3(2, 12, 160)
+material = SubResource("WallMat")
+
+[node name="WestWall" type="CSGBox3D" parent="Buildings/CityWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -90, 6, 0)
+use_collision = true
+size = Vector3(2, 12, 160)
+material = SubResource("WallMat")
+
+[node name="GrandGateTower_Left" type="Node3D" parent="Buildings/CityWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0, 80)
+
+[node name="Tower" type="CSGBox3D" parent="Buildings/CityWalls/GrandGateTower_Left"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
+use_collision = true
+size = Vector3(6, 16, 6)
+material = SubResource("WallMat")
+
+[node name="TowerCap" type="CSGBox3D" parent="Buildings/CityWalls/GrandGateTower_Left"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 16.75, 0)
+use_collision = true
+size = Vector3(7, 1.5, 7)
+material = SubResource("WallMat")
+
+[node name="Banner" type="CSGBox3D" parent="Buildings/CityWalls/GrandGateTower_Left"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14, 3.5)
+size = Vector3(2, 4, 0.1)
+material = SubResource("BannerMat")
+
+[node name="GrandGateTower_Right" type="Node3D" parent="Buildings/CityWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, 80)
+
+[node name="Tower" type="CSGBox3D" parent="Buildings/CityWalls/GrandGateTower_Right"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
+use_collision = true
+size = Vector3(6, 16, 6)
+material = SubResource("WallMat")
+
+[node name="TowerCap" type="CSGBox3D" parent="Buildings/CityWalls/GrandGateTower_Right"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 16.75, 0)
+use_collision = true
+size = Vector3(7, 1.5, 7)
+material = SubResource("WallMat")
+
+[node name="Banner" type="CSGBox3D" parent="Buildings/CityWalls/GrandGateTower_Right"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14, 3.5)
+size = Vector3(2, 4, 0.1)
+material = SubResource("BannerMat")
+
+[node name="NorthGateTower_Left" type="Node3D" parent="Buildings/CityWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, -80)
+
+[node name="Tower" type="CSGBox3D" parent="Buildings/CityWalls/NorthGateTower_Left"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+use_collision = true
+size = Vector3(4, 14, 4)
+material = SubResource("WallMat")
+
+[node name="TowerCap" type="CSGBox3D" parent="Buildings/CityWalls/NorthGateTower_Left"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.5, 0)
+use_collision = true
+size = Vector3(5, 1, 5)
+material = SubResource("WallMat")
+
+[node name="NorthGateTower_Right" type="Node3D" parent="Buildings/CityWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, -80)
+
+[node name="Tower" type="CSGBox3D" parent="Buildings/CityWalls/NorthGateTower_Right"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+use_collision = true
+size = Vector3(4, 14, 4)
+material = SubResource("WallMat")
+
+[node name="TowerCap" type="CSGBox3D" parent="Buildings/CityWalls/NorthGateTower_Right"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.5, 0)
+use_collision = true
+size = Vector3(5, 1, 5)
+material = SubResource("WallMat")
+
+[node name="CornerTower_SW" type="Node3D" parent="Buildings/CityWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -90, 0, 80)
+
+[node name="Tower" type="CSGCylinder3D" parent="Buildings/CityWalls/CornerTower_SW"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.5, 0)
+use_collision = true
+radius = 5.0
+height = 15.0
+sides = 8
+material = SubResource("WallMat")
+
+[node name="Cap" type="CSGCylinder3D" parent="Buildings/CityWalls/CornerTower_SW"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 16, 0)
+use_collision = true
+radius = 5.5
+height = 2.0
+sides = 8
+material = SubResource("WallMat")
+
+[node name="Roof" type="CSGCylinder3D" parent="Buildings/CityWalls/CornerTower_SW"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 19, 0)
+radius = 5.0
+height = 4.0
+sides = 8
+material = SubResource("RoofMat")
+
+[node name="CornerTower_SE" type="Node3D" parent="Buildings/CityWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90, 0, 80)
+
+[node name="Tower" type="CSGCylinder3D" parent="Buildings/CityWalls/CornerTower_SE"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.5, 0)
+use_collision = true
+radius = 5.0
+height = 15.0
+sides = 8
+material = SubResource("WallMat")
+
+[node name="Cap" type="CSGCylinder3D" parent="Buildings/CityWalls/CornerTower_SE"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 16, 0)
+use_collision = true
+radius = 5.5
+height = 2.0
+sides = 8
+material = SubResource("WallMat")
+
+[node name="Roof" type="CSGCylinder3D" parent="Buildings/CityWalls/CornerTower_SE"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 19, 0)
+radius = 5.0
+height = 4.0
+sides = 8
+material = SubResource("RoofMat")
+
+[node name="CornerTower_NW" type="Node3D" parent="Buildings/CityWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -90, 0, -80)
+
+[node name="Tower" type="CSGCylinder3D" parent="Buildings/CityWalls/CornerTower_NW"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.5, 0)
+use_collision = true
+radius = 5.0
+height = 15.0
+sides = 8
+material = SubResource("WallMat")
+
+[node name="Cap" type="CSGCylinder3D" parent="Buildings/CityWalls/CornerTower_NW"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 16, 0)
+use_collision = true
+radius = 5.5
+height = 2.0
+sides = 8
+material = SubResource("WallMat")
+
+[node name="Roof" type="CSGCylinder3D" parent="Buildings/CityWalls/CornerTower_NW"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 19, 0)
+radius = 5.0
+height = 4.0
+sides = 8
+material = SubResource("RoofMat")
+
+[node name="CornerTower_NE" type="Node3D" parent="Buildings/CityWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90, 0, -80)
+
+[node name="Tower" type="CSGCylinder3D" parent="Buildings/CityWalls/CornerTower_NE"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.5, 0)
+use_collision = true
+radius = 5.0
+height = 15.0
+sides = 8
+material = SubResource("WallMat")
+
+[node name="Cap" type="CSGCylinder3D" parent="Buildings/CityWalls/CornerTower_NE"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 16, 0)
+use_collision = true
+radius = 5.5
+height = 2.0
+sides = 8
+material = SubResource("WallMat")
+
+[node name="Roof" type="CSGCylinder3D" parent="Buildings/CityWalls/CornerTower_NE"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 19, 0)
+radius = 5.0
+height = 4.0
+sides = 8
+material = SubResource("RoofMat")
+
+[node name="WallTower_W1" type="Node3D" parent="Buildings/CityWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -90, 0, 40)
+
+[node name="Tower" type="CSGCylinder3D" parent="Buildings/CityWalls/WallTower_W1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+use_collision = true
+radius = 3.5
+height = 14.0
+sides = 8
+material = SubResource("WallMat")
+
+[node name="Cap" type="CSGCylinder3D" parent="Buildings/CityWalls/WallTower_W1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.75, 0)
+use_collision = true
+radius = 4.0
+height = 1.5
+sides = 8
+material = SubResource("WallMat")
+
+[node name="WallTower_W2" type="Node3D" parent="Buildings/CityWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -90, 0, -40)
+
+[node name="Tower" type="CSGCylinder3D" parent="Buildings/CityWalls/WallTower_W2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+use_collision = true
+radius = 3.5
+height = 14.0
+sides = 8
+material = SubResource("WallMat")
+
+[node name="Cap" type="CSGCylinder3D" parent="Buildings/CityWalls/WallTower_W2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.75, 0)
+use_collision = true
+radius = 4.0
+height = 1.5
+sides = 8
+material = SubResource("WallMat")
+
+[node name="WallTower_E1" type="Node3D" parent="Buildings/CityWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90, 0, 40)
+
+[node name="Tower" type="CSGCylinder3D" parent="Buildings/CityWalls/WallTower_E1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+use_collision = true
+radius = 3.5
+height = 14.0
+sides = 8
+material = SubResource("WallMat")
+
+[node name="Cap" type="CSGCylinder3D" parent="Buildings/CityWalls/WallTower_E1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.75, 0)
+use_collision = true
+radius = 4.0
+height = 1.5
+sides = 8
+material = SubResource("WallMat")
+
+[node name="WallTower_E2" type="Node3D" parent="Buildings/CityWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90, 0, -40)
+
+[node name="Tower" type="CSGCylinder3D" parent="Buildings/CityWalls/WallTower_E2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+use_collision = true
+radius = 3.5
+height = 14.0
+sides = 8
+material = SubResource("WallMat")
+
+[node name="Cap" type="CSGCylinder3D" parent="Buildings/CityWalls/WallTower_E2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.75, 0)
+use_collision = true
+radius = 4.0
+height = 1.5
+sides = 8
+material = SubResource("WallMat")
+
+[node name="WallTower_S1" type="Node3D" parent="Buildings/CityWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45, 0, 80)
+
+[node name="Tower" type="CSGCylinder3D" parent="Buildings/CityWalls/WallTower_S1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+use_collision = true
+radius = 3.5
+height = 14.0
+sides = 8
+material = SubResource("WallMat")
+
+[node name="Cap" type="CSGCylinder3D" parent="Buildings/CityWalls/WallTower_S1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.75, 0)
+use_collision = true
+radius = 4.0
+height = 1.5
+sides = 8
+material = SubResource("WallMat")
+
+[node name="WallTower_S2" type="Node3D" parent="Buildings/CityWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, 0, 80)
+
+[node name="Tower" type="CSGCylinder3D" parent="Buildings/CityWalls/WallTower_S2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+use_collision = true
+radius = 3.5
+height = 14.0
+sides = 8
+material = SubResource("WallMat")
+
+[node name="Cap" type="CSGCylinder3D" parent="Buildings/CityWalls/WallTower_S2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.75, 0)
+use_collision = true
+radius = 4.0
+height = 1.5
+sides = 8
+material = SubResource("WallMat")
+
+[node name="WallTower_N1" type="Node3D" parent="Buildings/CityWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45, 0, -80)
+
+[node name="Tower" type="CSGCylinder3D" parent="Buildings/CityWalls/WallTower_N1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+use_collision = true
+radius = 3.5
+height = 14.0
+sides = 8
+material = SubResource("WallMat")
+
+[node name="Cap" type="CSGCylinder3D" parent="Buildings/CityWalls/WallTower_N1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.75, 0)
+use_collision = true
+radius = 4.0
+height = 1.5
+sides = 8
+material = SubResource("WallMat")
+
+[node name="WallTower_N2" type="Node3D" parent="Buildings/CityWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, 0, -80)
+
+[node name="Tower" type="CSGCylinder3D" parent="Buildings/CityWalls/WallTower_N2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+use_collision = true
+radius = 3.5
+height = 14.0
+sides = 8
+material = SubResource("WallMat")
+
+[node name="Cap" type="CSGCylinder3D" parent="Buildings/CityWalls/WallTower_N2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.75, 0)
+use_collision = true
+radius = 4.0
+height = 1.5
+sides = 8
+material = SubResource("WallMat")
+
+[node name="GrandPlazaMonument" type="Node3D" parent="Buildings"]
+
+[node name="MonumentBase" type="CSGCylinder3D" parent="Buildings/GrandPlazaMonument"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+use_collision = true
+radius = 8.0
+height = 1.5
+sides = 6
+material = SubResource("MonumentBaseMat")
+
+[node name="MonumentPillar" type="CSGCylinder3D" parent="Buildings/GrandPlazaMonument"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.5, 0)
+use_collision = true
+radius = 2.5
+height = 15.0
+sides = 8
+material = SubResource("PillarMat")
+
+[node name="MonumentStatue" type="CSGSphere3D" parent="Buildings/GrandPlazaMonument"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 19, 0)
+radius = 2.0
+radial_segments = 8
+rings = 4
+material = SubResource("GoldMat")
+
+[node name="Fountain_West" type="Node3D" parent="Buildings/GrandPlazaMonument"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, 0)
+
+[node name="Basin" type="CSGCylinder3D" parent="Buildings/GrandPlazaMonument/Fountain_West"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+use_collision = true
+radius = 3.0
+height = 0.8
+sides = 12
+material = SubResource("StoneFountainMat")
+
+[node name="Water" type="CSGCylinder3D" parent="Buildings/GrandPlazaMonument/Fountain_West"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+radius = 2.5
+height = 0.4
+sides = 12
+material = SubResource("WaterMat")
+
+[node name="Spout" type="CSGCylinder3D" parent="Buildings/GrandPlazaMonument/Fountain_West"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+radius = 0.4
+height = 2.0
+sides = 6
+material = SubResource("StoneFountainMat")
+
+[node name="Fountain_East" type="Node3D" parent="Buildings/GrandPlazaMonument"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 0)
+
+[node name="Basin" type="CSGCylinder3D" parent="Buildings/GrandPlazaMonument/Fountain_East"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+use_collision = true
+radius = 3.0
+height = 0.8
+sides = 12
+material = SubResource("StoneFountainMat")
+
+[node name="Water" type="CSGCylinder3D" parent="Buildings/GrandPlazaMonument/Fountain_East"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+radius = 2.5
+height = 0.4
+sides = 12
+material = SubResource("WaterMat")
+
+[node name="Spout" type="CSGCylinder3D" parent="Buildings/GrandPlazaMonument/Fountain_East"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+radius = 0.4
+height = 2.0
+sides = 6
+material = SubResource("StoneFountainMat")
+
+[node name="Fountain_North" type="Node3D" parent="Buildings/GrandPlazaMonument"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -15)
+
+[node name="Basin" type="CSGCylinder3D" parent="Buildings/GrandPlazaMonument/Fountain_North"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+use_collision = true
+radius = 3.0
+height = 0.8
+sides = 12
+material = SubResource("StoneFountainMat")
+
+[node name="Water" type="CSGCylinder3D" parent="Buildings/GrandPlazaMonument/Fountain_North"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+radius = 2.5
+height = 0.4
+sides = 12
+material = SubResource("WaterMat")
+
+[node name="Spout" type="CSGCylinder3D" parent="Buildings/GrandPlazaMonument/Fountain_North"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+radius = 0.4
+height = 2.0
+sides = 6
+material = SubResource("StoneFountainMat")
+
+[node name="Fountain_South" type="Node3D" parent="Buildings/GrandPlazaMonument"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 15)
+
+[node name="Basin" type="CSGCylinder3D" parent="Buildings/GrandPlazaMonument/Fountain_South"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+use_collision = true
+radius = 3.0
+height = 0.8
+sides = 12
+material = SubResource("StoneFountainMat")
+
+[node name="Water" type="CSGCylinder3D" parent="Buildings/GrandPlazaMonument/Fountain_South"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+radius = 2.5
+height = 0.4
+sides = 12
+material = SubResource("WaterMat")
+
+[node name="Spout" type="CSGCylinder3D" parent="Buildings/GrandPlazaMonument/Fountain_South"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+radius = 0.4
+height = 2.0
+sides = 6
+material = SubResource("StoneFountainMat")
+
+[node name="MarketDistrict" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 0, 40)
+
+[node name="MarketBuilding_0" type="Node3D" parent="Buildings/MarketDistrict"]
+
+[node name="Walls" type="CSGBox3D" parent="Buildings/MarketDistrict/MarketBuilding_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+use_collision = true
+size = Vector3(8, 5, 7)
+material = SubResource("MarketWallMat")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/MarketDistrict/MarketBuilding_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.5, 0)
+use_collision = true
+size = Vector3(9, 1, 8)
+material = SubResource("MarketRoofMat")
+
+[node name="MarketBuilding_1" type="Node3D" parent="Buildings/MarketDistrict"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 0)
+
+[node name="Walls" type="CSGBox3D" parent="Buildings/MarketDistrict/MarketBuilding_1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+use_collision = true
+size = Vector3(8, 5, 7)
+material = SubResource("MarketWallMat")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/MarketDistrict/MarketBuilding_1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.5, 0)
+use_collision = true
+size = Vector3(9, 1, 8)
+material = SubResource("MarketRoofMat")
+
+[node name="MarketBuilding_2" type="Node3D" parent="Buildings/MarketDistrict"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 15)
+
+[node name="Walls" type="CSGBox3D" parent="Buildings/MarketDistrict/MarketBuilding_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+use_collision = true
+size = Vector3(8, 5, 7)
+material = SubResource("MarketWallMat")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/MarketDistrict/MarketBuilding_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.5, 0)
+use_collision = true
+size = Vector3(9, 1, 8)
+material = SubResource("MarketRoofMat")
+
+[node name="MarketBuilding_3" type="Node3D" parent="Buildings/MarketDistrict"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 15)
+
+[node name="Walls" type="CSGBox3D" parent="Buildings/MarketDistrict/MarketBuilding_3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+use_collision = true
+size = Vector3(8, 5, 7)
+material = SubResource("MarketWallMat")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/MarketDistrict/MarketBuilding_3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.5, 0)
+use_collision = true
+size = Vector3(9, 1, 8)
+material = SubResource("MarketRoofMat")
+
+[node name="MarketBuilding_4" type="Node3D" parent="Buildings/MarketDistrict"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, 5)
+
+[node name="Walls" type="CSGBox3D" parent="Buildings/MarketDistrict/MarketBuilding_4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+use_collision = true
+size = Vector3(8, 5, 7)
+material = SubResource("MarketWallMat")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/MarketDistrict/MarketBuilding_4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.5, 0)
+use_collision = true
+size = Vector3(9, 1, 8)
+material = SubResource("MarketRoofMat")
+
+[node name="MarketStalls" type="Node3D" parent="Buildings/MarketDistrict"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -10)
+
+[node name="Stall_0" type="Node3D" parent="Buildings/MarketDistrict/MarketStalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 0)
+
+[node name="Counter" type="CSGBox3D" parent="Buildings/MarketDistrict/MarketStalls/Stall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+use_collision = true
+size = Vector3(4, 1, 1.5)
+material = SubResource("WoodMat")
+
+[node name="Pole1" type="CSGCylinder3D" parent="Buildings/MarketDistrict/MarketStalls/Stall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 1.25, 0)
+use_collision = true
+radius = 0.1
+height = 2.5
+sides = 6
+material = SubResource("WoodMat")
+
+[node name="Pole2" type="CSGCylinder3D" parent="Buildings/MarketDistrict/MarketStalls/Stall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 1.25, 0)
+use_collision = true
+radius = 0.1
+height = 2.5
+sides = 6
+material = SubResource("WoodMat")
+
+[node name="Stall_1" type="Node3D" parent="Buildings/MarketDistrict/MarketStalls"]
+
+[node name="Counter" type="CSGBox3D" parent="Buildings/MarketDistrict/MarketStalls/Stall_1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+use_collision = true
+size = Vector3(4, 1, 1.5)
+material = SubResource("WoodMat")
+
+[node name="Pole1" type="CSGCylinder3D" parent="Buildings/MarketDistrict/MarketStalls/Stall_1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 1.25, 0)
+use_collision = true
+radius = 0.1
+height = 2.5
+sides = 6
+material = SubResource("WoodMat")
+
+[node name="Pole2" type="CSGCylinder3D" parent="Buildings/MarketDistrict/MarketStalls/Stall_1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 1.25, 0)
+use_collision = true
+radius = 0.1
+height = 2.5
+sides = 6
+material = SubResource("WoodMat")
+
+[node name="Stall_2" type="Node3D" parent="Buildings/MarketDistrict/MarketStalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 0)
+
+[node name="Counter" type="CSGBox3D" parent="Buildings/MarketDistrict/MarketStalls/Stall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+use_collision = true
+size = Vector3(4, 1, 1.5)
+material = SubResource("WoodMat")
+
+[node name="Pole1" type="CSGCylinder3D" parent="Buildings/MarketDistrict/MarketStalls/Stall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 1.25, 0)
+use_collision = true
+radius = 0.1
+height = 2.5
+sides = 6
+material = SubResource("WoodMat")
+
+[node name="Pole2" type="CSGCylinder3D" parent="Buildings/MarketDistrict/MarketStalls/Stall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 1.25, 0)
+use_collision = true
+radius = 0.1
+height = 2.5
+sides = 6
+material = SubResource("WoodMat")
+
+[node name="NobleQuarter" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50, 0, -40)
+
+[node name="Mansion_0" type="Node3D" parent="Buildings/NobleQuarter"]
+
+[node name="Walls" type="CSGBox3D" parent="Buildings/NobleQuarter/Mansion_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
+use_collision = true
+size = Vector3(12, 6, 10)
+material = SubResource("NobleWallMat")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/NobleQuarter/Mansion_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.5, 0)
+use_collision = true
+size = Vector3(13, 1, 11)
+material = SubResource("NobleRoofMat")
+
+[node name="Mansion_1" type="Node3D" parent="Buildings/NobleQuarter"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, 0)
+
+[node name="Walls" type="CSGBox3D" parent="Buildings/NobleQuarter/Mansion_1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
+use_collision = true
+size = Vector3(12, 6, 10)
+material = SubResource("NobleWallMat")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/NobleQuarter/Mansion_1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.5, 0)
+use_collision = true
+size = Vector3(13, 1, 11)
+material = SubResource("NobleRoofMat")
+
+[node name="Mansion_2" type="Node3D" parent="Buildings/NobleQuarter"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)
+
+[node name="Walls" type="CSGBox3D" parent="Buildings/NobleQuarter/Mansion_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
+use_collision = true
+size = Vector3(12, 6, 10)
+material = SubResource("NobleWallMat")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/NobleQuarter/Mansion_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.5, 0)
+use_collision = true
+size = Vector3(13, 1, 11)
+material = SubResource("NobleRoofMat")
+
+[node name="Mansion_3" type="Node3D" parent="Buildings/NobleQuarter"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, -20)
+
+[node name="Walls" type="CSGBox3D" parent="Buildings/NobleQuarter/Mansion_3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
+use_collision = true
+size = Vector3(12, 6, 10)
+material = SubResource("NobleWallMat")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/NobleQuarter/Mansion_3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.5, 0)
+use_collision = true
+size = Vector3(13, 1, 11)
+material = SubResource("NobleRoofMat")
+
+[node name="CraftsmanQuarter" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -50, 0, 40)
+
+[node name="Workshop_0" type="Node3D" parent="Buildings/CraftsmanQuarter"]
+
+[node name="Walls" type="CSGBox3D" parent="Buildings/CraftsmanQuarter/Workshop_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.25, 0)
+use_collision = true
+size = Vector3(9, 4.5, 8)
+material = SubResource("CraftsmanWallMat")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/CraftsmanQuarter/Workshop_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+use_collision = true
+size = Vector3(10, 1, 9)
+material = SubResource("CraftsmanRoofMat")
+
+[node name="Workshop_1" type="Node3D" parent="Buildings/CraftsmanQuarter"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 0)
+
+[node name="Walls" type="CSGBox3D" parent="Buildings/CraftsmanQuarter/Workshop_1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.25, 0)
+use_collision = true
+size = Vector3(9, 4.5, 8)
+material = SubResource("CraftsmanWallMat")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/CraftsmanQuarter/Workshop_1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+use_collision = true
+size = Vector3(10, 1, 9)
+material = SubResource("CraftsmanRoofMat")
+
+[node name="Workshop_2" type="Node3D" parent="Buildings/CraftsmanQuarter"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 12)
+
+[node name="Walls" type="CSGBox3D" parent="Buildings/CraftsmanQuarter/Workshop_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.25, 0)
+use_collision = true
+size = Vector3(9, 4.5, 8)
+material = SubResource("CraftsmanWallMat")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/CraftsmanQuarter/Workshop_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+use_collision = true
+size = Vector3(10, 1, 9)
+material = SubResource("CraftsmanRoofMat")
+
+[node name="Workshop_3" type="Node3D" parent="Buildings/CraftsmanQuarter"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 12)
+
+[node name="Walls" type="CSGBox3D" parent="Buildings/CraftsmanQuarter/Workshop_3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.25, 0)
+use_collision = true
+size = Vector3(9, 4.5, 8)
+material = SubResource("CraftsmanWallMat")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/CraftsmanQuarter/Workshop_3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+use_collision = true
+size = Vector3(10, 1, 9)
+material = SubResource("CraftsmanRoofMat")
+
+[node name="Workshop_4" type="Node3D" parent="Buildings/CraftsmanQuarter"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 6)
+
+[node name="Walls" type="CSGBox3D" parent="Buildings/CraftsmanQuarter/Workshop_4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.25, 0)
+use_collision = true
+size = Vector3(9, 4.5, 8)
+material = SubResource("CraftsmanWallMat")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/CraftsmanQuarter/Workshop_4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+use_collision = true
+size = Vector3(10, 1, 9)
+material = SubResource("CraftsmanRoofMat")
+
+[node name="Workshop_5" type="Node3D" parent="Buildings/CraftsmanQuarter"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -12)
+
+[node name="Walls" type="CSGBox3D" parent="Buildings/CraftsmanQuarter/Workshop_5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.25, 0)
+use_collision = true
+size = Vector3(9, 4.5, 8)
+material = SubResource("CraftsmanWallMat")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/CraftsmanQuarter/Workshop_5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+use_collision = true
+size = Vector3(10, 1, 9)
+material = SubResource("CraftsmanRoofMat")
+
+[node name="TempleDistrict" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 65, 0, 0)
+
+[node name="TemplePlaza" type="CSGBox3D" parent="Buildings/TempleDistrict"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+use_collision = true
+size = Vector3(50, 0.3, 60)
+material = SubResource("PlazaMat")
+
+[node name="TempleOfTime" type="Node3D" parent="Buildings/TempleDistrict"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -18)
+
+[node name="Building" type="CSGBox3D" parent="Buildings/TempleDistrict/TempleOfTime"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+use_collision = true
+size = Vector3(14, 10, 16)
+material = SubResource("TimeWallMat")
+
+[node name="RoofStep_0" type="CSGBox3D" parent="Buildings/TempleDistrict/TempleOfTime"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10.5, 0)
+use_collision = true
+size = Vector3(16, 1, 18)
+material = SubResource("TimeRoofMat")
+
+[node name="RoofStep_1" type="CSGBox3D" parent="Buildings/TempleDistrict/TempleOfTime"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 11.7, 0)
+use_collision = true
+size = Vector3(14, 1, 16)
+material = SubResource("TimeRoofMat")
+
+[node name="RoofStep_2" type="CSGBox3D" parent="Buildings/TempleDistrict/TempleOfTime"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12.9, 0)
+use_collision = true
+size = Vector3(12, 1, 14)
+material = SubResource("TimeRoofMat")
+
+[node name="ClockSpire" type="CSGCylinder3D" parent="Buildings/TempleDistrict/TempleOfTime"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 17.5, 0)
+use_collision = true
+radius = 1.5
+height = 8.0
+sides = 8
+material = SubResource("TimeAccentMat")
+
+[node name="Column_0" type="CSGCylinder3D" parent="Buildings/TempleDistrict/TempleOfTime"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 3.5, 9)
+use_collision = true
+radius = 0.5
+height = 7.0
+sides = 8
+material = SubResource("PillarMat")
+
+[node name="Column_1" type="CSGCylinder3D" parent="Buildings/TempleDistrict/TempleOfTime"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 3.5, 9)
+use_collision = true
+radius = 0.5
+height = 7.0
+sides = 8
+material = SubResource("PillarMat")
+
+[node name="Column_2" type="CSGCylinder3D" parent="Buildings/TempleDistrict/TempleOfTime"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 3.5, 9)
+use_collision = true
+radius = 0.5
+height = 7.0
+sides = 8
+material = SubResource("PillarMat")
+
+[node name="Column_3" type="CSGCylinder3D" parent="Buildings/TempleDistrict/TempleOfTime"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 3.5, 9)
+use_collision = true
+radius = 0.5
+height = 7.0
+sides = 8
+material = SubResource("PillarMat")
+
+[node name="TimeSymbol" type="CSGBox3D" parent="Buildings/TempleDistrict/TempleOfTime"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.5, 8.2)
+size = Vector3(3, 2, 0.2)
+material = SubResource("TimeAccentMat")
+
+[node name="GrondsOffice" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, -15)
+
+[node name="Building" type="CSGBox3D" parent="Buildings/GrondsOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+use_collision = true
+size = Vector3(10, 5, 8)
+material = SubResource("MarketWallMat")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/GrondsOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.4, 0)
+use_collision = true
+size = Vector3(11, 0.8, 9)
+material = SubResource("RoofMat")
+
+[node name="Sign" type="CSGBox3D" parent="Buildings/GrondsOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 4.2)
+size = Vector3(3, 1, 0.15)
+material = SubResource("RoofMat")
+
+[node name="Decorations" type="Node3D" parent="."]
+
+[node name="GardenTrees" type="Node3D" parent="Decorations"]
+
+[node name="Tree_NW_1" type="Node3D" parent="Decorations/GardenTrees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -65, 0, 50)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Decorations/GardenTrees/Tree_NW_1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+radius = 0.3
+height = 3.0
+sides = 6
+material = SubResource("TrunkMat")
+
+[node name="Canopy" type="CSGSphere3D" parent="Decorations/GardenTrees/Tree_NW_1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+radius = 2.0
+radial_segments = 8
+rings = 4
+material = SubResource("LeavesMat")
+
+[node name="Tree_NW_2" type="Node3D" parent="Decorations/GardenTrees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -55, 0, 60)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Decorations/GardenTrees/Tree_NW_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+radius = 0.3
+height = 3.0
+sides = 6
+material = SubResource("TrunkMat")
+
+[node name="Canopy" type="CSGSphere3D" parent="Decorations/GardenTrees/Tree_NW_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+radius = 2.0
+radial_segments = 8
+rings = 4
+material = SubResource("LeavesMat")
+
+[node name="Tree_NE_1" type="Node3D" parent="Decorations/GardenTrees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55, 0, 50)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Decorations/GardenTrees/Tree_NE_1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+radius = 0.3
+height = 3.0
+sides = 6
+material = SubResource("TrunkMat")
+
+[node name="Canopy" type="CSGSphere3D" parent="Decorations/GardenTrees/Tree_NE_1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+radius = 2.0
+radial_segments = 8
+rings = 4
+material = SubResource("LeavesMat")
+
+[node name="Tree_NE_2" type="Node3D" parent="Decorations/GardenTrees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 65, 0, 60)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Decorations/GardenTrees/Tree_NE_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+radius = 0.3
+height = 3.0
+sides = 6
+material = SubResource("TrunkMat")
+
+[node name="Canopy" type="CSGSphere3D" parent="Decorations/GardenTrees/Tree_NE_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+radius = 2.0
+radial_segments = 8
+rings = 4
+material = SubResource("LeavesMat")
+
+[node name="Tree_SW_1" type="Node3D" parent="Decorations/GardenTrees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -65, 0, -60)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Decorations/GardenTrees/Tree_SW_1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+radius = 0.3
+height = 3.0
+sides = 6
+material = SubResource("TrunkMat")
+
+[node name="Canopy" type="CSGSphere3D" parent="Decorations/GardenTrees/Tree_SW_1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+radius = 2.0
+radial_segments = 8
+rings = 4
+material = SubResource("LeavesMat")
+
+[node name="Tree_SW_2" type="Node3D" parent="Decorations/GardenTrees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -55, 0, -50)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Decorations/GardenTrees/Tree_SW_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+radius = 0.3
+height = 3.0
+sides = 6
+material = SubResource("TrunkMat")
+
+[node name="Canopy" type="CSGSphere3D" parent="Decorations/GardenTrees/Tree_SW_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+radius = 2.0
+radial_segments = 8
+rings = 4
+material = SubResource("LeavesMat")
+
+[node name="Tree_SE_1" type="Node3D" parent="Decorations/GardenTrees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55, 0, -60)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Decorations/GardenTrees/Tree_SE_1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+radius = 0.3
+height = 3.0
+sides = 6
+material = SubResource("TrunkMat")
+
+[node name="Canopy" type="CSGSphere3D" parent="Decorations/GardenTrees/Tree_SE_1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+radius = 2.0
+radial_segments = 8
+rings = 4
+material = SubResource("LeavesMat")
+
+[node name="Tree_SE_2" type="Node3D" parent="Decorations/GardenTrees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 65, 0, -50)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Decorations/GardenTrees/Tree_SE_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+radius = 0.3
+height = 3.0
+sides = 6
+material = SubResource("TrunkMat")
+
+[node name="Canopy" type="CSGSphere3D" parent="Decorations/GardenTrees/Tree_SE_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+radius = 2.0
+radial_segments = 8
+rings = 4
+material = SubResource("LeavesMat")
+
+[node name="Billboards" type="Node3D" parent="."]
+
+[node name="AmbientAnimals" type="Node3D" parent="Billboards"]
+
+[node name="Cat_0" type="Sprite3D" parent="Billboards/AmbientAnimals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.3, 50)
+pixel_size = 0.01
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("4")
+hframes = 5
+
+[node name="Cat_1" type="Sprite3D" parent="Billboards/AmbientAnimals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0.3, 65)
+pixel_size = 0.01
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("4")
+hframes = 5
+frame = 3
+
+[node name="Cat_2" type="Sprite3D" parent="Billboards/AmbientAnimals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.3, 80)
+pixel_size = 0.01
+billboard = 1
+transparent = true
+alpha_cut = 2
+alpha_scissor_threshold = 0.5
+texture = ExtResource("4")
+hframes = 5
+frame = 1
+
+[node name="Lights" type="Node3D" parent="."]
+
+[node name="PlazaLamp_NW" type="Node3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, -20)
+
+[node name="Post" type="CSGCylinder3D" parent="Lights/PlazaLamp_NW"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+use_collision = true
+radius = 0.15
+height = 4.0
+sides = 6
+material = SubResource("MetalMat")
+
+[node name="Light" type="OmniLight3D" parent="Lights/PlazaLamp_NW"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+light_color = Color(1, 0.9, 0.7, 1)
+light_energy = 1.5
+omni_range = 12.0
+
+[node name="PlazaLamp_NE" type="Node3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, -20)
+
+[node name="Post" type="CSGCylinder3D" parent="Lights/PlazaLamp_NE"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+use_collision = true
+radius = 0.15
+height = 4.0
+sides = 6
+material = SubResource("MetalMat")
+
+[node name="Light" type="OmniLight3D" parent="Lights/PlazaLamp_NE"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+light_color = Color(1, 0.9, 0.7, 1)
+light_energy = 1.5
+omni_range = 12.0
+
+[node name="PlazaLamp_SW" type="Node3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, 20)
+
+[node name="Post" type="CSGCylinder3D" parent="Lights/PlazaLamp_SW"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+use_collision = true
+radius = 0.15
+height = 4.0
+sides = 6
+material = SubResource("MetalMat")
+
+[node name="Light" type="OmniLight3D" parent="Lights/PlazaLamp_SW"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+light_color = Color(1, 0.9, 0.7, 1)
+light_energy = 1.5
+omni_range = 12.0
+
+[node name="PlazaLamp_SE" type="Node3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, 20)
+
+[node name="Post" type="CSGCylinder3D" parent="Lights/PlazaLamp_SE"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+use_collision = true
+radius = 0.15
+height = 4.0
+sides = 6
+material = SubResource("MetalMat")
+
+[node name="Light" type="OmniLight3D" parent="Lights/PlazaLamp_SE"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+light_color = Color(1, 0.9, 0.7, 1)
+light_energy = 1.5
+omni_range = 12.0
+
+[node name="TempleOfTimeLight" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 65, 8, -18)
+light_color = Color(0.7, 0.8, 1, 1)
+light_energy = 2.5
+omni_range = 18.0
+
+[node name="GrondsOfficeLight" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 4, -15)
+light_color = Color(1, 0.9, 0.7, 1)
+light_energy = 1.5
+omni_range = 10.0
+
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="default" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 70)
+
+[node name="from_wilderness" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 78)
+
+[node name="from_open_world" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 78)
+
+[node name="from_kings_watch" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -78)
+
+[node name="from_fast_travel" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.1, 32)
+
+[node name="EnemySpawnPoints" type="Node3D" parent="."]
+
+[node name="NPCSpawnPoints" type="Node3D" parent="."]
+
+[node name="PriestOfTime" type="Marker3D" parent="NPCSpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 65, 0, -13)
+
+[node name="GrondStoneheart" type="Marker3D" parent="NPCSpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, -10)
+
+[node name="TownCrier" type="Marker3D" parent="NPCSpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 5)
+
+[node name="LordAshworth" type="Marker3D" parent="NPCSpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, 0, -50)
+
+[node name="Interactables" type="Node3D" parent="."]
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+navigation_mesh = SubResource("NavMesh")

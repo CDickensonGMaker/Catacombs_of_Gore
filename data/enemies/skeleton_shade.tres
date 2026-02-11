@@ -1,0 +1,110 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/data/enemy_attack_data.gd" id="2"]
+
+[sub_resource type="Resource" id="1"]
+script = ExtResource("2")
+id = "shade_soul_drain"
+display_name = "Soul Drain"
+damage = Array[int]([2, 8, 4])
+damage_type = 5
+windup_time = 0.5
+active_time = 0.3
+recovery_time = 0.4
+cooldown = 2.5
+range_distance = 4.0
+is_ranged = true
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 12.0
+inflicts_condition = 5
+condition_chance = 0.35
+condition_duration = 5.0
+stagger_power = 0.5
+knockback_force = 1.0
+weight = 1.0
+min_range = 0.0
+max_range = 8.0
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[sub_resource type="Resource" id="2"]
+script = ExtResource("2")
+id = "shade_chain_lash"
+display_name = "Chain Lash"
+damage = Array[int]([1, 10, 3])
+damage_type = 0
+windup_time = 0.3
+active_time = 0.2
+recovery_time = 0.3
+cooldown = 1.5
+range_distance = 3.0
+is_ranged = false
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 15.0
+inflicts_condition = 6
+condition_chance = 0.25
+condition_duration = 3.0
+stagger_power = 1.2
+knockback_force = 3.0
+weight = 0.8
+min_range = 0.0
+max_range = 3.5
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[resource]
+script = ExtResource("1")
+id = "skeleton_shade"
+display_name = "Soul Shade"
+description = "A tortured spirit bound to skeletal remains by ancient chains. The dark energy crackling around it hungers for living souls to fuel its cursed existence."
+max_hp = 120
+armor_value = 6
+movement_speed = 4.5
+turn_speed = 6.0
+grit = 4
+agility = 7
+will = 9
+knowledge = 6
+behavior = 2
+faction = 2
+aggro_range = 16.0
+attack_range = 4.0
+preferred_distance = 5.0
+flee_hp_threshold = 0.1
+is_boss = false
+attacks = Array[ExtResource("2")]([SubResource("1"), SubResource("2")])
+can_block = false
+block_chance = 0.0
+stagger_resistance = 0.3
+fire_resistance = -0.25
+frost_resistance = 0.5
+lightning_resistance = 0.25
+poison_resistance = 1.0
+necrotic_resistance = 0.75
+physical_resistance = 0.3
+fire_weakness = 0.25
+frost_weakness = 0.0
+lightning_weakness = 0.0
+holy_weakness = 0.75
+causes_horror = true
+horror_difficulty = 14
+loot_table_av = 5
+gold_drop = Array[int]([40, 100])
+guaranteed_drops = Array[String]([])
+drop_table = {
+"scroll_soul_drain": 0.15,
+"health_potion": 0.2
+}
+xp_reward = 175
+scene_path = ""
+icon_path = ""
+scale = 1.1
+idle_sounds = Array[String]([])
+attack_sounds = Array[String]([])
+hurt_sounds = Array[String]([])
+death_sounds = Array[String]([])

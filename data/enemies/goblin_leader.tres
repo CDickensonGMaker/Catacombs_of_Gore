@@ -1,0 +1,117 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/data/enemy_attack_data.gd" id="2"]
+
+[sub_resource type="Resource" id="1"]
+script = ExtResource("2")
+id = "goblin_leader_cleave"
+display_name = "Massive Cleave"
+damage = Array[int]([2, 12, 8])
+damage_type = 0
+windup_time = 0.6
+active_time = 0.3
+recovery_time = 0.4
+cooldown = 2.0
+range_distance = 3.5
+is_ranged = false
+is_aoe = true
+aoe_radius = 2.5
+projectile_speed = 15.0
+inflicts_condition = 6
+condition_chance = 0.3
+condition_duration = 4.0
+stagger_power = 2.0
+knockback_force = 6.0
+weight = 1.0
+min_range = 0.0
+max_range = 4.0
+requires_los = true
+animation_name = "attack_heavy"
+sound_effect = ""
+
+[sub_resource type="Resource" id="2"]
+script = ExtResource("2")
+id = "goblin_leader_warcry"
+display_name = "War Cry"
+damage = Array[int]([1, 8, 4])
+damage_type = 0
+windup_time = 0.4
+active_time = 0.2
+recovery_time = 0.3
+cooldown = 1.5
+range_distance = 2.5
+is_ranged = false
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 15.0
+inflicts_condition = 7
+condition_chance = 0.4
+condition_duration = 2.0
+stagger_power = 1.5
+knockback_force = 4.0
+weight = 0.7
+min_range = 0.0
+max_range = 3.0
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[resource]
+script = ExtResource("1")
+id = "goblin_leader"
+display_name = "Goblin Warchief"
+description = "A massive goblin clad in scavenged armor, wielding an enormous cleaver. Commands the goblin tribes through sheer brutality and cunning."
+max_hp = 250
+armor_value = 18
+movement_speed = 3.5
+turn_speed = 4.0
+grit = 10
+agility = 5
+will = 6
+knowledge = 4
+behavior = 4
+faction = 1
+aggro_range = 18.0
+attack_range = 3.5
+preferred_distance = 2.5
+flee_hp_threshold = 0.0
+is_boss = true
+attacks = Array[ExtResource("2")]([SubResource("1"), SubResource("2")])
+can_block = true
+block_chance = 0.25
+stagger_resistance = 0.6
+fire_resistance = 0.0
+frost_resistance = 0.0
+lightning_resistance = 0.0
+poison_resistance = 0.2
+necrotic_resistance = 0.0
+physical_resistance = 0.15
+fire_weakness = 0.15
+frost_weakness = 0.0
+lightning_weakness = 0.0
+holy_weakness = 0.0
+causes_horror = true
+horror_difficulty = 10
+loot_table_av = 8
+gold_drop = Array[int]([150, 350])
+guaranteed_drops = Array[String]([])
+drop_table = {
+"health_potion": 0.5,
+"stamina_potion": 0.3
+}
+xp_reward = 400
+scene_path = ""
+icon_path = ""
+scale = 1.3
+sprite_path = "res://Sprite folders grab bag/goblin_sword.png"
+attack_sprite_path = ""
+sprite_hframes = 4
+sprite_vframes = 2
+attack_hframes = 4
+attack_vframes = 2
+sprite_pixel_size = 0.032
+idle_sounds = Array[String]([])
+attack_sounds = Array[String]([])
+hurt_sounds = Array[String]([])
+death_sounds = Array[String]([])

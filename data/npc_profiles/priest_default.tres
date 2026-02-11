@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="NPCKnowledgeProfile" load_steps=2 format=3 uid="uid://priest_default_profile"]
+
+[ext_resource type="Script" path="res://scripts/dialogue/npc_knowledge_profile.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+archetype = 7
+personality_traits = Array[String](["devout", "helpful", "wise"])
+knowledge_tags = Array[String](["religion", "temple", "elder_moor", "healing", "blessings"])
+base_disposition = 70
+speech_style = "formal"

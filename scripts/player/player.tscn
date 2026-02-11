@@ -1,0 +1,44 @@
+[gd_scene load_steps=6 format=3 uid="uid://ce4ug0lflj8qp"]
+
+[ext_resource type="Script" path="res://scripts/player/camera_pivot.gd" id="1_8afob"]
+[ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="1_dovo2"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_x7p2l"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_8afob"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dovo2"]
+size = Vector3(1, 1, 1.1177368)
+
+[node name="Player" type="CharacterBody3D"]
+script = ExtResource("1_dovo2")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_x7p2l")
+
+[node name="CameraPivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+script = ExtResource("1_8afob")
+
+[node name="SpringArm" type="SpringArm3D" parent="CameraPivot"]
+spring_length = 4.0
+margin = 0.2
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot/SpringArm"]
+current = true
+
+[node name="Model" type="Node3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("CapsuleMesh_8afob")
+skeleton = NodePath("../..")
+
+[node name="MeleeHitBox" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -10)
+monitoring = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeleeHitBox"]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 0.02513647, 4.7683716e-07, 9.536669)
+shape = SubResource("BoxShape3D_dovo2")

@@ -1,0 +1,118 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/data/enemy_attack_data.gd" id="2"]
+
+[sub_resource type="Resource" id="1"]
+script = ExtResource("2")
+id = "waterlogged_slam"
+display_name = "Waterlogged Slam"
+damage = Array[int]([2, 8, 0])
+damage_type = 0
+windup_time = 0.8
+active_time = 0.3
+recovery_time = 0.6
+cooldown = 2.0
+range_distance = 2.0
+is_ranged = false
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 0.0
+inflicts_condition = 4
+condition_chance = 0.4
+condition_duration = 2.0
+stagger_power = 1.0
+knockback_force = 2.5
+weight = 1.0
+min_range = 0.0
+max_range = 2.0
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[sub_resource type="Resource" id="2"]
+script = ExtResource("2")
+id = "drowning_grasp"
+display_name = "Drowning Grasp"
+damage = Array[int]([1, 6, 0])
+damage_type = 0
+windup_time = 0.5
+active_time = 0.4
+recovery_time = 0.5
+cooldown = 5.0
+range_distance = 2.0
+is_ranged = false
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 0.0
+inflicts_condition = 8
+condition_chance = 0.6
+condition_duration = 3.0
+stagger_power = 0.5
+knockback_force = 0.0
+weight = 0.5
+min_range = 0.0
+max_range = 2.0
+requires_los = true
+animation_name = "grab"
+sound_effect = ""
+
+[resource]
+script = ExtResource("1")
+id = "drowned_dead"
+display_name = "Drowned Dead"
+description = "Waterlogged corpses risen from the bogs of Elder Moor. Slow but relentless, their grip can hold you under."
+max_hp = 30
+armor_value = 6
+movement_speed = 2.5
+turn_speed = 3.0
+grit = 5
+agility = 2
+will = 0
+knowledge = 0
+behavior = 0
+faction = 4
+aggro_range = 10.0
+attack_range = 2.0
+preferred_distance = 2.0
+flee_hp_threshold = 0.0
+is_boss = false
+attacks = Array[ExtResource("2")]([SubResource("1"), SubResource("2")])
+can_block = false
+block_chance = 0.0
+stagger_resistance = 0.5
+fire_resistance = 0.0
+frost_resistance = 0.3
+lightning_resistance = -0.25
+poison_resistance = 1.0
+necrotic_resistance = 0.5
+physical_resistance = 0.2
+fire_weakness = 0.5
+frost_weakness = 0.0
+lightning_weakness = 0.25
+holy_weakness = 0.75
+causes_horror = true
+horror_difficulty = 10
+loot_table_av = 2
+gold_drop = Array[int]([5, 20])
+guaranteed_drops = Array[String]([])
+drop_table = {
+"waterlogged_cloth": 0.3,
+"bog_moss": 0.4,
+"ancient_coin": 0.1
+}
+xp_reward = 45
+scene_path = ""
+icon_path = "res://Sprite folders grab bag/swampy_undead.png"
+scale = 1.0
+sprite_path = "res://Sprite folders grab bag/swampy_undead.png"
+attack_sprite_path = ""
+sprite_hframes = 4
+sprite_vframes = 1
+attack_hframes = 1
+attack_vframes = 1
+sprite_pixel_size = 0.012
+idle_sounds = Array[String]([])
+attack_sounds = Array[String]([])
+hurt_sounds = Array[String]([])
+death_sounds = Array[String]([])

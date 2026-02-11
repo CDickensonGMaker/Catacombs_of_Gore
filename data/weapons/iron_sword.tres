@@ -1,0 +1,45 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "iron_sword"
+display_name = "Iron Sword"
+description = "A sturdy iron blade. Reliable if unspectacular."
+weapon_type = 1
+weapon_class = 1
+two_handed = false
+base_damage = Array[int]([2, 6, 2])
+damage_type = 0
+secondary_damage_type = 0
+secondary_damage = Array[int]([0, 0, 0])
+attack_speed = 1.1
+reach = 1.8
+stagger_power = 0.8
+armor_pierce = 0.0
+crit_chance = 0.05
+crit_multiplier = 2.0
+is_ranged = false
+projectile_speed = 30.0
+max_range = 320.0
+reload_time = 0.0
+ammo_type = ""
+inflicts_condition = 0
+condition_chance = 0.0
+condition_duration = 0.0
+lifesteal_percent = 0.0
+is_homing = false
+required_grit = 2
+required_agility = 0
+required_knowledge = 0
+base_value = 80
+weight = 2.5
+mesh_path = ""
+icon_path = ""
+attack_animation = "attack_slash"
+heavy_attack_animation = "attack_heavy_slash"
+fps_sprite_path = "res://Sprite folders grab bag/arm swing 4x4fixed.png"
+fps_h_frames = 4
+fps_v_frames = 4
+fps_sprite_size = Vector2(288, 288)

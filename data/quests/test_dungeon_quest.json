@@ -1,0 +1,36 @@
+{
+	"id": "test_dungeon_quest",
+	"title": "The Scholar's Research",
+	"description": "A scholar named Aldric became trapped in this ancient crypt while researching forbidden texts. Help him by clearing the undead and finding the exit.",
+	"quest_source": "story",
+	"giver_npc_id": "scholar_aldric",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "dungeon",
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "scholar_aldric",
+	"turn_in_zone": "dungeon",
+	"objectives": [
+		{
+			"id": "kill_undead",
+			"description": "Clear the undead from the crypt",
+			"type": "kill",
+			"target": "skeleton_shade",
+			"required_count": 3
+		},
+		{
+			"id": "defeat_boss",
+			"description": "Defeat the Vampire Lord",
+			"type": "kill",
+			"target": "vampire_lord",
+			"required_count": 1
+		}
+	],
+	"rewards": {
+		"gold": 100,
+		"xp": 50,
+		"items": [
+			{"id": "health_potion", "quantity": 3}
+		]
+	},
+	"prerequisites": []
+}

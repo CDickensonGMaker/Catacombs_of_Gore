@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://bounty_board_instance_001"]
+
+[ext_resource type="Script" path="res://scripts/world/bounty_board.gd" id="1"]
+
+[node name="BountyBoard" type="StaticBody3D"]
+script = ExtResource("1")
+board_name = "Bounty Board"
+max_available_bounties = 5
+min_available_bounties = 3

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://c5t3bx8qr7h2d"]
+
+[ext_resource type="Script" path="res://scripts/tests/test_bandit_hideout_generation.gd" id="1_test"]
+
+[node name="TestBanditHideoutGeneration" type="Node3D"]
+script = ExtResource("1_test")

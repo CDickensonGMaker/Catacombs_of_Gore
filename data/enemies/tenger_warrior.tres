@@ -1,0 +1,121 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/data/enemy_attack_data.gd" id="2"]
+
+[sub_resource type="Resource" id="1"]
+script = ExtResource("2")
+id = "tenger_cavalry_slash"
+display_name = "Cavalry Slash"
+damage = Array[int]([3, 8, 4])
+damage_type = 0
+windup_time = 0.35
+active_time = 0.2
+recovery_time = 0.3
+cooldown = 1.2
+range_distance = 3.0
+is_ranged = false
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 0.0
+inflicts_condition = 6
+condition_chance = 0.3
+condition_duration = 6.0
+stagger_power = 0.8
+knockback_force = 4.0
+weight = 1.0
+min_range = 0.0
+max_range = 3.5
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[sub_resource type="Resource" id="2"]
+script = ExtResource("2")
+id = "tenger_trample"
+display_name = "Horse Trample"
+damage = Array[int]([2, 10, 5])
+damage_type = 0
+windup_time = 0.6
+active_time = 0.3
+recovery_time = 0.5
+cooldown = 5.0
+range_distance = 3.5
+is_ranged = false
+is_aoe = true
+aoe_radius = 2.0
+projectile_speed = 0.0
+inflicts_condition = 1
+condition_chance = 0.5
+condition_duration = 2.0
+stagger_power = 1.5
+knockback_force = 6.0
+weight = 0.3
+min_range = 0.0
+max_range = 4.0
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[resource]
+script = ExtResource("1")
+id = "tenger_warrior"
+display_name = "Tenger Mounted Warrior"
+description = "An elite Tenger horseman wielding a curved blade from the saddle. These fearsome cavalry units are the terror of the frontier, cutting down villagers as sport."
+max_hp = 85
+armor_value = 14
+movement_speed = 7.0
+turn_speed = 4.5
+grit = 8
+agility = 7
+will = 4
+knowledge = 3
+bravery = 8
+behavior = 0
+faction = 8
+aggro_range = 25.0
+attack_range = 3.0
+preferred_distance = 2.5
+flee_hp_threshold = 0.08
+is_boss = false
+attacks = Array[ExtResource("2")]([SubResource("1"), SubResource("2")])
+can_block = true
+block_chance = 0.25
+stagger_resistance = 0.35
+fire_resistance = 0.1
+frost_resistance = -0.1
+lightning_resistance = 0.0
+poison_resistance = 0.15
+necrotic_resistance = 0.0
+physical_resistance = 0.2
+fire_weakness = 0.0
+frost_weakness = 0.1
+lightning_weakness = 0.0
+holy_weakness = 0.0
+causes_horror = false
+horror_difficulty = 14
+loot_table_av = 5
+gold_drop = Array[int]([50, 130])
+guaranteed_drops = Array[String]([])
+drop_table = {
+"health_potion": 0.25,
+"cooked_meat": 0.3,
+"leather": 0.2,
+"iron_ingot": 0.15,
+"steel_ingot": 0.08
+}
+xp_reward = 140
+scene_path = ""
+icon_path = ""
+scale = 1.3
+sprite_path = ""
+attack_sprite_path = ""
+sprite_hframes = 4
+sprite_vframes = 2
+attack_hframes = 4
+attack_vframes = 2
+sprite_pixel_size = 0.04
+idle_sounds = Array[String]([])
+attack_sounds = Array[String]([])
+hurt_sounds = Array[String]([])
+death_sounds = Array[String]([])

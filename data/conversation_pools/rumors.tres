@@ -1,0 +1,1058 @@
+[gd_resource type="Resource" script_class="ConversationResponsePool" load_steps=82 format=3 uid="uid://c1rumors_pool"]
+
+[ext_resource type="Script" path="res://scripts/dialogue/conversation_response_pool.gd" id="1_pool"]
+[ext_resource type="Script" path="res://scripts/dialogue/conversation_response.gd" id="2_resp"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_action.gd" id="3_action"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_condition.gd" id="4_cond"]
+
+# =============================================================================
+# DUNGEON RUMORS
+# =============================================================================
+
+[sub_resource type="Resource" id="rumor_dungeon_1"]
+script = ExtResource("2_resp")
+text = "They say {dungeon_name} has been stirring again. Lights in the depths, unnatural sounds..."
+topic_type = 1
+personality_affinity = ["nervous", "superstitious"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_dungeon_1"
+
+[sub_resource type="Resource" id="rumor_dungeon_2"]
+script = ExtResource("2_resp")
+text = "Adventurers went into {dungeon_name} a fortnight ago. None came back. Make of that what you will."
+topic_type = 1
+personality_affinity = ["grim", "cautious"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_dungeon_2"
+
+[sub_resource type="Resource" id="rumor_dungeon_3"]
+script = ExtResource("2_resp")
+text = "Some say the seals on {dungeon_name} are weakening. Ancient things are waking up."
+topic_type = 1
+personality_affinity = ["scholarly", "worried"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["rumors", "occult"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_dungeon_3"
+
+[sub_resource type="Resource" id="rumor_dungeon_4"]
+script = ExtResource("2_resp")
+text = "There's said to be a monster in the depths of {dungeon_name}. Big as a house, they say."
+topic_type = 1
+personality_affinity = ["dramatic", "gossipy"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "rumor_dungeon_4"
+
+# =============================================================================
+# TREASURE RUMORS
+# =============================================================================
+
+[sub_resource type="Resource" id="rumor_treasure_1"]
+script = ExtResource("2_resp")
+text = "I heard tell of a king's ransom buried somewhere in {region_name}. Old treasure, from before the wars."
+topic_type = 1
+personality_affinity = ["greedy", "adventurous"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_treasure_1"
+
+[sub_resource type="Resource" id="rumor_treasure_2"]
+script = ExtResource("2_resp")
+text = "A merchant lost his entire caravan somewhere on the eastern road. Never found a trace of the goods."
+topic_type = 1
+personality_affinity = ["mercantile", "opportunistic"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["trade", "rumors"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "rumor_treasure_2"
+
+[sub_resource type="Resource" id="rumor_treasure_3"]
+script = ExtResource("2_resp")
+text = "They say the old lords hid their valuables when the catacombs were sealed. Still there, waiting."
+topic_type = 1
+personality_affinity = ["knowledgeable", "adventurous"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["rumors", "history"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_treasure_3"
+
+[sub_resource type="Resource" id="rumor_treasure_4"]
+script = ExtResource("2_resp")
+text = "There's an enchanted blade hidden somewhere in {dungeon_name}, if you believe the old tales."
+topic_type = 1
+personality_affinity = ["romantic", "adventurous"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "rumor_treasure_4"
+
+# =============================================================================
+# DANGER WARNINGS
+# =============================================================================
+
+[sub_resource type="Resource" id="rumor_danger_1"]
+script = ExtResource("2_resp")
+text = "Stay off the roads after dark. There are things out there... things that hunt."
+topic_type = 1
+personality_affinity = ["protective", "serious"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_danger_1"
+
+[sub_resource type="Resource" id="rumor_danger_2"]
+script = ExtResource("2_resp")
+text = "Folk have been disappearing from the outskirts. The guards say wolves, but wolves don't pick locks."
+topic_type = 1
+personality_affinity = ["suspicious", "observant"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_danger_2"
+
+[sub_resource type="Resource" id="rumor_danger_3"]
+script = ExtResource("2_resp")
+text = "I'd avoid the old woods if I were you. Hunters say something large has moved in."
+topic_type = 1
+personality_affinity = ["cautious", "helpful"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_danger_3"
+
+[sub_resource type="Resource" id="rumor_danger_4"]
+script = ExtResource("2_resp")
+text = "Cultists have been seen performing rituals in the hills. Dark magic, they say."
+topic_type = 1
+personality_affinity = ["devout", "worried"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["occult"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_danger_4"
+
+# =============================================================================
+# HOSTILE/DISMISSIVE RUMORS
+# =============================================================================
+
+[sub_resource type="Resource" id="rumor_hostile_1"]
+script = ExtResource("2_resp")
+text = "Rumors? I've heard plenty. None I'd share with the likes of you."
+topic_type = 1
+personality_affinity = ["hostile", "secretive"]
+min_disposition = 0
+max_disposition = 30
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_hostile_1"
+
+[sub_resource type="Resource" id="rumor_dismissive"]
+script = ExtResource("2_resp")
+text = "Rumors are just idle talk for idle minds. I don't bother with such nonsense."
+topic_type = 1
+personality_affinity = ["practical", "dismissive"]
+min_disposition = 30
+max_disposition = 50
+required_knowledge = []
+weight = 0.8
+actions = []
+conditions = []
+response_id = "rumor_dismissive"
+
+[sub_resource type="Resource" id="rumor_none"]
+script = ExtResource("2_resp")
+text = "I keep to myself, mostly. Don't hear much worth repeating."
+topic_type = 1
+personality_affinity = ["reserved", "honest"]
+min_disposition = 25
+max_disposition = 60
+required_knowledge = []
+weight = 0.7
+actions = []
+conditions = []
+response_id = "rumor_none"
+
+# =============================================================================
+# MONSTER SIGHTINGS
+# =============================================================================
+
+[sub_resource type="Resource" id="rumor_monster_1"]
+script = ExtResource("2_resp")
+text = "A farmhand swears he saw a walking corpse in the fields at dawn. Eyes glowing like embers, he said."
+topic_type = 1
+personality_affinity = ["superstitious", "gossipy"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_monster_1"
+
+[sub_resource type="Resource" id="rumor_monster_2"]
+script = ExtResource("2_resp")
+text = "The fishermen won't go near the lake anymore. Something huge surfaced last week - tentacles, they say."
+topic_type = 1
+personality_affinity = ["nervous", "dramatic"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_monster_2"
+
+[sub_resource type="Resource" id="rumor_monster_3"]
+script = ExtResource("2_resp")
+text = "Wolves have been acting strange lately. Moving in packs larger than normal, led by something... wrong."
+topic_type = 1
+personality_affinity = ["observant", "cautious"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_monster_3"
+
+[sub_resource type="Resource" id="rumor_monster_4"]
+script = ExtResource("2_resp")
+text = "They found claw marks on old Gerrick's barn. Four feet up the wall. Whatever made them wasn't natural."
+topic_type = 1
+personality_affinity = ["worried", "observant"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "rumor_monster_4"
+
+# =============================================================================
+# MYSTERIOUS HAPPENINGS
+# =============================================================================
+
+[sub_resource type="Resource" id="rumor_mystery_1"]
+script = ExtResource("2_resp")
+text = "The old well in the square has been singing at midnight. Not wind through the stones - actual singing."
+topic_type = 1
+personality_affinity = ["superstitious", "curious"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["occult"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_mystery_1"
+
+[sub_resource type="Resource" id="rumor_mystery_2"]
+script = ExtResource("2_resp")
+text = "There's a ruin in the eastern hills that wasn't there a month ago. Just... appeared overnight."
+topic_type = 1
+personality_affinity = ["scholarly", "curious"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["rumors", "occult"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_mystery_2"
+
+[sub_resource type="Resource" id="rumor_mystery_3"]
+script = ExtResource("2_resp")
+text = "Folk who venture near the old cemetery come back... different. Speaking in tongues, seeing things."
+topic_type = 1
+personality_affinity = ["devout", "worried"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["occult"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_mystery_3"
+
+[sub_resource type="Resource" id="rumor_mystery_4"]
+script = ExtResource("2_resp")
+text = "Someone's been leaving strange symbols carved into trees around town. The priest won't even look at them."
+topic_type = 1
+personality_affinity = ["observant", "nervous"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "rumor_mystery_4"
+
+# =============================================================================
+# QUEST HOOKS (with DialogueAction to set flags)
+# =============================================================================
+
+[sub_resource type="Resource" id="action_set_flag_lost_heirloom"]
+script = ExtResource("3_action")
+type = 7
+param_string = "quest_hook_lost_heirloom"
+param_int = 0
+param_float = 0.0
+success_node_id = ""
+failure_node_id = ""
+
+[sub_resource type="Resource" id="rumor_quest_1"]
+script = ExtResource("2_resp")
+text = "The widow Marren's been asking around for help. Her husband's heirloom was taken by bandits on the north road. Poor woman's desperate."
+topic_type = 1
+personality_affinity = ["sympathetic", "helpful"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = [SubResource("action_set_flag_lost_heirloom")]
+conditions = []
+response_id = "rumor_quest_1"
+
+[sub_resource type="Resource" id="action_set_flag_missing_shipment"]
+script = ExtResource("3_action")
+type = 7
+param_string = "quest_hook_missing_shipment"
+param_int = 0
+param_float = 0.0
+success_node_id = ""
+failure_node_id = ""
+
+[sub_resource type="Resource" id="rumor_quest_2"]
+script = ExtResource("2_resp")
+text = "The merchant guild's offering coin for anyone who can find their missing shipment. Vanished somewhere between here and {town_name}. Good pay, if you've got the stomach for it."
+topic_type = 1
+personality_affinity = ["mercantile", "opportunistic"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["trade", "rumors"]
+weight = 1.0
+actions = [SubResource("action_set_flag_missing_shipment")]
+conditions = []
+response_id = "rumor_quest_2"
+
+[sub_resource type="Resource" id="action_set_flag_haunted_mine"]
+script = ExtResource("3_action")
+type = 7
+param_string = "quest_hook_haunted_mine"
+param_int = 0
+param_float = 0.0
+success_node_id = ""
+failure_node_id = ""
+
+[sub_resource type="Resource" id="rumor_quest_3"]
+script = ExtResource("2_resp")
+text = "The old silver mine's been abandoned since the... incident. But there's still ore down there. Someone brave enough could clear it out and make a fortune."
+topic_type = 1
+personality_affinity = ["adventurous", "greedy"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = [SubResource("action_set_flag_haunted_mine")]
+conditions = []
+response_id = "rumor_quest_3"
+
+[sub_resource type="Resource" id="action_set_flag_cult_investigation"]
+script = ExtResource("3_action")
+type = 7
+param_string = "quest_hook_cult_investigation"
+param_int = 0
+param_float = 0.0
+success_node_id = ""
+failure_node_id = ""
+
+[sub_resource type="Resource" id="rumor_quest_4"]
+script = ExtResource("2_resp")
+text = "The temple's been quietly looking for someone to investigate those cultists in the hills. They're paying well and asking no questions. Interested?"
+topic_type = 1
+personality_affinity = ["devout", "secretive"]
+min_disposition = 55
+max_disposition = 100
+required_knowledge = ["occult"]
+weight = 1.0
+actions = [SubResource("action_set_flag_cult_investigation")]
+conditions = []
+response_id = "rumor_quest_4"
+
+# =============================================================================
+# CONDITIONAL RESPONSES (require specific flags or high disposition)
+# =============================================================================
+
+[sub_resource type="Resource" id="cond_high_disposition"]
+script = ExtResource("4_cond")
+type = 0
+param_string = ""
+param_int = 0
+param_float = 0.0
+invert = false
+
+[sub_resource type="Resource" id="cond_knows_occult_secrets"]
+script = ExtResource("4_cond")
+type = 5
+param_string = "shared_occult_knowledge"
+param_int = 0
+param_float = 0.0
+invert = false
+
+[sub_resource type="Resource" id="rumor_secret_1"]
+script = ExtResource("2_resp")
+text = "Look, I trust you, so I'll tell you this... the mayor's been seen meeting with hooded figures at night. Something's not right at the top."
+topic_type = 1
+personality_affinity = ["trusting", "rebellious"]
+min_disposition = 75
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_secret_1"
+
+[sub_resource type="Resource" id="rumor_secret_2"]
+script = ExtResource("2_resp")
+text = "*lowers voice* Between you and me... there's a hidden passage beneath the old chapel. Leads somewhere deep. I've seen the priests going in at odd hours."
+topic_type = 1
+personality_affinity = ["secretive", "trusting"]
+min_disposition = 80
+max_disposition = 100
+required_knowledge = ["rumors", "occult"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_secret_2"
+
+[sub_resource type="Resource" id="cond_flag_heard_heirloom"]
+script = ExtResource("4_cond")
+type = 5
+param_string = "quest_hook_lost_heirloom"
+param_int = 0
+param_float = 0.0
+invert = false
+
+[sub_resource type="Resource" id="rumor_followup_1"]
+script = ExtResource("2_resp")
+text = "Oh, you've heard about widow Marren's heirloom? Word is the bandits are holed up in the old watchtower. Just so you know."
+topic_type = 1
+personality_affinity = ["helpful", "gossipy"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.2
+actions = []
+conditions = [SubResource("cond_flag_heard_heirloom")]
+response_id = "rumor_followup_1"
+
+[sub_resource type="Resource" id="cond_flag_not_heard_mine"]
+script = ExtResource("4_cond")
+type = 5
+param_string = "quest_hook_haunted_mine"
+param_int = 0
+param_float = 0.0
+invert = true
+
+[sub_resource type="Resource" id="rumor_conditional_mine"]
+script = ExtResource("2_resp")
+text = "Nobody talks about the old mine anymore. Bad luck, they say. But if you want to know what happened there, ask old Henrick at the tavern. He was there when it all went wrong."
+topic_type = 1
+personality_affinity = ["superstitious", "helpful"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 0.9
+actions = []
+conditions = [SubResource("cond_flag_not_heard_mine")]
+response_id = "rumor_conditional_mine"
+
+# =============================================================================
+# NAMED LOCATION RUMORS (Real explorable locations with treasure)
+# =============================================================================
+
+[sub_resource type="Resource" id="rumor_watchtower_1"]
+script = ExtResource("2_resp")
+text = "There's an old watchtower on Miller's Hill, west of here. Been abandoned for decades. Some say the last watchman hid his pay before he fled - never came back for it."
+topic_type = 1
+personality_affinity = ["helpful", "adventurous"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.1
+actions = []
+conditions = []
+response_id = "rumor_watchtower_1"
+
+[sub_resource type="Resource" id="rumor_watchtower_2"]
+script = ExtResource("2_resp")
+text = "My grandfather used to work at the watchtower on Miller's Hill. Said the lords kept valuables there during the wars. It's all ruins now, but who knows what's still buried in the rubble."
+topic_type = 1
+personality_affinity = ["knowledgeable", "nostalgic"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["rumors", "history"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_watchtower_2"
+
+[sub_resource type="Resource" id="rumor_watchtower_3"]
+script = ExtResource("2_resp")
+text = "Bandits used the old watchtower on Miller's Hill as a hideout years back. Guards cleared them out, but never found their stash. The lock on that place is something fierce though."
+topic_type = 1
+personality_affinity = ["gossipy", "cautious"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "rumor_watchtower_3"
+
+[sub_resource type="Resource" id="rumor_shrine_1"]
+script = ExtResource("2_resp")
+text = "There's an abandoned shrine in the eastern woods. Pilgrims used to leave offerings there - gold, scrolls, all sorts of valuables. Nobody goes there anymore. The pillars give folk an uneasy feeling."
+topic_type = 1
+personality_affinity = ["superstitious", "helpful"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.1
+actions = []
+conditions = []
+response_id = "rumor_shrine_1"
+
+[sub_resource type="Resource" id="rumor_shrine_2"]
+script = ExtResource("2_resp")
+text = "They say the abandoned shrine east of town was dedicated to some old god. The priests left centuries ago, but the offering box might still be there. Just... don't linger after dark."
+topic_type = 1
+personality_affinity = ["devout", "nervous"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["occult"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_shrine_2"
+
+[sub_resource type="Resource" id="rumor_shrine_3"]
+script = ExtResource("2_resp")
+text = "I've seen the abandoned shrine in the eastern wilderness. Stone pillars, half of them toppled. There's a chest on the old altar - locked tight with some ancient mechanism. Could be worth investigating if you've got the skill."
+topic_type = 1
+personality_affinity = ["adventurous", "observant"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_shrine_3"
+
+[sub_resource type="Resource" id="rumor_mine_1"]
+script = ExtResource("2_resp")
+text = "The collapsed mine near the northern road used to be a silver mine. Cave-in killed a dozen men. The miners' belongings are still scattered about - nobody wanted to go back for them."
+topic_type = 1
+personality_affinity = ["sympathetic", "helpful"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.1
+actions = []
+conditions = []
+response_id = "rumor_mine_1"
+
+[sub_resource type="Resource" id="rumor_mine_2"]
+script = ExtResource("2_resp")
+text = "If you're heading north toward Rotherhine, keep an eye out for the collapsed mine entrance. The foreman kept a locked chest for payroll - might still be there among the rubble."
+topic_type = 1
+personality_affinity = ["mercantile", "helpful"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["trade", "rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_mine_2"
+
+[sub_resource type="Resource" id="rumor_mine_3"]
+script = ExtResource("2_resp")
+text = "That old mine on the northern road? Collapsed years ago. But there's ore still scattered about - iron, maybe some gold if you know where to look. The entrance is blocked, but you can poke around outside."
+topic_type = 1
+personality_affinity = ["greedy", "practical"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "rumor_mine_3"
+
+# =============================================================================
+# ELDER MOOR / SWAMP RUMORS
+# =============================================================================
+
+[sub_resource type="Resource" id="rumor_elder_moor_1"]
+script = ExtResource("2_resp")
+text = "Strange lights have been seen floating over the moor at night. Will-o-wisps, the old folk call them. Follow one and you'll never find your way back."
+topic_type = 1
+personality_affinity = ["superstitious", "cautious"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_elder_moor_1"
+
+[sub_resource type="Resource" id="rumor_elder_moor_2"]
+script = ExtResource("2_resp")
+text = "The swamp around Elder Moor wasn't always this way. They say a witch cursed the land centuries ago when the villagers drove her out. Her cottage is still out there somewhere, sinking into the muck."
+topic_type = 1
+personality_affinity = ["knowledgeable", "storyteller"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["rumors", "history"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_elder_moor_2"
+
+[sub_resource type="Resource" id="rumor_elder_moor_3"]
+script = ExtResource("2_resp")
+text = "Careful in the moors after dark. The bog-dead walk there - drowned souls who'll drag you under if you stray from the path."
+topic_type = 1
+personality_affinity = ["superstitious", "nervous"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_elder_moor_3"
+
+[sub_resource type="Resource" id="rumor_elder_moor_4"]
+script = ExtResource("2_resp")
+text = "There's an old hermit living deep in the moors. Some say he's a healer who knows the swamp's secrets. Others say he's touched in the head. Either way, he doesn't like visitors."
+topic_type = 1
+personality_affinity = ["gossipy", "curious"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "rumor_elder_moor_4"
+
+# =============================================================================
+# KAZAN-DUN DWARF HOLD RUMORS
+# =============================================================================
+
+[sub_resource type="Resource" id="rumor_kazan_dun_1"]
+script = ExtResource("2_resp")
+text = "Kazan-Dun, the dwarf hold in the western mountains - they've sealed their gates to outsiders. Some say they're battling something in the deep. Others say they found something they shouldn't have."
+topic_type = 1
+personality_affinity = ["knowledgeable", "curious"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["rumors", "dwarves"]
+weight = 1.1
+actions = []
+conditions = []
+response_id = "rumor_kazan_dun_1"
+
+[sub_resource type="Resource" id="rumor_kazan_dun_2"]
+script = ExtResource("2_resp")
+text = "The dwarves of Kazan-Dun forge the finest steel in the realm. If you can get past their guards and prove your worth, they might craft something for you. Might cost your weight in gold, though."
+topic_type = 1
+personality_affinity = ["mercantile", "adventurous"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["trade"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_kazan_dun_2"
+
+[sub_resource type="Resource" id="rumor_kazan_dun_3"]
+script = ExtResource("2_resp")
+text = "They say Kazan-Dun sits atop veins of mithril so pure it glows blue. The dwarves guard it jealously. More than one thief has gone in and never come out."
+topic_type = 1
+personality_affinity = ["greedy", "dramatic"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_kazan_dun_3"
+
+[sub_resource type="Resource" id="rumor_kazan_dun_4"]
+script = ExtResource("2_resp")
+text = "A trader who does business with Kazan-Dun told me the dwarves have been buying up all the salt they can get. Preserving food for a long siege, maybe. Something's got them worried."
+topic_type = 1
+personality_affinity = ["mercantile", "observant"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = ["trade", "rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_kazan_dun_4"
+
+# =============================================================================
+# DESERT CAMP RUMORS
+# =============================================================================
+
+[sub_resource type="Resource" id="rumor_desert_camp_1"]
+script = ExtResource("2_resp")
+text = "There's a nomad camp in the southern desert, near a small oasis. Strange folk - they worship the sun and trade in exotic spices. But they know the desert's secrets better than anyone."
+topic_type = 1
+personality_affinity = ["worldly", "curious"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_desert_camp_1"
+
+[sub_resource type="Resource" id="rumor_desert_camp_2"]
+script = ExtResource("2_resp")
+text = "The desert nomads tell of ancient tombs buried beneath the sands. Kings from before the great cataclysm, entombed with all their treasures. The dunes shift and sometimes reveal their entrances."
+topic_type = 1
+personality_affinity = ["adventurous", "greedy"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["rumors", "history"]
+weight = 1.1
+actions = []
+conditions = []
+response_id = "rumor_desert_camp_2"
+
+[sub_resource type="Resource" id="rumor_desert_camp_3"]
+script = ExtResource("2_resp")
+text = "They say giant scorpions the size of horses hunt the southern desert. The nomads know how to avoid their territory, but outsiders often walk right into their nests."
+topic_type = 1
+personality_affinity = ["cautious", "helpful"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_desert_camp_3"
+
+# =============================================================================
+# ELVEN CITY RUMORS
+# =============================================================================
+
+[sub_resource type="Resource" id="rumor_elven_city_1"]
+script = ExtResource("2_resp")
+text = "The elven city across the western sea... they say it's beautiful beyond imagining. Towers of white stone that sing when the wind blows through them. But the elves don't welcome many human visitors."
+topic_type = 1
+personality_affinity = ["romantic", "worldly"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_elven_city_1"
+
+[sub_resource type="Resource" id="rumor_elven_city_2"]
+script = ExtResource("2_resp")
+text = "If you want to reach the elven lands, you'll need to book passage from one of the coastal towns. But be warned - the crossing is dangerous. Many ships have been lost to storms... and worse."
+topic_type = 1
+personality_affinity = ["helpful", "practical"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["trade"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_elven_city_2"
+
+[sub_resource type="Resource" id="rumor_elven_city_3"]
+script = ExtResource("2_resp")
+text = "The elves have a lighthouse on a rocky outcrop that guides ships to their harbor. They say the light is magical - it can cut through any fog or storm. Some sailors swear it saved their lives."
+topic_type = 1
+personality_affinity = ["superstitious", "nautical"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "rumor_elven_city_3"
+
+[sub_resource type="Resource" id="rumor_elven_city_4"]
+script = ExtResource("2_resp")
+text = "I met an elf once, years ago. Said their city was built on the ruins of something older. Something they don't talk about. Made it sound like the elves are standing guard over more than just their homeland."
+topic_type = 1
+personality_affinity = ["mysterious", "knowledgeable"]
+min_disposition = 55
+max_disposition = 100
+required_knowledge = ["occult", "rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_elven_city_4"
+
+# =============================================================================
+# SEA, GHOST SHIPS, AND SEA MONSTER RUMORS
+# =============================================================================
+
+[sub_resource type="Resource" id="rumor_ghost_ship_1"]
+script = ExtResource("2_resp")
+text = "Sailors speak of a wrecked ship that rises from the waves on moonless nights. Ghost pirates still man her deck, and they drag living sailors down to join their eternal crew."
+topic_type = 1
+personality_affinity = ["superstitious", "dramatic"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_ghost_ship_1"
+
+[sub_resource type="Resource" id="rumor_ghost_ship_2"]
+script = ExtResource("2_resp")
+text = "There's a shipwreck visible at low tide between here and the elven lands. At night, you can see spectral lights on her deck. The treasure she carried went down with her - but so did her cursed crew."
+topic_type = 1
+personality_affinity = ["nautical", "greedy"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.1
+actions = []
+conditions = []
+response_id = "rumor_ghost_ship_2"
+
+[sub_resource type="Resource" id="rumor_sea_monster_1"]
+script = ExtResource("2_resp")
+text = "Stay away from the deep waters between here and the elven coast. There's something enormous down there. Fishermen have seen tentacles thicker than oak trees break the surface."
+topic_type = 1
+personality_affinity = ["cautious", "nervous"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_sea_monster_1"
+
+[sub_resource type="Resource" id="rumor_sea_monster_2"]
+script = ExtResource("2_resp")
+text = "A merchant ship was found drifting last month - crew gone, hull torn open from the inside. Something big broke through the deck. The only survivor was mad, kept mumbling about eyes in the dark."
+topic_type = 1
+personality_affinity = ["dramatic", "gossipy"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_sea_monster_2"
+
+[sub_resource type="Resource" id="rumor_pirates_1"]
+script = ExtResource("2_resp")
+text = "Pirates have a hideout on one of the rocky islands in the western sea. They prey on ships crossing to the elven lands. The navy tried to root them out, but they know those waters too well."
+topic_type = 1
+personality_affinity = ["worldly", "cautious"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_pirates_1"
+
+[sub_resource type="Resource" id="rumor_island_ruins_1"]
+script = ExtResource("2_resp")
+text = "There's an island with ancient ruins out in the western sea. Older than the elves, some say. Treasure hunters who've gone there come back changed - if they come back at all."
+topic_type = 1
+personality_affinity = ["adventurous", "mysterious"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = ["rumors", "history"]
+weight = 1.1
+actions = []
+conditions = []
+response_id = "rumor_island_ruins_1"
+
+# =============================================================================
+# DALHURST AND TRADE ROUTE RUMORS
+# =============================================================================
+
+[sub_resource type="Resource" id="rumor_dalhurst_1"]
+script = ExtResource("2_resp")
+text = "Dalhurst is the biggest trading hub in the region. Every road leads there eventually. If you're looking to buy or sell, that's the place. Just watch your purse - the thieves guild runs strong there."
+topic_type = 1
+personality_affinity = ["mercantile", "practical"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["trade"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_dalhurst_1"
+
+[sub_resource type="Resource" id="rumor_dalhurst_2"]
+script = ExtResource("2_resp")
+text = "Caravans have been going missing on the road to Dalhurst. Bandits, most likely, but some say the attacks are too organized. Someone's paying them, funding a small army out in the hills."
+topic_type = 1
+personality_affinity = ["suspicious", "observant"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_dalhurst_2"
+
+# =============================================================================
+# DANGEROUS CREATURE RUMORS
+# =============================================================================
+
+[sub_resource type="Resource" id="rumor_creature_1"]
+script = ExtResource("2_resp")
+text = "There's a troll living under the old bridge on the northern road. Demands a toll from anyone who crosses. Pay up or end up as his supper. Some brave fool needs to deal with it."
+topic_type = 1
+personality_affinity = ["helpful", "cautious"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_creature_1"
+
+[sub_resource type="Resource" id="rumor_creature_2"]
+script = ExtResource("2_resp")
+text = "Wyverns have been spotted in the eastern hills. Not full dragons, mind you, but vicious enough. They've been picking off livestock - and a shepherd went missing last week."
+topic_type = 1
+personality_affinity = ["worried", "observant"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_creature_2"
+
+[sub_resource type="Resource" id="rumor_creature_3"]
+script = ExtResource("2_resp")
+text = "Hunters have found tracks in the northern forest - huge, clawed prints. Something big has moved into the area. Bigger than a bear, they say. Walks on two legs."
+topic_type = 1
+personality_affinity = ["nervous", "superstitious"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_creature_3"
+
+[sub_resource type="Resource" id="rumor_creature_4"]
+script = ExtResource("2_resp")
+text = "The mountain pass near Kazan-Dun is home to a basilisk, or so they say. Turns men to stone with a glance. The dwarves pay good coin for anyone who can clear the road."
+topic_type = 1
+personality_affinity = ["adventurous", "greedy"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_creature_4"
+
+# =============================================================================
+# HIDDEN TREASURE LOCATION RUMORS
+# =============================================================================
+
+[sub_resource type="Resource" id="rumor_hidden_treasure_1"]
+script = ExtResource("2_resp")
+text = "A retired mercenary told me he buried his life's savings near the old watchtower on Miller's Hill. Three paces east of the fallen oak, he said. Poor sod died before he could dig it up."
+topic_type = 1
+personality_affinity = ["gossipy", "greedy"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_hidden_treasure_1"
+
+[sub_resource type="Resource" id="rumor_hidden_treasure_2"]
+script = ExtResource("2_resp")
+text = "There's a cave behind the waterfall on River-01, northwest of here. Old smugglers used it to stash goods. They're long gone, but not everything was moved out."
+topic_type = 1
+personality_affinity = ["adventurous", "helpful"]
+min_disposition = 55
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "rumor_hidden_treasure_2"
+
+[sub_resource type="Resource" id="rumor_hidden_treasure_3"]
+script = ExtResource("2_resp")
+text = "The ruins up north, the ones the old-timers call Ruin-01 - there's supposed to be a sealed vault beneath them. Imperial gold from before the fall. Nobody's been able to open it."
+topic_type = 1
+personality_affinity = ["knowledgeable", "greedy"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = ["history", "rumors"]
+weight = 1.1
+actions = []
+conditions = []
+response_id = "rumor_hidden_treasure_3"
+
+[resource]
+script = ExtResource("1_pool")
+responses = [SubResource("rumor_dungeon_1"), SubResource("rumor_dungeon_2"), SubResource("rumor_dungeon_3"), SubResource("rumor_dungeon_4"), SubResource("rumor_treasure_1"), SubResource("rumor_treasure_2"), SubResource("rumor_treasure_3"), SubResource("rumor_treasure_4"), SubResource("rumor_danger_1"), SubResource("rumor_danger_2"), SubResource("rumor_danger_3"), SubResource("rumor_danger_4"), SubResource("rumor_hostile_1"), SubResource("rumor_dismissive"), SubResource("rumor_none"), SubResource("rumor_monster_1"), SubResource("rumor_monster_2"), SubResource("rumor_monster_3"), SubResource("rumor_monster_4"), SubResource("rumor_mystery_1"), SubResource("rumor_mystery_2"), SubResource("rumor_mystery_3"), SubResource("rumor_mystery_4"), SubResource("rumor_quest_1"), SubResource("rumor_quest_2"), SubResource("rumor_quest_3"), SubResource("rumor_quest_4"), SubResource("rumor_secret_1"), SubResource("rumor_secret_2"), SubResource("rumor_followup_1"), SubResource("rumor_conditional_mine"), SubResource("rumor_watchtower_1"), SubResource("rumor_watchtower_2"), SubResource("rumor_watchtower_3"), SubResource("rumor_shrine_1"), SubResource("rumor_shrine_2"), SubResource("rumor_shrine_3"), SubResource("rumor_mine_1"), SubResource("rumor_mine_2"), SubResource("rumor_mine_3"), SubResource("rumor_elder_moor_1"), SubResource("rumor_elder_moor_2"), SubResource("rumor_elder_moor_3"), SubResource("rumor_elder_moor_4"), SubResource("rumor_kazan_dun_1"), SubResource("rumor_kazan_dun_2"), SubResource("rumor_kazan_dun_3"), SubResource("rumor_kazan_dun_4"), SubResource("rumor_desert_camp_1"), SubResource("rumor_desert_camp_2"), SubResource("rumor_desert_camp_3"), SubResource("rumor_elven_city_1"), SubResource("rumor_elven_city_2"), SubResource("rumor_elven_city_3"), SubResource("rumor_elven_city_4"), SubResource("rumor_ghost_ship_1"), SubResource("rumor_ghost_ship_2"), SubResource("rumor_sea_monster_1"), SubResource("rumor_sea_monster_2"), SubResource("rumor_pirates_1"), SubResource("rumor_island_ruins_1"), SubResource("rumor_dalhurst_1"), SubResource("rumor_dalhurst_2"), SubResource("rumor_creature_1"), SubResource("rumor_creature_2"), SubResource("rumor_creature_3"), SubResource("rumor_creature_4"), SubResource("rumor_hidden_treasure_1"), SubResource("rumor_hidden_treasure_2"), SubResource("rumor_hidden_treasure_3")]
+pool_id = "rumors"
+description = "RUMORS topic responses including dungeon rumors, treasure rumors, danger warnings, monster sightings, mysterious happenings, quest hooks with flag-setting actions, conditional responses based on disposition and flags, named location rumors (Old Watchtower, Abandoned Shrine, Collapsed Mine), Elder Moor swamp mysteries, Kazan-Dun dwarf hold tales, desert camp stories, Elven City legends, ghost ships and sea monsters, pirate waters, dangerous creatures, and hidden treasure locations"

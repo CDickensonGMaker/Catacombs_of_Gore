@@ -1,0 +1,67 @@
+{
+	"kill": {
+		"standard": [
+			{"target": "goblin", "display": "Goblins", "count_min": 5, "count_max": 10},
+			{"target": "goblin_soldier", "display": "Goblin Soldiers", "count_min": 4, "count_max": 8},
+			{"target": "giant_rat", "display": "Giant Rats", "count_min": 6, "count_max": 12},
+			{"target": "giant_spider", "display": "Giant Spiders", "count_min": 4, "count_max": 8}
+		],
+		"dangerous": [
+			{"target": "wolf", "display": "Wolves", "count_min": 3, "count_max": 5},
+			{"target": "giant_spider", "display": "Giant Spiders", "count_min": 6, "count_max": 10},
+			{"target": "cultist", "display": "Cultists", "count_min": 3, "count_max": 5},
+			{"target": "goblin_soldier", "display": "Goblin Soldiers", "count_min": 8, "count_max": 12}
+		],
+		"deadly": [
+			{"target": "dire_wolf", "display": "Dire Wolves", "count_min": 2, "count_max": 3},
+			{"target": "drowned_dead", "display": "Drowned Dead", "count_min": 5, "count_max": 8},
+			{"target": "wyvern", "display": "Wyverns", "count_min": 1, "count_max": 2},
+			{"target": "ogre", "display": "Ogres", "count_min": 2, "count_max": 3}
+		],
+		"extreme": [
+			{"target": "troll", "display": "the Bridge Troll", "count_min": 1, "count_max": 1, "is_boss": true},
+			{"target": "basilisk", "display": "the Basilisk", "count_min": 1, "count_max": 1, "is_boss": true},
+			{"target": "cult_leader", "display": "the Cult Leader", "count_min": 1, "count_max": 1, "is_boss": true},
+			{"target": "vampire_lord", "display": "the Vampire Lord", "count_min": 1, "count_max": 1, "is_boss": true},
+			{"target": "goblin_warboss", "display": "Goblin Warbosses", "count_min": 1, "count_max": 2}
+		]
+	},
+	"collect": {
+		"standard": [
+			{"target": "health_potion", "display": "Health Potions", "count_min": 3, "count_max": 5},
+			{"target": "bread", "display": "Bread Loaves", "count_min": 5, "count_max": 8}
+		],
+		"dangerous": [
+			{"target": "health_potion", "display": "Health Potions", "count_min": 5, "count_max": 8},
+			{"target": "iron_ore", "display": "Iron Ore", "count_min": 5, "count_max": 8},
+			{"target": "stamina_potion", "display": "Stamina Potions", "count_min": 3, "count_max": 5}
+		],
+		"deadly": [
+			{"target": "goblin_war_horn", "display": "Goblin War Horns", "count_min": 3, "count_max": 5},
+			{"target": "iron_ingot", "display": "Iron Ingots", "count_min": 5, "count_max": 8},
+			{"target": "gold_ore", "display": "Gold Ore", "count_min": 3, "count_max": 5}
+		]
+	},
+	"explore": {
+		"standard": [
+			{"target": "goblin_cave_entrance", "display": "Goblin Cave Entrance", "count_min": 1, "count_max": 1}
+		],
+		"dangerous": [
+			{"target": "goblin_cave_depths", "display": "Deep within the Goblin Cave", "count_min": 1, "count_max": 1}
+		],
+		"deadly": [
+			{"target": "goblin_totem_chamber", "display": "The Totem Chamber", "count_min": 1, "count_max": 1}
+		]
+	},
+	"clear": {
+		"deadly": [
+			{"target": "spider_nest", "display": "the Spider Nest", "enemy_count": 10, "enemy_type": "giant_spider"},
+			{"target": "wolf_den", "display": "the Wolf Den", "enemy_count": 8, "enemy_type": "wolf"}
+		],
+		"extreme": [
+			{"target": "goblin_cave", "display": "the Goblin Cave", "enemy_count": 15, "enemy_type": "goblin_soldier"},
+			{"target": "cult_hideout", "display": "the Cult Hideout", "enemy_count": 12, "enemy_type": "cultist"},
+			{"target": "troll_bridge", "display": "Troll's Bridge", "enemy_count": 8, "enemy_type": "troll"}
+		]
+	}
+}

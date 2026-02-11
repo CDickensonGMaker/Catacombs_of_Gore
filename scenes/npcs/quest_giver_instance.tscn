@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://quest_giver_instance_001"]
+
+[ext_resource type="Script" path="res://scripts/npcs/quest_giver.gd" id="1"]
+
+[node name="QuestGiver" type="StaticBody3D"]
+script = ExtResource("1")
+npc_id = "quest_giver_01"
+display_name = "Mysterious Stranger"
+quest_ids = []

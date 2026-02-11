@@ -1,0 +1,28 @@
+{
+	"id": "bandit_bounty_note",
+	"title": "Bandit Bounty Notice",
+	"description": "A crumpled note found in the town storage offers payment for eliminating bandits. Deliver proof of their demise to any merchant for your reward.",
+	"is_main_quest": false,
+	"quest_source": "world_object",
+	"trigger_item": "bandit_bounty_note",
+	"giver_region": "elder_moor",
+	"turn_in_type": "npc_type_in_region",
+	"turn_in_target": "merchant",
+	"turn_in_region": "elder_moor",
+	"turn_in_zone": "elder_moor",
+	"objectives": [
+		{
+			"id": "kill_bandits",
+			"description": "Kill 3 human bandits",
+			"type": "kill",
+			"target": "human_bandit",
+			"required_count": 3,
+			"is_optional": false
+		}
+	],
+	"rewards": {
+		"gold": 150,
+		"xp": 100
+	},
+	"prerequisites": []
+}

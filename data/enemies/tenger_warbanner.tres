@@ -1,0 +1,121 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/data/enemy_attack_data.gd" id="2"]
+
+[sub_resource type="Resource" id="1"]
+script = ExtResource("2")
+id = "warbanner_strike"
+display_name = "Banner Pole Strike"
+damage = Array[int]([3, 7, 3])
+damage_type = 0
+windup_time = 0.4
+active_time = 0.25
+recovery_time = 0.35
+cooldown = 1.2
+range_distance = 2.8
+is_ranged = false
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 0.0
+inflicts_condition = 1
+condition_chance = 0.3
+condition_duration = 1.5
+stagger_power = 0.9
+knockback_force = 3.5
+weight = 1.0
+min_range = 0.0
+max_range = 3.0
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[sub_resource type="Resource" id="2"]
+script = ExtResource("2")
+id = "warbanner_rally"
+display_name = "War Rally"
+damage = Array[int]([0, 0, 0])
+damage_type = 0
+windup_time = 0.8
+active_time = 0.5
+recovery_time = 0.5
+cooldown = 15.0
+range_distance = 0.0
+is_ranged = false
+is_aoe = true
+aoe_radius = 12.0
+projectile_speed = 0.0
+inflicts_condition = 0
+condition_chance = 0.0
+condition_duration = 0.0
+stagger_power = 0.0
+knockback_force = 0.0
+weight = 0.15
+min_range = 0.0
+max_range = 0.0
+requires_los = false
+animation_name = "attack"
+sound_effect = ""
+
+[resource]
+script = ExtResource("1")
+id = "tenger_warbanner"
+display_name = "Tenger Warbanner"
+description = "A Tenger officer who carries the blood-stained war banner of their horde. Their presence inspires nearby warriors to fight with greater ferocity. Kill the flag bearer to demoralize the enemy."
+max_hp = 70
+armor_value = 12
+movement_speed = 4.0
+turn_speed = 4.5
+grit = 6
+agility = 5
+will = 7
+knowledge = 4
+bravery = 10
+behavior = 3
+faction = 8
+aggro_range = 18.0
+attack_range = 2.8
+preferred_distance = 8.0
+flee_hp_threshold = 0.1
+is_boss = false
+attacks = Array[ExtResource("2")]([SubResource("1"), SubResource("2")])
+can_block = true
+block_chance = 0.3
+stagger_resistance = 0.25
+fire_resistance = 0.1
+frost_resistance = -0.1
+lightning_resistance = 0.0
+poison_resistance = 0.1
+necrotic_resistance = 0.0
+physical_resistance = 0.15
+fire_weakness = 0.0
+frost_weakness = 0.1
+lightning_weakness = 0.0
+holy_weakness = 0.0
+causes_horror = false
+horror_difficulty = 13
+loot_table_av = 5
+gold_drop = Array[int]([50, 120])
+guaranteed_drops = Array[String]([])
+drop_table = {
+"health_potion": 0.25,
+"cooked_meat": 0.25,
+"leather": 0.2,
+"iron_ingot": 0.15,
+"repair_kit": 0.1
+}
+xp_reward = 130
+scene_path = ""
+icon_path = ""
+scale = 1.15
+sprite_path = "res://Sprite folders grab bag/tegner_flagman.png"
+attack_sprite_path = "res://Sprite folders grab bag/tegner_flagman.png"
+sprite_hframes = 4
+sprite_vframes = 1
+attack_hframes = 4
+attack_vframes = 1
+sprite_pixel_size = 0.035
+idle_sounds = Array[String]([])
+attack_sounds = Array[String]([])
+hurt_sounds = Array[String]([])
+death_sounds = Array[String]([])

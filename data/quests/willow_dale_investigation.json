@@ -1,0 +1,36 @@
+{
+	"id": "willow_dale_investigation",
+	"title": "The Ruins of Willow Dale",
+	"description": "A worried merchant in Dalhurst speaks of strange lights and sounds coming from the old ruins at Willow Dale, northwest of the city. Travelers have gone missing. Investigate the ruins and discover what lurks within.",
+	"is_main_quest": false,
+	"quest_source": "story",
+	"giver_npc_id": "worried_merchant_dalhurst",
+	"giver_npc_type": "merchant",
+	"giver_region": "dalhurst",
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "worried_merchant_dalhurst",
+	"turn_in_zone": "dalhurst",
+	"objectives": [
+		{
+			"id": "enter_willow_dale",
+			"description": "Enter the Willow Dale Ruins",
+			"type": "reach",
+			"target": "dungeon_willow_dale",
+			"required_count": 1,
+			"is_optional": false
+		},
+		{
+			"id": "explore_ruins",
+			"description": "Explore the depths of the ruins",
+			"type": "kill",
+			"target": "enemies",
+			"required_count": 5,
+			"is_optional": false
+		}
+	],
+	"rewards": {
+		"gold": 200,
+		"xp": 250
+	},
+	"prerequisites": []
+}

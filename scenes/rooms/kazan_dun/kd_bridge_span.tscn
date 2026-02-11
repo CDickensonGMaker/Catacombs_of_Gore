@@ -1,0 +1,325 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/modular_room.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://Sprite folders grab bag/stonewall.png" id="2"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/bridge/pillar_ornate.obj" id="mesh_pillar"]
+
+[sub_resource type="StandardMaterial3D" id="mat_bridge_floor"]
+albedo_color = Color(0.35, 0.33, 0.31, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.88
+uv1_scale = Vector3(8, 8, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_bridge_wall"]
+albedo_color = Color(0.38, 0.36, 0.34, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.85
+uv1_scale = Vector3(4, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_pillar"]
+albedo_color = Color(0.36, 0.34, 0.32, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.88
+uv1_scale = Vector3(2, 4, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_void"]
+albedo_color = Color(0.05, 0.05, 0.08, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="mat_brazier"]
+albedo_color = Color(0.42, 0.4, 0.44, 1)
+metallic = 0.4
+roughness = 0.55
+
+[sub_resource type="StandardMaterial3D" id="mat_fire"]
+albedo_color = Color(1.0, 0.6, 0.2, 1)
+emission_enabled = true
+emission = Color(1.0, 0.5, 0.1, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="StandardMaterial3D" id="mat_chain"]
+albedo_color = Color(0.4, 0.38, 0.36, 1)
+metallic = 0.5
+roughness = 0.55
+
+[node name="KDBridgeSpan" type="Node3D"]
+script = ExtResource("1")
+room_id = "kd_bridge_span"
+room_type = "bridge"
+room_name = "Great Bridge"
+room_width = 12.0
+room_depth = 50.0
+room_height = 40.0
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="BridgeDeck" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(12, 1, 50)
+material = SubResource("mat_bridge_floor")
+
+[node name="RailingL" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0.75, 0)
+use_collision = true
+size = Vector3(0.5, 1.5, 50)
+material = SubResource("mat_bridge_wall")
+
+[node name="RailingR" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0.75, 0)
+use_collision = true
+size = Vector3(0.5, 1.5, 50)
+material = SubResource("mat_bridge_wall")
+
+[node name="VoidBelow" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -20, 0)
+size = Vector3(40, 1, 60)
+material = SubResource("mat_void")
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="SupportPillarL1" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -8, -10, -15)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="SupportPillarR1" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 8, -10, -15)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="SupportPillarL2" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -8, -10, 15)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="SupportPillarR2" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 8, -10, 15)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="ChainL1" type="CSGCylinder3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 10, -20)
+radius = 0.15
+height = 20
+sides = 6
+material = SubResource("mat_chain")
+
+[node name="ChainR1" type="CSGCylinder3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 10, -20)
+radius = 0.15
+height = 20
+sides = 6
+material = SubResource("mat_chain")
+
+[node name="ChainL2" type="CSGCylinder3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 10, 20)
+radius = 0.15
+height = 20
+sides = 6
+material = SubResource("mat_chain")
+
+[node name="ChainR2" type="CSGCylinder3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 10, 20)
+radius = 0.15
+height = 20
+sides = 6
+material = SubResource("mat_chain")
+
+[node name="RailingPost1" type="CSGBox3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 1.25, -20)
+use_collision = true
+size = Vector3(0.6, 2.5, 0.6)
+material = SubResource("mat_bridge_wall")
+
+[node name="RailingPost2" type="CSGBox3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 1.25, -20)
+use_collision = true
+size = Vector3(0.6, 2.5, 0.6)
+material = SubResource("mat_bridge_wall")
+
+[node name="RailingPost3" type="CSGBox3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 1.25, 0)
+use_collision = true
+size = Vector3(0.6, 2.5, 0.6)
+material = SubResource("mat_bridge_wall")
+
+[node name="RailingPost4" type="CSGBox3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 1.25, 0)
+use_collision = true
+size = Vector3(0.6, 2.5, 0.6)
+material = SubResource("mat_bridge_wall")
+
+[node name="RailingPost5" type="CSGBox3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 1.25, 20)
+use_collision = true
+size = Vector3(0.6, 2.5, 0.6)
+material = SubResource("mat_bridge_wall")
+
+[node name="RailingPost6" type="CSGBox3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 1.25, 20)
+use_collision = true
+size = Vector3(0.6, 2.5, 0.6)
+material = SubResource("mat_bridge_wall")
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="Brazier1" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -15)
+
+[node name="Stand" type="CSGCylinder3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+radius = 0.3
+height = 1.0
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+radius = 0.45
+height = 0.4
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Fire" type="CSGSphere3D" parent="Lighting/Brazier1"]
+transform = Transform3D(0.65, 0, 0, 0, 0.8, 0, 0, 0, 0.65, 0, 1.55, 0)
+radius = 0.35
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 2.5
+omni_range = 15.0
+
+[node name="Brazier2" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -15)
+
+[node name="Stand" type="CSGCylinder3D" parent="Lighting/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+radius = 0.3
+height = 1.0
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Lighting/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+radius = 0.45
+height = 0.4
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Fire" type="CSGSphere3D" parent="Lighting/Brazier2"]
+transform = Transform3D(0.65, 0, 0, 0, 0.8, 0, 0, 0, 0.65, 0, 1.55, 0)
+radius = 0.35
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 2.5
+omni_range = 15.0
+
+[node name="Brazier3" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 15)
+
+[node name="Stand" type="CSGCylinder3D" parent="Lighting/Brazier3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+radius = 0.3
+height = 1.0
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Lighting/Brazier3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+radius = 0.45
+height = 0.4
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Fire" type="CSGSphere3D" parent="Lighting/Brazier3"]
+transform = Transform3D(0.65, 0, 0, 0, 0.8, 0, 0, 0, 0.65, 0, 1.55, 0)
+radius = 0.35
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/Brazier3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 2.5
+omni_range = 15.0
+
+[node name="Brazier4" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 15)
+
+[node name="Stand" type="CSGCylinder3D" parent="Lighting/Brazier4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+radius = 0.3
+height = 1.0
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Lighting/Brazier4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+radius = 0.45
+height = 0.4
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Fire" type="CSGSphere3D" parent="Lighting/Brazier4"]
+transform = Transform3D(0.65, 0, 0, 0, 0.8, 0, 0, 0, 0.65, 0, 1.55, 0)
+radius = 0.35
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/Brazier4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 2.5
+omni_range = 15.0
+
+[node name="Spawns" type="Node3D" parent="."]
+
+[node name="NPCSpawns" type="Node3D" parent="Spawns"]
+
+[node name="EnemySpawns" type="Node3D" parent="Spawns"]
+
+[node name="GoblinSpawn1" type="Marker3D" parent="Spawns/EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+metadata/enemy_data = "res://data/enemies/goblin_warrior.tres"
+metadata/sprite_path = "res://assets/sprites/enemies/goblin_warrior.png"
+metadata/h_frames = 4
+metadata/v_frames = 4
+
+[node name="GoblinSpawn2" type="Marker3D" parent="Spawns/EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 10)
+metadata/enemy_data = "res://data/enemies/goblin_archer.tres"
+metadata/sprite_path = "res://assets/sprites/enemies/goblin_archer.png"
+metadata/h_frames = 4
+metadata/v_frames = 4
+
+[node name="GoblinSpawn3" type="Marker3D" parent="Spawns/EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -10)
+metadata/enemy_data = "res://data/enemies/goblin_archer.tres"
+metadata/sprite_path = "res://assets/sprites/enemies/goblin_archer.png"
+metadata/h_frames = 4
+metadata/v_frames = 4
+
+[node name="ChestSpawns" type="Node3D" parent="Spawns"]
+
+[node name="Connections" type="Node3D" parent="."]
+
+[node name="DoorPositions" type="Node3D" parent="Connections"]
+
+[node name="DoorNorth" type="Marker3D" parent="Connections/DoorPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -24.5)
+metadata/door_id = "door_north"
+metadata/door_label = "To Gatehouse"
+
+[node name="DoorSouth" type="Marker3D" parent="Connections/DoorPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 24.5)
+metadata/door_id = "door_south"
+metadata/door_label = "To Deep Mines"
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]

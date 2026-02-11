@@ -1,0 +1,27 @@
+{
+	"id": "thin_the_herd",
+	"title": "Thin the Herd",
+	"description": "Before assaulting the cave, the goblin numbers must be reduced. Slay 10 goblins in total to weaken their forces.",
+	"quest_source": "story",
+	"giver_npc_id": "wandering_knight",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "elder_moor",
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "wandering_knight",
+	"turn_in_zone": "elder_moor",
+	"objectives": [
+		{
+			"id": "kill_many_goblins",
+			"description": "Kill 10 Goblins",
+			"type": "kill",
+			"target": "goblin",
+			"required_count": 10,
+			"is_optional": false
+		}
+	],
+	"rewards": {
+		"gold": 150,
+		"xp": 300
+	},
+	"prerequisites": ["scout_the_cave"]
+}

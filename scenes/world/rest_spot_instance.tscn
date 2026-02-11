@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://rest_spot_instance_001"]
+
+[ext_resource type="Script" path="res://scripts/world/rest_spot.gd" id="1"]
+
+[node name="RestSpot" type="StaticBody3D"]
+script = ExtResource("1")
+display_name = "Fireplace"
+rest_spot_id = "rest_spot_01"
+rest_type = 0

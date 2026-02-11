@@ -1,0 +1,245 @@
+[gd_resource type="Resource" script_class="DialogueData" load_steps=42 format=3 uid="uid://priest_of_time"]
+
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_node.gd" id="2_node"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_choice.gd" id="3_choice"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_condition.gd" id="4_cond"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_action.gd" id="5_action"]
+
+# ============================================================================
+# CHOICES
+# ============================================================================
+
+[sub_resource type="Resource" id="choice_goodbye"]
+script = ExtResource("3_choice")
+text = "I must go. Farewell."
+next_node_id = "end"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_back_start"]
+script = ExtResource("3_choice")
+text = "I had another question..."
+next_node_id = "start"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_learn_god"]
+script = ExtResource("3_choice")
+text = "Tell me about your god."
+next_node_id = "about_chronos"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_seek_blessing"]
+script = ExtResource("3_choice")
+text = "I seek a blessing."
+next_node_id = "blessing_offer"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_life_advice"]
+script = ExtResource("3_choice")
+text = "What wisdom can you share about life?"
+next_node_id = "wisdom_time"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_faith"]
+script = ExtResource("3_choice")
+text = "How did you come to this faith?"
+next_node_id = "personal_faith"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+# Action to set the blessing flag
+[sub_resource type="Resource" id="action_set_blessed"]
+script = ExtResource("5_action")
+type = 7
+param_string = "blessed_by_time"
+param_int = 0
+param_float = 0.0
+success_node_id = ""
+failure_node_id = ""
+
+# Condition: already blessed
+[sub_resource type="Resource" id="cond_already_blessed"]
+script = ExtResource("4_cond")
+type = 5
+param_string = "blessed_by_time"
+param_int = 0
+param_float = 0.0
+invert = false
+
+# Condition: not blessed
+[sub_resource type="Resource" id="cond_not_blessed"]
+script = ExtResource("4_cond")
+type = 5
+param_string = "blessed_by_time"
+param_int = 0
+param_float = 0.0
+invert = true
+
+[sub_resource type="Resource" id="choice_accept_blessing"]
+script = ExtResource("3_choice")
+text = "Yes, bless me in the name of Chronos."
+next_node_id = "blessing_granted"
+conditions = [SubResource("cond_not_blessed")]
+show_when_unavailable = true
+unavailable_reason = "You have already received this blessing"
+actions = [SubResource("action_set_blessed")]
+
+[sub_resource type="Resource" id="choice_decline_blessing"]
+script = ExtResource("3_choice")
+text = "Perhaps another time."
+next_node_id = "blessing_declined"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_deeper_wisdom"]
+script = ExtResource("3_choice")
+text = "Tell me more about the nature of time."
+next_node_id = "deeper_time"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_other_gods"]
+script = ExtResource("3_choice")
+text = "What of the other two gods?"
+next_node_id = "other_gods"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+# ============================================================================
+# NODES
+# ============================================================================
+
+[sub_resource type="Resource" id="node_start"]
+script = ExtResource("2_node")
+id = "start"
+speaker_name = "Priest Aldren"
+text = "*the elderly priest looks up from contemplation, his silver robes catching the blue light of the altar* Ah, a traveler. Time has brought you to our temple. What brings you before the Altar of Chronos, the Keeper of Hours?"
+choices = [SubResource("choice_learn_god"), SubResource("choice_seek_blessing"), SubResource("choice_life_advice"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_neutral"
+
+[sub_resource type="Resource" id="node_about_chronos"]
+script = ExtResource("2_node")
+id = "about_chronos"
+speaker_name = "Priest Aldren"
+text = "Chronos is the Eternal Witness, the god who sees all moments as one. Past, present, and future flow through his eyes like a river. He teaches us that every moment is precious, for it shall never come again. Yet he also reminds us that all things pass - both joy and sorrow."
+choices = [SubResource("choice_deeper_wisdom"), SubResource("choice_other_gods"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_thoughtful"
+
+[sub_resource type="Resource" id="node_deeper_time"]
+script = ExtResource("2_node")
+id = "deeper_time"
+speaker_name = "Priest Aldren"
+text = "Time is not the enemy many believe it to be. It is the canvas upon which we paint our deeds. The warrior fears time will steal his strength. The lover fears time will fade beauty. But Chronos teaches that nothing is truly lost - every moment exists forever in the tapestry of eternity. What we do now echoes always."
+choices = [SubResource("choice_faith"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_serene"
+
+[sub_resource type="Resource" id="node_other_gods"]
+script = ExtResource("2_node")
+id = "other_gods"
+speaker_name = "Priest Aldren"
+text = "The Three are aspects of the same truth. Gaela of the Harvest governs the cycles within time - growth and decay, plenty and want. Morthane of Death and Rebirth oversees what happens when mortal time ends and eternal time begins. Together, the Three guide us through every phase of existence."
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_wise"
+
+[sub_resource type="Resource" id="node_blessing_offer"]
+script = ExtResource("2_node")
+id = "blessing_offer"
+speaker_name = "Priest Aldren"
+text = "*he rises slowly, ancient joints creaking* A blessing of Time is no small thing. Chronos may grant you patience in battle, clarity in confusion, and the wisdom to know which moments matter most. Do you accept this gift with a humble heart?"
+choices = [SubResource("choice_accept_blessing"), SubResource("choice_decline_blessing")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_solemn"
+
+[sub_resource type="Resource" id="node_blessing_granted"]
+script = ExtResource("2_node")
+id = "blessing_granted"
+speaker_name = "Priest Aldren"
+text = "*he places a weathered hand upon your brow* By the Eternal Flow, I mark you as one who walks with Time's favor. May you see clearly what was, what is, and what may yet be. The blessing of Chronos is upon you, traveler. Use your moments wisely."
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_blessing"
+
+[sub_resource type="Resource" id="node_blessing_declined"]
+script = ExtResource("2_node")
+id = "blessing_declined"
+speaker_name = "Priest Aldren"
+text = "*he nods slowly, understanding in his eyes* Time is patient. When you are ready - if ever you are - the blessing will wait. That is the nature of eternity."
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_understanding"
+
+[sub_resource type="Resource" id="node_wisdom_time"]
+script = ExtResource("2_node")
+id = "wisdom_time"
+speaker_name = "Priest Aldren"
+text = "Wisdom? *he chuckles softly* I have spent seventy winters learning this: Do not mourn the past, for it has shaped you. Do not fear the future, for it is unwritten. Live fully in this breath, this heartbeat. Regret is a thief of the present moment."
+choices = [SubResource("choice_faith"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_wise"
+
+[sub_resource type="Resource" id="node_personal_faith"]
+script = ExtResource("2_node")
+id = "personal_faith"
+speaker_name = "Priest Aldren"
+text = "I was once a soldier. I watched friends die and wondered why some lived longer than others. Chronos showed me that length of life matters less than depth. A single day lived with purpose outweighs a century of mere existence. I laid down my sword and took up the robe. I have not regretted a moment since."
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_reflective"
+
+[sub_resource type="Resource" id="node_end"]
+script = ExtResource("2_node")
+id = "end"
+speaker_name = "Priest Aldren"
+text = "Go with Time's blessing, traveler. May your hours be well spent, and may we meet again when the currents of fate allow."
+choices = []
+is_end_node = true
+auto_continue_to = ""
+portrait_id = "priest_farewell"
+
+# ============================================================================
+# RESOURCE
+# ============================================================================
+
+[resource]
+script = ExtResource("1_data")
+id = "priest_of_time"
+display_name = "Priest of Time Dialogue"
+description = "Dialogue for Priest Aldren, servant of Chronos the Keeper of Hours. Offers blessing of time and wisdom about living in the present moment."
+start_node_id = "start"
+nodes = [SubResource("node_start"), SubResource("node_about_chronos"), SubResource("node_deeper_time"), SubResource("node_other_gods"), SubResource("node_blessing_offer"), SubResource("node_blessing_granted"), SubResource("node_blessing_declined"), SubResource("node_wisdom_time"), SubResource("node_personal_faith"), SubResource("node_end")]

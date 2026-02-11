@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://fast_travel_shrine_instance_001"]
+
+[ext_resource type="Script" path="res://scripts/world/fast_travel_shrine.gd" id="1"]
+
+[node name="FastTravelShrine" type="StaticBody3D"]
+script = ExtResource("1")
+display_name = "Shrine of Passage"
+shrine_id = "shrine_01"

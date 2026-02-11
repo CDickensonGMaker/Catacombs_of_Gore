@@ -1,0 +1,298 @@
+[gd_resource type="Resource" script_class="ConversationResponsePool" load_steps=23 format=3 uid="uid://c1trade_pool"]
+
+[ext_resource type="Script" path="res://scripts/dialogue/conversation_response_pool.gd" id="1_pool"]
+[ext_resource type="Script" path="res://scripts/dialogue/conversation_response.gd" id="2_resp"]
+
+# =============================================================================
+# MERCHANT GOODS AND SERVICES
+# =============================================================================
+
+[sub_resource type="Resource" id="trade_goods_1"]
+script = ExtResource("2_resp")
+text = "I deal in all manner of goods - weapons, armor, potions. If you need it, I probably have it. For the right price."
+topic_type = 4
+personality_affinity = ["mercantile", "confident"]
+min_disposition = 30
+max_disposition = 100
+required_knowledge = ["trade"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "trade_goods_1"
+
+[sub_resource type="Resource" id="trade_goods_2"]
+script = ExtResource("2_resp")
+text = "The finest wares in {town_name}, right here. Don't let the modest shop fool you - quality speaks for itself."
+topic_type = 4
+personality_affinity = ["proud", "mercantile"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["trade"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "trade_goods_2"
+
+[sub_resource type="Resource" id="trade_goods_3"]
+script = ExtResource("2_resp")
+text = "I specialize in rare ingredients and alchemical supplies. If you're brewing potions, you've come to the right place."
+topic_type = 4
+personality_affinity = ["scholarly", "mercantile"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["trade", "alchemy"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "trade_goods_3"
+
+# =============================================================================
+# PRICES AND HAGGLING
+# =============================================================================
+
+[sub_resource type="Resource" id="trade_haggle_1"]
+script = ExtResource("2_resp")
+text = "Prices are fair here. I don't haggle - what you see is what you pay. Take it or leave it."
+topic_type = 4
+personality_affinity = ["stern", "honest"]
+min_disposition = 30
+max_disposition = 100
+required_knowledge = ["trade"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "trade_haggle_1"
+
+[sub_resource type="Resource" id="trade_haggle_2"]
+script = ExtResource("2_resp")
+text = "Everything's negotiable for a good customer. Bring me repeat business and I'll make it worth your while."
+topic_type = 4
+personality_affinity = ["friendly", "mercantile"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = ["trade"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "trade_haggle_2"
+
+[sub_resource type="Resource" id="trade_haggle_3"]
+script = ExtResource("2_resp")
+text = "Prices have gone up lately. Blame the caravans - fewer shipments means higher costs for everyone."
+topic_type = 4
+personality_affinity = ["apologetic", "practical"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["trade"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "trade_haggle_3"
+
+# =============================================================================
+# TRADE ROUTES AND CARAVANS
+# =============================================================================
+
+[sub_resource type="Resource" id="trade_routes_1"]
+script = ExtResource("2_resp")
+text = "Most of our goods come through Dalhurst. It's the trade hub for the entire region. Roads converge there from every direction."
+topic_type = 4
+personality_affinity = ["knowledgeable", "mercantile"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["trade"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "trade_routes_1"
+
+[sub_resource type="Resource" id="trade_routes_2"]
+script = ExtResource("2_resp")
+text = "Caravans from the south bring exotic spices and silks. Dangerous journey, though. Bandits love those shipments."
+topic_type = 4
+personality_affinity = ["worldly", "cautious"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["trade", "rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "trade_routes_2"
+
+[sub_resource type="Resource" id="trade_routes_3"]
+script = ExtResource("2_resp")
+text = "The dwarves of Kazan-Dun send metalwork through the mountain passes. Best steel you'll find, but the supply's been unreliable lately."
+topic_type = 4
+personality_affinity = ["mercantile", "observant"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["trade", "dwarves"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "trade_routes_3"
+
+# =============================================================================
+# IMPORTING AND EXPORTING
+# =============================================================================
+
+[sub_resource type="Resource" id="trade_import_1"]
+script = ExtResource("2_resp")
+text = "We import most of our ore from the mining settlements up north. Local deposits dried up years ago."
+topic_type = 4
+personality_affinity = ["practical", "knowledgeable"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["trade"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "trade_import_1"
+
+[sub_resource type="Resource" id="trade_import_2"]
+script = ExtResource("2_resp")
+text = "The elves across the water trade in enchanted goods and rare herbs. Expensive, but worth every coin."
+topic_type = 4
+personality_affinity = ["worldly", "mercantile"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["trade"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "trade_import_2"
+
+[sub_resource type="Resource" id="trade_export_1"]
+script = ExtResource("2_resp")
+text = "This region exports lumber and leather mostly. Good forests, plenty of game. It's what keeps the economy going."
+topic_type = 4
+personality_affinity = ["practical", "local"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["trade"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "trade_export_1"
+
+# =============================================================================
+# SUPPLY AND DEMAND
+# =============================================================================
+
+[sub_resource type="Resource" id="trade_supply_1"]
+script = ExtResource("2_resp")
+text = "Weapons are in high demand right now. With all the monster sightings, everyone wants protection."
+topic_type = 4
+personality_affinity = ["observant", "mercantile"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["trade"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "trade_supply_1"
+
+[sub_resource type="Resource" id="trade_supply_2"]
+script = ExtResource("2_resp")
+text = "Healing potions are scarce. The herbalists can't keep up with demand, and red herbs don't grow fast enough."
+topic_type = 4
+personality_affinity = ["worried", "mercantile"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["trade", "alchemy"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "trade_supply_2"
+
+[sub_resource type="Resource" id="trade_supply_3"]
+script = ExtResource("2_resp")
+text = "Food prices are stable for now. Good harvest this year, praise the gods. But winter's coming..."
+topic_type = 4
+personality_affinity = ["practical", "devout"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = []
+weight = 0.9
+actions = []
+conditions = []
+response_id = "trade_supply_3"
+
+# =============================================================================
+# GENERIC CIVILIAN OPINIONS ON TRADE
+# =============================================================================
+
+[sub_resource type="Resource" id="trade_civilian_1"]
+script = ExtResource("2_resp")
+text = "Trade? I just try to make ends meet. The merchants get richer while folk like me scrape by."
+topic_type = 4
+personality_affinity = ["bitter", "poor"]
+min_disposition = 25
+max_disposition = 70
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "trade_civilian_1"
+
+[sub_resource type="Resource" id="trade_civilian_2"]
+script = ExtResource("2_resp")
+text = "I don't know much about trade, but I know prices keep going up. That's all I need to know."
+topic_type = 4
+personality_affinity = ["simple", "practical"]
+min_disposition = 30
+max_disposition = 80
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "trade_civilian_2"
+
+[sub_resource type="Resource" id="trade_civilian_3"]
+script = ExtResource("2_resp")
+text = "The market's the heart of {town_name}. Best place to hear news, find work, and spend your coin."
+topic_type = 4
+personality_affinity = ["friendly", "local"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "trade_civilian_3"
+
+# =============================================================================
+# LOW DISPOSITION / DISMISSIVE RESPONSES
+# =============================================================================
+
+[sub_resource type="Resource" id="trade_hostile_1"]
+script = ExtResource("2_resp")
+text = "My business is my own. Find someone else to pester with your questions."
+topic_type = 4
+personality_affinity = ["hostile", "secretive"]
+min_disposition = 0
+max_disposition = 25
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "trade_hostile_1"
+
+[sub_resource type="Resource" id="trade_dismissive_1"]
+script = ExtResource("2_resp")
+text = "I don't discuss trade with strangers. You want information, earn some trust first."
+topic_type = 4
+personality_affinity = ["suspicious", "cautious"]
+min_disposition = 0
+max_disposition = 35
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "trade_dismissive_1"
+
+[resource]
+script = ExtResource("1_pool")
+responses = [SubResource("trade_goods_1"), SubResource("trade_goods_2"), SubResource("trade_goods_3"), SubResource("trade_haggle_1"), SubResource("trade_haggle_2"), SubResource("trade_haggle_3"), SubResource("trade_routes_1"), SubResource("trade_routes_2"), SubResource("trade_routes_3"), SubResource("trade_import_1"), SubResource("trade_import_2"), SubResource("trade_export_1"), SubResource("trade_supply_1"), SubResource("trade_supply_2"), SubResource("trade_supply_3"), SubResource("trade_civilian_1"), SubResource("trade_civilian_2"), SubResource("trade_civilian_3"), SubResource("trade_hostile_1"), SubResource("trade_dismissive_1")]
+pool_id = "trade"
+description = "TRADE topic responses covering merchant goods and services, prices and haggling, trade routes and caravans, importing/exporting goods, supply and demand comments, merchant archetype responses, and generic civilian opinions on trade"

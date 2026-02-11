@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="ArmorData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/armor_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "ring_of_strength"
+display_name = "Ring of Strength"
+description = "A heavy iron ring that pulses with power. Increases physical might."
+slot = 5
+weight_class = 0
+is_shield = false
+armor_value = 0
+block_value = 0
+fire_resistance = 0.0
+frost_resistance = 0.0
+lightning_resistance = 0.0
+poison_resistance = 0.0
+necrotic_resistance = 0.0
+magic_resistance = 0.0
+grit_bonus = 2
+agility_bonus = 0
+will_bonus = 0
+speech_bonus = 0
+knowledge_bonus = 0
+vitality_bonus = 0
+agility_penalty = 0
+stealth_penalty = 0
+spell_failure_chance = 0.0
+required_grit = 0
+base_value = 200
+weight = 0.2

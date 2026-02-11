@@ -1,0 +1,371 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/modular_room.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://Sprite folders grab bag/stonewall.png" id="2"]
+
+[sub_resource type="StandardMaterial3D" id="mat_rock_floor"]
+albedo_color = Color(0.28, 0.26, 0.24, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.92
+uv1_scale = Vector3(4, 4, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_rock_wall"]
+albedo_color = Color(0.32, 0.3, 0.28, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.9
+uv1_scale = Vector3(3, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_ceiling"]
+albedo_color = Color(0.25, 0.23, 0.21, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.92
+uv1_scale = Vector3(4, 4, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_wood"]
+albedo_color = Color(0.4, 0.32, 0.25, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_ore"]
+albedo_color = Color(0.45, 0.42, 0.48, 1)
+metallic = 0.5
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="mat_gold_ore"]
+albedo_color = Color(0.7, 0.6, 0.3, 1)
+metallic = 0.7
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="mat_brazier"]
+albedo_color = Color(0.42, 0.4, 0.44, 1)
+metallic = 0.4
+roughness = 0.55
+
+[sub_resource type="StandardMaterial3D" id="mat_fire"]
+albedo_color = Color(1.0, 0.6, 0.2, 1)
+emission_enabled = true
+emission = Color(1.0, 0.5, 0.1, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="StandardMaterial3D" id="mat_rail"]
+albedo_color = Color(0.4, 0.38, 0.35, 1)
+metallic = 0.6
+roughness = 0.5
+
+[node name="KDMineShaft" type="Node3D"]
+script = ExtResource("1")
+room_id = "kd_mine_shaft"
+room_type = "mine_shaft"
+room_name = "Mine Shaft"
+room_width = 15.0
+room_depth = 40.0
+room_height = 8.0
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="Floor" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(15, 1, 40)
+material = SubResource("mat_rock_floor")
+
+[node name="Ceiling" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
+use_collision = true
+size = Vector3(15, 0.5, 40)
+material = SubResource("mat_ceiling")
+
+[node name="WallNorth" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -20)
+use_collision = true
+size = Vector3(15, 8, 1)
+material = SubResource("mat_rock_wall")
+
+[node name="WallSouthLeft" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 4, 20)
+use_collision = true
+size = Vector3(5, 8, 1)
+material = SubResource("mat_rock_wall")
+
+[node name="WallSouthRight" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 4, 20)
+use_collision = true
+size = Vector3(5, 8, 1)
+material = SubResource("mat_rock_wall")
+
+[node name="WallSouthTop" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.5, 20)
+use_collision = true
+size = Vector3(5, 3, 1)
+material = SubResource("mat_rock_wall")
+
+[node name="WallEast" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 4, 0)
+use_collision = true
+size = Vector3(1, 8, 40)
+material = SubResource("mat_rock_wall")
+
+[node name="WallWest" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.5, 4, 0)
+use_collision = true
+size = Vector3(1, 8, 40)
+material = SubResource("mat_rock_wall")
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="SupportBeam1" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -15)
+
+[node name="PostL" type="CSGBox3D" parent="Props/SupportBeam1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 4, 0)
+use_collision = true
+size = Vector3(0.6, 8, 0.6)
+material = SubResource("mat_wood")
+
+[node name="PostR" type="CSGBox3D" parent="Props/SupportBeam1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 4, 0)
+use_collision = true
+size = Vector3(0.6, 8, 0.6)
+material = SubResource("mat_wood")
+
+[node name="Crossbeam" type="CSGBox3D" parent="Props/SupportBeam1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.5, 0)
+use_collision = true
+size = Vector3(12, 0.5, 0.5)
+material = SubResource("mat_wood")
+
+[node name="SupportBeam2" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
+
+[node name="PostL" type="CSGBox3D" parent="Props/SupportBeam2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 4, 0)
+use_collision = true
+size = Vector3(0.6, 8, 0.6)
+material = SubResource("mat_wood")
+
+[node name="PostR" type="CSGBox3D" parent="Props/SupportBeam2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 4, 0)
+use_collision = true
+size = Vector3(0.6, 8, 0.6)
+material = SubResource("mat_wood")
+
+[node name="Crossbeam" type="CSGBox3D" parent="Props/SupportBeam2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.5, 0)
+use_collision = true
+size = Vector3(12, 0.5, 0.5)
+material = SubResource("mat_wood")
+
+[node name="SupportBeam3" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5)
+
+[node name="PostL" type="CSGBox3D" parent="Props/SupportBeam3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 4, 0)
+use_collision = true
+size = Vector3(0.6, 8, 0.6)
+material = SubResource("mat_wood")
+
+[node name="PostR" type="CSGBox3D" parent="Props/SupportBeam3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 4, 0)
+use_collision = true
+size = Vector3(0.6, 8, 0.6)
+material = SubResource("mat_wood")
+
+[node name="Crossbeam" type="CSGBox3D" parent="Props/SupportBeam3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.5, 0)
+use_collision = true
+size = Vector3(12, 0.5, 0.5)
+material = SubResource("mat_wood")
+
+[node name="SupportBeam4" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 15)
+
+[node name="PostL" type="CSGBox3D" parent="Props/SupportBeam4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 4, 0)
+use_collision = true
+size = Vector3(0.6, 8, 0.6)
+material = SubResource("mat_wood")
+
+[node name="PostR" type="CSGBox3D" parent="Props/SupportBeam4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 4, 0)
+use_collision = true
+size = Vector3(0.6, 8, 0.6)
+material = SubResource("mat_wood")
+
+[node name="Crossbeam" type="CSGBox3D" parent="Props/SupportBeam4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.5, 0)
+use_collision = true
+size = Vector3(12, 0.5, 0.5)
+material = SubResource("mat_wood")
+
+[node name="MineCart" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
+
+[node name="CartBody" type="CSGBox3D" parent="Props/MineCart"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+use_collision = true
+size = Vector3(2, 1, 2.5)
+material = SubResource("mat_wood")
+
+[node name="CartInterior" type="CSGBox3D" parent="Props/MineCart"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+operation = 2
+size = Vector3(1.6, 0.8, 2.1)
+material = SubResource("mat_wood")
+
+[node name="Ore1" type="CSGBox3D" parent="Props/MineCart"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 0.9, -0.3)
+size = Vector3(0.4, 0.35, 0.4)
+material = SubResource("mat_ore")
+
+[node name="Ore2" type="CSGBox3D" parent="Props/MineCart"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 0.9, 0.2)
+size = Vector3(0.35, 0.3, 0.35)
+material = SubResource("mat_ore")
+
+[node name="Rail1" type="CSGBox3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 0.05, 0)
+size = Vector3(0.15, 0.1, 35)
+material = SubResource("mat_rail")
+
+[node name="Rail2" type="CSGBox3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.05, 0)
+size = Vector3(0.15, 0.1, 35)
+material = SubResource("mat_rail")
+
+[node name="OreVeinE" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.8, 2, -10)
+
+[node name="Ore1" type="CSGBox3D" parent="Props/OreVeinE"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+size = Vector3(0.5, 0.8, 1.2)
+material = SubResource("mat_ore")
+
+[node name="Ore2" type="CSGBox3D" parent="Props/OreVeinE"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0.8)
+size = Vector3(0.4, 0.5, 0.6)
+material = SubResource("mat_ore")
+
+[node name="GoldVeinW" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8, 1.5, 5)
+
+[node name="Ore1" type="CSGBox3D" parent="Props/GoldVeinW"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+size = Vector3(0.4, 0.6, 0.8)
+material = SubResource("mat_gold_ore")
+
+[node name="Ore2" type="CSGBox3D" parent="Props/GoldVeinW"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0.5)
+size = Vector3(0.3, 0.4, 0.5)
+material = SubResource("mat_gold_ore")
+
+[node name="Pickaxe" type="Node3D" parent="Props"]
+transform = Transform3D(0.707, 0, 0.707, 0, 1, 0, -0.707, 0, 0.707, 5, 0, -8)
+
+[node name="Handle" type="CSGBox3D" parent="Props/Pickaxe"]
+transform = Transform3D(1, 0, 0, 0, 0.707, 0.707, 0, -0.707, 0.707, 0, 0.5, 0)
+size = Vector3(0.1, 1.2, 0.1)
+material = SubResource("mat_wood")
+
+[node name="Head" type="CSGBox3D" parent="Props/Pickaxe"]
+transform = Transform3D(1, 0, 0, 0, 0.707, 0.707, 0, -0.707, 0.707, 0, 1.1, 0)
+size = Vector3(0.6, 0.15, 0.1)
+material = SubResource("mat_rail")
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="WallTorch1" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 3.5, -12)
+
+[node name="Bracket" type="CSGBox3D" parent="Lighting/WallTorch1"]
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_brazier")
+
+[node name="Flame" type="CSGSphere3D" parent="Lighting/WallTorch1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.2, 0)
+radius = 0.2
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/WallTorch1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.2, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10.0
+
+[node name="WallTorch2" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 3.5, 0)
+
+[node name="Bracket" type="CSGBox3D" parent="Lighting/WallTorch2"]
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_brazier")
+
+[node name="Flame" type="CSGSphere3D" parent="Lighting/WallTorch2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.2, 0)
+radius = 0.2
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/WallTorch2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.2, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10.0
+
+[node name="WallTorch3" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 3.5, 12)
+
+[node name="Bracket" type="CSGBox3D" parent="Lighting/WallTorch3"]
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_brazier")
+
+[node name="Flame" type="CSGSphere3D" parent="Lighting/WallTorch3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.2, 0)
+radius = 0.2
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/WallTorch3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.2, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10.0
+
+[node name="Spawns" type="Node3D" parent="."]
+
+[node name="NPCSpawns" type="Node3D" parent="Spawns"]
+
+[node name="EnemySpawns" type="Node3D" parent="Spawns"]
+
+[node name="GoblinSpawn1" type="Marker3D" parent="Spawns/EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -15)
+metadata/enemy_data = "res://data/enemies/goblin_miner.tres"
+metadata/sprite_path = "res://assets/sprites/enemies/goblin_miner.png"
+metadata/h_frames = 4
+metadata/v_frames = 4
+
+[node name="GoblinSpawn2" type="Marker3D" parent="Spawns/EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 0)
+metadata/enemy_data = "res://data/enemies/goblin_miner.tres"
+metadata/sprite_path = "res://assets/sprites/enemies/goblin_miner.png"
+metadata/h_frames = 4
+metadata/v_frames = 4
+
+[node name="ChestSpawns" type="Node3D" parent="Spawns"]
+
+[node name="MineChest" type="Marker3D" parent="Spawns/ChestSpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -17)
+metadata/chest_id = "kd_mine_chest_1"
+metadata/chest_name = "Miner's Chest"
+metadata/loot_tier = "common"
+metadata/is_locked = false
+metadata/lock_difficulty = 0
+
+[node name="Connections" type="Node3D" parent="."]
+
+[node name="DoorPositions" type="Node3D" parent="Connections"]
+
+[node name="DoorSouth" type="Marker3D" parent="Connections/DoorPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 19.5)
+metadata/door_id = "door_south"
+metadata/door_label = "To Forge"
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]

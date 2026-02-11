@@ -1,0 +1,375 @@
+[gd_resource type="Resource" script_class="DialogueData" load_steps=45 format=3 uid="uid://merchant_haggle"]
+
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_node.gd" id="2_node"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_choice.gd" id="3_choice"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_condition.gd" id="4_cond"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_action.gd" id="5_action"]
+
+# ============================================================================
+# CONDITIONS
+# ============================================================================
+
+# Condition: Already befriended (permanent discount)
+# Uses {merchant_id} placeholder - substituted by DialogueManager with actual merchant ID
+[sub_resource type="Resource" id="cond_befriended"]
+script = ExtResource("4_cond")
+type = 5
+param_string = "{merchant_id}:befriend"
+param_int = 0
+param_float = 0.0
+invert = false
+
+# Condition: Not befriended
+[sub_resource type="Resource" id="cond_not_befriended"]
+script = ExtResource("4_cond")
+type = 5
+param_string = "{merchant_id}:befriend"
+param_int = 0
+param_float = 0.0
+invert = true
+
+# Condition: Merchant angered
+[sub_resource type="Resource" id="cond_angered"]
+script = ExtResource("4_cond")
+type = 5
+param_string = "{merchant_id}:angered"
+param_int = 0
+param_float = 0.0
+invert = false
+
+# Condition: Merchant not angered
+[sub_resource type="Resource" id="cond_not_angered"]
+script = ExtResource("4_cond")
+type = 5
+param_string = "{merchant_id}:angered"
+param_int = 0
+param_float = 0.0
+invert = true
+
+# ============================================================================
+# ACTIONS
+# ============================================================================
+
+# Action: Open shop normally
+[sub_resource type="Resource" id="action_open_shop"]
+script = ExtResource("5_action")
+type = 15
+param_string = "merchant_shop"
+param_int = 0
+param_float = 0.0
+success_node_id = ""
+failure_node_id = ""
+
+# Action: Set haggle success flag (per-merchant via {merchant_id} placeholder)
+[sub_resource type="Resource" id="action_set_haggle_success"]
+script = ExtResource("5_action")
+type = 8
+param_string = "{merchant_id}:haggle_success"
+param_int = 0
+param_float = 0.0
+success_node_id = ""
+failure_node_id = ""
+
+# Action: Set intimidate success flag (per-merchant via {merchant_id} placeholder)
+[sub_resource type="Resource" id="action_set_intimidate_success"]
+script = ExtResource("5_action")
+type = 8
+param_string = "{merchant_id}:intimidate_success"
+param_int = 0
+param_float = 0.0
+success_node_id = ""
+failure_node_id = ""
+
+# Action: Set befriend flag (permanent discount, per-merchant)
+[sub_resource type="Resource" id="action_set_befriend"]
+script = ExtResource("5_action")
+type = 8
+param_string = "{merchant_id}:befriend"
+param_int = 0
+param_float = 0.0
+success_node_id = ""
+failure_node_id = ""
+
+# Action: Set angered flag (per-merchant)
+[sub_resource type="Resource" id="action_set_angered"]
+script = ExtResource("5_action")
+type = 8
+param_string = "{merchant_id}:angered"
+param_int = 0
+param_float = 0.0
+success_node_id = ""
+failure_node_id = ""
+
+# Skill Check: Negotiation DC 12
+[sub_resource type="Resource" id="action_skill_negotiation"]
+script = ExtResource("5_action")
+type = 10
+param_string = ""
+param_int = 14
+param_float = 12.0
+success_node_id = "negotiate_success"
+failure_node_id = "negotiate_fail"
+
+# Skill Check: Intimidation DC 15
+[sub_resource type="Resource" id="action_skill_intimidation"]
+script = ExtResource("5_action")
+type = 10
+param_string = ""
+param_int = 1
+param_float = 15.0
+success_node_id = "intimidate_success"
+failure_node_id = "intimidate_fail"
+
+# Skill Check: Persuasion DC 10
+[sub_resource type="Resource" id="action_skill_persuasion"]
+script = ExtResource("5_action")
+type = 10
+param_string = ""
+param_int = 12
+param_float = 10.0
+success_node_id = "persuade_success"
+failure_node_id = "persuade_fail"
+
+# ============================================================================
+# CHOICES
+# ============================================================================
+
+[sub_resource type="Resource" id="choice_goodbye"]
+script = ExtResource("3_choice")
+text = "I'll think about it. Farewell."
+next_node_id = "end"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_see_wares"]
+script = ExtResource("3_choice")
+text = "Let's see your wares."
+next_node_id = "shop_open"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = [SubResource("action_open_shop")]
+
+[sub_resource type="Resource" id="choice_negotiate"]
+script = ExtResource("3_choice")
+text = "[Negotiation] Can you offer a better deal?"
+next_node_id = ""
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = [SubResource("action_skill_negotiation")]
+
+[sub_resource type="Resource" id="choice_intimidate"]
+script = ExtResource("3_choice")
+text = "[Intimidation] You'll give me a discount or else..."
+next_node_id = ""
+conditions = [SubResource("cond_not_angered")]
+show_when_unavailable = true
+unavailable_reason = "The merchant is too wary of you now"
+actions = [SubResource("action_skill_intimidation")]
+
+[sub_resource type="Resource" id="choice_persuade"]
+script = ExtResource("3_choice")
+text = "[Persuasion] I'm a regular customer, any discounts?"
+next_node_id = ""
+conditions = [SubResource("cond_not_befriended")]
+show_when_unavailable = true
+unavailable_reason = "You already have a customer discount"
+actions = [SubResource("action_skill_persuasion")]
+
+[sub_resource type="Resource" id="choice_back_start"]
+script = ExtResource("3_choice")
+text = "Actually, let me reconsider..."
+next_node_id = "start"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_shop_after_negotiate"]
+script = ExtResource("3_choice")
+text = "Alright, show me what you've got."
+next_node_id = "shop_open"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = [SubResource("action_set_haggle_success"), SubResource("action_open_shop")]
+
+[sub_resource type="Resource" id="choice_shop_after_intimidate"]
+script = ExtResource("3_choice")
+text = "Smart choice. Now let's trade."
+next_node_id = "shop_open"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = [SubResource("action_set_intimidate_success"), SubResource("action_open_shop")]
+
+[sub_resource type="Resource" id="choice_shop_after_befriend"]
+script = ExtResource("3_choice")
+text = "You're very kind. Let me browse."
+next_node_id = "shop_open"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = [SubResource("action_set_befriend"), SubResource("action_open_shop")]
+
+[sub_resource type="Resource" id="choice_shop_normal_after_fail"]
+script = ExtResource("3_choice")
+text = "Fine, I'll pay full price."
+next_node_id = "shop_open"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = [SubResource("action_open_shop")]
+
+[sub_resource type="Resource" id="choice_leave_angry"]
+script = ExtResource("3_choice")
+text = "Then I'll take my business elsewhere."
+next_node_id = "end_angry"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_shop_after_angry"]
+script = ExtResource("3_choice")
+text = "...Fine. Show me your wares."
+next_node_id = "shop_angry"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = [SubResource("action_set_angered"), SubResource("action_open_shop")]
+
+# ============================================================================
+# NODES
+# ============================================================================
+
+[sub_resource type="Resource" id="node_start"]
+script = ExtResource("2_node")
+id = "start"
+speaker_name = "Merchant"
+text = "*adjusts their wares on the counter* Welcome, traveler! Fine goods at fair prices - or so I like to say. What brings you to my humble shop?"
+choices = [SubResource("choice_see_wares"), SubResource("choice_negotiate"), SubResource("choice_intimidate"), SubResource("choice_persuade"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "merchant_friendly"
+
+[sub_resource type="Resource" id="node_shop_open"]
+script = ExtResource("2_node")
+id = "shop_open"
+speaker_name = "Merchant"
+text = "Take your time browsing. Let me know if anything catches your eye!"
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "merchant_friendly"
+
+# Negotiation branch
+[sub_resource type="Resource" id="node_negotiate_success"]
+script = ExtResource("2_node")
+id = "negotiate_success"
+speaker_name = "Merchant"
+text = "*strokes chin thoughtfully* Hmm, you drive a hard bargain... but I respect that. Tell you what - I'll knock a bit off the prices. Just don't tell anyone, or everyone will want the same deal!"
+choices = [SubResource("choice_shop_after_negotiate"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "merchant_impressed"
+
+[sub_resource type="Resource" id="node_negotiate_fail"]
+script = ExtResource("2_node")
+id = "negotiate_fail"
+speaker_name = "Merchant"
+text = "*shakes head firmly* My prices are already fair, friend. I've got to make a living too, you know. Perhaps you'd like to browse at the regular prices?"
+choices = [SubResource("choice_shop_normal_after_fail"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "merchant_firm"
+
+# Intimidation branch
+[sub_resource type="Resource" id="node_intimidate_success"]
+script = ExtResource("2_node")
+id = "intimidate_success"
+speaker_name = "Merchant"
+text = "*takes a nervous step back, eyes wide* N-now let's not be hasty! I'm sure we can work something out. I'll... I'll give you a discount, just please, no trouble..."
+choices = [SubResource("choice_shop_after_intimidate"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "merchant_scared"
+
+[sub_resource type="Resource" id="node_intimidate_fail"]
+script = ExtResource("2_node")
+id = "intimidate_fail"
+speaker_name = "Merchant"
+text = "*crosses arms and glares* Is that supposed to scare me? I've dealt with tougher than you. Now either buy something at MY prices, or get out of my shop. And don't think I won't remember this..."
+choices = [SubResource("choice_shop_after_angry"), SubResource("choice_leave_angry")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "merchant_hostile"
+
+# Persuasion branch
+[sub_resource type="Resource" id="node_persuade_success"]
+script = ExtResource("2_node")
+id = "persuade_success"
+speaker_name = "Merchant"
+text = "*breaks into a warm smile* You know what? You're right! Good customers like yourself deserve a little something extra. I'll give you a permanent five percent discount. Consider it a loyalty bonus!"
+choices = [SubResource("choice_shop_after_befriend"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "merchant_warm"
+
+[sub_resource type="Resource" id="node_persuade_fail"]
+script = ExtResource("2_node")
+id = "persuade_fail"
+speaker_name = "Merchant"
+text = "*gives a polite but firm smile* I appreciate the sentiment, friend, but I can't just hand out discounts to everyone who asks. My prices are fair as they are. But I'll certainly remember you if you keep coming back!"
+choices = [SubResource("choice_shop_normal_after_fail"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "merchant_polite"
+
+# Angry shop
+[sub_resource type="Resource" id="node_shop_angry"]
+script = ExtResource("2_node")
+id = "shop_angry"
+speaker_name = "Merchant"
+text = "*glares suspiciously* Fine. Browse if you must. But I'll be watching you closely, and don't expect any favors from me."
+choices = [SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "merchant_suspicious"
+
+# End nodes
+[sub_resource type="Resource" id="node_end"]
+script = ExtResource("2_node")
+id = "end"
+speaker_name = "Merchant"
+text = "Safe travels, friend! Come back anytime you need quality goods."
+choices = []
+is_end_node = true
+auto_continue_to = ""
+portrait_id = "merchant_farewell"
+
+[sub_resource type="Resource" id="node_end_angry"]
+script = ExtResource("2_node")
+id = "end_angry"
+speaker_name = "Merchant"
+text = "*mutters under breath* Good riddance... threatening honest merchants... the nerve..."
+choices = []
+is_end_node = true
+auto_continue_to = ""
+portrait_id = "merchant_angry"
+
+# ============================================================================
+# RESOURCE
+# ============================================================================
+
+[resource]
+script = ExtResource("1_data")
+id = "merchant_haggle"
+display_name = "Merchant Haggle Dialogue"
+description = "Generic merchant dialogue with haggling options. Supports negotiation, intimidation, and persuasion skill checks to obtain discounts. Sets per-merchant flags using {merchant_id} placeholder pattern (e.g., '{merchant_id}:befriend' becomes 'blacksmith_01:befriend'). Requires DialogueManager context variables support."
+start_node_id = "start"
+nodes = [SubResource("node_start"), SubResource("node_shop_open"), SubResource("node_negotiate_success"), SubResource("node_negotiate_fail"), SubResource("node_intimidate_success"), SubResource("node_intimidate_fail"), SubResource("node_persuade_success"), SubResource("node_persuade_fail"), SubResource("node_shop_angry"), SubResource("node_end"), SubResource("node_end_angry")]

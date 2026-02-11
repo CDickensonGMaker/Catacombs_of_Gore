@@ -1,0 +1,27 @@
+{
+	"id": "gather_intel",
+	"title": "Gather Intel",
+	"description": "The knight needs proof of goblin military organization. Obtain a Goblin War Horn - a rare item carried by goblin leaders - to confirm they are coordinating attacks.",
+	"quest_source": "story",
+	"giver_npc_id": "wandering_knight",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "elder_moor",
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "wandering_knight",
+	"turn_in_zone": "elder_moor",
+	"objectives": [
+		{
+			"id": "collect_war_horn",
+			"description": "Collect a Goblin War Horn",
+			"type": "collect",
+			"target": "goblin_war_horn",
+			"required_count": 1,
+			"is_optional": false
+		}
+	],
+	"rewards": {
+		"gold": 100,
+		"xp": 200
+	},
+	"prerequisites": ["thin_the_herd"]
+}

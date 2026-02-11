@@ -1,0 +1,40 @@
+[gd_scene load_steps=6 format=3 uid="uid://goblin_cave_scene"]
+
+[ext_resource type="PackedScene" uid="uid://player_scene" path="res://scenes/player/player.tscn" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="2"]
+[ext_resource type="Script" path="res://scripts/levels/goblin_cave.gd" id="3"]
+
+[sub_resource type="ProceduralSkyMaterial" id="1"]
+sky_top_color = Color(0.05, 0.05, 0.08, 1)
+sky_horizon_color = Color(0.1, 0.08, 0.1, 1)
+ground_bottom_color = Color(0.02, 0.02, 0.03, 1)
+ground_horizon_color = Color(0.05, 0.04, 0.05, 1)
+
+[sub_resource type="Sky" id="2"]
+sky_material = SubResource("1")
+
+[sub_resource type="Environment" id="3"]
+background_mode = 2
+sky = SubResource("2")
+ambient_light_source = 2
+ambient_light_color = Color(0.15, 0.12, 0.1, 1)
+ambient_light_energy = 0.3
+fog_enabled = true
+fog_light_color = Color(0.1, 0.08, 0.06, 1)
+fog_density = 0.04
+
+[node name="GoblinCave" type="Node3D"]
+script = ExtResource("3")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("3")
+
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="DefaultSpawn" type="Node3D" parent="SpawnPoints" groups=["default_spawn", "spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 25)
+
+[node name="Player" parent="." instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 25)
+
+[node name="HUD" parent="." instance=ExtResource("2")]

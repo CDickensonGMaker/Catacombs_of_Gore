@@ -1,0 +1,236 @@
+[gd_resource type="Resource" script_class="DialogueData" load_steps=32 format=3 uid="uid://thieves_guild_rep"]
+
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_node.gd" id="2_node"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_choice.gd" id="3_choice"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_condition.gd" id="4_cond"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_action.gd" id="5_action"]
+
+# ============================================================================
+# CHOICES
+# ============================================================================
+
+[sub_resource type="Resource" id="choice_goodbye"]
+script = ExtResource("3_choice")
+text = "I must go. Stay in the shadows."
+next_node_id = "end"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_back_start"]
+script = ExtResource("3_choice")
+text = "I had another question..."
+next_node_id = "start"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_about_guild"]
+script = ExtResource("3_choice")
+text = "Tell me about... your organization."
+next_node_id = "about_guild"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_training"]
+script = ExtResource("3_choice")
+text = "I want to learn stealth and subtlety."
+next_node_id = "training_offer"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_quests"]
+script = ExtResource("3_choice")
+text = "Any... special work available?"
+next_node_id = "heist_work"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_join_guild"]
+script = ExtResource("3_choice")
+text = "How does one join?"
+next_node_id = "join_info"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_accept_training"]
+script = ExtResource("3_choice")
+text = "Yes, teach me the art of the shadow."
+next_node_id = "training_begin"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_decline_training"]
+script = ExtResource("3_choice")
+text = "Perhaps another time."
+next_node_id = "training_declined"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_stealth_focus"]
+script = ExtResource("3_choice")
+text = "Tell me about moving unseen."
+next_node_id = "stealth_training"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_lockpicking_focus"]
+script = ExtResource("3_choice")
+text = "What about locks and traps?"
+next_node_id = "lockpicking_training"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_philosophy"]
+script = ExtResource("3_choice")
+text = "What is your code?"
+next_node_id = "thief_philosophy"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+# ============================================================================
+# NODES
+# ============================================================================
+
+[sub_resource type="Resource" id="node_start"]
+script = ExtResource("2_node")
+id = "start"
+speaker_name = "Silktongue"
+text = "*a figure in nondescript clothes lounges in a shadowy corner, watching you with sharp eyes* Well, well. You found me. That alone suggests you have some talent, or at least good instincts. I represent certain... interests. Interests that value discretion, skill, and the redistribution of wealth. What do you seek?"
+choices = [SubResource("choice_about_guild"), SubResource("choice_training"), SubResource("choice_quests"), SubResource("choice_join_guild"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "thief_neutral"
+
+[sub_resource type="Resource" id="node_about_guild"]
+script = ExtResource("2_node")
+id = "about_guild"
+speaker_name = "Silktongue"
+text = "*she smiles thinly* Guild? There is no guild. Officially. What exists is a network of individuals who share certain skills and values. We take from those who have too much and keep our blades clean. Murder is bad for business - attracts guards, makes the whole region watchful. We prefer to be forgotten the moment we leave."
+choices = [SubResource("choice_philosophy"), SubResource("choice_join_guild"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "thief_amused"
+
+[sub_resource type="Resource" id="node_training_offer"]
+script = ExtResource("2_node")
+id = "training_offer"
+speaker_name = "Silktongue"
+text = "*she leans forward, interested* Ah, the shadow arts. Moving unseen, opening locked doors, finding secrets others hide. I can teach you these things - for a price, naturally. Everything has a price. But the skills you learn could pay for themselves a hundred times over. Interested?"
+choices = [SubResource("choice_accept_training"), SubResource("choice_stealth_focus"), SubResource("choice_lockpicking_focus"), SubResource("choice_decline_training")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "thief_teaching"
+
+[sub_resource type="Resource" id="node_training_begin"]
+script = ExtResource("2_node")
+id = "training_begin"
+speaker_name = "Silktongue"
+text = "*she produces a set of lockpicks seemingly from nowhere* Good. First lesson is free: the best theft is one where no one knows anything was taken. Rushed jobs attract attention. Patient jobs build wealth. Return with coin and I'll teach you more. For now, practice being unremarkable. Blend with crowds. Be the one no one remembers seeing."
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "thief_ready"
+
+[sub_resource type="Resource" id="node_training_declined"]
+script = ExtResource("2_node")
+id = "training_declined"
+speaker_name = "Silktongue"
+text = "*she shrugs and returns to the shadows* The choice is yours. These skills can save your life even if you never steal a copper. Knowing how locks work helps you protect your own belongings. But I won't press. When you're ready, you know where to find me."
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "thief_neutral"
+
+[sub_resource type="Resource" id="node_stealth_training"]
+script = ExtResource("2_node")
+id = "stealth_training"
+speaker_name = "Silktongue"
+text = "Stealth is more than hiding. It's knowing where guards look and when they don't. It's wearing soft-soled boots and dark colors. It's timing your movements to match environmental noise - a creaking floorboard covered by distant thunder. Light and shadow, sound and silence. Master these and you become a ghost."
+choices = [SubResource("choice_lockpicking_focus"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "thief_teaching"
+
+[sub_resource type="Resource" id="node_lockpicking_training"]
+script = ExtResource("2_node")
+id = "lockpicking_training"
+speaker_name = "Silktongue"
+text = "*she produces a small set of tools* Locks and traps are simply puzzles with consequences for failure. Every lock has a pattern, every trap a trigger. Learn to feel the tumblers, to sense the pressure plates. Patience is key - a broken lockpick inside a lock is worse than no lockpick at all. And always check for secondary traps. The clever ones set traps to catch you when you think you've succeeded."
+choices = [SubResource("choice_stealth_focus"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "thief_thoughtful"
+
+[sub_resource type="Resource" id="node_heist_work"]
+script = ExtResource("2_node")
+id = "heist_work"
+speaker_name = "Silktongue"
+text = "*her eyes glint with interest* Special work, you say? We always have... opportunities. Wealthy merchants who won't miss a few gems. Nobles with more gold than sense. Documents that certain parties would pay handsomely to see. Nothing violent - violence is messy and attracts attention. Clean, quiet, profitable. If you're interested, prove yourself with smaller jobs first."
+choices = [SubResource("choice_training"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "thief_serious"
+
+[sub_resource type="Resource" id="node_join_info"]
+script = ExtResource("2_node")
+id = "join_info"
+speaker_name = "Silktongue"
+text = "Join? *she laughs softly* You don't join. You become useful, and then you're in. Complete jobs without getting caught, share a percentage with the network, and don't ever rat on a fellow shadow-walker. Betray one of us and... well. Let's just say the network has a long memory and very sharp knives. But play straight and you'll find friends in every city."
+choices = [SubResource("choice_about_guild"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "thief_stern"
+
+[sub_resource type="Resource" id="node_thief_philosophy"]
+script = ExtResource("2_node")
+id = "thief_philosophy"
+speaker_name = "Silktongue"
+text = "*her voice drops to a whisper* We have three rules. First: never steal from the poor - they have little and need it. Second: never kill - corpses attract investigators. Third: never betray the network. Beyond that? The wealthy hoard while the hungry starve. We simply... correct the imbalance. Consider it a service to society."
+choices = [SubResource("choice_about_guild"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "thief_wise"
+
+[sub_resource type="Resource" id="node_end"]
+script = ExtResource("2_node")
+id = "end"
+speaker_name = "Silktongue"
+text = "*she fades back into the shadows, her voice seeming to come from everywhere and nowhere* Walk soft, friend. The shadows are always watching... and so am I."
+choices = []
+is_end_node = true
+auto_continue_to = ""
+portrait_id = "thief_farewell"
+
+# ============================================================================
+# RESOURCE
+# ============================================================================
+
+[resource]
+script = ExtResource("1_data")
+id = "thieves_guild_rep"
+display_name = "Thieves Guild Representative"
+description = "Dialogue for Silktongue, representative of the Thieves Guild. Offers stealth training and heist quests."
+start_node_id = "start"
+nodes = [SubResource("node_start"), SubResource("node_about_guild"), SubResource("node_training_offer"), SubResource("node_training_begin"), SubResource("node_training_declined"), SubResource("node_stealth_training"), SubResource("node_lockpicking_training"), SubResource("node_heist_work"), SubResource("node_join_info"), SubResource("node_thief_philosophy"), SubResource("node_end")]

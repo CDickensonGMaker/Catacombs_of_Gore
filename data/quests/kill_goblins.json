@@ -1,0 +1,27 @@
+{
+	"id": "test_kill_goblins",
+	"title": "Goblin Slayer",
+	"description": "Slay 3 goblins terrorizing the area",
+	"quest_source": "npc_bounty",
+	"giver_npc_type": "guard",
+	"giver_region": "elder_moor",
+	"turn_in_type": "npc_type_in_region",
+	"turn_in_target": "guard",
+	"turn_in_region": "elder_moor",
+	"turn_in_zone": "elder_moor",
+	"objectives": [
+		{
+			"id": "kill_goblins",
+			"description": "Kill goblins",
+			"type": "kill",
+			"target": "goblin",
+			"required_count": 3,
+			"is_optional": false
+		}
+	],
+	"rewards": {
+		"gold": 150,
+		"xp": 300
+	},
+	"prerequisites": []
+}

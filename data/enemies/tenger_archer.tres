@@ -1,0 +1,120 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/data/enemy_attack_data.gd" id="2"]
+
+[sub_resource type="Resource" id="1"]
+script = ExtResource("2")
+id = "tenger_composite_bow"
+display_name = "Composite Bow Shot"
+damage = Array[int]([3, 8, 3])
+damage_type = 0
+windup_time = 0.35
+active_time = 0.1
+recovery_time = 0.25
+cooldown = 1.3
+range_distance = 35.0
+is_ranged = true
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 22.0
+inflicts_condition = 0
+condition_chance = 0.0
+condition_duration = 0.0
+stagger_power = 0.4
+knockback_force = 1.5
+weight = 1.0
+min_range = 5.0
+max_range = 35.0
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[sub_resource type="Resource" id="2"]
+script = ExtResource("2")
+id = "tenger_poison_arrow"
+display_name = "Poisoned Arrow"
+damage = Array[int]([2, 6, 2])
+damage_type = 4
+windup_time = 0.5
+active_time = 0.1
+recovery_time = 0.3
+cooldown = 8.0
+range_distance = 30.0
+is_ranged = true
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 20.0
+inflicts_condition = 2
+condition_chance = 0.7
+condition_duration = 10.0
+stagger_power = 0.3
+knockback_force = 1.0
+weight = 0.25
+min_range = 5.0
+max_range = 30.0
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[resource]
+script = ExtResource("1")
+id = "tenger_archer"
+display_name = "Tenger Horse Archer"
+description = "A deadly Tenger scout mounted on a swift steppe horse. Masters of the composite bow, they can loose arrows with terrifying accuracy while riding at full gallop."
+max_hp = 45
+armor_value = 9
+movement_speed = 6.5
+turn_speed = 6.0
+grit = 4
+agility = 9
+will = 4
+knowledge = 3
+bravery = 6
+behavior = 2
+faction = 8
+aggro_range = 40.0
+attack_range = 35.0
+preferred_distance = 22.0
+flee_hp_threshold = 0.2
+is_boss = false
+attacks = Array[ExtResource("2")]([SubResource("1"), SubResource("2")])
+can_block = false
+block_chance = 0.0
+stagger_resistance = 0.1
+fire_resistance = 0.1
+frost_resistance = -0.1
+lightning_resistance = 0.0
+poison_resistance = 0.3
+necrotic_resistance = 0.0
+physical_resistance = 0.05
+fire_weakness = 0.0
+frost_weakness = 0.1
+lightning_weakness = 0.0
+holy_weakness = 0.0
+causes_horror = false
+horror_difficulty = 10
+loot_table_av = 4
+gold_drop = Array[int]([30, 85])
+guaranteed_drops = Array[String]([])
+drop_table = {
+"arrows": 0.4,
+"health_potion": 0.15,
+"leather": 0.2,
+"antidote": 0.15
+}
+xp_reward = 100
+scene_path = ""
+icon_path = ""
+scale = 1.2
+sprite_path = ""
+attack_sprite_path = ""
+sprite_hframes = 4
+sprite_vframes = 2
+attack_hframes = 4
+attack_vframes = 2
+sprite_pixel_size = 0.035
+idle_sounds = Array[String]([])
+attack_sounds = Array[String]([])
+hurt_sounds = Array[String]([])
+death_sounds = Array[String]([])

@@ -1,0 +1,119 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/data/enemy_attack_data.gd" id="2"]
+
+[sub_resource type="Resource" id="1"]
+script = ExtResource("2")
+id = "stone_gaze"
+display_name = "Stone Gaze"
+damage = Array[int]([0, 0, 0])
+damage_type = 0
+windup_time = 1.5
+active_time = 0.5
+recovery_time = 1.0
+cooldown = 8.0
+range_distance = 12.0
+is_ranged = true
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 100.0
+inflicts_condition = 9
+condition_chance = 0.4
+condition_duration = 5.0
+stagger_power = 0.0
+knockback_force = 0.0
+weight = 0.6
+min_range = 0.0
+max_range = 12.0
+requires_los = true
+animation_name = "gaze"
+sound_effect = ""
+
+[sub_resource type="Resource" id="2"]
+script = ExtResource("2")
+id = "basilisk_bite"
+display_name = "Venomous Bite"
+damage = Array[int]([3, 10, 5])
+damage_type = 4
+windup_time = 0.5
+active_time = 0.3
+recovery_time = 0.4
+cooldown = 2.0
+range_distance = 3.0
+is_ranged = false
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 0.0
+inflicts_condition = 3
+condition_chance = 0.7
+condition_duration = 15.0
+stagger_power = 1.0
+knockback_force = 2.0
+weight = 1.0
+min_range = 0.0
+max_range = 3.0
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[resource]
+script = ExtResource("1")
+id = "basilisk"
+display_name = "Basilisk"
+description = "An ancient serpentine beast whose gaze can turn flesh to stone. Its venom is legendarily potent."
+max_hp = 120
+armor_value = 18
+movement_speed = 3.0
+turn_speed = 4.0
+grit = 10
+agility = 5
+will = 8
+knowledge = 3
+behavior = 1
+faction = 2
+aggro_range = 15.0
+attack_range = 3.0
+preferred_distance = 8.0
+flee_hp_threshold = 0.0
+is_boss = true
+attacks = Array[ExtResource("2")]([SubResource("1"), SubResource("2")])
+can_block = false
+block_chance = 0.0
+stagger_resistance = 0.6
+fire_resistance = 0.0
+frost_resistance = 0.3
+lightning_resistance = 0.0
+poison_resistance = 1.0
+necrotic_resistance = 0.3
+physical_resistance = 0.25
+fire_weakness = 0.0
+frost_weakness = 0.0
+lightning_weakness = 0.0
+holy_weakness = 0.0
+causes_horror = true
+horror_difficulty = 18
+loot_table_av = 9
+gold_drop = Array[int]([200, 400])
+guaranteed_drops = Array[String](["basilisk_eye"])
+drop_table = {
+"basilisk_scale": 0.6,
+"basilisk_venom": 0.5,
+"petrified_heart": 0.3,
+"legendary_gem": 0.1
+}
+xp_reward = 500
+scene_path = ""
+icon_path = "res://Sprite folders grab bag/baslisk.png"
+scale = 1.8
+sprite_path = "res://Sprite folders grab bag/baslisk.png"
+attack_sprite_path = ""
+sprite_hframes = 4
+sprite_vframes = 1
+attack_hframes = 1
+attack_vframes = 1
+sprite_pixel_size = 0.015
+idle_sounds = Array[String]([])
+attack_sounds = Array[String]([])
+hurt_sounds = Array[String]([])
+death_sounds = Array[String]([])

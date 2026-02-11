@@ -1,0 +1,117 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/data/enemy_attack_data.gd" id="2"]
+
+[sub_resource type="Resource" id="1"]
+script = ExtResource("2")
+id = "skeleton_mace_swing"
+display_name = "Mace Swing"
+damage = Array[int]([2, 6, 3])
+damage_type = 0
+windup_time = 0.4
+active_time = 0.25
+recovery_time = 0.35
+cooldown = 1.2
+range_distance = 2.5
+is_ranged = false
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 0.0
+inflicts_condition = 0
+condition_chance = 0.0
+condition_duration = 0.0
+stagger_power = 1.0
+knockback_force = 2.5
+weight = 1.0
+min_range = 0.0
+max_range = 2.5
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[sub_resource type="Resource" id="2"]
+script = ExtResource("2")
+id = "skeleton_shield_bash"
+display_name = "Shield Bash"
+damage = Array[int]([1, 4, 2])
+damage_type = 0
+windup_time = 0.25
+active_time = 0.2
+recovery_time = 0.4
+cooldown = 3.0
+range_distance = 2.0
+is_ranged = false
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 0.0
+inflicts_condition = 1
+condition_chance = 0.4
+condition_duration = 2.0
+stagger_power = 2.0
+knockback_force = 4.0
+weight = 0.6
+min_range = 0.0
+max_range = 2.0
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[resource]
+script = ExtResource("1")
+id = "skeleton_warrior"
+display_name = "Skeleton Warrior"
+description = "An undead warrior clad in ancient armor, still gripping its shield and mace. These skeletal sentinels guard crypts and dungeons with tireless vigilance."
+max_hp = 85
+armor_value = 10
+movement_speed = 3.5
+turn_speed = 5.0
+grit = 5
+agility = 4
+will = 3
+knowledge = 1
+behavior = 1
+faction = 2
+aggro_range = 12.0
+attack_range = 2.5
+preferred_distance = 2.0
+flee_hp_threshold = 0.0
+is_boss = false
+attacks = Array[ExtResource("2")]([SubResource("1"), SubResource("2")])
+can_block = true
+block_chance = 0.35
+stagger_resistance = 0.4
+fire_resistance = -0.25
+frost_resistance = 0.25
+lightning_resistance = 0.0
+poison_resistance = 1.0
+necrotic_resistance = 0.5
+physical_resistance = 0.2
+fire_weakness = 0.25
+frost_weakness = 0.0
+lightning_weakness = 0.0
+holy_weakness = 0.5
+causes_horror = true
+horror_difficulty = 12
+loot_table_av = 4
+gold_drop = Array[int]([15, 45])
+guaranteed_drops = Array[String]([])
+drop_table = {
+"iron_ingot": 0.15,
+"health_potion": 0.1
+}
+xp_reward = 95
+scene_path = ""
+icon_path = ""
+scale = 1.0
+sprite_path = ""
+attack_sprite_path = ""
+sprite_hframes = 1
+sprite_vframes = 1
+attack_hframes = 1
+attack_vframes = 1
+sprite_pixel_size = 0.02
+idle_sounds = Array[String]([])
+attack_sounds = Array[String]([])
+hurt_sounds = Array[String]([])
+death_sounds = Array[String]([])

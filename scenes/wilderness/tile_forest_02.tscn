@@ -1,0 +1,240 @@
+[gd_scene load_steps=10 format=3 uid="uid://evs2forest02tile"]
+
+[ext_resource type="Script" path="res://scripts/generation/wilderness_tile.gd" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
+albedo_color = Color(0.15, 0.25, 0.1, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_trunk"]
+albedo_color = Color(0.32, 0.2, 0.1, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_leaves"]
+albedo_color = Color(0.18, 0.38, 0.12, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dead_leaves"]
+albedo_color = Color(0.5, 0.35, 0.18, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rock"]
+albedo_color = Color(0.4, 0.38, 0.34, 1)
+roughness = 0.92
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ruin"]
+albedo_color = Color(0.45, 0.42, 0.38, 1)
+roughness = 0.88
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_moss"]
+albedo_color = Color(0.22, 0.32, 0.15, 1)
+roughness = 0.85
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
+size = Vector3(100, 1, 100)
+
+[node name="WildernessTile_Forest_02" type="Node3D"]
+script = ExtResource("1")
+biome = "forest"
+variant = 2
+danger_level = 1.2
+has_dungeon_entrance = true
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="Ground" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(100, 1, 100)
+material = SubResource("StandardMaterial3D_ground")
+
+[node name="GroundCollision" type="StaticBody3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Terrain/GroundCollision"]
+shape = SubResource("BoxShape3D_ground")
+
+[node name="TerrainFeatures" type="Node3D" parent="Terrain"]
+
+[node name="LeafCover" type="CSGBox3D" parent="Terrain/TerrainFeatures"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+size = Vector3(60, 0.1, 50)
+material = SubResource("StandardMaterial3D_dead_leaves")
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="Tree_01" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 0, 20)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Props/Tree_01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+use_collision = true
+radius = 0.65
+height = 8
+sides = 8
+material = SubResource("StandardMaterial3D_trunk")
+
+[node name="Canopy" type="CSGSphere3D" parent="Props/Tree_01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9, 0)
+radius = 4.0
+radial_segments = 8
+rings = 4
+material = SubResource("StandardMaterial3D_leaves")
+
+[node name="Tree_02" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, 30)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Props/Tree_02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
+use_collision = true
+radius = 0.5
+height = 6
+sides = 8
+material = SubResource("StandardMaterial3D_trunk")
+
+[node name="Canopy" type="CSGSphere3D" parent="Props/Tree_02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+radius = 3.0
+radial_segments = 8
+rings = 4
+material = SubResource("StandardMaterial3D_leaves")
+
+[node name="Tree_03" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 0, -15)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Props/Tree_03"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+use_collision = true
+radius = 0.55
+height = 7
+sides = 8
+material = SubResource("StandardMaterial3D_trunk")
+
+[node name="Canopy" type="CSGSphere3D" parent="Props/Tree_03"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
+radius = 3.5
+radial_segments = 8
+rings = 4
+material = SubResource("StandardMaterial3D_leaves")
+
+[node name="Tree_04" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35, 0, -25)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Props/Tree_04"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+use_collision = true
+radius = 0.7
+height = 9
+sides = 8
+material = SubResource("StandardMaterial3D_trunk")
+
+[node name="Canopy" type="CSGSphere3D" parent="Props/Tree_04"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 0)
+radius = 4.5
+radial_segments = 8
+rings = 4
+material = SubResource("StandardMaterial3D_leaves")
+
+[node name="Tree_05" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -35)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Props/Tree_05"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
+use_collision = true
+radius = 0.5
+height = 6
+sides = 8
+material = SubResource("StandardMaterial3D_trunk")
+
+[node name="Canopy" type="CSGSphere3D" parent="Props/Tree_05"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+radius = 3.0
+radial_segments = 8
+rings = 4
+material = SubResource("StandardMaterial3D_leaves")
+
+[node name="Ruins" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -5)
+
+[node name="BrokenWall_01" type="CSGBox3D" parent="Props/Ruins"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+size = Vector3(5, 3, 0.6)
+material = SubResource("StandardMaterial3D_ruin")
+
+[node name="BrokenWall_02" type="CSGBox3D" parent="Props/Ruins"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 2.5, 1, 2)
+use_collision = true
+size = Vector3(3.5, 2, 0.6)
+material = SubResource("StandardMaterial3D_ruin")
+
+[node name="Rubble_01" type="CSGBox3D" parent="Props/Ruins"]
+transform = Transform3D(0.906, 0, -0.423, 0, 1, 0, 0.423, 0, 0.906, -1, 0.3, 3)
+use_collision = true
+size = Vector3(1.2, 0.6, 0.8)
+material = SubResource("StandardMaterial3D_ruin")
+
+[node name="Rubble_02" type="CSGBox3D" parent="Props/Ruins"]
+transform = Transform3D(0.819, 0, 0.574, 0, 1, 0, -0.574, 0, 0.819, 1.5, 0.25, 1)
+use_collision = true
+size = Vector3(0.8, 0.5, 0.6)
+material = SubResource("StandardMaterial3D_ruin")
+
+[node name="MossyRock" type="CSGBox3D" parent="Props"]
+transform = Transform3D(0.94, 0, 0.342, 0, 1, 0, -0.342, 0, 0.94, 18, 0.45, 5)
+use_collision = true
+size = Vector3(1.8, 0.9, 1.4)
+material = SubResource("StandardMaterial3D_moss")
+
+[node name="Rock_01" type="CSGBox3D" parent="Props"]
+transform = Transform3D(0.866, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866, -30, 0.35, 15)
+use_collision = true
+size = Vector3(1.4, 0.7, 1.1)
+material = SubResource("StandardMaterial3D_rock")
+
+[node name="Spawns" type="Node3D" parent="."]
+
+[node name="EnemySpawn_01" type="Node3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 0.5, 30)
+
+[node name="EnemySpawn_02" type="Node3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 0.5, -30)
+
+[node name="EnemySpawn_03" type="Node3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0.5, -20)
+
+[node name="EnemySpawn_04" type="Node3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0.5, 10)
+
+[node name="EnemySpawn_05" type="Node3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -10)
+
+[node name="Exits" type="Node3D" parent="."]
+
+[node name="Exit_North" type="Node3D" parent="Exits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -48)
+
+[node name="Exit_South" type="Node3D" parent="Exits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 48)
+
+[node name="Exit_East" type="Node3D" parent="Exits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, 0.5, 0)
+
+[node name="Exit_West" type="Node3D" parent="Exits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48, 0.5, 0)
+
+[node name="POIs" type="Node3D" parent="."]
+
+[node name="DungeonEntrance" type="Node3D" parent="POIs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -5)
+
+[node name="RuinLocation" type="Node3D" parent="POIs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -5)
+
+[node name="Lights" type="Node3D" parent="."]
+
+[node name="AmbientLight" type="DirectionalLight3D" parent="Lights"]
+transform = Transform3D(0.866, -0.354, 0.354, 0, 0.707, 0.707, -0.5, -0.612, 0.612, 0, 20, 0)
+light_color = Color(0.8, 0.85, 0.75, 1)
+light_energy = 0.5
+shadow_enabled = true

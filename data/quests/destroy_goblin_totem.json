@@ -1,0 +1,35 @@
+{
+	"id": "destroy_goblin_totem",
+	"title": "Destroy the Goblin Totem",
+	"description": "A dark totem in the back chamber continuously spawns goblins. Destroy it and bring back proof of its destruction.",
+	"quest_source": "story",
+	"giver_npc_id": "wandering_knight",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "elder_moor",
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "wandering_knight",
+	"turn_in_zone": "elder_moor",
+	"objectives": [
+		{
+			"id": "destroy_totem",
+			"description": "Destroy the Goblin Totem",
+			"type": "destroy",
+			"target": "goblin_totem",
+			"required_count": 1,
+			"is_optional": false
+		},
+		{
+			"id": "collect_shard",
+			"description": "Collect the Corrupted Totem Shard",
+			"type": "collect",
+			"target": "corrupted_totem_shard",
+			"required_count": 1,
+			"is_optional": false
+		}
+	],
+	"rewards": {
+		"gold": 300,
+		"xp": 500
+	},
+	"prerequisites": ["gather_intel"]
+}

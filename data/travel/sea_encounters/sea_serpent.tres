@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="SeaEncounter" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/travel/sea_encounter.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "sea_serpent"
+display_name = "Sea Serpent Attack"
+description = "The waters churn violently as a massive serpentine form rises from the depths. Scales the size of shields glisten in the dim light as the ancient creature eyes the vessel hungrily."
+encounter_type = 2
+is_combat = true
+can_flee = true
+flee_difficulty = 8
+enemy_spawns = Array[String](["tree_ent"])
+enemy_counts = Array[Vector2i]([Vector2i(1, 1)])
+is_wave_encounter = false
+wave_count = 1
+npc_spawns = Array[String]([])
+gold_reward = Vector2i(250, 500)
+guaranteed_loot = Array[String]([])
+loot_tier = 4
+loot_rolls = 4
+xp_reward = 500
+difficulty_rating = 8
+min_player_level = 6
+max_player_level = 0
+intro_dialogue_id = ""
+peaceful_dialogue_id = ""
+can_resolve_peacefully = false
+peaceful_skill = 0
+peaceful_skill_dc = 25
+storm_damage = 0
+cargo_loss_chance = 0.0
+storm_duration_hours = 0.0
+discovered_location_id = ""
+island_coords = Vector2i(-999, -999)
+procedural_island = true
+encounter_scene_path = ""
+background_path = ""
+icon_path = ""
+music_track = ""
+ambient_sound = ""

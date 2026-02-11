@@ -1,0 +1,940 @@
+[gd_scene load_steps=25 format=3 uid="uid://bj350seiitkm6"]
+
+[ext_resource type="Script" uid="uid://do1fcgan1s0tt" path="res://scripts/levels/kazan_dun_level_3.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
+[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://Sprite folders grab bag/stonewall.png" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/world/zone_door_instance.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://scenes/world/merchant_instance.tscn" id="6"]
+
+[sub_resource type="Environment" id="Environment_level3"]
+background_mode = 1
+background_color = Color(0.15, 0.1, 0.08, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.6, 0.4, 0.3, 1)
+ambient_light_energy = 0.4
+fog_enabled = true
+fog_light_color = Color(0.4, 0.25, 0.15, 1)
+
+[sub_resource type="StandardMaterial3D" id="mat_stone_floor"]
+albedo_color = Color(0.35, 0.32, 0.3, 1)
+albedo_texture = ExtResource("4")
+roughness = 0.95
+uv1_scale = Vector3(25, 25, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_ceiling"]
+albedo_color = Color(0.25, 0.23, 0.2, 1)
+albedo_texture = ExtResource("4")
+roughness = 0.95
+uv1_scale = Vector3(25, 25, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_stone_wall"]
+albedo_color = Color(0.38, 0.35, 0.32, 1)
+albedo_texture = ExtResource("4")
+roughness = 0.92
+uv1_scale = Vector3(6, 3, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_forge_stone"]
+albedo_color = Color(0.3, 0.28, 0.25, 1)
+albedo_texture = ExtResource("4")
+roughness = 0.9
+uv1_scale = Vector3(3, 3, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_coal"]
+albedo_color = Color(0.15, 0.12, 0.1, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="mat_forge_fire"]
+albedo_color = Color(1, 0.5, 0.1, 1)
+emission_enabled = true
+emission = Color(1, 0.4, 0.05, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="StandardMaterial3D" id="mat_bellows"]
+albedo_color = Color(0.5, 0.4, 0.32, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="mat_anvil"]
+albedo_color = Color(0.35, 0.35, 0.4, 1)
+metallic = 0.7
+roughness = 0.3
+
+[sub_resource type="StandardMaterial3D" id="mat_metal"]
+albedo_color = Color(0.45, 0.45, 0.5, 1)
+metallic = 0.6
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="mat_quench_water"]
+transparency = 1
+albedo_color = Color(0.15, 0.2, 0.25, 0.8)
+metallic = 0.1
+roughness = 0.2
+
+[sub_resource type="StandardMaterial3D" id="mat_weapon_rack"]
+albedo_color = Color(0.4, 0.32, 0.25, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_char"]
+albedo_color = Color(0.12, 0.1, 0.08, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="mat_blood"]
+albedo_color = Color(0.4, 0.08, 0.05, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="mat_barricade_wood"]
+albedo_color = Color(0.35, 0.28, 0.2, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="mat_goblin_cloth"]
+albedo_color = Color(0.25, 0.2, 0.15, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_dwarf_armor"]
+albedo_color = Color(0.4, 0.38, 0.45, 1)
+metallic = 0.5
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="mat_hot_metal"]
+albedo_color = Color(0.9, 0.4, 0.1, 1)
+metallic = 0.5
+roughness = 0.5
+emission_enabled = true
+emission = Color(0.8, 0.3, 0.05, 1)
+emission_energy_multiplier = 1.5
+
+[node name="KazanDunLevel3" type="Node3D"]
+script = ExtResource("1")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_level3")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866, -0.433, 0.25, 0, 0.5, 0.866, -0.5, -0.75, 0.433, 0, 20, 0)
+light_color = Color(0.9, 0.7, 0.5, 1)
+light_energy = 0.2
+shadow_enabled = true
+shadow_bias = 0.02
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="Floor" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(100, 1, 100)
+material = SubResource("mat_stone_floor")
+
+[node name="Ceiling" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15.301672, 0)
+use_collision = true
+size = Vector3(100, 0.5, 100)
+material = SubResource("mat_ceiling")
+
+[node name="Walls" type="Node3D" parent="Terrain"]
+
+[node name="WallNorth" type="CSGBox3D" parent="Terrain/Walls"]
+transform = Transform3D(1, 0, 0, 0, 2.5162377, 0, 0, 0, 1, 0, 6.909665, -50)
+use_collision = true
+size = Vector3(100, 6, 2)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthLeft" type="CSGBox3D" parent="Terrain/Walls"]
+transform = Transform3D(1, 0, 0, 0, 2.5162377, 0, 0, 0, 1, -35, 6.909665, 50)
+use_collision = true
+size = Vector3(30, 6, 2)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthRight" type="CSGBox3D" parent="Terrain/Walls"]
+transform = Transform3D(1, 0, 0, 0, 2.5162377, 0, 0, 0, 1, 35, 6.909665, 50)
+use_collision = true
+size = Vector3(30, 6, 2)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthTop" type="CSGBox3D" parent="Terrain/Walls"]
+transform = Transform3D(1, 0, 0, 0, 2.5162377, 0, 0, 0, 1, 0, 11.942141, 50)
+use_collision = true
+size = Vector3(40, 2, 2)
+material = SubResource("mat_stone_wall")
+
+[node name="WallEast" type="CSGBox3D" parent="Terrain/Walls"]
+transform = Transform3D(1, 0, 0, 0, 2.5162377, 0, 0, 0, 1, 50, 6.909665, 0)
+use_collision = true
+size = Vector3(2, 6, 100)
+material = SubResource("mat_stone_wall")
+
+[node name="WallWest" type="CSGBox3D" parent="Terrain/Walls"]
+transform = Transform3D(1, 0, 0, 0, 2.5162377, 0, 0, 0, 1, -50, 6.909665, 0)
+use_collision = true
+size = Vector3(2, 6, 100)
+material = SubResource("mat_stone_wall")
+
+[node name="WallNorthDoorLeft" type="CSGBox3D" parent="Terrain/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35, 3, -50)
+use_collision = true
+size = Vector3(30, 6, 2)
+material = SubResource("mat_stone_wall")
+
+[node name="WallNorthDoorRight" type="CSGBox3D" parent="Terrain/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 3, -50)
+use_collision = true
+size = Vector3(30, 6, 2)
+material = SubResource("mat_stone_wall")
+
+[node name="WallNorthDoorTop" type="CSGBox3D" parent="Terrain/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, -50)
+use_collision = true
+size = Vector3(40, 2, 2)
+material = SubResource("mat_stone_wall")
+
+[node name="Structures" type="Node3D" parent="."]
+
+[node name="MainForge" type="Node3D" parent="Structures"]
+
+[node name="ForgeBase" type="CSGBox3D" parent="Structures/MainForge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+use_collision = true
+size = Vector3(10, 1, 8)
+material = SubResource("mat_forge_stone")
+
+[node name="ForgeHood" type="CSGBox3D" parent="Structures/MainForge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, -2)
+use_collision = true
+size = Vector3(8, 4, 5)
+material = SubResource("mat_forge_stone")
+
+[node name="ForgeChimney" type="CSGBox3D" parent="Structures/MainForge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.5, -2)
+use_collision = true
+size = Vector3(4, 2, 3)
+material = SubResource("mat_forge_stone")
+
+[node name="CoalPit" type="CSGBox3D" parent="Structures/MainForge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+size = Vector3(6, 0.4, 4)
+material = SubResource("mat_coal")
+
+[node name="ForgeFire" type="CSGSphere3D" parent="Structures/MainForge"]
+transform = Transform3D(1.5, 0, 0, 0, 1, 0, 0, 0, 1.2, 0, 1.8, 0)
+radius = 1.0
+material = SubResource("mat_forge_fire")
+
+[node name="ForgeLight" type="OmniLight3D" parent="Structures/MainForge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+light_color = Color(1, 0.5, 0.15, 1)
+light_energy = 6.0
+omni_range = 20.0
+
+[node name="Bellows" type="CSGBox3D" parent="Structures/MainForge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 1.2, 0)
+use_collision = true
+size = Vector3(1.5, 1.2, 2.5)
+material = SubResource("mat_bellows")
+
+[node name="AnvilMain" type="Node3D" parent="Structures/MainForge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5)
+
+[node name="Base" type="CSGBox3D" parent="Structures/MainForge/AnvilMain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+use_collision = true
+size = Vector3(1.2, 0.8, 0.8)
+material = SubResource("mat_anvil")
+
+[node name="Top" type="CSGBox3D" parent="Structures/MainForge/AnvilMain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+use_collision = true
+size = Vector3(1.8, 0.3, 0.6)
+material = SubResource("mat_anvil")
+
+[node name="Base2" type="CSGBox3D" parent="Structures/MainForge/AnvilMain"]
+transform = Transform3D(0.15998456, 0, 0.9871195, 0, 1, 0, -0.9871195, 0, 0.15998456, -2.7768462, 0.4, -0.0023441315)
+use_collision = true
+size = Vector3(1.2, 0.8, 0.8)
+material = SubResource("mat_anvil")
+
+[node name="Top2" type="CSGBox3D" parent="Structures/MainForge/AnvilMain"]
+transform = Transform3D(0.15998456, 0, 0.9871195, 0, 1, 0, -0.9871195, 0, 0.15998456, -2.7768462, 0.95, -0.0023441315)
+use_collision = true
+size = Vector3(1.8, 0.3, 0.6)
+material = SubResource("mat_anvil")
+
+[node name="Horn" type="CSGCylinder3D" parent="Structures/MainForge/AnvilMain"]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 1.2, 0.95, 0)
+radius = 0.15
+height = 0.6
+sides = 6
+material = SubResource("mat_anvil")
+
+[node name="QuenchTrough" type="Node3D" parent="Structures/MainForge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 2)
+
+[node name="Trough" type="CSGBox3D" parent="Structures/MainForge/QuenchTrough"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+use_collision = true
+size = Vector3(3, 0.8, 1.5)
+material = SubResource("mat_metal")
+
+[node name="Water" type="CSGBox3D" parent="Structures/MainForge/QuenchTrough"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+size = Vector3(2.8, 0.4, 1.3)
+material = SubResource("mat_quench_water")
+
+[node name="SmithyWest" type="Node3D" parent="Structures"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 0, -20)
+
+[node name="WorkbenchWall" type="CSGBox3D" parent="Structures/SmithyWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 2.5, 0)
+use_collision = true
+size = Vector3(0.5, 5, 15)
+material = SubResource("mat_stone_wall")
+
+[node name="Workbench" type="CSGBox3D" parent="Structures/SmithyWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.5, 0)
+use_collision = true
+size = Vector3(4, 1, 12)
+material = SubResource("mat_forge_stone")
+
+[node name="Forge" type="CSGBox3D" parent="Structures/SmithyWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+use_collision = true
+size = Vector3(4, 1.2, 5)
+material = SubResource("mat_forge_stone")
+
+[node name="ForgeFire" type="CSGSphere3D" parent="Structures/SmithyWest"]
+transform = Transform3D(0.8, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 0, 1.4, 0)
+radius = 0.7
+material = SubResource("mat_forge_fire")
+
+[node name="ForgeLight" type="OmniLight3D" parent="Structures/SmithyWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+light_color = Color(1, 0.5, 0.15, 1)
+light_energy = 3.0
+omni_range = 12.0
+
+[node name="Anvil" type="Node3D" parent="Structures/SmithyWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 0)
+
+[node name="Base" type="CSGBox3D" parent="Structures/SmithyWest/Anvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+use_collision = true
+size = Vector3(1, 0.7, 0.7)
+material = SubResource("mat_anvil")
+
+[node name="Top" type="CSGBox3D" parent="Structures/SmithyWest/Anvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+use_collision = true
+size = Vector3(1.5, 0.25, 0.5)
+material = SubResource("mat_anvil")
+
+[node name="SmithyEast" type="Node3D" parent="Structures"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 0, -20)
+
+[node name="WorkbenchWall" type="CSGBox3D" parent="Structures/SmithyEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 2.5, 0)
+use_collision = true
+size = Vector3(0.5, 5, 15)
+material = SubResource("mat_stone_wall")
+
+[node name="Workbench" type="CSGBox3D" parent="Structures/SmithyEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.5, 0)
+use_collision = true
+size = Vector3(4, 1, 12)
+material = SubResource("mat_forge_stone")
+
+[node name="Forge" type="CSGBox3D" parent="Structures/SmithyEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+use_collision = true
+size = Vector3(4, 1.2, 5)
+material = SubResource("mat_forge_stone")
+
+[node name="ForgeFire" type="CSGSphere3D" parent="Structures/SmithyEast"]
+transform = Transform3D(0.8, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 0, 1.4, 0)
+radius = 0.7
+material = SubResource("mat_forge_fire")
+
+[node name="ForgeLight" type="OmniLight3D" parent="Structures/SmithyEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+light_color = Color(1, 0.5, 0.15, 1)
+light_energy = 3.0
+omni_range = 12.0
+
+[node name="Anvil" type="Node3D" parent="Structures/SmithyEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 0)
+
+[node name="Base" type="CSGBox3D" parent="Structures/SmithyEast/Anvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+use_collision = true
+size = Vector3(1, 0.7, 0.7)
+material = SubResource("mat_anvil")
+
+[node name="Top" type="CSGBox3D" parent="Structures/SmithyEast/Anvil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+use_collision = true
+size = Vector3(1.5, 0.25, 0.5)
+material = SubResource("mat_anvil")
+
+[node name="Armory" type="Node3D" parent="Structures"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 30)
+
+[node name="WeaponRackL" type="Node3D" parent="Structures/Armory"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, 0)
+
+[node name="Frame" type="CSGBox3D" parent="Structures/Armory/WeaponRackL"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+size = Vector3(6, 3, 1)
+material = SubResource("mat_weapon_rack")
+
+[node name="Bar1" type="CSGCylinder3D" parent="Structures/Armory/WeaponRackL"]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 2.5, 0.3)
+radius = 0.1
+height = 5.5
+sides = 6
+material = SubResource("mat_metal")
+
+[node name="Bar2" type="CSGCylinder3D" parent="Structures/Armory/WeaponRackL"]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 1.5, 0.3)
+radius = 0.1
+height = 5.5
+sides = 6
+material = SubResource("mat_metal")
+
+[node name="WeaponRackR" type="Node3D" parent="Structures/Armory"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 0)
+
+[node name="Frame" type="CSGBox3D" parent="Structures/Armory/WeaponRackR"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+size = Vector3(6, 3, 1)
+material = SubResource("mat_weapon_rack")
+
+[node name="Bar1" type="CSGCylinder3D" parent="Structures/Armory/WeaponRackR"]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 2.5, 0.3)
+radius = 0.1
+height = 5.5
+sides = 6
+material = SubResource("mat_metal")
+
+[node name="Bar2" type="CSGCylinder3D" parent="Structures/Armory/WeaponRackR"]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 1.5, 0.3)
+radius = 0.1
+height = 5.5
+sides = 6
+material = SubResource("mat_metal")
+
+[node name="ArmorStand1" type="CSGCylinder3D" parent="Structures/Armory"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 1, 8)
+use_collision = true
+radius = 0.3
+sides = 6
+material = SubResource("mat_metal")
+
+[node name="ArmorStand2" type="CSGCylinder3D" parent="Structures/Armory"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 8)
+use_collision = true
+radius = 0.3
+sides = 6
+material = SubResource("mat_metal")
+
+[node name="ArmorStand3" type="CSGCylinder3D" parent="Structures/Armory"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 1, 8)
+use_collision = true
+radius = 0.3
+sides = 6
+material = SubResource("mat_metal")
+
+[node name="BattleDamage" type="Node3D" parent="Structures"]
+
+[node name="OverturndAnvil1" type="Node3D" parent="Structures/BattleDamage"]
+transform = Transform3D(0.866, -0.5, 0, 0.5, 0.866, 0, 0, 0, 1, -25, 0, -10)
+
+[node name="Base" type="CSGBox3D" parent="Structures/BattleDamage/OverturndAnvil1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+use_collision = true
+size = Vector3(1, 0.6, 0.6)
+material = SubResource("mat_anvil")
+
+[node name="Top" type="CSGBox3D" parent="Structures/BattleDamage/OverturndAnvil1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
+use_collision = true
+size = Vector3(1.4, 0.2, 0.4)
+material = SubResource("mat_anvil")
+
+[node name="OverturndAnvil2" type="Node3D" parent="Structures/BattleDamage"]
+transform = Transform3D(0.707, 0, 0.707, 0, 1, 0, -0.707, 0, 0.707, 28, 0, -15)
+
+[node name="Base" type="CSGBox3D" parent="Structures/BattleDamage/OverturndAnvil2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+use_collision = true
+size = Vector3(1, 0.6, 0.6)
+material = SubResource("mat_anvil")
+
+[node name="ScorchedFloor1" type="CSGBox3D" parent="Structures/BattleDamage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0.02, -5)
+size = Vector3(6, 0.04, 5)
+material = SubResource("mat_char")
+
+[node name="ScorchedFloor2" type="CSGBox3D" parent="Structures/BattleDamage"]
+transform = Transform3D(0.966, 0, 0.259, 0, 1, 0, -0.259, 0, 0.966, 20, 0.02, 0)
+size = Vector3(5, 0.04, 4)
+material = SubResource("mat_char")
+
+[node name="BloodPool1" type="CSGBox3D" parent="Structures/BattleDamage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.02, -20)
+size = Vector3(3, 0.04, 2.5)
+material = SubResource("mat_blood")
+
+[node name="BloodPool2" type="CSGBox3D" parent="Structures/BattleDamage"]
+transform = Transform3D(0.985, 0, 0.174, 0, 1, 0, -0.174, 0, 0.985, 15, 0.02, -25)
+size = Vector3(2.5, 0.04, 3)
+material = SubResource("mat_blood")
+
+[node name="BloodPool3" type="CSGBox3D" parent="Structures/BattleDamage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -15)
+size = Vector3(4, 0.04, 3)
+material = SubResource("mat_blood")
+
+[node name="SmashDebris1" type="CSGSphere3D" parent="Structures/BattleDamage"]
+transform = Transform3D(1.2, 0, 0, 0, 0.4, 0, 0, 0, 1, -20, 0.2, -8)
+radius = 0.6
+material = SubResource("mat_forge_stone")
+
+[node name="SmashDebris2" type="CSGSphere3D" parent="Structures/BattleDamage"]
+transform = Transform3D(0.8, 0, 0, 0, 0.3, 0, 0, 0, 0.7, 22, 0.15, -12)
+material = SubResource("mat_stone_wall")
+
+[node name="DwarfBarricade" type="Node3D" parent="Structures"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
+
+[node name="BarricadeMain" type="CSGBox3D" parent="Structures/DwarfBarricade"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+use_collision = true
+size = Vector3(30, 1.5, 1.5)
+material = SubResource("mat_barricade_wood")
+
+[node name="BarricadeLeft" type="CSGBox3D" parent="Structures/DwarfBarricade"]
+transform = Transform3D(0.866, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866, -18, 0.75, 3)
+use_collision = true
+size = Vector3(10, 1.5, 1.5)
+material = SubResource("mat_barricade_wood")
+
+[node name="BarricadeRight" type="CSGBox3D" parent="Structures/DwarfBarricade"]
+transform = Transform3D(0.866, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866, 18, 0.75, 3)
+use_collision = true
+size = Vector3(10, 1.5, 1.5)
+material = SubResource("mat_barricade_wood")
+
+[node name="Sandbag1" type="CSGSphere3D" parent="Structures/DwarfBarricade"]
+transform = Transform3D(1.5, 0, 0, 0, 0.6, 0, 0, 0, 1, -5, 0.3, 1.5)
+use_collision = true
+material = SubResource("mat_forge_stone")
+
+[node name="Sandbag2" type="CSGSphere3D" parent="Structures/DwarfBarricade"]
+transform = Transform3D(1.5, 0, 0, 0, 0.6, 0, 0, 0, 1, 5, 0.3, 1.5)
+use_collision = true
+material = SubResource("mat_forge_stone")
+
+[node name="GoblinBarricade" type="Node3D" parent="Structures"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -25)
+
+[node name="CrudeWall1" type="CSGBox3D" parent="Structures/GoblinBarricade"]
+transform = Transform3D(0.996, 0, 0.087, 0, 1, 0, -0.087, 0, 0.996, -12, 0.6, 0)
+use_collision = true
+size = Vector3(12, 1.2, 1)
+material = SubResource("mat_barricade_wood")
+
+[node name="CrudeWall2" type="CSGBox3D" parent="Structures/GoblinBarricade"]
+transform = Transform3D(0.996, 0, -0.087, 0, 1, 0, 0.087, 0, 0.996, 12, 0.6, 0)
+use_collision = true
+size = Vector3(12, 1.2, 1)
+material = SubResource("mat_barricade_wood")
+
+[node name="JunkPile1" type="CSGSphere3D" parent="Structures/GoblinBarricade"]
+transform = Transform3D(1, 0, 0, 0, 0.5, 0, 0, 0, 0.8, -20, 0.25, 2)
+radius = 0.8
+material = SubResource("mat_goblin_cloth")
+
+[node name="JunkPile2" type="CSGSphere3D" parent="Structures/GoblinBarricade"]
+transform = Transform3D(0.9, 0, 0, 0, 0.4, 0, 0, 0, 0.7, 20, 0.2, 1)
+radius = 0.7
+material = SubResource("mat_goblin_cloth")
+
+[node name="StolenAnvil" type="CSGBox3D" parent="Structures/GoblinBarricade"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -3)
+use_collision = true
+size = Vector3(1.5, 1, 1)
+material = SubResource("mat_anvil")
+
+[node name="FallenBodies" type="Node3D" parent="Structures"]
+
+[node name="DwarfBody1" type="Node3D" parent="Structures/FallenBodies"]
+transform = Transform3D(0.866, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866, -10, 0, -18)
+
+[node name="Torso" type="CSGBox3D" parent="Structures/FallenBodies/DwarfBody1"]
+transform = Transform3D(1, 0, 0, 0, 0.2, 0, 0, 0, 1, 0, 0.2, 0)
+size = Vector3(1.2, 1.8, 0.6)
+material = SubResource("mat_dwarf_armor")
+
+[node name="DwarfBody2" type="Node3D" parent="Structures/FallenBodies"]
+transform = Transform3D(0.707, 0, -0.707, 0, 1, 0, 0.707, 0, 0.707, 12, 0, -20)
+
+[node name="Torso" type="CSGBox3D" parent="Structures/FallenBodies/DwarfBody2"]
+transform = Transform3D(1, 0, 0, 0, 0.2, 0, 0, 0, 1, 0, 0.2, 0)
+size = Vector3(1.2, 1.8, 0.6)
+material = SubResource("mat_dwarf_armor")
+
+[node name="GoblinBody1" type="Node3D" parent="Structures/FallenBodies"]
+transform = Transform3D(0.966, 0, 0.259, 0, 1, 0, -0.259, 0, 0.966, -5, 0, -22)
+
+[node name="Torso" type="CSGBox3D" parent="Structures/FallenBodies/GoblinBody1"]
+transform = Transform3D(1, 0, 0, 0, 0.15, 0, 0, 0, 1, 0, 0.15, 0)
+size = Vector3(0.8, 1.4, 0.4)
+material = SubResource("mat_goblin_cloth")
+
+[node name="GoblinBody2" type="Node3D" parent="Structures/FallenBodies"]
+transform = Transform3D(0.5, 0, 0.866, 0, 1, 0, -0.866, 0, 0.5, 8, 0, -24)
+
+[node name="Torso" type="CSGBox3D" parent="Structures/FallenBodies/GoblinBody2"]
+transform = Transform3D(1, 0, 0, 0, 0.15, 0, 0, 0, 1, 0, 0.15, 0)
+size = Vector3(0.8, 1.4, 0.4)
+material = SubResource("mat_goblin_cloth")
+
+[node name="GoblinBody3" type="Node3D" parent="Structures/FallenBodies"]
+transform = Transform3D(0.259, 0, 0.966, 0, 1, 0, -0.966, 0, 0.259, -15, 0, -15)
+
+[node name="Torso" type="CSGBox3D" parent="Structures/FallenBodies/GoblinBody3"]
+transform = Transform3D(1, 0, 0, 0, 0.15, 0, 0, 0, 1, 0, 0.15, 0)
+size = Vector3(0.8, 1.4, 0.4)
+material = SubResource("mat_goblin_cloth")
+
+[node name="Decorations" type="Node3D" parent="."]
+
+[node name="HotMetalPieces" type="Node3D" parent="Decorations"]
+
+[node name="HotMetal1" type="CSGBox3D" parent="Decorations/HotMetalPieces"]
+transform = Transform3D(0.6068766, 0, 0.79479605, 0, 1, 0, -0.79479605, 0, 0.6068766, -0.36375022, 1.15, 5)
+size = Vector3(0.8, 0.1, 0.15)
+material = SubResource("mat_hot_metal")
+
+[node name="HotMetal2" type="CSGBox3D" parent="Decorations/HotMetalPieces"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5244466, 1.1, 4.8)
+size = Vector3(0.6, 0.08, 0.12)
+material = SubResource("mat_hot_metal")
+
+[node name="HotMetal3" type="CSGBox3D" parent="Decorations/HotMetalPieces"]
+transform = Transform3D(-0.68746775, 0, 0.7262149, 0, 1, 0, -0.7262149, 0, -0.68746775, -2.8350406, 1.15, 5.356721)
+size = Vector3(0.8, 0.1, 0.15)
+material = SubResource("mat_hot_metal")
+
+[node name="HotMetal4" type="CSGBox3D" parent="Decorations/HotMetalPieces"]
+transform = Transform3D(0.15998456, 0, 0.9871195, 0, 1, 0, -0.9871195, 0, 0.15998456, -2.8903666, 1.1, 4.4479675)
+size = Vector3(0.6, 0.08, 0.12)
+material = SubResource("mat_hot_metal")
+
+[node name="CooledMetal" type="Node3D" parent="Decorations"]
+
+[node name="Sword1" type="CSGBox3D" parent="Decorations/CooledMetal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 1.15, -18)
+size = Vector3(0.8, 0.08, 0.1)
+material = SubResource("mat_metal")
+
+[node name="Sword2" type="CSGBox3D" parent="Decorations/CooledMetal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28, 1.15, -18)
+size = Vector3(0.7, 0.08, 0.1)
+material = SubResource("mat_metal")
+
+[node name="AxeHead" type="CSGBox3D" parent="Decorations/CooledMetal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 1.15, -18)
+size = Vector3(0.3, 0.2, 0.1)
+material = SubResource("mat_metal")
+
+[node name="WallTorchN1" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 3, -48)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorchN1"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorchN1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0.4)
+radius = 0.2
+material = SubResource("mat_forge_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorchN1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0.4)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10.0
+
+[node name="WallTorchN2" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 3, -48)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorchN2"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorchN2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0.4)
+radius = 0.2
+material = SubResource("mat_forge_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorchN2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0.4)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10.0
+
+[node name="WallTorchE1" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, 3, -25)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorchE1"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorchE1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.3, 0)
+radius = 0.2
+material = SubResource("mat_forge_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorchE1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.3, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10.0
+
+[node name="WallTorchE2" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, 3, 25)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorchE2"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorchE2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.3, 0)
+radius = 0.2
+material = SubResource("mat_forge_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorchE2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.3, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10.0
+
+[node name="WallTorchW1" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48, 3, -25)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorchW1"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorchW1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.3, 0)
+radius = 0.2
+material = SubResource("mat_forge_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorchW1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.3, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10.0
+
+[node name="WallTorchW2" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48, 3, 25)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorchW2"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorchW2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.3, 0)
+radius = 0.2
+material = SubResource("mat_forge_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorchW2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.3, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10.0
+
+[node name="WallTorchS1" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 3, 48)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorchS1"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorchS1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, -0.4)
+radius = 0.2
+material = SubResource("mat_forge_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorchS1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, -0.4)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10.0
+
+[node name="WallTorchS2" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 3, 48)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorchS2"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorchS2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, -0.4)
+radius = 0.2
+material = SubResource("mat_forge_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorchS2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, -0.4)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10.0
+
+[node name="WallTorchCenter1" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.0877776, 3, 39.232353)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorchCenter1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.82220984, 0, 0)
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorchCenter1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2222104, 0.29999995, 0)
+radius = 0.2
+material = SubResource("mat_forge_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorchCenter1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.3, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10.0
+
+[node name="WallTorchCenter3" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.261707, 3, 39.232353)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorchCenter3"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorchCenter3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.3, 0)
+radius = 0.2
+material = SubResource("mat_forge_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorchCenter3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.3, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10.0
+
+[node name="WallTorchCenter2" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 3, 0)
+
+[node name="Bracket" type="CSGBox3D" parent="Decorations/WallTorchCenter2"]
+use_collision = true
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_metal")
+
+[node name="Flame" type="CSGSphere3D" parent="Decorations/WallTorchCenter2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.3, 0)
+radius = 0.2
+material = SubResource("mat_forge_fire")
+
+[node name="Light" type="OmniLight3D" parent="Decorations/WallTorchCenter2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.3, 0)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 10.0
+
+[node name="NPCs" type="Node3D" parent="."]
+
+[node name="Merchants" type="Node3D" parent="NPCs"]
+
+[node name="MasterSmith" parent="NPCs/Merchants" instance=ExtResource("6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 20)
+merchant_name = "Kazan-Dun Master Smith"
+shop_tier = 4
+shop_type = "blacksmith"
+
+[node name="ArmorSmith" parent="NPCs/Merchants" instance=ExtResource("6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 35)
+merchant_name = "Kazan-Dun Armorer"
+shop_tier = 4
+shop_type = "armor"
+
+[node name="DwarfDefenders" type="Node3D" parent="NPCs"]
+
+[node name="DefenderSpawn1" type="Node3D" parent="NPCs/DwarfDefenders" groups=["npc_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 15)
+
+[node name="DefenderSpawn2" type="Node3D" parent="NPCs/DwarfDefenders" groups=["npc_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, 15)
+
+[node name="DefenderSpawn3" type="Node3D" parent="NPCs/DwarfDefenders" groups=["npc_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 12)
+
+[node name="GoblinEnemies" type="Node3D" parent="NPCs"]
+
+[node name="GoblinSpawn1" type="Node3D" parent="NPCs/GoblinEnemies" groups=["enemy_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, -30)
+
+[node name="GoblinSpawn2" type="Node3D" parent="NPCs/GoblinEnemies" groups=["enemy_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, -30)
+
+[node name="GoblinSpawn3" type="Node3D" parent="NPCs/GoblinEnemies" groups=["enemy_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -35)
+
+[node name="GoblinSpawn4" type="Node3D" parent="NPCs/GoblinEnemies" groups=["enemy_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 0, -38)
+
+[node name="GoblinSpawn5" type="Node3D" parent="NPCs/GoblinEnemies" groups=["enemy_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 0, -38)
+
+[node name="Interactables" type="Node3D" parent="."]
+
+[node name="Doors" type="Node3D" parent="."]
+
+[node name="Level2Door" parent="Doors" instance=ExtResource("5")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 48)
+target_scene = "res://scenes/levels/kazan_dun_level_2.tscn"
+spawn_point_id = "from_level_3"
+door_name = "Ascend to Residential Level"
+
+[node name="Level4Door" parent="Doors" instance=ExtResource("5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -48)
+target_scene = "res://scenes/levels/kazan_dun_level_4.tscn"
+spawn_point_id = "from_level_3"
+door_name = "Descend to Mining Tunnels"
+
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="from_level_2" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 45)
+
+[node name="from_level_4" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -45)
+
+[node name="default" type="Node3D" parent="SpawnPoints" groups=["default_spawn", "spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 45)
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+
+[node name="Player" parent="." instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 45)
+
+[node name="HUD" parent="." instance=ExtResource("3")]

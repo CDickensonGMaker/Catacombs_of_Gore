@@ -1,0 +1,334 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/modular_room.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://Sprite folders grab bag/stonewall.png" id="2"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/bridge/pillar_simple.obj" id="mesh_pillar"]
+
+[sub_resource type="StandardMaterial3D" id="mat_stone_floor"]
+albedo_color = Color(0.34, 0.32, 0.3, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.88
+uv1_scale = Vector3(5, 5, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_stone_wall"]
+albedo_color = Color(0.4, 0.38, 0.36, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.85
+uv1_scale = Vector3(4, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_ceiling"]
+albedo_color = Color(0.3, 0.28, 0.26, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.88
+uv1_scale = Vector3(5, 5, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_gate"]
+albedo_color = Color(0.35, 0.32, 0.28, 1)
+metallic = 0.3
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="mat_metal"]
+albedo_color = Color(0.45, 0.43, 0.4, 1)
+metallic = 0.6
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="mat_brazier"]
+albedo_color = Color(0.42, 0.4, 0.44, 1)
+metallic = 0.4
+roughness = 0.55
+
+[sub_resource type="StandardMaterial3D" id="mat_fire"]
+albedo_color = Color(1.0, 0.6, 0.2, 1)
+emission_enabled = true
+emission = Color(1.0, 0.5, 0.1, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="StandardMaterial3D" id="mat_pillar"]
+albedo_color = Color(0.38, 0.36, 0.34, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.85
+uv1_scale = Vector3(2, 4, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_banner"]
+albedo_color = Color(0.5, 0.12, 0.08, 1)
+roughness = 0.9
+
+[node name="KDBridgeGatehouse" type="Node3D"]
+script = ExtResource("1")
+room_id = "kd_bridge_gatehouse"
+room_type = "gatehouse"
+room_name = "Bridge Gatehouse"
+room_width = 20.0
+room_depth = 16.0
+room_height = 12.0
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="Floor" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(20, 1, 16)
+material = SubResource("mat_stone_floor")
+
+[node name="Ceiling" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, 0)
+use_collision = true
+size = Vector3(20, 0.5, 16)
+material = SubResource("mat_ceiling")
+
+[node name="WallNorthLeft" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 6, -8)
+use_collision = true
+size = Vector3(7, 12, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallNorthRight" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 6, -8)
+use_collision = true
+size = Vector3(7, 12, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallNorthTop" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.5, -8)
+use_collision = true
+size = Vector3(6, 5, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthLeft" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 6, 8)
+use_collision = true
+size = Vector3(7, 12, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthRight" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 6, 8)
+use_collision = true
+size = Vector3(7, 12, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthTop" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.5, 8)
+use_collision = true
+size = Vector3(6, 5, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallEast" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 6, 0)
+use_collision = true
+size = Vector3(1, 12, 16)
+material = SubResource("mat_stone_wall")
+
+[node name="WallWest" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 6, 0)
+use_collision = true
+size = Vector3(1, 12, 16)
+material = SubResource("mat_stone_wall")
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="GateNorth" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -7)
+
+[node name="GateFrame" type="CSGBox3D" parent="Props/GateNorth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+use_collision = true
+size = Vector3(6, 7, 0.8)
+material = SubResource("mat_gate")
+
+[node name="GateOpening" type="CSGBox3D" parent="Props/GateNorth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+operation = 2
+size = Vector3(4, 5, 1)
+material = SubResource("mat_gate")
+
+[node name="Portcullis1" type="CSGBox3D" parent="Props/GateNorth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 2.5, 0)
+size = Vector3(0.15, 5, 0.15)
+material = SubResource("mat_metal")
+
+[node name="Portcullis2" type="CSGBox3D" parent="Props/GateNorth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 2.5, 0)
+size = Vector3(0.15, 5, 0.15)
+material = SubResource("mat_metal")
+
+[node name="Portcullis3" type="CSGBox3D" parent="Props/GateNorth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 2.5, 0)
+size = Vector3(0.15, 5, 0.15)
+material = SubResource("mat_metal")
+
+[node name="Portcullis4" type="CSGBox3D" parent="Props/GateNorth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 2.5, 0)
+size = Vector3(0.15, 5, 0.15)
+material = SubResource("mat_metal")
+
+[node name="GateSouth" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 7)
+
+[node name="GateFrame" type="CSGBox3D" parent="Props/GateSouth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+use_collision = true
+size = Vector3(6, 7, 0.8)
+material = SubResource("mat_gate")
+
+[node name="GateOpening" type="CSGBox3D" parent="Props/GateSouth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+operation = 2
+size = Vector3(4, 5, 1)
+material = SubResource("mat_gate")
+
+[node name="MurderHoles" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 11, 0)
+
+[node name="Hole1" type="CSGBox3D" parent="Props/MurderHoles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
+operation = 2
+size = Vector3(0.6, 1.5, 0.6)
+material = SubResource("mat_stone_wall")
+
+[node name="Hole2" type="CSGBox3D" parent="Props/MurderHoles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
+operation = 2
+size = Vector3(0.6, 1.5, 0.6)
+material = SubResource("mat_stone_wall")
+
+[node name="Hole3" type="CSGBox3D" parent="Props/MurderHoles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 2)
+operation = 2
+size = Vector3(0.6, 1.5, 0.6)
+material = SubResource("mat_stone_wall")
+
+[node name="Hole4" type="CSGBox3D" parent="Props/MurderHoles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
+operation = 2
+size = Vector3(0.6, 1.5, 0.6)
+material = SubResource("mat_stone_wall")
+
+[node name="Pillar1" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, -4)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="Pillar2" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, -4)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="Pillar3" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, 4)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="Pillar4" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, 4)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="BannerE" type="CSGBox3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.4, 6, 0)
+size = Vector3(0.1, 4, 2)
+material = SubResource("mat_banner")
+
+[node name="BannerW" type="CSGBox3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.4, 6, 0)
+size = Vector3(0.1, 4, 2)
+material = SubResource("mat_banner")
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="Brazier1" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 0)
+
+[node name="Stand" type="CSGCylinder3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+radius = 0.35
+height = 1.0
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+radius = 0.5
+height = 0.4
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Fire" type="CSGSphere3D" parent="Lighting/Brazier1"]
+transform = Transform3D(0.7, 0, 0, 0, 0.85, 0, 0, 0, 0.7, 0, 1.6, 0)
+radius = 0.38
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 3.0
+omni_range = 14.0
+
+[node name="Brazier2" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 0)
+
+[node name="Stand" type="CSGCylinder3D" parent="Lighting/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+radius = 0.35
+height = 1.0
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Lighting/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+radius = 0.5
+height = 0.4
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Fire" type="CSGSphere3D" parent="Lighting/Brazier2"]
+transform = Transform3D(0.7, 0, 0, 0, 0.85, 0, 0, 0, 0.7, 0, 1.6, 0)
+radius = 0.38
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 3.0
+omni_range = 14.0
+
+[node name="Spawns" type="Node3D" parent="."]
+
+[node name="NPCSpawns" type="Node3D" parent="Spawns"]
+
+[node name="GateGuard1" type="Marker3D" parent="Spawns/NPCSpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, 0)
+metadata/npc_type = "dwarf_guard"
+metadata/npc_name = "Gate Guard"
+metadata/npc_id = "gate_guard_1"
+metadata/archetype = "guard"
+
+[node name="GateGuard2" type="Marker3D" parent="Spawns/NPCSpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, 0)
+metadata/npc_type = "dwarf_guard"
+metadata/npc_name = "Gate Guard"
+metadata/npc_id = "gate_guard_2"
+metadata/archetype = "guard"
+
+[node name="EnemySpawns" type="Node3D" parent="Spawns"]
+
+[node name="ChestSpawns" type="Node3D" parent="Spawns"]
+
+[node name="Connections" type="Node3D" parent="."]
+
+[node name="DoorPositions" type="Node3D" parent="Connections"]
+
+[node name="DoorNorth" type="Marker3D" parent="Connections/DoorPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -7.5)
+metadata/door_id = "door_north"
+metadata/door_label = "To Goblin Territory"
+
+[node name="DoorSouth" type="Marker3D" parent="Connections/DoorPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 7.5)
+metadata/door_id = "door_south"
+metadata/door_label = "To Great Bridge"
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]

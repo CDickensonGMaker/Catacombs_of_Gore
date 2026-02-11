@@ -1,0 +1,236 @@
+[gd_resource type="Resource" script_class="DialogueData" load_steps=32 format=3 uid="uid://fighters_guild_rep"]
+
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_node.gd" id="2_node"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_choice.gd" id="3_choice"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_condition.gd" id="4_cond"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_action.gd" id="5_action"]
+
+# ============================================================================
+# CHOICES
+# ============================================================================
+
+[sub_resource type="Resource" id="choice_goodbye"]
+script = ExtResource("3_choice")
+text = "I must go. Fight well."
+next_node_id = "end"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_back_start"]
+script = ExtResource("3_choice")
+text = "I had another question..."
+next_node_id = "start"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_about_guild"]
+script = ExtResource("3_choice")
+text = "Tell me about the Fighters Guild."
+next_node_id = "about_guild"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_training"]
+script = ExtResource("3_choice")
+text = "I seek combat training."
+next_node_id = "training_offer"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_bounties"]
+script = ExtResource("3_choice")
+text = "Do you have any bounty contracts?"
+next_node_id = "bounty_work"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_join_guild"]
+script = ExtResource("3_choice")
+text = "How do I join the Fighters Guild?"
+next_node_id = "join_info"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_accept_training"]
+script = ExtResource("3_choice")
+text = "Yes, I wish to train my combat skills."
+next_node_id = "training_begin"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_decline_training"]
+script = ExtResource("3_choice")
+text = "Perhaps another time."
+next_node_id = "training_declined"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_melee_focus"]
+script = ExtResource("3_choice")
+text = "Tell me more about melee combat."
+next_node_id = "melee_training"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_ranged_focus"]
+script = ExtResource("3_choice")
+text = "What about ranged combat?"
+next_node_id = "ranged_training"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_philosophy"]
+script = ExtResource("3_choice")
+text = "What is the warrior's code?"
+next_node_id = "warrior_philosophy"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+# ============================================================================
+# NODES
+# ============================================================================
+
+[sub_resource type="Resource" id="node_start"]
+script = ExtResource("2_node")
+id = "start"
+speaker_name = "Guildmaster Ironhide"
+text = "*a scarred veteran in worn plate armor looks you over with a critical eye* Hail, warrior. You have the look of one who has seen battle. The Fighters Guild welcomes all who seek to master the art of combat. What brings you to our hall?"
+choices = [SubResource("choice_about_guild"), SubResource("choice_training"), SubResource("choice_bounties"), SubResource("choice_join_guild"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "fighter_neutral"
+
+[sub_resource type="Resource" id="node_about_guild"]
+script = ExtResource("2_node")
+id = "about_guild"
+speaker_name = "Guildmaster Ironhide"
+text = "The Fighters Guild has stood for three centuries, training warriors and providing honorable work for those skilled in combat. We take contracts others won't - clearing monster dens, escorting caravans through dangerous lands, and yes, hunting down those with bounties on their heads. We do not murder, we do not steal. Steel with honor - that is our way."
+choices = [SubResource("choice_philosophy"), SubResource("choice_join_guild"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "fighter_proud"
+
+[sub_resource type="Resource" id="node_training_offer"]
+script = ExtResource("2_node")
+id = "training_offer"
+speaker_name = "Guildmaster Ironhide"
+text = "*he nods approvingly* Training is the foundation of a warrior's life. I can help you hone your skills with blade and bow. The fee is reasonable - we believe knowledge of combat should not be hoarded by the wealthy. Do you wish to begin?"
+choices = [SubResource("choice_accept_training"), SubResource("choice_melee_focus"), SubResource("choice_ranged_focus"), SubResource("choice_decline_training")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "fighter_teaching"
+
+[sub_resource type="Resource" id="node_training_begin"]
+script = ExtResource("2_node")
+id = "training_begin"
+speaker_name = "Guildmaster Ironhide"
+text = "*he rises and draws a practice sword* Good. Training requires dedication and gold. Come to me when you have coin to spare and the will to improve. For now, remember this: in combat, hesitation kills. Strike true, strike fast, and always watch your opponent's eyes - they betray intent before the body moves."
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "fighter_ready"
+
+[sub_resource type="Resource" id="node_training_declined"]
+script = ExtResource("2_node")
+id = "training_declined"
+speaker_name = "Guildmaster Ironhide"
+text = "*he shrugs* The training grounds are always open. Return when you are ready - the enemies you face will not wait for you to prepare."
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "fighter_neutral"
+
+[sub_resource type="Resource" id="node_melee_training"]
+script = ExtResource("2_node")
+id = "melee_training"
+speaker_name = "Guildmaster Ironhide"
+text = "Melee combat is about more than swinging steel. Footwork, timing, stamina management - these separate the living warrior from the corpse on the battlefield. I teach all weapon styles: sword and shield for defense, two-handed weapons for power, dual wielding for speed. Each has its place depending on the foe."
+choices = [SubResource("choice_ranged_focus"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "fighter_teaching"
+
+[sub_resource type="Resource" id="node_ranged_training"]
+script = ExtResource("2_node")
+id = "ranged_training"
+speaker_name = "Guildmaster Ironhide"
+text = "Ranged combat requires patience and precision. The bow is silent and swift - good for hunting and ambush. The crossbow hits harder but takes longer to reload. And those newfangled muskets... *he spits* loud and slow, but they punch through armor like nothing else. I can teach you all three."
+choices = [SubResource("choice_melee_focus"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "fighter_thoughtful"
+
+[sub_resource type="Resource" id="node_bounty_work"]
+script = ExtResource("2_node")
+id = "bounty_work"
+speaker_name = "Guildmaster Ironhide"
+text = "*he gestures to a board covered in notices* Bounty contracts are posted on the board outside. Most are for monsters threatening the roads, but some are for criminals who have fled justice. The guild takes a small cut, but the rest is yours. Just remember - we bring criminals to justice alive when possible. Execution is for the courts, not us."
+choices = [SubResource("choice_training"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "fighter_serious"
+
+[sub_resource type="Resource" id="node_join_info"]
+script = ExtResource("2_node")
+id = "join_info"
+speaker_name = "Guildmaster Ironhide"
+text = "Joining is simple - prove yourself. Complete a few contracts, show you can fight with honor, and you will be invited to take the oath. Members receive discounted training, access to our armories, and the respect that comes with wearing our insignia. We do not accept murderers or thieves. If you have blood on your hands from unjust deeds, seek redemption elsewhere first."
+choices = [SubResource("choice_about_guild"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "fighter_stern"
+
+[sub_resource type="Resource" id="node_warrior_philosophy"]
+script = ExtResource("2_node")
+id = "warrior_philosophy"
+speaker_name = "Guildmaster Ironhide"
+text = "*his voice grows solemn* Steel with honor. These are not mere words. A true warrior protects those who cannot protect themselves. We fight because we must, not because we want to. Every life we take should weigh on us - if it does not, we have become monsters ourselves. The blade is a tool of last resort, not first."
+choices = [SubResource("choice_about_guild"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "fighter_wise"
+
+[sub_resource type="Resource" id="node_end"]
+script = ExtResource("2_node")
+id = "end"
+speaker_name = "Guildmaster Ironhide"
+text = "*he claps a fist to his chest* Steel with honor, warrior. May your blade stay sharp and your enemies stay few."
+choices = []
+is_end_node = true
+auto_continue_to = ""
+portrait_id = "fighter_farewell"
+
+# ============================================================================
+# RESOURCE
+# ============================================================================
+
+[resource]
+script = ExtResource("1_data")
+id = "fighters_guild_rep"
+display_name = "Fighters Guild Representative"
+description = "Dialogue for Guildmaster Ironhide, representative of the Fighters Guild. Offers combat training and bounty quests."
+start_node_id = "start"
+nodes = [SubResource("node_start"), SubResource("node_about_guild"), SubResource("node_training_offer"), SubResource("node_training_begin"), SubResource("node_training_declined"), SubResource("node_melee_training"), SubResource("node_ranged_training"), SubResource("node_bounty_work"), SubResource("node_join_info"), SubResource("node_warrior_philosophy"), SubResource("node_end")]

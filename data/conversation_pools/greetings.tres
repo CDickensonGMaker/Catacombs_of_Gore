@@ -1,0 +1,234 @@
+[gd_resource type="Resource" script_class="ConversationResponsePool" load_steps=18 format=3 uid="uid://c1greetings_pool"]
+
+[ext_resource type="Script" path="res://scripts/dialogue/conversation_response_pool.gd" id="1_pool"]
+[ext_resource type="Script" path="res://scripts/dialogue/conversation_response.gd" id="2_resp"]
+
+# =============================================================================
+# STRANGER GREETINGS (Disposition 0-25)
+# =============================================================================
+
+[sub_resource type="Resource" id="greeting_stranger_1"]
+script = ExtResource("2_resp")
+text = "What do you want?"
+topic_type = 7
+personality_affinity = ["grumpy", "suspicious"]
+min_disposition = 0
+max_disposition = 25
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "greeting_stranger_1"
+
+[sub_resource type="Resource" id="greeting_stranger_2"]
+script = ExtResource("2_resp")
+text = "State your business."
+topic_type = 7
+personality_affinity = ["stern", "formal"]
+min_disposition = 0
+max_disposition = 25
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "greeting_stranger_2"
+
+[sub_resource type="Resource" id="greeting_stranger_3"]
+script = ExtResource("2_resp")
+text = "Hmph."
+topic_type = 7
+personality_affinity = ["grumpy", "cold"]
+min_disposition = 0
+max_disposition = 25
+required_knowledge = []
+weight = 0.8
+actions = []
+conditions = []
+response_id = "greeting_stranger_3"
+
+[sub_resource type="Resource" id="greeting_stranger_4"]
+script = ExtResource("2_resp")
+text = "I don't know you. Keep your distance."
+topic_type = 7
+personality_affinity = ["suspicious", "nervous"]
+min_disposition = 0
+max_disposition = 25
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "greeting_stranger_4"
+
+# =============================================================================
+# ACQUAINTANCE GREETINGS (Disposition 26-50)
+# =============================================================================
+
+[sub_resource type="Resource" id="greeting_acquaint_1"]
+script = ExtResource("2_resp")
+text = "Oh, it's you."
+topic_type = 7
+personality_affinity = ["neutral", "reserved"]
+min_disposition = 26
+max_disposition = 50
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "greeting_acquaint_1"
+
+[sub_resource type="Resource" id="greeting_acquaint_2"]
+script = ExtResource("2_resp")
+text = "Back again?"
+topic_type = 7
+personality_affinity = ["curious", "neutral"]
+min_disposition = 26
+max_disposition = 50
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "greeting_acquaint_2"
+
+[sub_resource type="Resource" id="greeting_acquaint_3"]
+script = ExtResource("2_resp")
+text = "I've seen you before. What is it?"
+topic_type = 7
+personality_affinity = ["observant", "cautious"]
+min_disposition = 26
+max_disposition = 50
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "greeting_acquaint_3"
+
+[sub_resource type="Resource" id="greeting_acquaint_4"]
+script = ExtResource("2_resp")
+text = "You again. Need something?"
+topic_type = 7
+personality_affinity = ["busy", "practical"]
+min_disposition = 26
+max_disposition = 50
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "greeting_acquaint_4"
+
+# =============================================================================
+# FRIEND GREETINGS (Disposition 51-75)
+# =============================================================================
+
+[sub_resource type="Resource" id="greeting_friend_1"]
+script = ExtResource("2_resp")
+text = "Well met, friend!"
+topic_type = 7
+personality_affinity = ["friendly", "warm"]
+min_disposition = 51
+max_disposition = 75
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "greeting_friend_1"
+
+[sub_resource type="Resource" id="greeting_friend_2"]
+script = ExtResource("2_resp")
+text = "Good to see you!"
+topic_type = 7
+personality_affinity = ["cheerful", "friendly"]
+min_disposition = 51
+max_disposition = 75
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "greeting_friend_2"
+
+[sub_resource type="Resource" id="greeting_friend_3"]
+script = ExtResource("2_resp")
+text = "Ah, a familiar face! How goes it?"
+topic_type = 7
+personality_affinity = ["warm", "sociable"]
+min_disposition = 51
+max_disposition = 75
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "greeting_friend_3"
+
+[sub_resource type="Resource" id="greeting_friend_4"]
+script = ExtResource("2_resp")
+text = "I was hoping you'd stop by!"
+topic_type = 7
+personality_affinity = ["enthusiastic", "friendly"]
+min_disposition = 51
+max_disposition = 75
+required_knowledge = []
+weight = 0.9
+actions = []
+conditions = []
+response_id = "greeting_friend_4"
+
+# =============================================================================
+# CLOSE FRIEND GREETINGS (Disposition 76-100)
+# =============================================================================
+
+[sub_resource type="Resource" id="greeting_close_1"]
+script = ExtResource("2_resp")
+text = "My friend! Always a pleasure!"
+topic_type = 7
+personality_affinity = ["warm", "loyal"]
+min_disposition = 76
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "greeting_close_1"
+
+[sub_resource type="Resource" id="greeting_close_2"]
+script = ExtResource("2_resp")
+text = "{player_name}! By the gods, it's good to see you!"
+topic_type = 7
+personality_affinity = ["enthusiastic", "devoted"]
+min_disposition = 76
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "greeting_close_2"
+
+[sub_resource type="Resource" id="greeting_close_3"]
+script = ExtResource("2_resp")
+text = "There you are! I've been thinking about you."
+topic_type = 7
+personality_affinity = ["affectionate", "warm"]
+min_disposition = 76
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "greeting_close_3"
+
+[sub_resource type="Resource" id="greeting_close_4"]
+script = ExtResource("2_resp")
+text = "Welcome, dear friend. What can I do for you?"
+topic_type = 7
+personality_affinity = ["gracious", "loyal"]
+min_disposition = 76
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "greeting_close_4"
+
+[resource]
+script = ExtResource("1_pool")
+responses = [SubResource("greeting_stranger_1"), SubResource("greeting_stranger_2"), SubResource("greeting_stranger_3"), SubResource("greeting_stranger_4"), SubResource("greeting_acquaint_1"), SubResource("greeting_acquaint_2"), SubResource("greeting_acquaint_3"), SubResource("greeting_acquaint_4"), SubResource("greeting_friend_1"), SubResource("greeting_friend_2"), SubResource("greeting_friend_3"), SubResource("greeting_friend_4"), SubResource("greeting_close_1"), SubResource("greeting_close_2"), SubResource("greeting_close_3"), SubResource("greeting_close_4")]
+pool_id = "greetings"
+description = "Greeting responses organized by disposition level (Stranger, Acquaintance, Friend, Close)"

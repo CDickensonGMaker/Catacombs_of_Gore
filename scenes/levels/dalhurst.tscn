@@ -1,0 +1,1390 @@
+[gd_scene load_steps=51 format=3 uid="uid://bfi17vads61ti"]
+
+[ext_resource type="Script" uid="uid://jey01ic3cvl" path="res://scripts/levels/dalhurst.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
+[ext_resource type="Texture2D" uid="uid://gmwgb548r8l7" path="res://Sprite folders grab bag/stonefloor.png" id="4"]
+[ext_resource type="Texture2D" uid="uid://dyhj3smpg4g87" path="res://Sprite folders grab bag/woodenfloor.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://Sprite folders grab bag/stonewall.png" id="6"]
+[ext_resource type="PackedScene" path="res://scenes/world/merchant_instance.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://scenes/world/bounty_board_instance.tscn" id="8"]
+[ext_resource type="PackedScene" path="res://scenes/world/rest_spot_instance.tscn" id="9"]
+[ext_resource type="PackedScene" path="res://scenes/world/fast_travel_shrine_instance.tscn" id="10"]
+[ext_resource type="PackedScene" path="res://scenes/npcs/quest_giver_instance.tscn" id="11"]
+[ext_resource type="PackedScene" path="res://scenes/world/zone_door_instance.tscn" id="12"]
+[ext_resource type="Texture2D" uid="uid://dpdehw6py1vin" path="res://Sprite folders grab bag/cat_animiation.png" id="13"]
+[ext_resource type="Texture2D" uid="uid://nl8fdo0bmq3w" path="res://Sprite folders grab bag/cow animiation.png" id="14"]
+
+[sub_resource type="Environment" id="Environment_dalhurst"]
+background_mode = 2
+background_energy_multiplier = 0.9
+ambient_light_source = 3
+ambient_light_color = Color(0.85, 0.88, 0.95, 1)
+ambient_light_energy = 0.7
+fog_enabled = true
+fog_light_color = Color(0.7, 0.75, 0.85, 1)
+fog_density = 0.003
+fog_sky_affect = 0.3
+
+[sub_resource type="StandardMaterial3D" id="mat_cobble"]
+albedo_color = Color(0.5, 0.48, 0.45, 1)
+albedo_texture = ExtResource("4")
+roughness = 0.95
+uv1_scale = Vector3(20, 20, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_street"]
+albedo_color = Color(0.4, 0.38, 0.35, 1)
+albedo_texture = ExtResource("4")
+roughness = 0.9
+uv1_scale = Vector3(5, 25, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_dock"]
+albedo_color = Color(0.45, 0.35, 0.25, 1)
+albedo_texture = ExtResource("5")
+roughness = 0.9
+uv1_scale = Vector3(15, 15, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_wall"]
+albedo_color = Color(0.55, 0.52, 0.48, 1)
+albedo_texture = ExtResource("6")
+roughness = 0.9
+uv1_scale = Vector3(15, 3, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_water"]
+transparency = 1
+albedo_color = Color(0.15, 0.35, 0.5, 0.85)
+metallic = 0.3
+roughness = 0.1
+
+[sub_resource type="StandardMaterial3D" id="mat_ship_hull"]
+albedo_color = Color(0.35, 0.28, 0.2, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_sail"]
+albedo_color = Color(0.9, 0.88, 0.82, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="mat_official_wall"]
+albedo_color = Color(0.6, 0.58, 0.55, 1)
+albedo_texture = ExtResource("6")
+roughness = 0.9
+uv1_scale = Vector3(3, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_official_roof"]
+albedo_color = Color(0.3, 0.35, 0.4, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_harbor_trim"]
+albedo_color = Color(0.3, 0.4, 0.5, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="mat_guild_wall"]
+albedo_color = Color(0.5, 0.4, 0.3, 1)
+albedo_texture = ExtResource("5")
+roughness = 0.9
+uv1_scale = Vector3(3, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_guild_roof"]
+albedo_color = Color(0.35, 0.28, 0.2, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_guild_trim"]
+albedo_color = Color(0.4, 0.35, 0.25, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="mat_curiosities_wall"]
+albedo_color = Color(0.55, 0.5, 0.48, 1)
+albedo_texture = ExtResource("6")
+roughness = 0.9
+uv1_scale = Vector3(2, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_curiosities_roof"]
+albedo_color = Color(0.25, 0.2, 0.3, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_curiosities_trim"]
+albedo_color = Color(0.4, 0.25, 0.45, 1)
+roughness = 0.6
+emission_enabled = true
+emission = Color(0.12, 0.075, 0.135, 1)
+emission_energy_multiplier = 0.5
+
+[sub_resource type="StandardMaterial3D" id="mat_tavern_floor"]
+albedo_color = Color(0.55, 0.45, 0.35, 1)
+albedo_texture = ExtResource("5")
+roughness = 0.95
+uv1_scale = Vector3(5, 5, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_tavern_wall"]
+albedo_color = Color(0.5, 0.42, 0.35, 1)
+albedo_texture = ExtResource("6")
+roughness = 0.9
+uv1_scale = Vector3(4, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_tavern_roof"]
+albedo_color = Color(0.3, 0.25, 0.2, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_tavern_gold"]
+albedo_color = Color(0.7, 0.55, 0.25, 1)
+metallic = 0.3
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="mat_inn_floor"]
+albedo_color = Color(0.6, 0.5, 0.4, 1)
+albedo_texture = ExtResource("5")
+roughness = 0.95
+uv1_scale = Vector3(4, 4, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_inn_wall"]
+albedo_color = Color(0.55, 0.48, 0.42, 1)
+albedo_texture = ExtResource("6")
+roughness = 0.9
+uv1_scale = Vector3(3, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_inn_roof"]
+albedo_color = Color(0.35, 0.28, 0.22, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_inn_trim"]
+albedo_color = Color(0.5, 0.38, 0.25, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="mat_shop_floor_wood"]
+albedo_color = Color(0.7, 0.6, 0.5, 1)
+albedo_texture = ExtResource("5")
+roughness = 0.95
+uv1_scale = Vector3(3, 3, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_shop_wall"]
+albedo_color = Color(0.6, 0.55, 0.5, 1)
+albedo_texture = ExtResource("6")
+roughness = 0.9
+uv1_scale = Vector3(2, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_shop_trim_general"]
+albedo_color = Color(0.5, 0.45, 0.35, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="mat_shop_floor_stone"]
+albedo_color = Color(0.7, 0.6, 0.5, 1)
+albedo_texture = ExtResource("4")
+roughness = 0.95
+uv1_scale = Vector3(3, 3, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_shop_trim_blacksmith"]
+albedo_color = Color(0.35, 0.32, 0.38, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="mat_shop_trim_armor"]
+albedo_color = Color(0.3, 0.4, 0.5, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="mat_shop_trim_alchemist"]
+albedo_color = Color(0.25, 0.45, 0.35, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="mat_shop_trim_weapon"]
+albedo_color = Color(0.5, 0.3, 0.25, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="mat_shop_trim_supplies"]
+albedo_color = Color(0.35, 0.45, 0.5, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="mat_guard_post"]
+albedo_color = Color(0.4, 0.35, 0.3, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="mat_guard_banner"]
+albedo_color = Color(0.3, 0.4, 0.6, 1)
+roughness = 0.8
+
+[node name="Dalhurst" type="Node3D"]
+script = ExtResource("1")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_dalhurst")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866, -0.433, 0.25, 0, 0.5, 0.866, -0.5, -0.75, 0.433, 0, 25, 0)
+light_color = Color(1, 0.95, 0.9, 1)
+light_energy = 1.3
+shadow_enabled = true
+shadow_bias = 0.02
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="CityGround" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.020769358, -0.51799345, -0.04103756)
+use_collision = true
+size = Vector3(120, 1, 100)
+material = SubResource("mat_cobble")
+
+[node name="MainStreet" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+size = Vector3(10, 0.05, 100)
+material = SubResource("mat_street")
+
+[node name="CrossStreet" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+size = Vector3(120, 0.05, 8)
+material = SubResource("mat_street")
+
+[node name="DockMain" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, -60)
+use_collision = true
+size = Vector3(80, 0.3, 20)
+material = SubResource("mat_dock")
+
+[node name="Piers" type="Node3D" parent="Terrain"]
+
+[node name="Pier0" type="CSGBox3D" parent="Terrain/Piers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32, 0.13, -82)
+use_collision = true
+size = Vector3(8, 0.25, 25)
+material = SubResource("mat_dock")
+
+[node name="Pier1" type="CSGBox3D" parent="Terrain/Piers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0.13, -82)
+use_collision = true
+size = Vector3(8, 0.25, 25)
+material = SubResource("mat_dock")
+
+[node name="Pier2" type="CSGBox3D" parent="Terrain/Piers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.13, -82)
+use_collision = true
+size = Vector3(8, 0.25, 25)
+material = SubResource("mat_dock")
+
+[node name="Pier3" type="CSGBox3D" parent="Terrain/Piers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0.13, -82)
+use_collision = true
+size = Vector3(8, 0.25, 25)
+material = SubResource("mat_dock")
+
+[node name="Pier4" type="CSGBox3D" parent="Terrain/Piers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 0.13, -82)
+use_collision = true
+size = Vector3(8, 0.25, 25)
+material = SubResource("mat_dock")
+
+[node name="Walls" type="Node3D" parent="."]
+
+[node name="SouthWallLeft" type="CSGBox3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33, 4, 50)
+use_collision = true
+size = Vector3(54, 8, 1.5)
+material = SubResource("mat_wall")
+
+[node name="SouthWallRight" type="CSGBox3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33, 4, 50)
+use_collision = true
+size = Vector3(54, 8, 1.5)
+material = SubResource("mat_wall")
+
+[node name="EastWall" type="CSGBox3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, 4, 0)
+use_collision = true
+size = Vector3(1.5, 8, 100)
+material = SubResource("mat_wall")
+
+[node name="WestWall" type="CSGBox3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -60, 4, 0)
+use_collision = true
+size = Vector3(1.5, 8, 100)
+material = SubResource("mat_wall")
+
+[node name="NorthWall" type="CSGBox3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -39.365967, 2.4, -50)
+use_collision = true
+size = Vector3(41.268066, 4.8, 1.5)
+material = SubResource("mat_wall")
+
+[node name="NorthWall2" type="CSGBox3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.258263, 2.573052, -50.229084)
+use_collision = true
+size = Vector3(41.268066, 4.8, 1.5)
+material = SubResource("mat_wall")
+
+[node name="Towers" type="Node3D" parent="Walls"]
+
+[node name="GateTowerLeft" type="CSGBox3D" parent="Walls/Towers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 6, 50)
+use_collision = true
+size = Vector3(4, 12, 4)
+material = SubResource("mat_wall")
+
+[node name="GateTowerLeftCap" type="CSGBox3D" parent="Walls/Towers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 12.5, 50)
+use_collision = true
+size = Vector3(5, 1, 5)
+material = SubResource("mat_wall")
+
+[node name="GateTowerRight" type="CSGBox3D" parent="Walls/Towers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 6, 50)
+use_collision = true
+size = Vector3(4, 12, 4)
+material = SubResource("mat_wall")
+
+[node name="GateTowerRightCap" type="CSGBox3D" parent="Walls/Towers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 12.5, 50)
+use_collision = true
+size = Vector3(5, 1, 5)
+material = SubResource("mat_wall")
+
+[node name="CornerTowerSW" type="CSGCylinder3D" parent="Walls/Towers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -60, 5, 50)
+use_collision = true
+radius = 3.0
+height = 10.0
+material = SubResource("mat_wall")
+
+[node name="CornerTowerSWCap" type="CSGCylinder3D" parent="Walls/Towers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -60, 10.75, 50)
+use_collision = true
+radius = 3.5
+height = 1.5
+material = SubResource("mat_wall")
+
+[node name="CornerTowerSE" type="CSGCylinder3D" parent="Walls/Towers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, 5, 50)
+use_collision = true
+radius = 3.0
+height = 10.0
+material = SubResource("mat_wall")
+
+[node name="CornerTowerSECap" type="CSGCylinder3D" parent="Walls/Towers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, 10.75, 50)
+use_collision = true
+radius = 3.5
+height = 1.5
+material = SubResource("mat_wall")
+
+[node name="CornerTowerNW" type="CSGCylinder3D" parent="Walls/Towers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -60, 5, -50)
+use_collision = true
+radius = 3.0
+height = 10.0
+material = SubResource("mat_wall")
+
+[node name="CornerTowerNW2" type="CSGCylinder3D" parent="Walls/Towers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.039913, 5, -50)
+use_collision = true
+radius = 3.0
+height = 10.0
+material = SubResource("mat_wall")
+
+[node name="CornerTowerNWCap" type="CSGCylinder3D" parent="Walls/Towers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -60, 10.75, -50)
+use_collision = true
+radius = 3.5
+height = 1.5
+material = SubResource("mat_wall")
+
+[node name="CornerTowerNE" type="CSGCylinder3D" parent="Walls/Towers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, 5, -50)
+use_collision = true
+radius = 3.0
+height = 10.0
+material = SubResource("mat_wall")
+
+[node name="CornerTowerNE2" type="CSGCylinder3D" parent="Walls/Towers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.789352, 5, -50)
+use_collision = true
+radius = 3.0
+height = 10.0
+material = SubResource("mat_wall")
+
+[node name="CornerTowerNECap" type="CSGCylinder3D" parent="Walls/Towers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, 10.75, -50)
+use_collision = true
+radius = 3.5
+height = 1.5
+material = SubResource("mat_wall")
+
+[node name="Harbor" type="Node3D" parent="."]
+
+[node name="BayWater" type="CSGBox3D" parent="Harbor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.5, -90)
+use_collision = true
+size = Vector3(150, 2, 60)
+material = SubResource("mat_water")
+
+[node name="Ships" type="Node3D" parent="Harbor"]
+
+[node name="Ship0" type="Node3D" parent="Harbor/Ships"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32, 0, -90)
+
+[node name="Hull" type="CSGBox3D" parent="Harbor/Ships/Ship0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+size = Vector3(6, 2, 15)
+material = SubResource("mat_ship_hull")
+
+[node name="Mast" type="CSGCylinder3D" parent="Harbor/Ships/Ship0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+radius = 0.3
+height = 12.0
+sides = 6
+material = SubResource("mat_ship_hull")
+
+[node name="Sail" type="CSGBox3D" parent="Harbor/Ships/Ship0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
+size = Vector3(0.1, 8, 5)
+material = SubResource("mat_sail")
+
+[node name="Ship1" type="Node3D" parent="Harbor/Ships"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, -95)
+
+[node name="Hull" type="CSGBox3D" parent="Harbor/Ships/Ship1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+size = Vector3(6, 2, 15)
+material = SubResource("mat_ship_hull")
+
+[node name="Mast" type="CSGCylinder3D" parent="Harbor/Ships/Ship1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+radius = 0.3
+height = 12.0
+sides = 6
+material = SubResource("mat_ship_hull")
+
+[node name="Sail" type="CSGBox3D" parent="Harbor/Ships/Ship1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
+size = Vector3(0.1, 8, 5)
+material = SubResource("mat_sail")
+
+[node name="Ship2" type="Node3D" parent="Harbor/Ships"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -88)
+
+[node name="Hull" type="CSGBox3D" parent="Harbor/Ships/Ship2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+size = Vector3(6, 2, 15)
+material = SubResource("mat_ship_hull")
+
+[node name="Mast" type="CSGCylinder3D" parent="Harbor/Ships/Ship2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+radius = 0.3
+height = 12.0
+sides = 6
+material = SubResource("mat_ship_hull")
+
+[node name="Sail" type="CSGBox3D" parent="Harbor/Ships/Ship2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
+size = Vector3(0.1, 8, 5)
+material = SubResource("mat_sail")
+
+[node name="Ship3" type="Node3D" parent="Harbor/Ships"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0, -92)
+
+[node name="Hull" type="CSGBox3D" parent="Harbor/Ships/Ship3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+size = Vector3(6, 2, 15)
+material = SubResource("mat_ship_hull")
+
+[node name="Mast" type="CSGCylinder3D" parent="Harbor/Ships/Ship3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+radius = 0.3
+height = 12.0
+sides = 6
+material = SubResource("mat_ship_hull")
+
+[node name="Sail" type="CSGBox3D" parent="Harbor/Ships/Ship3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
+size = Vector3(0.1, 8, 5)
+material = SubResource("mat_sail")
+
+[node name="Ship4" type="Node3D" parent="Harbor/Ships"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 0, -90)
+
+[node name="Hull" type="CSGBox3D" parent="Harbor/Ships/Ship4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+size = Vector3(6, 2, 15)
+material = SubResource("mat_ship_hull")
+
+[node name="Mast" type="CSGCylinder3D" parent="Harbor/Ships/Ship4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+radius = 0.3
+height = 12.0
+sides = 6
+material = SubResource("mat_ship_hull")
+
+[node name="Sail" type="CSGBox3D" parent="Harbor/Ships/Ship4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
+size = Vector3(0.1, 8, 5)
+material = SubResource("mat_sail")
+
+[node name="Buildings" type="Node3D" parent="."]
+
+[node name="HarbormasterOffice" type="Node3D" parent="Buildings"]
+transform = Transform3D(-0.86148745, 0, -0.5077789, 0, 1, 0, 0.5077789, 0, -0.86148745, 44.267494, -0.55207634, -15.95683)
+
+[node name="MainBuilding" type="CSGBox3D" parent="Buildings/HarbormasterOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
+use_collision = true
+size = Vector3(12, 6, 10)
+material = SubResource("mat_official_wall")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/HarbormasterOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.5, 0)
+use_collision = true
+size = Vector3(13, 1, 11)
+material = SubResource("mat_official_roof")
+
+[node name="Banner" type="CSGBox3D" parent="Buildings/HarbormasterOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 5.2)
+size = Vector3(9.6, 0.5, 0.2)
+material = SubResource("mat_harbor_trim")
+
+[node name="BuildingLight" type="OmniLight3D" parent="Buildings/HarbormasterOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+light_color = Color(1, 0.9, 0.7, 1)
+light_energy = 1.5
+omni_range = 10.0
+
+[node name="ShipwrightGuild" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.81424, 0, -40)
+
+[node name="MainBuilding" type="CSGBox3D" parent="Buildings/ShipwrightGuild"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8404827, 2.610981, -0.020309448)
+use_collision = true
+size = Vector3(14, 5, 12)
+material = SubResource("mat_guild_wall")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/ShipwrightGuild"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.9478588, 5.860981, 0.0012512207)
+use_collision = true
+size = Vector3(16, 1.5, 14)
+material = SubResource("mat_guild_roof")
+
+[node name="GuildSign" type="CSGBox3D" parent="Buildings/ShipwrightGuild"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8404827, 4.610981, 6.2796936)
+size = Vector3(4, 1.5, 0.2)
+material = SubResource("mat_guild_trim")
+
+[node name="WorkLight" type="OmniLight3D" parent="Buildings/ShipwrightGuild"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.283747, 4, -7.718399)
+light_color = Color(1, 0.85, 0.6, 1)
+light_energy = 2.0
+omni_range = 12.0
+
+[node name="LadyNightshadesCuriosities" type="Node3D" parent="Buildings"]
+transform = Transform3D(-0.88491446, 0, -0.4657536, 0, 1, 0, 0.4657536, 0, -0.88491446, 35, 0, 15)
+
+[node name="MainBuilding" type="CSGBox3D" parent="Buildings/LadyNightshadesCuriosities"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+use_collision = true
+size = Vector3(8, 5, 8)
+material = SubResource("mat_curiosities_wall")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/LadyNightshadesCuriosities"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.4, 0)
+use_collision = true
+size = Vector3(8.5, 0.8, 8.5)
+material = SubResource("mat_curiosities_roof")
+
+[node name="Awning" type="CSGBox3D" parent="Buildings/LadyNightshadesCuriosities"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.2, 5)
+size = Vector3(4.8, 0.3, 2)
+material = SubResource("mat_curiosities_trim")
+
+[node name="MysteryLight" type="OmniLight3D" parent="Buildings/LadyNightshadesCuriosities"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 5)
+light_color = Color(0.4, 0.25, 0.45, 1)
+light_energy = 1.5
+omni_range = 6.0
+
+[node name="TheGildedGrog" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35, 0, 0)
+
+[node name="TavernFloor" type="CSGBox3D" parent="Buildings/TheGildedGrog"]
+transform = Transform3D(0.23936386, 0, -0.9709299, 0, 1, 0, 0.9709299, 0, 0.23936386, -1.4065857, 0.1500001, -18.103569)
+use_collision = true
+size = Vector3(16, 0.3, 14)
+material = SubResource("mat_tavern_floor")
+
+[node name="BackWall" type="CSGBox3D" parent="Buildings/TheGildedGrog"]
+transform = Transform3D(0.23936386, 0, -0.9709299, 0, 1, 0, 0.9709299, 0, 0.23936386, 5.147192, 3, -19.719275)
+use_collision = true
+size = Vector3(16, 6, 0.5)
+material = SubResource("mat_tavern_wall")
+
+[node name="LeftWall" type="CSGBox3D" parent="Buildings/TheGildedGrog"]
+transform = Transform3D(0.23936386, 0, -0.9709299, 0, 1, 0, 0.9709299, 0, 0.23936386, -3.504387, 3, -25.568434)
+use_collision = true
+size = Vector3(0.5, 6, 13.5)
+material = SubResource("mat_tavern_wall")
+
+[node name="RightWallAbove" type="CSGBox3D" parent="Buildings/TheGildedGrog"]
+transform = Transform3D(0.23936386, 0, -0.9709299, 0, 1, 0, 0.9709299, 0, 0.23936386, 0.20575333, 4.75, -10.519021)
+use_collision = true
+size = Vector3(0.5, 2.5, 13.5)
+material = SubResource("mat_tavern_wall")
+
+[node name="RightWallFront" type="CSGBox3D" parent="Buildings/TheGildedGrog"]
+transform = Transform3D(0.23936386, 0, -0.9709299, 0, 1, 0, 0.9709299, 0, 0.23936386, -4.0420647, 1.75, -9.471804)
+use_collision = true
+size = Vector3(0.5, 3.5, 4.25)
+material = SubResource("mat_tavern_wall")
+
+[node name="RightWallBack" type="CSGBox3D" parent="Buildings/TheGildedGrog"]
+transform = Transform3D(0.23936386, 0, -0.9709299, 0, 1, 0, 0.9709299, 0, 0.23936386, 4.4535713, 3.9997673, -11.566237)
+use_collision = true
+size = Vector3(0.5, 3.5, 4.25)
+material = SubResource("mat_tavern_wall")
+
+[node name="FrontWall" type="CSGBox3D" parent="Buildings/TheGildedGrog"]
+transform = Transform3D(0.23936386, 0, -0.9709299, 0, 1, 0, 0.9709299, 0, 0.23936386, -7.9603615, 3, -16.487862)
+use_collision = true
+size = Vector3(15, 6, 0.5)
+material = SubResource("mat_tavern_wall")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/TheGildedGrog"]
+transform = Transform3D(0.23936386, 0, -0.9709299, 0, 1, 0, 0.9709299, 0, 0.23936386, -1.4065857, 6.3, -18.103569)
+use_collision = true
+size = Vector3(17, 0.6, 15)
+material = SubResource("mat_tavern_roof")
+
+[node name="GoldTrim" type="CSGBox3D" parent="Buildings/TheGildedGrog"]
+transform = Transform3D(0.23936386, 0, -0.9709299, 0, 1, 0, 0.9709299, 0, 0.23936386, -1.4065857, 6.8, -18.103569)
+size = Vector3(17.2, 0.4, 15.2)
+material = SubResource("mat_tavern_gold")
+
+[node name="TavernSign" type="CSGBox3D" parent="Buildings/TheGildedGrog"]
+transform = Transform3D(0.23936386, 0, -0.9709299, 0, 1, 0, 0.9709299, 0, 0.23936386, 0.6280098, 5, -9.850664)
+size = Vector3(0.2, 2, 4)
+material = SubResource("mat_tavern_gold")
+
+[node name="TavernLight" type="OmniLight3D" parent="Buildings/TheGildedGrog"]
+transform = Transform3D(0.23936386, 0, -0.9709299, 0, 1, 0, 0.9709299, 0, 0.23936386, -0.53115845, 4.5, -18.319387)
+light_color = Color(1, 0.8, 0.5, 1)
+light_energy = 2.5
+omni_range = 15.0
+
+[node name="TavernLight2" type="OmniLight3D" parent="Buildings/TheGildedGrog"]
+transform = Transform3D(0.23936386, 0, -0.9709299, 0, 1, 0, 0.9709299, 0, 0.23936386, 1.5911942, 2, -23.992315)
+light_color = Color(1, 0.75, 0.4, 1)
+light_energy = 1.5
+omni_range = 8.0
+
+[node name="DalhurstInn" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 0, 0)
+
+[node name="Floor" type="CSGBox3D" parent="Buildings/DalhurstInn"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+use_collision = true
+size = Vector3(12, 0.2, 10)
+material = SubResource("mat_inn_floor")
+
+[node name="BackWall" type="CSGBox3D" parent="Buildings/DalhurstInn"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.75, -4.75)
+use_collision = true
+size = Vector3(12, 5.5, 0.5)
+material = SubResource("mat_inn_wall")
+
+[node name="RightWall" type="CSGBox3D" parent="Buildings/DalhurstInn"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.75, 2.75, 0.25)
+use_collision = true
+size = Vector3(0.5, 5.5, 9.5)
+material = SubResource("mat_inn_wall")
+
+[node name="FrontWall" type="CSGBox3D" parent="Buildings/DalhurstInn"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, 2.75, 4.75)
+use_collision = true
+size = Vector3(11.5, 5.5, 0.5)
+material = SubResource("mat_inn_wall")
+
+[node name="LeftWallAbove" type="CSGBox3D" parent="Buildings/DalhurstInn"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.75, 4.5, 0.25)
+use_collision = true
+size = Vector3(0.5, 2, 9.5)
+material = SubResource("mat_inn_wall")
+
+[node name="LeftWallFront" type="CSGBox3D" parent="Buildings/DalhurstInn"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.75, 1.75, 2.875)
+use_collision = true
+size = Vector3(0.5, 3.5, 2.75)
+material = SubResource("mat_inn_wall")
+
+[node name="LeftWallBack" type="CSGBox3D" parent="Buildings/DalhurstInn"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.75, 1.75, -2.375)
+use_collision = true
+size = Vector3(0.5, 3.5, 2.75)
+material = SubResource("mat_inn_wall")
+
+[node name="Roof" type="CSGBox3D" parent="Buildings/DalhurstInn"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.75, 0)
+use_collision = true
+size = Vector3(12.8, 0.5, 10.8)
+material = SubResource("mat_inn_roof")
+
+[node name="Awning" type="CSGBox3D" parent="Buildings/DalhurstInn"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.7, 3.5, 0)
+size = Vector3(1.8, 0.3, 4)
+material = SubResource("mat_inn_trim")
+
+[node name="InnLight" type="OmniLight3D" parent="Buildings/DalhurstInn"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+light_color = Color(1, 0.85, 0.6, 1)
+light_energy = 2.0
+omni_range = 10.0
+
+[node name="MerchantShops" type="Node3D" parent="Buildings"]
+
+[node name="Shop_DalhurstGeneralGoods" type="Node3D" parent="Buildings/MerchantShops"]
+transform = Transform3D(-0.034725044, 0, -0.9993969, 0, 1, 0, 0.9993969, 0, -0.034725044, 20, 0, 25)
+
+[node name="Floor" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_DalhurstGeneralGoods"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+use_collision = true
+size = Vector3(7, 0.2, 7)
+material = SubResource("mat_shop_floor_wood")
+
+[node name="BackWall" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_DalhurstGeneralGoods"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.25, -3.3)
+use_collision = true
+size = Vector3(7, 4.5, 0.4)
+material = SubResource("mat_shop_wall")
+
+[node name="LeftWall" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_DalhurstGeneralGoods"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.3, 2.25, 0.2)
+use_collision = true
+size = Vector3(0.4, 4.5, 6.6)
+material = SubResource("mat_shop_wall")
+
+[node name="RightWall" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_DalhurstGeneralGoods"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3, 2.25, 0.2)
+use_collision = true
+size = Vector3(0.4, 4.5, 6.6)
+material = SubResource("mat_shop_wall")
+
+[node name="FrontLeftPost" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_DalhurstGeneralGoods"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.325, 2.25, 3.3)
+use_collision = true
+size = Vector3(1.55, 4.5, 0.4)
+material = SubResource("mat_shop_wall")
+
+[node name="FrontRightPost" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_DalhurstGeneralGoods"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.325, 2.25, 3.3)
+use_collision = true
+size = Vector3(1.55, 4.5, 0.4)
+material = SubResource("mat_shop_wall")
+
+[node name="Awning" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_DalhurstGeneralGoods"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 4)
+size = Vector3(4, 0.3, 1.5)
+material = SubResource("mat_shop_trim_general")
+
+[node name="RoofTrim" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_DalhurstGeneralGoods"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.65, 0)
+size = Vector3(7.3, 0.3, 7.3)
+material = SubResource("mat_shop_trim_general")
+
+[node name="ShopLight" type="OmniLight3D" parent="Buildings/MerchantShops/Shop_DalhurstGeneralGoods"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+light_color = Color(1, 0.9, 0.7, 1)
+light_energy = 1.5
+omni_range = 7.0
+
+[node name="Shop_HarborBlacksmith" type="Node3D" parent="Buildings/MerchantShops"]
+transform = Transform3D(-0.7030224, 0, -0.71116763, 0, 1, 0, 0.71116763, 0, -0.7030224, 20, 0, 12)
+
+[node name="Floor" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_HarborBlacksmith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+use_collision = true
+size = Vector3(7, 0.2, 7)
+material = SubResource("mat_shop_floor_stone")
+
+[node name="BackWall" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_HarborBlacksmith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.25, -3.3)
+use_collision = true
+size = Vector3(7, 4.5, 0.4)
+material = SubResource("mat_shop_wall")
+
+[node name="LeftWall" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_HarborBlacksmith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.3, 2.25, 0.2)
+use_collision = true
+size = Vector3(0.4, 4.5, 6.6)
+material = SubResource("mat_shop_wall")
+
+[node name="RightWall" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_HarborBlacksmith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3, 2.25, 0.2)
+use_collision = true
+size = Vector3(0.4, 4.5, 6.6)
+material = SubResource("mat_shop_wall")
+
+[node name="FrontLeftPost" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_HarborBlacksmith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.325, 2.25, 3.3)
+use_collision = true
+size = Vector3(1.55, 4.5, 0.4)
+material = SubResource("mat_shop_wall")
+
+[node name="FrontRightPost" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_HarborBlacksmith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.325, 2.25, 3.3)
+use_collision = true
+size = Vector3(1.55, 4.5, 0.4)
+material = SubResource("mat_shop_wall")
+
+[node name="Awning" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_HarborBlacksmith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 4)
+size = Vector3(4, 0.3, 1.5)
+material = SubResource("mat_shop_trim_blacksmith")
+
+[node name="RoofTrim" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_HarborBlacksmith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.65, 0)
+size = Vector3(7.3, 0.3, 7.3)
+material = SubResource("mat_shop_trim_blacksmith")
+
+[node name="ShopLight" type="OmniLight3D" parent="Buildings/MerchantShops/Shop_HarborBlacksmith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+light_color = Color(1, 0.9, 0.7, 1)
+light_energy = 1.5
+omni_range = 7.0
+
+[node name="Shop_SeabreezeArmory" type="Node3D" parent="Buildings/MerchantShops"]
+transform = Transform3D(0.90927243, 0, 0.41620144, 0, 1, 0, -0.41620144, 0, 0.90927243, -11.377686, 9.536743e-07, -10.259255)
+
+[node name="Floor" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_SeabreezeArmory"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+use_collision = true
+size = Vector3(7, 0.2, 7)
+material = SubResource("mat_shop_floor_stone")
+
+[node name="BackWall" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_SeabreezeArmory"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.25, -3.3)
+use_collision = true
+size = Vector3(7, 4.5, 0.4)
+material = SubResource("mat_shop_wall")
+
+[node name="LeftWall" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_SeabreezeArmory"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.3, 2.25, 0.2)
+use_collision = true
+size = Vector3(0.4, 4.5, 6.6)
+material = SubResource("mat_shop_wall")
+
+[node name="RightWall" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_SeabreezeArmory"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3, 2.25, 0.2)
+use_collision = true
+size = Vector3(0.4, 4.5, 6.6)
+material = SubResource("mat_shop_wall")
+
+[node name="FrontLeftPost" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_SeabreezeArmory"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.325, 2.25, 3.3)
+use_collision = true
+size = Vector3(1.55, 4.5, 0.4)
+material = SubResource("mat_shop_wall")
+
+[node name="FrontRightPost" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_SeabreezeArmory"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.325, 2.25, 3.3)
+use_collision = true
+size = Vector3(1.55, 4.5, 0.4)
+material = SubResource("mat_shop_wall")
+
+[node name="Awning" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_SeabreezeArmory"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 4)
+size = Vector3(4, 0.3, 1.5)
+material = SubResource("mat_shop_trim_armor")
+
+[node name="RoofTrim" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_SeabreezeArmory"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.65, 0)
+size = Vector3(7.3, 0.3, 7.3)
+material = SubResource("mat_shop_trim_armor")
+
+[node name="ShopLight" type="OmniLight3D" parent="Buildings/MerchantShops/Shop_SeabreezeArmory"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+light_color = Color(1, 0.9, 0.7, 1)
+light_energy = 1.5
+omni_range = 7.0
+
+[node name="Shop_DocksideAlchemist" type="Node3D" parent="Buildings/MerchantShops"]
+transform = Transform3D(0.90047824, 0, -0.4349011, 0, 1, 0, 0.4349011, 0, 0.90047824, 13.049517, 0, -10.8234625)
+
+[node name="Floor" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_DocksideAlchemist"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+use_collision = true
+size = Vector3(7, 0.2, 7)
+material = SubResource("mat_shop_floor_wood")
+
+[node name="BackWall" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_DocksideAlchemist"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.25, -3.3)
+use_collision = true
+size = Vector3(7, 4.5, 0.4)
+material = SubResource("mat_shop_wall")
+
+[node name="LeftWall" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_DocksideAlchemist"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.3, 2.25, 0.2)
+use_collision = true
+size = Vector3(0.4, 4.5, 6.6)
+material = SubResource("mat_shop_wall")
+
+[node name="RightWall" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_DocksideAlchemist"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3, 2.25, 0.2)
+use_collision = true
+size = Vector3(0.4, 4.5, 6.6)
+material = SubResource("mat_shop_wall")
+
+[node name="FrontLeftPost" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_DocksideAlchemist"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.325, 2.25, 3.3)
+use_collision = true
+size = Vector3(1.55, 4.5, 0.4)
+material = SubResource("mat_shop_wall")
+
+[node name="FrontRightPost" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_DocksideAlchemist"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.325, 2.25, 3.3)
+use_collision = true
+size = Vector3(1.55, 4.5, 0.4)
+material = SubResource("mat_shop_wall")
+
+[node name="Awning" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_DocksideAlchemist"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 4)
+size = Vector3(4, 0.3, 1.5)
+material = SubResource("mat_shop_trim_alchemist")
+
+[node name="RoofTrim" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_DocksideAlchemist"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.65, 0)
+size = Vector3(7.3, 0.3, 7.3)
+material = SubResource("mat_shop_trim_alchemist")
+
+[node name="ShopLight" type="OmniLight3D" parent="Buildings/MerchantShops/Shop_DocksideAlchemist"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+light_color = Color(1, 0.9, 0.7, 1)
+light_energy = 1.5
+omni_range = 7.0
+
+[node name="Shop_SaltyDogWeapons" type="Node3D" parent="Buildings/MerchantShops"]
+transform = Transform3D(-0.1622238, 0, 0.986754, 0, 1, 0, -0.986754, 0, -0.1622238, -20, 0, 25)
+
+[node name="Floor" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_SaltyDogWeapons"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+use_collision = true
+size = Vector3(7, 0.2, 7)
+material = SubResource("mat_shop_floor_stone")
+
+[node name="BackWall" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_SaltyDogWeapons"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.25, -3.3)
+use_collision = true
+size = Vector3(7, 4.5, 0.4)
+material = SubResource("mat_shop_wall")
+
+[node name="LeftWall" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_SaltyDogWeapons"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.3, 2.25, 0.2)
+use_collision = true
+size = Vector3(0.4, 4.5, 6.6)
+material = SubResource("mat_shop_wall")
+
+[node name="RightWall" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_SaltyDogWeapons"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3, 2.25, 0.2)
+use_collision = true
+size = Vector3(0.4, 4.5, 6.6)
+material = SubResource("mat_shop_wall")
+
+[node name="FrontLeftPost" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_SaltyDogWeapons"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.325, 2.25, 3.3)
+use_collision = true
+size = Vector3(1.55, 4.5, 0.4)
+material = SubResource("mat_shop_wall")
+
+[node name="FrontRightPost" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_SaltyDogWeapons"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.325, 2.25, 3.3)
+use_collision = true
+size = Vector3(1.55, 4.5, 0.4)
+material = SubResource("mat_shop_wall")
+
+[node name="Awning" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_SaltyDogWeapons"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 4)
+size = Vector3(4, 0.3, 1.5)
+material = SubResource("mat_shop_trim_weapon")
+
+[node name="RoofTrim" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_SaltyDogWeapons"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.65, 0)
+size = Vector3(7.3, 0.3, 7.3)
+material = SubResource("mat_shop_trim_weapon")
+
+[node name="ShopLight" type="OmniLight3D" parent="Buildings/MerchantShops/Shop_SaltyDogWeapons"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+light_color = Color(1, 0.9, 0.7, 1)
+light_energy = 1.5
+omni_range = 7.0
+
+[node name="Shop_SeafarersSupplies" type="Node3D" parent="Buildings/MerchantShops"]
+transform = Transform3D(-0.85894203, 0, 0.5120729, 0, 1, 0, -0.5120729, 0, -0.85894203, -20, 0, 12)
+
+[node name="Floor" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_SeafarersSupplies"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+use_collision = true
+size = Vector3(7, 0.2, 7)
+material = SubResource("mat_shop_floor_wood")
+
+[node name="BackWall" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_SeafarersSupplies"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.25, -3.3)
+use_collision = true
+size = Vector3(7, 4.5, 0.4)
+material = SubResource("mat_shop_wall")
+
+[node name="LeftWall" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_SeafarersSupplies"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.3, 2.25, 0.2)
+use_collision = true
+size = Vector3(0.4, 4.5, 6.6)
+material = SubResource("mat_shop_wall")
+
+[node name="RightWall" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_SeafarersSupplies"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3, 2.25, 0.2)
+use_collision = true
+size = Vector3(0.4, 4.5, 6.6)
+material = SubResource("mat_shop_wall")
+
+[node name="FrontLeftPost" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_SeafarersSupplies"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.325, 2.25, 3.3)
+use_collision = true
+size = Vector3(1.55, 4.5, 0.4)
+material = SubResource("mat_shop_wall")
+
+[node name="FrontRightPost" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_SeafarersSupplies"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.325, 2.25, 3.3)
+use_collision = true
+size = Vector3(1.55, 4.5, 0.4)
+material = SubResource("mat_shop_wall")
+
+[node name="Awning" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_SeafarersSupplies"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 4)
+size = Vector3(4, 0.3, 1.5)
+material = SubResource("mat_shop_trim_supplies")
+
+[node name="RoofTrim" type="CSGBox3D" parent="Buildings/MerchantShops/Shop_SeafarersSupplies"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.65, 0)
+size = Vector3(7.3, 0.3, 7.3)
+material = SubResource("mat_shop_trim_supplies")
+
+[node name="ShopLight" type="OmniLight3D" parent="Buildings/MerchantShops/Shop_SeafarersSupplies"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+light_color = Color(1, 0.9, 0.7, 1)
+light_energy = 1.5
+omni_range = 7.0
+
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="from_wilderness" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 48)
+
+[node name="from_inn" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.5, 0.1, 0)
+
+[node name="from_fast_travel" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.6425095, 0.1, 0)
+
+[node name="NPCSpawns" type="Node3D" parent="."]
+
+[node name="GuardPosts" type="Node3D" parent="."]
+
+[node name="GuardPost0" type="Node3D" parent="GuardPosts"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 45)
+
+[node name="PostPole" type="CSGCylinder3D" parent="GuardPosts/GuardPost0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+radius = 0.15
+height = 3.0
+sides = 6
+material = SubResource("mat_guard_post")
+
+[node name="Banner" type="CSGBox3D" parent="GuardPosts/GuardPost0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 2.5, 0)
+size = Vector3(0.8, 0.5, 0.05)
+material = SubResource("mat_guard_banner")
+
+[node name="TorchLight" type="OmniLight3D" parent="GuardPosts/GuardPost0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+
+[node name="GuardPost1" type="Node3D" parent="GuardPosts"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 45)
+
+[node name="PostPole" type="CSGCylinder3D" parent="GuardPosts/GuardPost1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+radius = 0.15
+height = 3.0
+sides = 6
+material = SubResource("mat_guard_post")
+
+[node name="Banner" type="CSGBox3D" parent="GuardPosts/GuardPost1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 2.5, 0)
+size = Vector3(0.8, 0.5, 0.05)
+material = SubResource("mat_guard_banner")
+
+[node name="TorchLight" type="OmniLight3D" parent="GuardPosts/GuardPost1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+
+[node name="GuardPost2" type="Node3D" parent="GuardPosts"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 45)
+
+[node name="PostPole" type="CSGCylinder3D" parent="GuardPosts/GuardPost2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+radius = 0.15
+height = 3.0
+sides = 6
+material = SubResource("mat_guard_post")
+
+[node name="Banner" type="CSGBox3D" parent="GuardPosts/GuardPost2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 2.5, 0)
+size = Vector3(0.8, 0.5, 0.05)
+material = SubResource("mat_guard_banner")
+
+[node name="TorchLight" type="OmniLight3D" parent="GuardPosts/GuardPost2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+
+[node name="GuardPost3" type="Node3D" parent="GuardPosts"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55, 0, 0)
+
+[node name="PostPole" type="CSGCylinder3D" parent="GuardPosts/GuardPost3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+radius = 0.15
+height = 3.0
+sides = 6
+material = SubResource("mat_guard_post")
+
+[node name="Banner" type="CSGBox3D" parent="GuardPosts/GuardPost3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 2.5, 0)
+size = Vector3(0.8, 0.5, 0.05)
+material = SubResource("mat_guard_banner")
+
+[node name="TorchLight" type="OmniLight3D" parent="GuardPosts/GuardPost3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+
+[node name="GuardPost4" type="Node3D" parent="GuardPosts"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -55, 0, 0)
+
+[node name="PostPole" type="CSGCylinder3D" parent="GuardPosts/GuardPost4"]
+transform = Transform3D(0.23936386, 0, -0.9709299, 0, 1, 0, 0.9709299, 0, 0.23936386, 22.54673, 1.4445848, -8.926624)
+use_collision = true
+radius = 0.15
+height = 3.0
+sides = 6
+material = SubResource("mat_guard_post")
+
+[node name="Banner" type="CSGBox3D" parent="GuardPosts/GuardPost4"]
+transform = Transform3D(0.23936386, 0, -0.9709299, 0, 1, 0, 0.9709299, 0, 0.23936386, 22.666412, 2.4445848, -8.441162)
+size = Vector3(0.8, 0.5, 0.05)
+material = SubResource("mat_guard_banner")
+
+[node name="TorchLight" type="OmniLight3D" parent="GuardPosts/GuardPost4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+
+[node name="GuardPost5" type="Node3D" parent="GuardPosts"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -48)
+
+[node name="PostPole" type="CSGCylinder3D" parent="GuardPosts/GuardPost5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+radius = 0.15
+height = 3.0
+sides = 6
+material = SubResource("mat_guard_post")
+
+[node name="Banner" type="CSGBox3D" parent="GuardPosts/GuardPost5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 2.5, 0)
+size = Vector3(0.8, 0.5, 0.05)
+material = SubResource("mat_guard_banner")
+
+[node name="TorchLight" type="OmniLight3D" parent="GuardPosts/GuardPost5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+
+[node name="GuardPost6" type="Node3D" parent="GuardPosts"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 0, -48)
+
+[node name="PostPole" type="CSGCylinder3D" parent="GuardPosts/GuardPost6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+radius = 0.15
+height = 3.0
+sides = 6
+material = SubResource("mat_guard_post")
+
+[node name="Banner" type="CSGBox3D" parent="GuardPosts/GuardPost6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 2.5, 0)
+size = Vector3(0.8, 0.5, 0.05)
+material = SubResource("mat_guard_banner")
+
+[node name="TorchLight" type="OmniLight3D" parent="GuardPosts/GuardPost6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+
+[node name="GuardPost7" type="Node3D" parent="GuardPosts"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 0, -48)
+
+[node name="PostPole" type="CSGCylinder3D" parent="GuardPosts/GuardPost7"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.443264, 1.610981, 59.656235)
+use_collision = true
+radius = 0.15
+height = 3.0
+sides = 6
+material = SubResource("mat_guard_post")
+
+[node name="Banner" type="CSGBox3D" parent="GuardPosts/GuardPost7"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.943264, 2.610981, 59.656235)
+size = Vector3(0.8, 0.5, 0.05)
+material = SubResource("mat_guard_banner")
+
+[node name="TorchLight" type="OmniLight3D" parent="GuardPosts/GuardPost7"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+
+[node name="NPCs" type="Node3D" parent="."]
+
+[node name="Merchants" type="Node3D" parent="NPCs"]
+
+[node name="Merchant_GeneralGoods" parent="NPCs/Merchants" instance=ExtResource("7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, 23.5)
+merchant_name = "Dalhurst General Goods"
+shop_tier = 2
+
+[node name="Merchant_Blacksmith" parent="NPCs/Merchants" instance=ExtResource("7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, 10.5)
+merchant_name = "Harbor Blacksmith"
+shop_tier = 2
+shop_type = "blacksmith"
+
+[node name="Merchant_Armory" parent="NPCs/Merchants" instance=ExtResource("7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.762777, 0, -9.846027)
+merchant_name = "Seabreeze Armory"
+shop_tier = 2
+shop_type = "armor"
+
+[node name="Merchant_Alchemist" parent="NPCs/Merchants" instance=ExtResource("7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.901911, 0, -13.118561)
+merchant_name = "Dockside Alchemist"
+shop_tier = 2
+shop_type = "alchemist"
+
+[node name="Merchant_Weapons" parent="NPCs/Merchants" instance=ExtResource("7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, 23.5)
+merchant_name = "Salty Dog Weapons"
+shop_tier = 2
+shop_type = "weapon"
+
+[node name="Merchant_Supplies" parent="NPCs/Merchants" instance=ExtResource("7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, 10.5)
+merchant_name = "Seafarer's Supplies"
+shop_tier = 2
+
+[node name="Merchant_Bar" parent="NPCs/Merchants" instance=ExtResource("7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 41.8639, 0.021261603, -0.04819107)
+merchant_name = "Gilded Grog Bar"
+
+[node name="QuestGivers" type="Node3D" parent="NPCs"]
+
+[node name="Nathan" parent="NPCs/QuestGivers" instance=ExtResource("11")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 25)
+npc_id = "nathan"
+display_name = "Nathan"
+quest_ids = Array[String](["journey_to_kazandun"])
+
+[node name="HarborCaptain" parent="NPCs/QuestGivers" instance=ExtResource("11")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, -35)
+npc_id = "harbor_captain"
+display_name = "Harbor Captain"
+
+[node name="WorriedMerchant" parent="NPCs/QuestGivers" instance=ExtResource("11")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 20)
+npc_id = "worried_merchant_dalhurst"
+display_name = "Worried Merchant"
+quest_ids = Array[String](["willow_dale_investigation"])
+
+[node name="Interactables" type="Node3D" parent="."]
+
+[node name="BountyBoard" parent="Interactables" instance=ExtResource("8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.756374, 0, -5)
+board_name = "Dalhurst Bounty Board"
+
+[node name="RestSpot" parent="Interactables" instance=ExtResource("9")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25.47723, 0, 2)
+display_name = "Gilded Grog Table"
+rest_type = 1
+
+[node name="FastTravelShrine" parent="Interactables" instance=ExtResource("10")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -0.632658)
+display_name = "Dalhurst Shrine"
+shrine_id = "dalhurst_shrine"
+
+[node name="Doors" type="Node3D" parent="."]
+
+[node name="InnDoor" parent="Doors" instance=ExtResource("12")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 34, 0, 0)
+target_scene = "res://scenes/levels/inn_interior.tscn"
+spawn_point_id = "from_dalhurst"
+door_name = "The Sailor's Rest Inn"
+
+[node name="WildernessExit" parent="Doors" instance=ExtResource("12")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, -0.5, 52)
+target_scene = "RETURN_TO_WILDERNESS"
+spawn_point_id = "from_dalhurst"
+door_name = "Leave City (Wilderness)"
+
+[node name="Player" parent="." instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 40)
+
+[node name="HUD" parent="." instance=ExtResource("3")]
+
+[node name="AmbientAnimals" type="Node3D" parent="."]
+
+[node name="Cat_0" type="Sprite3D" parent="AmbientAnimals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0.3, 20)
+billboard = 1
+alpha_cut = 2
+texture = ExtResource("13")
+hframes = 5
+
+[node name="Cat_1" type="Sprite3D" parent="AmbientAnimals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 0.3, 15)
+billboard = 1
+alpha_cut = 2
+texture = ExtResource("13")
+hframes = 5
+frame = 1
+
+[node name="Cat_2" type="Sprite3D" parent="AmbientAnimals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 0.3, -30)
+billboard = 1
+alpha_cut = 2
+texture = ExtResource("13")
+hframes = 5
+frame = 3
+
+[node name="Bull_0" type="Sprite3D" parent="AmbientAnimals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40, 0.5, 35)
+pixel_size = 0.02
+billboard = 1
+alpha_cut = 2
+texture = ExtResource("14")
+hframes = 5
+
+[node name="Bull_1" type="Sprite3D" parent="AmbientAnimals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, 0.5, 30)
+pixel_size = 0.02
+billboard = 1
+alpha_cut = 2
+texture = ExtResource("14")
+hframes = 5
+frame = 2

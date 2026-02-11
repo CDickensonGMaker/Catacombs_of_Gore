@@ -1,0 +1,294 @@
+[gd_resource type="Resource" script_class="ConversationResponsePool" load_steps=24 format=3 uid="uid://c1quests_pool"]
+
+[ext_resource type="Script" path="res://scripts/dialogue/conversation_response_pool.gd" id="1_pool"]
+[ext_resource type="Script" path="res://scripts/dialogue/conversation_response.gd" id="2_resp"]
+
+# =============================================================================
+# HOSTILE/DISMISSIVE QUEST RESPONSES (Disposition 0-30)
+# =============================================================================
+
+[sub_resource type="Resource" id="quest_hostile_1"]
+script = ExtResource("2_resp")
+text = "Work? Why would I help the likes of you find work?"
+topic_type = 6
+personality_affinity = ["hostile", "suspicious"]
+min_disposition = 0
+max_disposition = 30
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "quest_hostile_1"
+
+[sub_resource type="Resource" id="quest_dismissive_1"]
+script = ExtResource("2_resp")
+text = "I'm not in the business of helping strangers. Ask someone else."
+topic_type = 6
+personality_affinity = ["cold", "reserved"]
+min_disposition = 0
+max_disposition = 35
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "quest_dismissive_1"
+
+# =============================================================================
+# GENERAL QUEST LEADS (Disposition 35-100)
+# =============================================================================
+
+[sub_resource type="Resource" id="quest_bounty_board_1"]
+script = ExtResource("2_resp")
+text = "Check the bounty board near the town square. They post notices there for all sorts of work - monster hunts, deliveries, the usual."
+topic_type = 6
+personality_affinity = ["helpful", "practical"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "quest_bounty_board_1"
+
+[sub_resource type="Resource" id="quest_bounty_board_2"]
+script = ExtResource("2_resp")
+text = "The bounty board's where you want to look. Last I saw, they were offering good coin for clearing out some goblins."
+topic_type = 6
+personality_affinity = ["mercantile", "opportunistic"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "quest_bounty_board_2"
+
+[sub_resource type="Resource" id="quest_guild_hall_1"]
+script = ExtResource("2_resp")
+text = "The guild hall's your best bet for steady work. Fighters' guild especially - they're always looking for capable folk."
+topic_type = 6
+personality_affinity = ["adventurous", "practical"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "quest_guild_hall_1"
+
+[sub_resource type="Resource" id="quest_guild_hall_2"]
+script = ExtResource("2_resp")
+text = "Head to the guild hall. The fighters take on muscle, the mages need research done, and the thieves... well, they don't advertise openly, if you take my meaning."
+topic_type = 6
+personality_affinity = ["worldly", "knowing"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["guilds"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "quest_guild_hall_2"
+
+[sub_resource type="Resource" id="quest_temple_1"]
+script = ExtResource("2_resp")
+text = "The temple sometimes needs help with... delicate matters. The priests won't say it openly, but they pay well for those who can handle themselves."
+topic_type = 6
+personality_affinity = ["devout", "secretive"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["religion"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "quest_temple_1"
+
+[sub_resource type="Resource" id="quest_merchants_1"]
+script = ExtResource("2_resp")
+text = "The merchants are always looking for guards or couriers. Talk to the traders near the market - they'll pay for safe passage of their goods."
+topic_type = 6
+personality_affinity = ["mercantile", "helpful"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["trade"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "quest_merchants_1"
+
+[sub_resource type="Resource" id="quest_merchants_2"]
+script = ExtResource("2_resp")
+text = "A merchant was complaining about missing shipments just yesterday. Might be worth asking around if you're looking for paying work."
+topic_type = 6
+personality_affinity = ["gossipy", "helpful"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "quest_merchants_2"
+
+# =============================================================================
+# DANGER WARNINGS (Disposition 45-100)
+# =============================================================================
+
+[sub_resource type="Resource" id="quest_warning_1"]
+script = ExtResource("2_resp")
+text = "There's work aplenty for adventurers, but be careful what you take on. Plenty of folk have bitten off more than they could chew and never came back."
+topic_type = 6
+personality_affinity = ["cautious", "protective"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "quest_warning_1"
+
+[sub_resource type="Resource" id="quest_warning_2"]
+script = ExtResource("2_resp")
+text = "A word of advice - avoid the jobs marked with a red seal on the bounty board. Those are the ones that got the last adventurer killed."
+topic_type = 6
+personality_affinity = ["helpful", "grim"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "quest_warning_2"
+
+[sub_resource type="Resource" id="quest_warning_3"]
+script = ExtResource("2_resp")
+text = "If someone offers you work that sounds too good to be true, it probably is. I've seen eager adventurers walk into traps more times than I can count."
+topic_type = 6
+personality_affinity = ["wise", "cautious"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = []
+weight = 0.9
+actions = []
+conditions = []
+response_id = "quest_warning_3"
+
+# =============================================================================
+# CIVILIAN OBSERVATIONS ABOUT ADVENTURERS (Disposition 35-100)
+# =============================================================================
+
+[sub_resource type="Resource" id="quest_civilian_1"]
+script = ExtResource("2_resp")
+text = "Adventurers come through here all the time looking for work. Most head to the guild hall or the tavern. That's where the job offers flow."
+topic_type = 6
+personality_affinity = ["observant", "neutral"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "quest_civilian_1"
+
+[sub_resource type="Resource" id="quest_civilian_2"]
+script = ExtResource("2_resp")
+text = "Saw a group of adventurers head out toward the old ruins yesterday. Wonder if they'll be the ones to finally clear whatever's lurking there."
+topic_type = 6
+personality_affinity = ["curious", "gossipy"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "quest_civilian_2"
+
+[sub_resource type="Resource" id="quest_civilian_3"]
+script = ExtResource("2_resp")
+text = "You've got the look of someone seeking adventure. This town's got plenty of troubles that could use a capable hand, if you're willing."
+topic_type = 6
+personality_affinity = ["observant", "friendly"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "quest_civilian_3"
+
+# =============================================================================
+# SPECIFIC QUEST GIVER DIRECTIONS (Disposition 40-100)
+# =============================================================================
+
+[sub_resource type="Resource" id="quest_directions_1"]
+script = ExtResource("2_resp")
+text = "The captain of the guard sometimes posts special jobs. He's usually at the barracks near the north gate. Pays better than the bounty board, but harder work too."
+topic_type = 6
+personality_affinity = ["helpful", "knowledgeable"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "quest_directions_1"
+
+[sub_resource type="Resource" id="quest_directions_2"]
+script = ExtResource("2_resp")
+text = "Old Henrick at the tavern knows everyone's business. If there's work to be had, he'll know who's offering and what it pays."
+topic_type = 6
+personality_affinity = ["gossipy", "helpful"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["local"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "quest_directions_2"
+
+# =============================================================================
+# ADVENTURING OPPORTUNITIES (Disposition 40-100)
+# =============================================================================
+
+[sub_resource type="Resource" id="quest_opportunity_1"]
+script = ExtResource("2_resp")
+text = "The roads haven't been safe lately. Caravans are paying double for guards. Dangerous work, but the coin's good."
+topic_type = 6
+personality_affinity = ["practical", "mercantile"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["trade"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "quest_opportunity_1"
+
+[sub_resource type="Resource" id="quest_opportunity_2"]
+script = ExtResource("2_resp")
+text = "Word is the local mine needs clearing. Something moved in and the miners won't go back until it's dealt with. Good opportunity for someone with steel in their spine."
+topic_type = 6
+personality_affinity = ["adventurous", "helpful"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = ["rumors"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "quest_opportunity_2"
+
+[sub_resource type="Resource" id="quest_opportunity_3"]
+script = ExtResource("2_resp")
+text = "The herbalist needs rare ingredients from the old forest. Dangerous journey, but she pays in potions and remedies - might be worth more than coin in the long run."
+topic_type = 6
+personality_affinity = ["practical", "knowledgeable"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = []
+weight = 0.9
+actions = []
+conditions = []
+response_id = "quest_opportunity_3"
+
+[resource]
+script = ExtResource("1_pool")
+responses = [SubResource("quest_hostile_1"), SubResource("quest_dismissive_1"), SubResource("quest_bounty_board_1"), SubResource("quest_bounty_board_2"), SubResource("quest_guild_hall_1"), SubResource("quest_guild_hall_2"), SubResource("quest_temple_1"), SubResource("quest_merchants_1"), SubResource("quest_merchants_2"), SubResource("quest_warning_1"), SubResource("quest_warning_2"), SubResource("quest_warning_3"), SubResource("quest_civilian_1"), SubResource("quest_civilian_2"), SubResource("quest_civilian_3"), SubResource("quest_directions_1"), SubResource("quest_directions_2"), SubResource("quest_opportunity_1"), SubResource("quest_opportunity_2"), SubResource("quest_opportunity_3")]
+pool_id = "quests"
+description = "QUESTS topic responses including hostile/dismissive reactions, bounty board mentions, guild hall referrals, temple work hints, merchant job leads, danger warnings, civilian observations about adventurers, quest giver directions, and adventuring opportunities"

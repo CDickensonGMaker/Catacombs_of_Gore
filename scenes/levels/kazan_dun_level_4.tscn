@@ -1,0 +1,75 @@
+[gd_scene load_steps=12 format=3 uid="uid://kazandun_level4_mod_001"]
+
+[ext_resource type="Script" path="res://scripts/levels/kazan_dun_level_4.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/world/zone_door_instance.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/kazan_dun/kd_forge_main.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/kazan_dun/kd_mine_shaft.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/kazan_dun/kd_bridge_span.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/kazan_dun/kd_bridge_gatehouse.tscn" id="8"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/kazan_dun/kd_stairwell_down.tscn" id="9"]
+
+[node name="KazanDunLevel4Modular" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Rooms" type="Node3D" parent="."]
+
+[node name="StairwellUp" parent="Rooms" instance=ExtResource("9")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="ForgeMain" parent="Rooms" instance=ExtResource("5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -8, -35)
+
+[node name="MineShaft" parent="Rooms" instance=ExtResource("6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, -8, -35)
+
+[node name="BridgeGatehouse1" parent="Rooms" instance=ExtResource("8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -8, -65)
+
+[node name="BridgeSpan1" parent="Rooms" instance=ExtResource("7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -8, -85)
+
+[node name="BridgeSpan2" parent="Rooms" instance=ExtResource("7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -8, -105)
+
+[node name="BridgeSpan3" parent="Rooms" instance=ExtResource("7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -8, -125)
+
+[node name="BridgeGatehouse2" parent="Rooms" instance=ExtResource("8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -8, -145)
+
+[node name="StairwellDown" parent="Rooms" instance=ExtResource("9")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -8, -170)
+
+[node name="Doors" type="Node3D" parent="."]
+
+[node name="Level3Door" parent="Doors" instance=ExtResource("4")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 10)
+target_scene = "res://scenes/levels/kazan_dun_level_3.tscn"
+spawn_point_id = "from_level_4"
+door_name = "Ascend to War Room"
+
+[node name="Level5Door" parent="Doors" instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -16, -180)
+target_scene = "res://scenes/levels/kazan_dun_level_5.tscn"
+spawn_point_id = "from_level_4"
+door_name = "Descend to Goblin-Held Zone"
+
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="from_level_3" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 5)
+
+[node name="from_level_5" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, -15.9, -175)
+
+[node name="default" type="Marker3D" parent="SpawnPoints" groups=["default_spawn", "spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 5)
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+
+[node name="Player" parent="." instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 5)
+
+[node name="HUD" parent="." instance=ExtResource("3")]

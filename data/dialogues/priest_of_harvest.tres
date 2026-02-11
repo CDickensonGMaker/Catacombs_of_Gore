@@ -1,0 +1,264 @@
+[gd_resource type="Resource" script_class="DialogueData" load_steps=44 format=3 uid="uid://priest_of_harvest"]
+
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_node.gd" id="2_node"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_choice.gd" id="3_choice"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_condition.gd" id="4_cond"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_action.gd" id="5_action"]
+
+# ============================================================================
+# CHOICES
+# ============================================================================
+
+[sub_resource type="Resource" id="choice_goodbye"]
+script = ExtResource("3_choice")
+text = "Thank you. I must continue my journey."
+next_node_id = "end"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_back_start"]
+script = ExtResource("3_choice")
+text = "I have more questions..."
+next_node_id = "start"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_learn_god"]
+script = ExtResource("3_choice")
+text = "Who is your goddess?"
+next_node_id = "about_gaela"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_seek_blessing"]
+script = ExtResource("3_choice")
+text = "I would receive a blessing."
+next_node_id = "blessing_offer"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_life_advice"]
+script = ExtResource("3_choice")
+text = "What guidance do you offer to travelers?"
+next_node_id = "wisdom_harvest"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_faith"]
+script = ExtResource("3_choice")
+text = "Why did you become a priestess?"
+next_node_id = "personal_faith"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+# Action to set the blessing flag
+[sub_resource type="Resource" id="action_set_blessed"]
+script = ExtResource("5_action")
+type = 7
+param_string = "blessed_by_harvest"
+param_int = 0
+param_float = 0.0
+success_node_id = ""
+failure_node_id = ""
+
+# Condition: already blessed
+[sub_resource type="Resource" id="cond_already_blessed"]
+script = ExtResource("4_cond")
+type = 5
+param_string = "blessed_by_harvest"
+param_int = 0
+param_float = 0.0
+invert = false
+
+# Condition: not blessed
+[sub_resource type="Resource" id="cond_not_blessed"]
+script = ExtResource("4_cond")
+type = 5
+param_string = "blessed_by_harvest"
+param_int = 0
+param_float = 0.0
+invert = true
+
+[sub_resource type="Resource" id="choice_accept_blessing"]
+script = ExtResource("3_choice")
+text = "Yes, I accept Gaela's blessing with gratitude."
+next_node_id = "blessing_granted"
+conditions = [SubResource("cond_not_blessed")]
+show_when_unavailable = true
+unavailable_reason = "Gaela's blessing already rests upon you"
+actions = [SubResource("action_set_blessed")]
+
+[sub_resource type="Resource" id="choice_decline_blessing"]
+script = ExtResource("3_choice")
+text = "Not today, but I thank you for the offer."
+next_node_id = "blessing_declined"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_cycles"]
+script = ExtResource("3_choice")
+text = "Tell me about the cycles of nature."
+next_node_id = "cycles_nature"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_abundance"]
+script = ExtResource("3_choice")
+text = "How can I find abundance in my life?"
+next_node_id = "finding_abundance"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+[sub_resource type="Resource" id="choice_other_gods"]
+script = ExtResource("3_choice")
+text = "How does Gaela relate to the other gods?"
+next_node_id = "other_gods"
+conditions = []
+show_when_unavailable = false
+unavailable_reason = ""
+actions = []
+
+# ============================================================================
+# NODES
+# ============================================================================
+
+[sub_resource type="Resource" id="node_start"]
+script = ExtResource("2_node")
+id = "start"
+speaker_name = "Priest Elmara"
+text = "*a woman in flowing green robes looks up with a warm smile, golden embroidery glinting* Welcome to the Altar of the Harvest, friend. I am Elmara, tender of Gaela's garden. What brings you to seek the Mother of Seasons?"
+choices = [SubResource("choice_learn_god"), SubResource("choice_seek_blessing"), SubResource("choice_life_advice"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_warm"
+
+[sub_resource type="Resource" id="node_about_gaela"]
+script = ExtResource("2_node")
+id = "about_gaela"
+speaker_name = "Priest Elmara"
+text = "Gaela is the goddess of cycles, of planting and reaping, of abundance and rest. She teaches that life moves in seasons - there is a time to sow and a time to harvest, a time to grow and a time to lie fallow. She blesses the farmer's field and the warrior's resolve alike, for both require patience and timing."
+choices = [SubResource("choice_cycles"), SubResource("choice_other_gods"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_teaching"
+
+[sub_resource type="Resource" id="node_cycles_nature"]
+script = ExtResource("2_node")
+id = "cycles_nature"
+speaker_name = "Priest Elmara"
+text = "Watch any seed and you will understand. It falls, it waits in darkness, it reaches for light, it blooms, it fruits, and then returns its own seeds to the earth. We are no different. Our lives have springs of vigor, summers of action, autumns of reaping what we have sown, and winters of rest and reflection."
+choices = [SubResource("choice_abundance"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_serene"
+
+[sub_resource type="Resource" id="node_finding_abundance"]
+script = ExtResource("2_node")
+id = "finding_abundance"
+speaker_name = "Priest Elmara"
+text = "Abundance is not about hoarding grain, but about recognizing fullness where you stand. The hungry traveler who shares a crust knows more abundance than the miser drowning in gold. Give freely, receive gratefully, and the cycles will provide. Gaela rewards those who trust the turning of seasons."
+choices = [SubResource("choice_faith"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_wise"
+
+[sub_resource type="Resource" id="node_other_gods"]
+script = ExtResource("2_node")
+id = "other_gods"
+speaker_name = "Priest Elmara"
+text = "Chronos sets the rhythm - the hours, the years, the ages. Gaela dances to that rhythm, making things grow and fade in their proper time. And Morthane... Morthane receives what the harvest cannot hold. The fallen leaves, the spent stalks, the souls who have completed their seasons. The Three are one song."
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_thoughtful"
+
+[sub_resource type="Resource" id="node_blessing_offer"]
+script = ExtResource("2_node")
+id = "blessing_offer"
+speaker_name = "Priest Elmara"
+text = "*she produces a small bundle of dried herbs and grain from her robes* Gaela's blessing brings fortune in finding sustenance, luck in trade, and the wisdom to know when to act and when to wait. Will you kneel and receive the Mother's favor?"
+choices = [SubResource("choice_accept_blessing"), SubResource("choice_decline_blessing")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_offering"
+
+[sub_resource type="Resource" id="node_blessing_granted"]
+script = ExtResource("2_node")
+id = "blessing_granted"
+speaker_name = "Priest Elmara"
+text = "*she traces a symbol on your forehead with herb-scented oil* By root and branch, by seed and fruit, by the turning of all seasons, I mark you as Gaela's own. May your pouches never empty, may your hungers be satisfied, and may you always find shelter when the cold winds blow. Rise, blessed one."
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_blessing"
+
+[sub_resource type="Resource" id="node_blessing_declined"]
+script = ExtResource("2_node")
+id = "blessing_declined"
+speaker_name = "Priest Elmara"
+text = "*she tucks the herbs away with an understanding nod* The seed knows when the soil is ready. When your heart is prepared, the blessing will wait. Gaela is patient - she has watched countless springs come and go."
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_understanding"
+
+[sub_resource type="Resource" id="node_wisdom_harvest"]
+script = ExtResource("2_node")
+id = "wisdom_harvest"
+speaker_name = "Priest Elmara"
+text = "For those who travel far, I offer this: rest when you are weary, for even fields must lie fallow. Eat when you find food, for hunger is a poor companion in battle. And never take more than you need - the land remembers those who respect its gifts, and those who squander them."
+choices = [SubResource("choice_faith"), SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_wise"
+
+[sub_resource type="Resource" id="node_personal_faith"]
+script = ExtResource("2_node")
+id = "personal_faith"
+speaker_name = "Priest Elmara"
+text = "I grew up on a farm that barely fed us. I prayed every night for abundance. One day, Gaela spoke to me in a dream of wheat fields stretching to the horizon. She showed me that abundance was not about quantity, but about sharing what little we had. I left the farm to share that truth with others."
+choices = [SubResource("choice_back_start"), SubResource("choice_goodbye")]
+is_end_node = false
+auto_continue_to = ""
+portrait_id = "priest_reflective"
+
+[sub_resource type="Resource" id="node_end"]
+script = ExtResource("2_node")
+id = "end"
+speaker_name = "Priest Elmara"
+text = "May your path be fruitful and your burdens light. Return to us when the road grows long, and we will share bread and wisdom alike. Gaela watch over you, traveler."
+choices = []
+is_end_node = true
+auto_continue_to = ""
+portrait_id = "priest_farewell"
+
+# ============================================================================
+# RESOURCE
+# ============================================================================
+
+[resource]
+script = ExtResource("1_data")
+id = "priest_of_harvest"
+display_name = "Priest of Harvest Dialogue"
+description = "Dialogue for Priest Elmara, servant of Gaela the Mother of Seasons. Offers blessing of harvest and wisdom about cycles, abundance, and patience."
+start_node_id = "start"
+nodes = [SubResource("node_start"), SubResource("node_about_gaela"), SubResource("node_cycles_nature"), SubResource("node_finding_abundance"), SubResource("node_other_gods"), SubResource("node_blessing_offer"), SubResource("node_blessing_granted"), SubResource("node_blessing_declined"), SubResource("node_wisdom_harvest"), SubResource("node_personal_faith"), SubResource("node_end")]

@@ -1,0 +1,253 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/modular_room.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://Sprite folders grab bag/stonewall.png" id="2"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/forge/rack_weapons.obj" id="mesh_weapon_rack"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/forge/ingot_stack.obj" id="mesh_ingots"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/forge/rack_wall.obj" id="mesh_tool_rack"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/forge/grinding_wheel.obj" id="mesh_grindstone"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/bridge/pillar_simple.obj" id="mesh_pillar"]
+
+[sub_resource type="StandardMaterial3D" id="mat_stone_floor"]
+albedo_color = Color(0.36, 0.34, 0.32, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.88
+uv1_scale = Vector3(5, 5, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_stone_wall"]
+albedo_color = Color(0.4, 0.38, 0.36, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.85
+uv1_scale = Vector3(4, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_ceiling"]
+albedo_color = Color(0.32, 0.3, 0.28, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.88
+uv1_scale = Vector3(5, 5, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_prop"]
+albedo_color = Color(0.38, 0.35, 0.32, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.85
+uv1_scale = Vector3(2, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_metal"]
+albedo_color = Color(0.5, 0.5, 0.52, 1)
+metallic = 0.7
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="mat_brazier"]
+albedo_color = Color(0.42, 0.4, 0.44, 1)
+metallic = 0.4
+roughness = 0.55
+
+[sub_resource type="StandardMaterial3D" id="mat_fire"]
+albedo_color = Color(1.0, 0.6, 0.2, 1)
+emission_enabled = true
+emission = Color(1.0, 0.5, 0.1, 1)
+emission_energy_multiplier = 2.0
+
+[node name="KDArmory" type="Node3D"]
+script = ExtResource("1")
+room_id = "kd_armory"
+room_type = "armory"
+room_name = "Armory"
+room_width = 22.0
+room_depth = 18.0
+room_height = 8.0
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="Floor" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(22, 1, 18)
+material = SubResource("mat_stone_floor")
+
+[node name="Ceiling" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
+use_collision = true
+size = Vector3(22, 0.5, 18)
+material = SubResource("mat_ceiling")
+
+[node name="WallNorth" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -9)
+use_collision = true
+size = Vector3(22, 8, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthLeft" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.5, 4, 9)
+use_collision = true
+size = Vector3(7, 8, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthRight" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 4, 9)
+use_collision = true
+size = Vector3(7, 8, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthTop" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.5, 9)
+use_collision = true
+size = Vector3(8, 3, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallEast" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 4, 0)
+use_collision = true
+size = Vector3(1, 8, 18)
+material = SubResource("mat_stone_wall")
+
+[node name="WallWest" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 4, 0)
+use_collision = true
+size = Vector3(1, 8, 18)
+material = SubResource("mat_stone_wall")
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="WeaponRackE1" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0, -5)
+mesh = ExtResource("mesh_weapon_rack")
+surface_material_override/0 = SubResource("mat_prop")
+
+[node name="WeaponRackE2" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0, 2)
+mesh = ExtResource("mesh_weapon_rack")
+surface_material_override/0 = SubResource("mat_prop")
+
+[node name="WeaponRackW1" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -9, 0, -5)
+mesh = ExtResource("mesh_weapon_rack")
+surface_material_override/0 = SubResource("mat_prop")
+
+[node name="WeaponRackW2" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -9, 0, 2)
+mesh = ExtResource("mesh_weapon_rack")
+surface_material_override/0 = SubResource("mat_prop")
+
+[node name="IngotStackE" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 6)
+mesh = ExtResource("mesh_ingots")
+surface_material_override/0 = SubResource("mat_metal")
+
+[node name="IngotStackW" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 6)
+mesh = ExtResource("mesh_ingots")
+surface_material_override/0 = SubResource("mat_metal")
+
+[node name="ToolRack" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -7)
+mesh = ExtResource("mesh_tool_rack")
+surface_material_override/0 = SubResource("mat_prop")
+
+[node name="Workbench" type="CSGBox3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.5, -5)
+use_collision = true
+size = Vector3(3, 1, 1.5)
+material = SubResource("mat_prop")
+
+[node name="Grindstone" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -5)
+mesh = ExtResource("mesh_grindstone")
+surface_material_override/0 = SubResource("mat_prop")
+
+[node name="Pillar1" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 0)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_prop")
+
+[node name="Pillar2" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 0)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_prop")
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="Brazier1" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
+
+[node name="Stand" type="CSGCylinder3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+radius = 0.3
+height = 1.0
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+radius = 0.45
+height = 0.4
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Fire" type="CSGSphere3D" parent="Lighting/Brazier1"]
+transform = Transform3D(0.65, 0, 0, 0, 0.8, 0, 0, 0, 0.65, 0, 1.55, 0)
+radius = 0.35
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 2.5
+omni_range = 12.0
+
+[node name="WallTorchN" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, -8.5)
+
+[node name="Bracket" type="CSGBox3D" parent="Lighting/WallTorchN"]
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_brazier")
+
+[node name="Flame" type="CSGSphere3D" parent="Lighting/WallTorchN"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0.4)
+radius = 0.2
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/WallTorchN"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0.4)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 8.0
+
+[node name="Spawns" type="Node3D" parent="."]
+
+[node name="NPCSpawns" type="Node3D" parent="Spawns"]
+
+[node name="Armorer" type="Marker3D" parent="Spawns/NPCSpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -4)
+metadata/npc_type = "merchant"
+metadata/npc_name = "Durgrim the Armorer"
+metadata/npc_id = "durgrim_armorer"
+metadata/archetype = "craftsman"
+metadata/shop_type = "weapons"
+
+[node name="EnemySpawns" type="Node3D" parent="Spawns"]
+
+[node name="ChestSpawns" type="Node3D" parent="Spawns"]
+
+[node name="WeaponChest" type="Marker3D" parent="Spawns/ChestSpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 5)
+metadata/chest_id = "kd_armory_chest_1"
+metadata/chest_name = "Weapon Chest"
+metadata/loot_tier = "rare"
+metadata/is_locked = true
+metadata/lock_difficulty = 12
+
+[node name="Connections" type="Node3D" parent="."]
+
+[node name="DoorPositions" type="Node3D" parent="Connections"]
+
+[node name="DoorSouth" type="Marker3D" parent="Connections/DoorPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 8.5)
+metadata/door_id = "door_south"
+metadata/door_label = "To Corridor"
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]

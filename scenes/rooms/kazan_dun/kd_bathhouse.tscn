@@ -1,0 +1,296 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/modular_room.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://Sprite folders grab bag/stonewall.png" id="2"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/bridge/pillar_simple.obj" id="mesh_pillar"]
+[ext_resource type="ArrayMesh" path="res://assets/models/dwarven/residential/bench_long.obj" id="mesh_bench"]
+
+[sub_resource type="StandardMaterial3D" id="mat_stone_floor"]
+albedo_color = Color(0.38, 0.36, 0.34, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.85
+uv1_scale = Vector3(5, 5, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_stone_wall"]
+albedo_color = Color(0.42, 0.4, 0.38, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.82
+uv1_scale = Vector3(4, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_ceiling"]
+albedo_color = Color(0.34, 0.32, 0.3, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.85
+uv1_scale = Vector3(5, 5, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_pool_edge"]
+albedo_color = Color(0.4, 0.38, 0.36, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.8
+uv1_scale = Vector3(3, 3, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_water"]
+transparency = 1
+albedo_color = Color(0.25, 0.35, 0.45, 0.7)
+metallic = 0.1
+roughness = 0.15
+
+[sub_resource type="StandardMaterial3D" id="mat_steam"]
+transparency = 1
+albedo_color = Color(0.9, 0.9, 0.9, 0.3)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="mat_prop"]
+albedo_color = Color(0.4, 0.35, 0.3, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.88
+uv1_scale = Vector3(2, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_pillar"]
+albedo_color = Color(0.4, 0.38, 0.36, 1)
+albedo_texture = ExtResource("2")
+roughness = 0.82
+uv1_scale = Vector3(2, 4, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="mat_brazier"]
+albedo_color = Color(0.42, 0.4, 0.44, 1)
+metallic = 0.4
+roughness = 0.55
+
+[sub_resource type="StandardMaterial3D" id="mat_fire"]
+albedo_color = Color(1.0, 0.6, 0.2, 1)
+emission_enabled = true
+emission = Color(1.0, 0.5, 0.1, 1)
+emission_energy_multiplier = 2.0
+
+[node name="KDBathhouse" type="Node3D"]
+script = ExtResource("1")
+room_id = "kd_bathhouse"
+room_type = "bathhouse"
+room_name = "Bathhouse"
+room_width = 25.0
+room_depth = 20.0
+room_height = 10.0
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="Floor" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(25, 1, 20)
+material = SubResource("mat_stone_floor")
+
+[node name="Ceiling" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 0)
+use_collision = true
+size = Vector3(25, 0.5, 20)
+material = SubResource("mat_ceiling")
+
+[node name="WallNorth" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, -10)
+use_collision = true
+size = Vector3(25, 10, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthLeft" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 5, 10)
+use_collision = true
+size = Vector3(9, 10, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthRight" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 5, 10)
+use_collision = true
+size = Vector3(9, 10, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallSouthTop" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 10)
+use_collision = true
+size = Vector3(7, 4, 1)
+material = SubResource("mat_stone_wall")
+
+[node name="WallEast" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 5, 0)
+use_collision = true
+size = Vector3(1, 10, 20)
+material = SubResource("mat_stone_wall")
+
+[node name="WallWest" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.5, 5, 0)
+use_collision = true
+size = Vector3(1, 10, 20)
+material = SubResource("mat_stone_wall")
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="MainPool" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2)
+
+[node name="PoolEdge" type="CSGBox3D" parent="Props/MainPool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+use_collision = true
+size = Vector3(14, 0.3, 10)
+material = SubResource("mat_pool_edge")
+
+[node name="PoolBasin" type="CSGBox3D" parent="Props/MainPool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+operation = 2
+size = Vector3(12, 1.5, 8)
+material = SubResource("mat_pool_edge")
+
+[node name="Water" type="CSGBox3D" parent="Props/MainPool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, 0)
+size = Vector3(11.8, 1, 7.8)
+material = SubResource("mat_water")
+
+[node name="Steam1" type="CSGSphere3D" parent="Props/MainPool"]
+transform = Transform3D(3, 0, 0, 0, 1.5, 0, 0, 0, 2, -3, 1, -2)
+radius = 0.8
+material = SubResource("mat_steam")
+
+[node name="Steam2" type="CSGSphere3D" parent="Props/MainPool"]
+transform = Transform3D(2.5, 0, 0, 0, 1.2, 0, 0, 0, 1.8, 2, 0.8, 1)
+radius = 0.7
+material = SubResource("mat_steam")
+
+[node name="Steam3" type="CSGSphere3D" parent="Props/MainPool"]
+transform = Transform3D(2, 0, 0, 0, 1, 0, 0, 0, 1.5, 0, 1.2, 0)
+radius = 0.6
+material = SubResource("mat_steam")
+
+[node name="SmallPool" type="Node3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 5)
+
+[node name="PoolEdge" type="CSGBox3D" parent="Props/SmallPool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+use_collision = true
+size = Vector3(6, 0.3, 5)
+material = SubResource("mat_pool_edge")
+
+[node name="Water" type="CSGBox3D" parent="Props/SmallPool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
+size = Vector3(5, 0.8, 4)
+material = SubResource("mat_water")
+
+[node name="BenchE1" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 10, 0, -5)
+mesh = ExtResource("mesh_bench")
+surface_material_override/0 = SubResource("mat_prop")
+
+[node name="BenchE2" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 10, 0, 2)
+mesh = ExtResource("mesh_bench")
+surface_material_override/0 = SubResource("mat_prop")
+
+[node name="BenchW" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -10, 0, -5)
+mesh = ExtResource("mesh_bench")
+surface_material_override/0 = SubResource("mat_prop")
+
+[node name="Pillar1" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -6)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="Pillar2" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -6)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="Pillar3" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 6)
+mesh = ExtResource("mesh_pillar")
+surface_material_override/0 = SubResource("mat_pillar")
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="Brazier1" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 0)
+
+[node name="Stand" type="CSGCylinder3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+radius = 0.3
+height = 1.0
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Bowl" type="CSGCylinder3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+radius = 0.45
+height = 0.4
+sides = 6
+material = SubResource("mat_brazier")
+
+[node name="Fire" type="CSGSphere3D" parent="Lighting/Brazier1"]
+transform = Transform3D(0.65, 0, 0, 0, 0.8, 0, 0, 0, 0.65, 0, 1.55, 0)
+radius = 0.35
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 2.5
+omni_range = 12.0
+
+[node name="WallTorchN1" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 4, -9.5)
+
+[node name="Bracket" type="CSGBox3D" parent="Lighting/WallTorchN1"]
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_brazier")
+
+[node name="Flame" type="CSGSphere3D" parent="Lighting/WallTorchN1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0.4)
+radius = 0.2
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/WallTorchN1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0.4)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 8.0
+
+[node name="WallTorchN2" type="Node3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 4, -9.5)
+
+[node name="Bracket" type="CSGBox3D" parent="Lighting/WallTorchN2"]
+size = Vector3(0.3, 0.3, 0.3)
+material = SubResource("mat_brazier")
+
+[node name="Flame" type="CSGSphere3D" parent="Lighting/WallTorchN2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0.4)
+radius = 0.2
+material = SubResource("mat_fire")
+
+[node name="Light" type="OmniLight3D" parent="Lighting/WallTorchN2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0.4)
+light_color = Color(1, 0.6, 0.2, 1)
+light_energy = 1.5
+omni_range = 8.0
+
+[node name="Spawns" type="Node3D" parent="."]
+
+[node name="NPCSpawns" type="Node3D" parent="Spawns"]
+
+[node name="EnemySpawns" type="Node3D" parent="Spawns"]
+
+[node name="ChestSpawns" type="Node3D" parent="Spawns"]
+
+[node name="Connections" type="Node3D" parent="."]
+
+[node name="DoorPositions" type="Node3D" parent="Connections"]
+
+[node name="DoorSouth" type="Marker3D" parent="Connections/DoorPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 9.5)
+metadata/door_id = "door_south"
+metadata/door_label = "To Corridor"
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]

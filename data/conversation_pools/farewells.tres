@@ -1,0 +1,234 @@
+[gd_resource type="Resource" script_class="ConversationResponsePool" load_steps=18 format=3 uid="uid://c1farewells_pool"]
+
+[ext_resource type="Script" path="res://scripts/dialogue/conversation_response_pool.gd" id="1_pool"]
+[ext_resource type="Script" path="res://scripts/dialogue/conversation_response.gd" id="2_resp"]
+
+# =============================================================================
+# STRANGER FAREWELLS (Disposition 0-25)
+# =============================================================================
+
+[sub_resource type="Resource" id="farewell_stranger_1"]
+script = ExtResource("2_resp")
+text = "Leave me be."
+topic_type = 7
+personality_affinity = ["grumpy", "cold"]
+min_disposition = 0
+max_disposition = 25
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "farewell_stranger_1"
+
+[sub_resource type="Resource" id="farewell_stranger_2"]
+script = ExtResource("2_resp")
+text = "Begone."
+topic_type = 7
+personality_affinity = ["stern", "dismissive"]
+min_disposition = 0
+max_disposition = 25
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "farewell_stranger_2"
+
+[sub_resource type="Resource" id="farewell_stranger_3"]
+script = ExtResource("2_resp")
+text = "Finally."
+topic_type = 7
+personality_affinity = ["grumpy", "impatient"]
+min_disposition = 0
+max_disposition = 25
+required_knowledge = []
+weight = 0.8
+actions = []
+conditions = []
+response_id = "farewell_stranger_3"
+
+[sub_resource type="Resource" id="farewell_stranger_4"]
+script = ExtResource("2_resp")
+text = "Good riddance."
+topic_type = 7
+personality_affinity = ["hostile", "bitter"]
+min_disposition = 0
+max_disposition = 15
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "farewell_stranger_4"
+
+# =============================================================================
+# ACQUAINTANCE FAREWELLS (Disposition 26-50)
+# =============================================================================
+
+[sub_resource type="Resource" id="farewell_acquaint_1"]
+script = ExtResource("2_resp")
+text = "Until next time."
+topic_type = 7
+personality_affinity = ["neutral", "formal"]
+min_disposition = 26
+max_disposition = 50
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "farewell_acquaint_1"
+
+[sub_resource type="Resource" id="farewell_acquaint_2"]
+script = ExtResource("2_resp")
+text = "Watch yourself out there."
+topic_type = 7
+personality_affinity = ["cautious", "practical"]
+min_disposition = 26
+max_disposition = 50
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "farewell_acquaint_2"
+
+[sub_resource type="Resource" id="farewell_acquaint_3"]
+script = ExtResource("2_resp")
+text = "Be seeing you."
+topic_type = 7
+personality_affinity = ["casual", "neutral"]
+min_disposition = 26
+max_disposition = 50
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "farewell_acquaint_3"
+
+[sub_resource type="Resource" id="farewell_acquaint_4"]
+script = ExtResource("2_resp")
+text = "Safe travels."
+topic_type = 7
+personality_affinity = ["polite", "reserved"]
+min_disposition = 26
+max_disposition = 50
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "farewell_acquaint_4"
+
+# =============================================================================
+# FRIEND FAREWELLS (Disposition 51-75)
+# =============================================================================
+
+[sub_resource type="Resource" id="farewell_friend_1"]
+script = ExtResource("2_resp")
+text = "Take care of yourself, friend."
+topic_type = 7
+personality_affinity = ["caring", "warm"]
+min_disposition = 51
+max_disposition = 75
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "farewell_friend_1"
+
+[sub_resource type="Resource" id="farewell_friend_2"]
+script = ExtResource("2_resp")
+text = "May the road rise to meet you!"
+topic_type = 7
+personality_affinity = ["cheerful", "traditional"]
+min_disposition = 51
+max_disposition = 75
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "farewell_friend_2"
+
+[sub_resource type="Resource" id="farewell_friend_3"]
+script = ExtResource("2_resp")
+text = "Come back soon!"
+topic_type = 7
+personality_affinity = ["friendly", "welcoming"]
+min_disposition = 51
+max_disposition = 75
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "farewell_friend_3"
+
+[sub_resource type="Resource" id="farewell_friend_4"]
+script = ExtResource("2_resp")
+text = "Stay safe out there. These are dangerous times."
+topic_type = 7
+personality_affinity = ["concerned", "protective"]
+min_disposition = 51
+max_disposition = 75
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "farewell_friend_4"
+
+# =============================================================================
+# CLOSE FRIEND FAREWELLS (Disposition 76-100)
+# =============================================================================
+
+[sub_resource type="Resource" id="farewell_close_1"]
+script = ExtResource("2_resp")
+text = "Farewell, my friend. May we meet again soon!"
+topic_type = 7
+personality_affinity = ["warm", "loyal"]
+min_disposition = 76
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "farewell_close_1"
+
+[sub_resource type="Resource" id="farewell_close_2"]
+script = ExtResource("2_resp")
+text = "Go with the gods, {player_name}. I shall await your return."
+topic_type = 7
+personality_affinity = ["devoted", "formal"]
+min_disposition = 76
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "farewell_close_2"
+
+[sub_resource type="Resource" id="farewell_close_3"]
+script = ExtResource("2_resp")
+text = "Don't be a stranger! My door is always open to you."
+topic_type = 7
+personality_affinity = ["hospitable", "affectionate"]
+min_disposition = 76
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "farewell_close_3"
+
+[sub_resource type="Resource" id="farewell_close_4"]
+script = ExtResource("2_resp")
+text = "Until we meet again, dear friend. Stay strong."
+topic_type = 7
+personality_affinity = ["encouraging", "loyal"]
+min_disposition = 76
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "farewell_close_4"
+
+[resource]
+script = ExtResource("1_pool")
+responses = [SubResource("farewell_stranger_1"), SubResource("farewell_stranger_2"), SubResource("farewell_stranger_3"), SubResource("farewell_stranger_4"), SubResource("farewell_acquaint_1"), SubResource("farewell_acquaint_2"), SubResource("farewell_acquaint_3"), SubResource("farewell_acquaint_4"), SubResource("farewell_friend_1"), SubResource("farewell_friend_2"), SubResource("farewell_friend_3"), SubResource("farewell_friend_4"), SubResource("farewell_close_1"), SubResource("farewell_close_2"), SubResource("farewell_close_3"), SubResource("farewell_close_4")]
+pool_id = "farewells"
+description = "Farewell/goodbye responses organized by disposition level (Stranger, Acquaintance, Friend, Close)"

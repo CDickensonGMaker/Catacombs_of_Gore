@@ -1,0 +1,515 @@
+[gd_scene load_steps=9 format=3 uid="uid://bvllmwfsqi7j1"]
+
+[ext_resource type="Script" uid="uid://hu0sxmv4la6q" path="res://scripts/levels/bandit_hideout_exterior.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
+albedo_color = Color(0.25, 0.3, 0.2, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_path"]
+albedo_color = Color(0.35, 0.28, 0.2, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tent_dark"]
+albedo_color = Color(0.32, 0.28, 0.22, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_stone"]
+albedo_color = Color(0.35, 0.32, 0.28, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wood"]
+albedo_color = Color(0.35, 0.28, 0.2, 1)
+roughness = 0.9
+
+[node name="BanditHideoutExterior" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Player" parent="." instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 15)
+
+[node name="HUD" parent="." instance=ExtResource("3")]
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="Ground" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.056976, -0.5, -36.703243)
+use_collision = true
+size = Vector3(103.123474, 1, 146.4873)
+material = SubResource("StandardMaterial3D_ground")
+
+[node name="MainPath" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -34.003784)
+size = Vector3(4, 0.1, 140.54565)
+material = SubResource("StandardMaterial3D_path")
+
+[node name="CrossPath" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.855713, 0.05, 0)
+size = Vector3(92.51416, 0.1, 3)
+material = SubResource("StandardMaterial3D_path")
+
+[node name="CavePath" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -15)
+size = Vector3(5, 0.1, 10)
+material = SubResource("StandardMaterial3D_path")
+
+[node name="Structures" type="Node3D" parent="."]
+
+[node name="Tent_3" type="Node3D" parent="Structures"]
+transform = Transform3D(0.46508056, 0, 0.8854501, 0, 1, 0, -0.8854501, 0, 0.46508056, 8, 0, 4)
+
+[node name="Floor" type="CSGBox3D" parent="Structures/Tent_3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+size = Vector3(3, 0.1, 3)
+material = SubResource("StandardMaterial3D_tent_dark")
+
+[node name="WallLeft" type="CSGBox3D" parent="Structures/Tent_3"]
+transform = Transform3D(0.7147012, -0.17053741, 0.6782889, -0.69403666, -0.053077534, 0.7179498, -0.08643539, -0.98392, -0.15629378, -0.98770046, 1.0495714, 0.14315867)
+use_collision = true
+size = Vector3(0.1, 2.5, 3.5927734)
+material = SubResource("StandardMaterial3D_tent_dark")
+
+[node name="WallRight" type="CSGBox3D" parent="Structures/Tent_3"]
+transform = Transform3D(0.7677849, -0.14872971, -0.62317127, 0.622403, -0.057476938, 0.78055567, -0.1519098, -0.9872059, 0.048439898, 1.1718369, 1.1785045, -0.18693686)
+use_collision = true
+size = Vector3(0.1, 2.5, 3)
+material = SubResource("StandardMaterial3D_tent_dark")
+
+[node name="Tent_7" type="Node3D" parent="Structures"]
+transform = Transform3D(0.7333211, 0, 0.6801192, 0, 1, 0, -0.6801192, 0, 0.7333211, 5.013997, 0, 11.344973)
+
+[node name="Floor" type="CSGBox3D" parent="Structures/Tent_7"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+size = Vector3(3, 0.1, 3)
+material = SubResource("StandardMaterial3D_tent_dark")
+
+[node name="WallLeft" type="CSGBox3D" parent="Structures/Tent_7"]
+transform = Transform3D(0.7147012, -0.17053741, 0.6782889, -0.69403666, -0.053077534, 0.7179498, -0.08643539, -0.98392, -0.15629378, -0.98770046, 1.0495714, 0.14315867)
+use_collision = true
+size = Vector3(0.1, 2.5, 3.5927734)
+material = SubResource("StandardMaterial3D_tent_dark")
+
+[node name="WallRight" type="CSGBox3D" parent="Structures/Tent_7"]
+transform = Transform3D(0.7677849, -0.14872971, -0.62317127, 0.622403, -0.057476938, 0.78055567, -0.1519098, -0.9872059, 0.048439898, 1.1718369, 1.1785045, -0.18693686)
+use_collision = true
+size = Vector3(0.1, 2.5, 3)
+material = SubResource("StandardMaterial3D_tent_dark")
+
+[node name="Tent_4" type="Node3D" parent="Structures"]
+transform = Transform3D(-0.21373987, 0, -0.9770554, 0, 1, 0, 0.9770554, 0, -0.21373987, -6.758582, 0.34252453, 5.2221107)
+
+[node name="Floor" type="CSGBox3D" parent="Structures/Tent_4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+size = Vector3(3, 0.1, 3)
+material = SubResource("StandardMaterial3D_tent_dark")
+
+[node name="WallLeft" type="CSGBox3D" parent="Structures/Tent_4"]
+transform = Transform3D(0.7147012, -0.17053741, 0.6782889, -0.69403666, -0.053077534, 0.7179498, -0.08643539, -0.98392, -0.15629378, -0.98770046, 1.0495714, 0.14315867)
+use_collision = true
+size = Vector3(0.1, 2.5, 3.5927734)
+material = SubResource("StandardMaterial3D_tent_dark")
+
+[node name="WallRight" type="CSGBox3D" parent="Structures/Tent_4"]
+transform = Transform3D(0.7677849, -0.14872971, -0.62317127, 0.622403, -0.057476938, 0.78055567, -0.1519098, -0.9872059, 0.048439898, 1.1718369, 1.1785045, -0.18693686)
+use_collision = true
+size = Vector3(0.1, 2.5, 3)
+material = SubResource("StandardMaterial3D_tent_dark")
+
+[node name="Floor2" type="CSGBox3D" parent="Structures/Tent_4"]
+transform = Transform3D(0.48951948, 0, 0.8719924, 0, 1, 0, -0.8719924, 0, 0.48951948, 1.3180208, 0.050000012, 5.690257)
+size = Vector3(3, 0.1, 3)
+material = SubResource("StandardMaterial3D_tent_dark")
+
+[node name="WallLeft2" type="CSGBox3D" parent="Structures/Tent_4"]
+transform = Transform3D(0.27448922, -0.9414524, 0.19574867, -0.6940367, -0.053077515, 0.71794975, -0.665526, -0.33294076, -0.6679719, 0.9593549, 1.0495714, 6.621602)
+use_collision = true
+size = Vector3(0.1, 2.5, 3.5927734)
+material = SubResource("StandardMaterial3D_tent_dark")
+
+[node name="WallRight2" type="CSGBox3D" parent="Structures/Tent_4"]
+transform = Transform3D(0.2433815, -0.93364227, -0.26281527, 0.622403, -0.057476934, 0.78055567, -0.7438656, -0.35356545, 0.567113, 1.728651, 1.1785045, 4.576915)
+use_collision = true
+size = Vector3(0.1, 2.5, 3)
+material = SubResource("StandardMaterial3D_tent_dark")
+
+[node name="Tent_5" type="Node3D" parent="Structures"]
+transform = Transform3D(0.989, 0, -0.149, 0, 1, 0, 0.149, 0, 0.989, 6.0385036, 0, -8.729297)
+
+[node name="Floor" type="CSGBox3D" parent="Structures/Tent_5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+size = Vector3(3, 0.1, 3)
+material = SubResource("StandardMaterial3D_tent_dark")
+
+[node name="WallLeft" type="CSGBox3D" parent="Structures/Tent_5"]
+transform = Transform3D(0.7147012, -0.17053741, 0.6782889, -0.69403666, -0.053077534, 0.7179498, -0.08643539, -0.98392, -0.15629378, -0.98770046, 1.0495714, 0.14315867)
+use_collision = true
+size = Vector3(0.1, 2.5, 3.5927734)
+material = SubResource("StandardMaterial3D_tent_dark")
+
+[node name="WallRight" type="CSGBox3D" parent="Structures/Tent_5"]
+transform = Transform3D(0.7677849, -0.14872971, -0.62317127, 0.622403, -0.057476938, 0.78055567, -0.1519098, -0.9872059, 0.048439898, 1.1718369, 1.1785045, -0.18693686)
+use_collision = true
+size = Vector3(0.1, 2.5, 3)
+material = SubResource("StandardMaterial3D_tent_dark")
+
+[node name="Floor2" type="CSGBox3D" parent="Structures/Tent_5"]
+transform = Transform3D(0.563944, 0, -0.8258128, 0, 1, 0, 0.8258128, 0, 0.563944, -0.69676495, 0.050000012, -4.7795496)
+size = Vector3(3, 0.1, 3)
+material = SubResource("StandardMaterial3D_tent_dark")
+
+[node name="WallLeft2" type="CSGBox3D" parent="Structures/Tent_5"]
+transform = Transform3D(0.47443098, 0.71636033, 0.51158637, -0.6940367, -0.053077545, 0.71794987, 0.5414648, -0.69570786, 0.4719988, -1.371995, 1.0495714, -5.514473)
+use_collision = true
+size = Vector3(0.1, 2.5, 3.5927734)
+material = SubResource("StandardMaterial3D_tent_dark")
+
+[node name="WallRight2" type="CSGBox3D" parent="Structures/Tent_5"]
+transform = Transform3D(0.55843675, 0.73137206, -0.39143595, 0.622403, -0.057476938, 0.78055567, 0.54837793, -0.67955166, -0.48730534, 0.1184597, 1.1785045, -3.9172525)
+use_collision = true
+size = Vector3(0.1, 2.5, 3)
+material = SubResource("StandardMaterial3D_tent_dark")
+
+[node name="Tent_6" type="Node3D" parent="Structures"]
+transform = Transform3D(0.80808485, 0, 0.5893393, 0, 1, 0, -0.5893393, 0, 0.80808485, -6.1037025, -0.08885455, -5.256319)
+
+[node name="Floor" type="CSGBox3D" parent="Structures/Tent_6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+size = Vector3(3, 0.1, 3)
+material = SubResource("StandardMaterial3D_tent_dark")
+
+[node name="WallLeft" type="CSGBox3D" parent="Structures/Tent_6"]
+transform = Transform3D(0.7147012, -0.17053741, 0.6782889, -0.69403666, -0.053077534, 0.7179498, -0.08643539, -0.98392, -0.15629378, -0.98770046, 1.0495714, 0.14315867)
+use_collision = true
+size = Vector3(0.1, 2.5, 3.5927734)
+material = SubResource("StandardMaterial3D_tent_dark")
+
+[node name="WallRight" type="CSGBox3D" parent="Structures/Tent_6"]
+transform = Transform3D(0.7677849, -0.14872971, -0.62317127, 0.622403, -0.057476938, 0.78055567, -0.1519098, -0.9872059, 0.048439898, 1.1718369, 1.1785045, -0.18693686)
+use_collision = true
+size = Vector3(0.1, 2.5, 3)
+material = SubResource("StandardMaterial3D_tent_dark")
+
+[node name="Campfires" type="Node3D" parent="."]
+
+[node name="CentralFire" type="Node3D" parent="Campfires"]
+
+[node name="StoneRing" type="CSGTorus3D" parent="Campfires/CentralFire"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+outer_radius = 0.8
+sides = 6
+material = SubResource("StandardMaterial3D_stone")
+
+[node name="FireLight" type="OmniLight3D" parent="Campfires/CentralFire"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+light_color = Color(1, 0.55, 0.2, 1)
+light_energy = 2.8
+omni_range = 10.0
+
+[node name="Fire_East" type="Node3D" parent="Campfires"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -8)
+
+[node name="StoneRing" type="CSGTorus3D" parent="Campfires/Fire_East"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+outer_radius = 0.8
+sides = 6
+material = SubResource("StandardMaterial3D_stone")
+
+[node name="FireLight" type="OmniLight3D" parent="Campfires/Fire_East"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+light_color = Color(1, 0.55, 0.2, 1)
+light_energy = 2.8
+omni_range = 10.0
+
+[node name="Fire_West" type="Node3D" parent="Campfires"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 8)
+
+[node name="StoneRing" type="CSGTorus3D" parent="Campfires/Fire_West"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+outer_radius = 0.8
+sides = 6
+material = SubResource("StandardMaterial3D_stone")
+
+[node name="FireLight" type="OmniLight3D" parent="Campfires/Fire_West"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+light_color = Color(1, 0.55, 0.2, 1)
+light_energy = 2.8
+omni_range = 10.0
+
+[node name="Decorations" type="Node3D" parent="."]
+
+[node name="LogBench_W" type="CSGCylinder3D" parent="Decorations"]
+transform = Transform3D(0, -0.955, 0.296, 1, 0, 0, 0, 0.296, 0.955, -3, 0.25, 0)
+use_collision = true
+radius = 0.25
+height = 2.5
+material = SubResource("StandardMaterial3D_wood")
+
+[node name="LogBench_E" type="CSGCylinder3D" parent="Decorations"]
+transform = Transform3D(0, -0.955, -0.296, 1, 0, 0, 0, -0.296, 0.955, 3, 0.25, 0)
+use_collision = true
+radius = 0.25
+height = 2.5
+material = SubResource("StandardMaterial3D_wood")
+
+[node name="LogBench_N" type="CSGCylinder3D" parent="Decorations"]
+transform = Transform3D(0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0.25, -3)
+use_collision = true
+radius = 0.25
+height = 2.5
+material = SubResource("StandardMaterial3D_wood")
+
+[node name="LogBench_S" type="CSGCylinder3D" parent="Decorations"]
+transform = Transform3D(0, 0, -1, 1, 0, 0, 0, -1, 0, 0, 0.25, 3)
+use_collision = true
+radius = 0.25
+height = 2.5
+material = SubResource("StandardMaterial3D_wood")
+
+[node name="SupplyArea_West" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 0)
+
+[node name="Crate0" type="CSGBox3D" parent="Decorations/SupplyArea_West"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.35, 0)
+use_collision = true
+size = Vector3(1, 0.7, 0.7)
+material = SubResource("StandardMaterial3D_wood")
+
+[node name="Crate1" type="CSGBox3D" parent="Decorations/SupplyArea_West"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 0.35, 0.1)
+use_collision = true
+size = Vector3(1, 0.7, 0.7)
+material = SubResource("StandardMaterial3D_wood")
+
+[node name="Crate2" type="CSGBox3D" parent="Decorations/SupplyArea_West"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1, 0.35, -0.1)
+use_collision = true
+size = Vector3(1, 0.7, 0.7)
+material = SubResource("StandardMaterial3D_wood")
+
+[node name="Barrel" type="CSGCylinder3D" parent="Decorations/SupplyArea_West"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.5, 0)
+use_collision = true
+radius = 0.4
+height = 1.0
+material = SubResource("StandardMaterial3D_wood")
+
+[node name="SupplyArea_East" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, -3)
+
+[node name="Crate0" type="CSGBox3D" parent="Decorations/SupplyArea_East"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.35, 0)
+use_collision = true
+size = Vector3(1, 0.7, 0.7)
+material = SubResource("StandardMaterial3D_wood")
+
+[node name="Crate1" type="CSGBox3D" parent="Decorations/SupplyArea_East"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 0.35, 0.15)
+use_collision = true
+size = Vector3(1, 0.7, 0.7)
+material = SubResource("StandardMaterial3D_wood")
+
+[node name="Crate2" type="CSGBox3D" parent="Decorations/SupplyArea_East"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1, 0.35, -0.05)
+use_collision = true
+size = Vector3(1, 0.7, 0.7)
+material = SubResource("StandardMaterial3D_wood")
+
+[node name="Barrel" type="CSGCylinder3D" parent="Decorations/SupplyArea_East"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.5, 0)
+use_collision = true
+radius = 0.4
+height = 1.0
+material = SubResource("StandardMaterial3D_wood")
+
+[node name="WeaponRack_W" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -8)
+
+[node name="WeaponRack_E" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -6)
+
+[node name="Barricade_West" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 15)
+
+[node name="Post0" type="CSGBox3D" parent="Decorations/Barricade_West"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.95, 0)
+use_collision = true
+size = Vector3(0.2, 1.9, 0.15)
+material = SubResource("StandardMaterial3D_wood")
+
+[node name="Post1" type="CSGBox3D" parent="Decorations/Barricade_West"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1, 0)
+use_collision = true
+size = Vector3(0.2, 2, 0.15)
+material = SubResource("StandardMaterial3D_wood")
+
+[node name="Post2" type="CSGBox3D" parent="Decorations/Barricade_West"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+use_collision = true
+size = Vector3(0.2, 1.8, 0.15)
+material = SubResource("StandardMaterial3D_wood")
+
+[node name="Post3" type="CSGBox3D" parent="Decorations/Barricade_West"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.05, 0)
+use_collision = true
+size = Vector3(0.2, 2.1, 0.15)
+material = SubResource("StandardMaterial3D_wood")
+
+[node name="Post4" type="CSGBox3D" parent="Decorations/Barricade_West"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.95, 0)
+use_collision = true
+size = Vector3(0.2, 1.9, 0.15)
+material = SubResource("StandardMaterial3D_wood")
+
+[node name="Barricade_East" type="Node3D" parent="Decorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 15)
+
+[node name="Post0" type="CSGBox3D" parent="Decorations/Barricade_East"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.9, 0)
+use_collision = true
+size = Vector3(0.2, 1.8, 0.15)
+material = SubResource("StandardMaterial3D_wood")
+
+[node name="Post1" type="CSGBox3D" parent="Decorations/Barricade_East"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1, 0)
+use_collision = true
+size = Vector3(0.2, 2, 0.15)
+material = SubResource("StandardMaterial3D_wood")
+
+[node name="Post2" type="CSGBox3D" parent="Decorations/Barricade_East"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+use_collision = true
+size = Vector3(0.2, 1.9, 0.15)
+material = SubResource("StandardMaterial3D_wood")
+
+[node name="Post3" type="CSGBox3D" parent="Decorations/Barricade_East"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.85, 0)
+use_collision = true
+size = Vector3(0.2, 1.7, 0.15)
+material = SubResource("StandardMaterial3D_wood")
+
+[node name="Post4" type="CSGBox3D" parent="Decorations/Barricade_East"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0)
+use_collision = true
+size = Vector3(0.2, 2, 0.15)
+material = SubResource("StandardMaterial3D_wood")
+
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="SpawnPoint_default" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 18)
+metadata/spawn_id = "default"
+
+[node name="SpawnPoint_from_wilderness" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 18)
+metadata/spawn_id = "from_wilderness"
+
+[node name="SpawnPoint_from_thornfield" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 18)
+metadata/spawn_id = "from_thornfield"
+
+[node name="SpawnPoint_from_hideout" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -17)
+metadata/spawn_id = "from_hideout"
+
+[node name="SpawnPoint_from_level_1" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -17)
+metadata/spawn_id = "from_level_1"
+
+[node name="EnemySpawns" type="Node3D" parent="."]
+
+[node name="EnemySpawn_SouthGuard_W" type="Marker3D" parent="EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 16)
+metadata/enemy_data = "res://data/enemies/human_bandit.tres"
+
+[node name="EnemySpawn_SouthGuard_E" type="Marker3D" parent="EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 16)
+metadata/enemy_data = "res://data/enemies/human_bandit.tres"
+
+[node name="EnemySpawn_NorthGuard_W" type="Marker3D" parent="EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, -15)
+metadata/enemy_data = "res://data/enemies/human_bandit.tres"
+
+[node name="EnemySpawn_NorthGuard_E" type="Marker3D" parent="EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -15)
+metadata/enemy_data = "res://data/enemies/human_bandit.tres"
+
+[node name="EnemySpawn_Camp_0" type="Marker3D" parent="EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0, -4)
+metadata/enemy_data = "res://data/enemies/human_bandit.tres"
+
+[node name="EnemySpawn_Camp_1" type="Marker3D" parent="EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0, -6)
+metadata/enemy_data = "res://data/enemies/human_bandit.tres"
+
+[node name="EnemySpawn_Camp_2" type="Marker3D" parent="EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, 6)
+metadata/enemy_data = "res://data/enemies/human_bandit.tres"
+
+[node name="EnemySpawn_Camp_4" type="Marker3D" parent="EnemySpawns"]
+transform = Transform3D(0.48951945, 0, 0.87199235, 0, 1, 0, -0.87199235, 0, 0.48951945, -12.039856, 0, 5.884962)
+metadata/enemy_data = "res://data/enemies/human_bandit.tres"
+
+[node name="EnemySpawn_Camp_3" type="Marker3D" parent="EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, 5)
+metadata/enemy_data = "res://data/enemies/human_bandit.tres"
+
+[node name="EnemySpawn_LeaderPatrol_W" type="Marker3D" parent="EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -8)
+metadata/enemy_data = "res://data/enemies/human_bandit.tres"
+
+[node name="EnemySpawn_LeaderPatrol_E" type="Marker3D" parent="EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -8)
+metadata/enemy_data = "res://data/enemies/human_bandit.tres"
+
+[node name="ChestPositions" type="Node3D" parent="."]
+
+[node name="ChestPos_Supplies" type="Marker3D" parent="ChestPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 2)
+metadata/chest_name = "Bandit Supplies"
+metadata/is_locked = false
+metadata/lock_difficulty = 10
+metadata/randomize_loot = true
+metadata/persistent_id = "bandit_ext_chest_1"
+
+[node name="ChestPos_Captain" type="Marker3D" parent="ChestPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -13)
+metadata/chest_name = "Captain's Stash"
+metadata/is_locked = true
+metadata/lock_difficulty = 12
+metadata/randomize_loot = true
+metadata/persistent_id = "bandit_ext_chest_2"
+
+[node name="ChestPos_EastSupply" type="Marker3D" parent="ChestPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, -2)
+metadata/chest_name = "Supply Crate"
+metadata/is_locked = false
+metadata/lock_difficulty = 8
+metadata/randomize_loot = true
+metadata/persistent_id = "bandit_ext_chest_3"
+
+[node name="DoorPositions" type="Node3D" parent="."]
+
+[node name="DoorPos_Thornfield" type="Marker3D" parent="DoorPositions"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 21)
+metadata/target_scene = "res://scenes/levels/thornfield.tscn"
+metadata/spawn_id = "from_bandit_hideout"
+metadata/door_label = "Forest Path to Thornfield"
+metadata/show_frame = false
+
+[node name="DoorPos_Wilderness" type="Marker3D" parent="DoorPositions"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -10, 0, 21)
+metadata/target_scene = "RETURN_TO_WILDERNESS"
+metadata/spawn_id = "from_bandit_hideout"
+metadata/door_label = "Leave Bandit Territory"
+metadata/show_frame = false
+
+[node name="DoorPos_CaveEntrance" type="Marker3D" parent="DoorPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)
+metadata/target_scene = "res://scenes/levels/bandit_hideout_level_1.tscn"
+metadata/spawn_id = "from_exterior"
+metadata/door_label = "Enter Cave"
+metadata/show_frame = true
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]

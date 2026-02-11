@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "cooked_meat"
+display_name = "Cooked Meat"
+description = "A hearty portion of roasted meat. Restores 2d6+4 HP and grants +1 Vitality for 90 seconds."
+item_type = 0
+is_stackable = true
+max_stack = 10
+consumable_effect = 1
+effect_value = Array[int]([2, 6, 4])
+effect_duration = 90.0
+effect_percent = 0.0
+teaches_spell_id = ""
+requires_literacy = false
+literacy_dc = 10
+base_value = 15
+weight = 0.5
+icon_path = ""
+mesh_path = ""
+use_sound = ""

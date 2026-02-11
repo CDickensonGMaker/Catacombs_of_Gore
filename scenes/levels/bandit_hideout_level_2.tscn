@@ -1,0 +1,1780 @@
+[gd_scene load_steps=34 format=3 uid="uid://bieabafpgvp7l"]
+
+[ext_resource type="Script" uid="uid://qhpaq0818vpc" path="res://scripts/levels/bandit_hideout_level_2.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
+[ext_resource type="Texture2D" uid="uid://dilhhkx3xdfns" path="res://Sprite folders grab bag/hanging_gore_totem1.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://bm7yidtuy4wyj" path="res://Sprite folders grab bag/hanging_gore_totem2.png" id="6"]
+[ext_resource type="Texture2D" uid="uid://b3o2chjxaj4k" path="res://Sprite folders grab bag/hanging_gore_totem3.png" id="7"]
+[ext_resource type="Texture2D" uid="uid://1xjlkpui02ro" path="res://Sprite folders grab bag/gore_totem2.png" id="7_x7dke"]
+[ext_resource type="Texture2D" uid="uid://bcblmlpu6wmf4" path="res://Sprite folders grab bag/monastary_floor_outside1.png" id="8_8ijyh"]
+[ext_resource type="Texture2D" uid="uid://birqqw3rpi0yv" path="res://Sprite folders grab bag/stonefloor_3.png" id="12_8d3as"]
+[ext_resource type="Material" path="res://assets/materials/dungeon/woodenfloor_mat.tres" id="14_rsfg8"]
+[ext_resource type="Texture2D" uid="uid://cv67a5r1deaum" path="res://assets/sprites/textures/dungeon/wooden_barrel.png" id="tex_barrel"]
+[ext_resource type="Texture2D" uid="uid://dqedk7bprk8s7" path="res://assets/sprites/textures/dungeon/wooden_crate1.png" id="tex_crate1"]
+[ext_resource type="Texture2D" uid="uid://dptsnhvq1x81o" path="res://assets/sprites/textures/dungeon/stonefloor_2.png" id="tex_floor2"]
+[ext_resource type="Texture2D" uid="uid://bvhkhf51thgln" path="res://assets/sprites/textures/dungeon/stonefloor_3.png" id="tex_floor3"]
+[ext_resource type="Texture2D" uid="uid://brkqkr24x8043" path="res://assets/sprites/textures/dungeon/stonewall.png" id="tex_wall"]
+[ext_resource type="Texture2D" uid="uid://cwua2u8ogd2y7" path="res://assets/sprites/textures/dungeon/wood.png" id="tex_wood"]
+[ext_resource type="Texture2D" uid="uid://eisnhw2eqk62" path="res://assets/sprites/textures/dungeon/woodenfloor.png" id="tex_woodfloor"]
+
+[sub_resource type="StandardMaterial3D" id="floor_mat"]
+albedo_texture = ExtResource("8_8ijyh")
+roughness = 0.95
+uv1_scale = Vector3(4, 4, 4)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="ceiling_mat"]
+albedo_texture = ExtResource("tex_floor2")
+roughness = 0.95
+uv1_scale = Vector3(4, 4, 4)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="wall_mat"]
+albedo_texture = ExtResource("tex_wall")
+roughness = 0.9
+uv1_scale = Vector3(2, 2, 2)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="boss_floor_mat"]
+albedo_texture = ExtResource("tex_floor3")
+roughness = 0.9
+uv1_scale = Vector3(3, 3, 3)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="boss_wall_mat"]
+albedo_texture = ExtResource("12_8d3as")
+roughness = 0.85
+uv1_scale = Vector3(2, 2, 2)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="rug_mat"]
+albedo_color = Color(0.6, 0.25, 0.2, 1)
+albedo_texture = ExtResource("tex_woodfloor")
+roughness = 0.75
+uv1_scale = Vector3(2, 2, 2)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="gold_mat"]
+albedo_color = Color(0.8, 0.65, 0.2, 1)
+metallic = 0.8
+roughness = 0.3
+
+[sub_resource type="StandardMaterial3D" id="banner_mat"]
+albedo_color = Color(0.7, 0.25, 0.2, 1)
+albedo_texture = ExtResource("tex_wood")
+roughness = 0.8
+uv1_scale = Vector3(1, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="brazier_mat"]
+albedo_color = Color(0.28, 0.25, 0.22, 1)
+metallic = 0.3
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="wood_mat"]
+albedo_texture = ExtResource("tex_crate1")
+roughness = 0.85
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="metal_mat"]
+albedo_color = Color(0.45, 0.42, 0.48, 1)
+metallic = 0.7
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="map_mat"]
+albedo_color = Color(0.85, 0.8, 0.7, 1)
+albedo_texture = ExtResource("tex_woodfloor")
+roughness = 0.8
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bm6mv"]
+albedo_color = Color(0.35, 0.28, 0.2, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="barrel_mat"]
+albedo_texture = ExtResource("tex_barrel")
+roughness = 0.85
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="silver_mat"]
+albedo_color = Color(0.75, 0.75, 0.78, 1)
+metallic = 0.85
+roughness = 0.3
+
+[sub_resource type="StandardMaterial3D" id="torch_holder_mat"]
+albedo_color = Color(0.5, 0.4, 0.3, 1)
+albedo_texture = ExtResource("tex_wood")
+roughness = 0.9
+texture_filter = 0
+
+[node name="BanditHideoutLevel2" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Player" parent="." instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 2)
+
+[node name="HUD" parent="." instance=ExtResource("3")]
+
+[node name="GoreDecorations" type="Node3D" parent="."]
+
+[node name="HangingGore_0" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 4.426619, -19.33828)
+pixel_size = 0.018
+billboard = 1
+alpha_cut = 2
+texture = ExtResource("5")
+
+[node name="HangingGore_7" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 4.426619, -16.410791)
+pixel_size = 0.018
+billboard = 1
+alpha_cut = 2
+texture = ExtResource("5")
+
+[node name="HangingGore_8" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.356895, 4.426619, -16.410791)
+pixel_size = 0.018
+billboard = 1
+alpha_cut = 2
+texture = ExtResource("5")
+
+[node name="HangingGore_9" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4620354, 4.5171885, -19.33828)
+pixel_size = 0.018
+billboard = 1
+alpha_cut = 2
+texture = ExtResource("5")
+
+[node name="HangingGore_10" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4620354, 4.5171885, -16.410791)
+pixel_size = 0.018
+billboard = 1
+alpha_cut = 2
+texture = ExtResource("5")
+
+[node name="HangingGore_11" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.1051407, 4.5171885, -16.410791)
+pixel_size = 0.018
+billboard = 1
+alpha_cut = 2
+texture = ExtResource("5")
+
+[node name="HangingGore_1" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.96435714, 2.8679557, -8)
+pixel_size = 0.018
+billboard = 1
+alpha_cut = 2
+texture = ExtResource("6")
+
+[node name="HangingGore_12" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.10033643, 2.8679557, -5.8845835)
+pixel_size = 0.018
+billboard = 1
+alpha_cut = 2
+texture = ExtResource("6")
+
+[node name="HangingGore_2" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2360046, 2.8631966, -2.6834216)
+pixel_size = 0.018
+billboard = 1
+alpha_cut = 2
+texture = ExtResource("7")
+
+[node name="HangingGore_3" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6832633, 2.8631966, -3.384055)
+pixel_size = 0.018
+billboard = 1
+alpha_cut = 2
+texture = ExtResource("7")
+
+[node name="HangingGore_4" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6832633, 2.8631966, -3.384055)
+pixel_size = 0.018
+billboard = 1
+alpha_cut = 2
+texture = ExtResource("7")
+
+[node name="HangingGore_5" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.478509, 2.8711207, -2.430151)
+pixel_size = 0.018
+billboard = 1
+alpha_cut = 2
+texture = ExtResource("7")
+
+[node name="HangingGore_6" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7567108, 2.8711207, -3.1588433)
+pixel_size = 0.018
+billboard = 1
+alpha_cut = 2
+texture = ExtResource("7")
+
+[node name="gore_totem" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1.3199048, 0, 0.14270659, 0, 1.884606, 0, -0.18181375, 0, 1.0360004, -2.6146612, 1.2090056, -3.6194215)
+shaded = true
+texture = ExtResource("7_x7dke")
+
+[node name="gore_totem3" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(-0.036749296, 0, 1.0304033, 0, 2.5187857, 0, -0.8363376, 0, -0.045276713, -8.551258, 3.5744295, -15.445382)
+shaded = true
+texture = ExtResource("7_x7dke")
+
+[node name="gore_totem4" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(-0.063409105, 0, -1.0284346, 0, 2.5187857, 0, 0.8347397, 0, -0.07812266, 8.489222, 3.2525249, -15.592198)
+shaded = true
+texture = ExtResource("7_x7dke")
+
+[node name="gore_totem5" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(0.8350664, 0, 0.07262902, 0, 2.5187857, 0, -0.058950074, 0, 1.0288372, 7.057128, 3.2525249, -29.640705)
+shaded = true
+texture = ExtResource("7_x7dke")
+
+[node name="gore_totem6" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(0.8350664, 0, 0.07262902, 0, 2.5187857, 0, -0.058950074, 0, 1.0288372, 7.057128, 3.2525249, -29.640705)
+shaded = true
+texture = ExtResource("7_x7dke")
+
+[node name="gore_totem7" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(0.8350664, 0, 0.07262902, 0, 2.5187857, 0, -0.058950074, 0, 1.0288372, -6.8397636, 3.2525249, -29.640705)
+shaded = true
+texture = ExtResource("7_x7dke")
+
+[node name="gore_totem2" type="Sprite3D" parent="GoreDecorations"]
+transform = Transform3D(1.3199048, 0, 0.14270659, 0, 1.884606, 0, -0.18181375, 0, 1.0360004, 2.6988397, 1.2090056, -3.6194215)
+shaded = true
+texture = ExtResource("7_x7dke")
+
+[node name="Rooms" type="Node3D" parent="."]
+
+[node name="EntranceChamber" type="Node3D" parent="Rooms"]
+
+[node name="Floor" type="CSGBox3D" parent="Rooms/EntranceChamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+use_collision = true
+size = Vector3(10, 0.5, 8)
+material = SubResource("floor_mat")
+
+[node name="Ceiling" type="CSGBox3D" parent="Rooms/EntranceChamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.25, 0)
+use_collision = true
+size = Vector3(10, 0.5, 8)
+material = SubResource("ceiling_mat")
+
+[node name="NorthWall" type="CSGBox3D" parent="Rooms/EntranceChamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.4128418, 2, -4)
+use_collision = true
+size = Vector3(3.1743164, 4, 0.5)
+material = SubResource("wall_mat")
+
+[node name="NorthWall2" type="CSGBox3D" parent="Rooms/EntranceChamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5718255, 2, -4)
+use_collision = true
+size = Vector3(3.1743164, 4, 0.5)
+material = SubResource("wall_mat")
+
+[node name="SouthWall" type="CSGBox3D" parent="Rooms/EntranceChamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 4)
+use_collision = true
+size = Vector3(10, 4, 0.5)
+material = SubResource("wall_mat")
+
+[node name="EastWall" type="CSGBox3D" parent="Rooms/EntranceChamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2, 0)
+use_collision = true
+size = Vector3(0.5, 4, 8)
+material = SubResource("wall_mat")
+
+[node name="WestWall" type="CSGBox3D" parent="Rooms/EntranceChamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2, 0)
+use_collision = true
+size = Vector3(0.5, 4, 8)
+material = SubResource("wall_mat")
+
+[node name="BossCorridor" type="Node3D" parent="Rooms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -9)
+
+[node name="Floor" type="CSGBox3D" parent="Rooms/BossCorridor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+use_collision = true
+size = Vector3(4, 0.5, 10)
+material = SubResource("floor_mat")
+
+[node name="Ceiling" type="CSGBox3D" parent="Rooms/BossCorridor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.9619083, -0.14175415)
+use_collision = true
+size = Vector3(4, 1.8833313, 12.440002)
+material = SubResource("ceiling_mat")
+
+[node name="EastWall" type="CSGBox3D" parent="Rooms/BossCorridor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2.0708618, 0)
+use_collision = true
+size = Vector3(0.5, 4.1417236, 10)
+material = SubResource("wall_mat")
+
+[node name="WestWall" type="CSGBox3D" parent="Rooms/BossCorridor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2.1068726, 0)
+use_collision = true
+size = Vector3(0.5, 4.213745, 10)
+material = SubResource("wall_mat")
+
+[node name="BossChamber" type="Node3D" parent="Rooms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -22)
+
+[node name="Floor" type="CSGBox3D" parent="Rooms/BossChamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+use_collision = true
+size = Vector3(18, 0.5, 16)
+material = SubResource("boss_floor_mat")
+
+[node name="Ceiling" type="CSGBox3D" parent="Rooms/BossChamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.75, 0)
+use_collision = true
+size = Vector3(18, 0.5, 16)
+material = SubResource("ceiling_mat")
+
+[node name="NorthWall" type="CSGBox3D" parent="Rooms/BossChamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.75, -8)
+use_collision = true
+size = Vector3(18, 5.5, 0.5)
+material = SubResource("boss_wall_mat")
+
+[node name="SouthWall" type="CSGBox3D" parent="Rooms/BossChamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.557602, 2.75, 8)
+use_collision = true
+size = Vector3(6.884796, 5.5, 0.5)
+material = SubResource("boss_wall_mat")
+
+[node name="SouthWall2" type="CSGBox3D" parent="Rooms/BossChamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.405465, 2.75, 8)
+use_collision = true
+size = Vector3(6.884796, 5.5, 0.5)
+material = SubResource("boss_wall_mat")
+
+[node name="EastWall" type="CSGBox3D" parent="Rooms/BossChamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 2.75, -0.077697754)
+use_collision = true
+size = Vector3(0.5, 5.5, 15.8446045)
+material = SubResource("boss_wall_mat")
+
+[node name="WestWall" type="CSGBox3D" parent="Rooms/BossChamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 2.75, 4.927185)
+use_collision = true
+size = Vector3(0.5, 5.5, 6.14563)
+material = SubResource("boss_wall_mat")
+
+[node name="WestWall2" type="CSGBox3D" parent="Rooms/BossChamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 2.75, -5.2947083)
+use_collision = true
+size = Vector3(0.5, 5.5, 6.14563)
+material = SubResource("boss_wall_mat")
+
+[node name="TreasureCorridor" type="Node3D" parent="Rooms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, -22)
+
+[node name="Floor" type="CSGBox3D" parent="Rooms/TreasureCorridor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.63305664, -0.3413086, 0)
+use_collision = true
+size = Vector3(9.266113, 0.6826172, 4)
+material = SubResource("floor_mat")
+
+[node name="Ceiling" type="CSGBox3D" parent="Rooms/TreasureCorridor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0349274, 4.098261, -0.0024414063)
+use_collision = true
+size = Vector3(8.40213, 0.3496211, 4.004883)
+material = SubResource("ceiling_mat")
+
+[node name="NorthWall" type="CSGBox3D" parent="Rooms/TreasureCorridor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.92562866, 2.0430298, -2)
+use_collision = true
+size = Vector3(8.247498, 4.0860596, 0.5)
+material = SubResource("wall_mat")
+
+[node name="SouthWall" type="CSGBox3D" parent="Rooms/TreasureCorridor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.80062866, 2.1221313, 2)
+use_collision = true
+size = Vector3(7.956482, 4.2442627, 0.5)
+material = SubResource("wall_mat")
+
+[node name="TreasureVault" type="Node3D" parent="Rooms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 0, -22)
+
+[node name="Floor" type="CSGBox3D" parent="Rooms/TreasureVault"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+use_collision = true
+size = Vector3(10, 0.5, 10)
+material = SubResource("floor_mat")
+
+[node name="Ceiling" type="CSGBox3D" parent="Rooms/TreasureVault"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.25, 0)
+use_collision = true
+size = Vector3(10, 0.5, 10)
+material = SubResource("ceiling_mat")
+
+[node name="NorthWall" type="CSGBox3D" parent="Rooms/TreasureVault"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.012636185, 1.9818771, -5.014784)
+use_collision = true
+size = Vector3(10, 4, 0.5)
+material = SubResource("wall_mat")
+
+[node name="SouthWall" type="CSGBox3D" parent="Rooms/TreasureVault"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 5)
+use_collision = true
+size = Vector3(10, 4, 0.5)
+material = SubResource("wall_mat")
+
+[node name="EastWall" type="CSGBox3D" parent="Rooms/TreasureVault"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2, 3.4144897)
+use_collision = true
+size = Vector3(0.5, 4, 3.1710205)
+material = SubResource("wall_mat")
+
+[node name="EastWall2" type="CSGBox3D" parent="Rooms/TreasureVault"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2, -3.2698727)
+use_collision = true
+size = Vector3(0.5, 4, 3.1710205)
+material = SubResource("wall_mat")
+
+[node name="WestWall" type="CSGBox3D" parent="Rooms/TreasureVault"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2, 0)
+use_collision = true
+size = Vector3(0.5, 4, 10)
+material = SubResource("wall_mat")
+
+[node name="BossRoomDecorations" type="Node3D" parent="."]
+
+[node name="CentralRug" type="CSGBox3D" parent="BossRoomDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, -22)
+size = Vector3(4, 0.05, 10)
+material = SubResource("rug_mat")
+
+[node name="ThroneRug" type="CSGBox3D" parent="BossRoomDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, -27)
+size = Vector3(8, 0.05, 6)
+material = SubResource("rug_mat")
+
+[node name="Throne" type="Node3D" parent="BossRoomDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -28)
+
+[node name="Platform" type="CSGBox3D" parent="BossRoomDecorations/Throne"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+use_collision = true
+size = Vector3(5, 0.4, 3)
+material = ExtResource("14_rsfg8")
+
+[node name="Step1" type="CSGBox3D" parent="BossRoomDecorations/Throne"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 1.75)
+use_collision = true
+size = Vector3(5, 0.2, 0.5)
+material = ExtResource("14_rsfg8")
+
+[node name="Seat" type="CSGBox3D" parent="BossRoomDecorations/Throne"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+use_collision = true
+size = Vector3(2.2, 0.8, 1.5)
+material = ExtResource("14_rsfg8")
+
+[node name="Back" type="CSGBox3D" parent="BossRoomDecorations/Throne"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.05, -0.6)
+use_collision = true
+size = Vector3(2.4, 2.5, 0.3)
+material = ExtResource("14_rsfg8")
+
+[node name="ArmrestLeft" type="CSGBox3D" parent="BossRoomDecorations/Throne"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1.1, 0)
+size = Vector3(0.3, 0.6, 1.2)
+material = ExtResource("14_rsfg8")
+
+[node name="ArmrestRight" type="CSGBox3D" parent="BossRoomDecorations/Throne"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1.1, 0)
+size = Vector3(0.3, 0.6, 1.2)
+material = ExtResource("14_rsfg8")
+
+[node name="Emblem" type="CSGBox3D" parent="BossRoomDecorations/Throne"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -0.4)
+size = Vector3(0.8, 0.8, 0.1)
+material = SubResource("gold_mat")
+
+[node name="Banner3" type="CSGBox3D" parent="BossRoomDecorations"]
+transform = Transform3D(0.013192927, 0, 1.3969668, 0, 1.1419301, 0, -1.0051255, 0, 0.0183361, -8.700863, 3.1763165, -15.348406)
+size = Vector3(1.5, 3, 0.1)
+material = SubResource("banner_mat")
+
+[node name="Banner4" type="CSGBox3D" parent="BossRoomDecorations"]
+transform = Transform3D(-0.13315445, 0, -1.3847758, 0, 1.1419301, 0, 0.9963539, 0, -0.18506378, 8.64934, 3.1763165, -15.67061)
+size = Vector3(1.5, 3, 0.1)
+material = SubResource("banner_mat")
+
+[node name="Banner5" type="CSGBox3D" parent="BossRoomDecorations"]
+transform = Transform3D(1.0051215, 0, 0.018774897, 0, 1.1419302, 0, -0.013508573, 0, 1.396961, 6.956212, 3.1763165, -29.787682)
+size = Vector3(1.5, 3, 0.1)
+material = SubResource("banner_mat")
+
+[node name="Banner6" type="CSGBox3D" parent="BossRoomDecorations"]
+transform = Transform3D(1.0051215, 0, 0.018774897, 0, 1.1419302, 0, -0.013508573, 0, 1.396961, -6.9406796, 3.1763165, -29.787682)
+size = Vector3(1.5, 3, 0.1)
+material = SubResource("banner_mat")
+
+[node name="Brazier1" type="Node3D" parent="BossRoomDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -26)
+
+[node name="Stand" type="CSGCylinder3D" parent="BossRoomDecorations/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+use_collision = true
+radius = 0.2
+height = 0.8
+material = SubResource("brazier_mat")
+
+[node name="Bowl" type="CSGCylinder3D" parent="BossRoomDecorations/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+use_collision = true
+height = 0.5
+material = SubResource("brazier_mat")
+
+[node name="FireLight" type="OmniLight3D" parent="BossRoomDecorations/Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.585088, 0)
+light_color = Color(1, 0.5, 0.15, 1)
+light_energy = 2.5
+omni_range = 8.0
+
+[node name="Brazier2" type="Node3D" parent="BossRoomDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -26)
+
+[node name="Stand" type="CSGCylinder3D" parent="BossRoomDecorations/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+use_collision = true
+radius = 0.2
+height = 0.8
+material = SubResource("brazier_mat")
+
+[node name="Bowl" type="CSGCylinder3D" parent="BossRoomDecorations/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+use_collision = true
+height = 0.5
+material = SubResource("brazier_mat")
+
+[node name="FireLight" type="OmniLight3D" parent="BossRoomDecorations/Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7198315, 0)
+light_color = Color(1, 0.5, 0.15, 1)
+light_energy = 2.5
+omni_range = 8.0
+
+[node name="WeaponRack1" type="Node3D" parent="BossRoomDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, -25)
+
+[node name="Frame" type="CSGBox3D" parent="BossRoomDecorations/WeaponRack1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+use_collision = true
+size = Vector3(1.8, 2.5, 0.3)
+material = SubResource("wood_mat")
+
+[node name="Weapon0" type="CSGBox3D" parent="BossRoomDecorations/WeaponRack1"]
+transform = Transform3D(0.99, 0, -0.14, 0, 1, 0, 0.14, 0, 0.99, -0.5, 1.5, 0.2)
+size = Vector3(0.08, 1.3, 0.05)
+material = SubResource("metal_mat")
+
+[node name="Weapon1" type="CSGBox3D" parent="BossRoomDecorations/WeaponRack1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0.2)
+size = Vector3(0.08, 1.3, 0.05)
+material = SubResource("metal_mat")
+
+[node name="Weapon2" type="CSGBox3D" parent="BossRoomDecorations/WeaponRack1"]
+transform = Transform3D(0.99, 0, 0.14, 0, 1, 0, -0.14, 0, 0.99, 0.5, 1.5, 0.2)
+size = Vector3(0.08, 1.3, 0.05)
+material = SubResource("metal_mat")
+
+[node name="WeaponRack2" type="Node3D" parent="BossRoomDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, -25)
+
+[node name="Frame2" type="CSGBox3D" parent="BossRoomDecorations/WeaponRack2"]
+transform = Transform3D(0.018010773, 0, -0.99983793, 0, 1, 0, 0.99983793, 0, 0.018010773, 1.7110577, 1.25, 0.13241196)
+use_collision = true
+size = Vector3(1.8, 2.5, 0.3)
+material = SubResource("wood_mat")
+
+[node name="Weapon3" type="CSGBox3D" parent="BossRoomDecorations/WeaponRack2"]
+transform = Transform3D(-0.13277388, 0, -0.99099493, 0, 0.99999994, 0, 0.99099493, 0, -0.13277388, 1.5561428, 1.5, -0.34412384)
+size = Vector3(0.08, 1.3, 0.05)
+material = SubResource("metal_mat")
+
+[node name="Weapon4" type="CSGBox3D" parent="BossRoomDecorations/WeaponRack2"]
+transform = Transform3D(0.007295355, 0, -0.99997354, 0, 1, 0, 0.99997354, 0, 0.007295355, 1.5597906, 1.5, 0.15586472)
+size = Vector3(0.08, 1.3, 0.05)
+material = SubResource("metal_mat")
+
+[node name="Weapon5" type="CSGBox3D" parent="BossRoomDecorations/WeaponRack2"]
+transform = Transform3D(0.14721867, 0, -0.9889523, 0, 0.99999994, 0, 0.9889523, 0, 0.14721867, 1.5634384, 1.5, 0.65584946)
+size = Vector3(0.08, 1.3, 0.05)
+material = SubResource("metal_mat")
+
+[node name="Frame3" type="CSGBox3D" parent="BossRoomDecorations/WeaponRack2"]
+transform = Transform3D(0.018010773, 0, -0.99983793, 0, 1, 0, 0.99983793, 0, 0.018010773, 1.7110577, 1.25, 6.7756042)
+use_collision = true
+size = Vector3(1.8, 2.5, 0.3)
+material = SubResource("wood_mat")
+
+[node name="Weapon6" type="CSGBox3D" parent="BossRoomDecorations/WeaponRack2"]
+transform = Transform3D(-0.13277388, 0, -0.99099493, 0, 0.99999994, 0, 0.99099493, 0, -0.13277388, 1.5561428, 1.5, 6.2990685)
+size = Vector3(0.08, 1.3, 0.05)
+material = SubResource("metal_mat")
+
+[node name="Weapon7" type="CSGBox3D" parent="BossRoomDecorations/WeaponRack2"]
+transform = Transform3D(0.007295355, 0, -0.99997354, 0, 1, 0, 0.99997354, 0, 0.007295355, 1.5597906, 1.5, 6.799057)
+size = Vector3(0.08, 1.3, 0.05)
+material = SubResource("metal_mat")
+
+[node name="Weapon8" type="CSGBox3D" parent="BossRoomDecorations/WeaponRack2"]
+transform = Transform3D(0.14721867, 0, -0.9889523, 0, 0.99999994, 0, 0.9889523, 0, 0.14721867, 1.5634384, 1.5, 7.2990417)
+size = Vector3(0.08, 1.3, 0.05)
+material = SubResource("metal_mat")
+
+[node name="Frame4" type="CSGBox3D" parent="BossRoomDecorations/WeaponRack2"]
+transform = Transform3D(0.018010773, 0, -0.99983793, 0, 1, 0, 0.99983793, 0, 0.018010773, 1.7110577, 1.25, 4.348549)
+use_collision = true
+size = Vector3(1.8, 2.5, 0.3)
+material = SubResource("wood_mat")
+
+[node name="Weapon9" type="CSGBox3D" parent="BossRoomDecorations/WeaponRack2"]
+transform = Transform3D(-0.13277388, 0, -0.99099493, 0, 0.99999994, 0, 0.99099493, 0, -0.13277388, 1.5561428, 1.5, 3.872013)
+size = Vector3(0.08, 1.3, 0.05)
+material = SubResource("metal_mat")
+
+[node name="Weapon10" type="CSGBox3D" parent="BossRoomDecorations/WeaponRack2"]
+transform = Transform3D(0.007295355, 0, -0.99997354, 0, 1, 0, 0.99997354, 0, 0.007295355, 1.5597906, 1.5, 4.3720016)
+size = Vector3(0.08, 1.3, 0.05)
+material = SubResource("metal_mat")
+
+[node name="Weapon11" type="CSGBox3D" parent="BossRoomDecorations/WeaponRack2"]
+transform = Transform3D(0.14721867, 0, -0.9889523, 0, 0.99999994, 0, 0.9889523, 0, 0.14721867, 1.5634384, 1.5, 4.8719864)
+size = Vector3(0.08, 1.3, 0.05)
+material = SubResource("metal_mat")
+
+[node name="WarTable1" type="Node3D" parent="BossRoomDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -19)
+
+[node name="Top" type="CSGBox3D" parent="BossRoomDecorations/WarTable1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+use_collision = true
+size = Vector3(2.5, 0.1, 1.5)
+material = SubResource("wood_mat")
+
+[node name="Leg0" type="CSGBox3D" parent="BossRoomDecorations/WarTable1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.375, -0.6)
+use_collision = true
+size = Vector3(0.12, 0.75, 0.12)
+material = SubResource("wood_mat")
+
+[node name="Leg1" type="CSGBox3D" parent="BossRoomDecorations/WarTable1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.375, -0.6)
+use_collision = true
+size = Vector3(0.12, 0.75, 0.12)
+material = SubResource("wood_mat")
+
+[node name="Leg2" type="CSGBox3D" parent="BossRoomDecorations/WarTable1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.375, 0.6)
+use_collision = true
+size = Vector3(0.12, 0.75, 0.12)
+material = SubResource("wood_mat")
+
+[node name="Leg3" type="CSGBox3D" parent="BossRoomDecorations/WarTable1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.375, 0.6)
+use_collision = true
+size = Vector3(0.12, 0.75, 0.12)
+material = SubResource("wood_mat")
+
+[node name="Map" type="CSGBox3D" parent="BossRoomDecorations/WarTable1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.86, 0)
+size = Vector3(1.8, 0.02, 1)
+material = SubResource("map_mat")
+
+[node name="WarTable2" type="Node3D" parent="BossRoomDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -19)
+
+[node name="Top" type="CSGBox3D" parent="BossRoomDecorations/WarTable2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+use_collision = true
+size = Vector3(2.5, 0.1, 1.5)
+material = SubResource("wood_mat")
+
+[node name="Leg0" type="CSGBox3D" parent="BossRoomDecorations/WarTable2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.375, -0.6)
+use_collision = true
+size = Vector3(0.12, 0.75, 0.12)
+material = SubResource("wood_mat")
+
+[node name="Leg1" type="CSGBox3D" parent="BossRoomDecorations/WarTable2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.375, -0.6)
+use_collision = true
+size = Vector3(0.12, 0.75, 0.12)
+material = SubResource("wood_mat")
+
+[node name="Leg2" type="CSGBox3D" parent="BossRoomDecorations/WarTable2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.375, 0.6)
+use_collision = true
+size = Vector3(0.12, 0.75, 0.12)
+material = SubResource("wood_mat")
+
+[node name="Leg3" type="CSGBox3D" parent="BossRoomDecorations/WarTable2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.375, 0.6)
+use_collision = true
+size = Vector3(0.12, 0.75, 0.12)
+material = SubResource("wood_mat")
+
+[node name="Map" type="CSGBox3D" parent="BossRoomDecorations/WarTable2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.86, 0)
+size = Vector3(1.8, 0.02, 1)
+material = SubResource("map_mat")
+
+[node name="EntranceCrateStack" type="Node3D" parent="BossRoomDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 2)
+
+[node name="Crate1" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.4, 0)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("wood_mat")
+
+[node name="Crate2" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5110676, 0.4, -1.0369542)
+use_collision = true
+size = Vector3(0.9, 0.8, 0.9)
+material = SubResource("wood_mat")
+
+[node name="Crate3" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4000001, 0.4, 0.21154308)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate4" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.4, 0.21154308)
+use_collision = true
+size = Vector3(0.9, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate5" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.98, 0, 0.2, 0, 1, 0, -0.2, 0, 0.98, 0, 1.15, 0.21154308)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate10" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.98, 0, 0.2, 0, 1, 0, -0.2, 0, 0.98, 0, 0.014682174, 1.965678)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate11" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.98, 0, 0.2, 0, 1, 0, -0.2, 0, 0.98, 0.06513405, 0.35728836, 1.3246162)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate6" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.109977216, 0, -0.9939341, 0, 1, 0, 0.9939341, 0, 0.109977216, -1.2353458, 0.4, 0.8446567)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate7" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.109977216, 0, -0.9939341, 0, 1, 0, 0.9939341, 0, 0.109977216, -1.1363659, 0.4, 1.7391975)
+use_collision = true
+size = Vector3(0.9, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate8" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.30656448, 0, -0.9520599, 0, 1, 0, 0.9520599, 0, 0.30656448, -1.1913548, 1.15, 1.2422302)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate9" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.10997723, 0, -0.9939342, 0.8464695, -0.5241346, 0.093660496, -0.52095526, -0.8516356, -0.05764287, -1.1897402, 1.2652671, 1.9718044)
+use_collision = true
+size = Vector3(0.9, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate12" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.30656448, 0, -0.9520599, 0.810808, -0.5241346, 0.2610812, -0.49900752, -0.85163546, -0.16068104, -1.244729, 0.4489314, 1.5935562)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate13" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4000001, 0.4, 0.21154308)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate14" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.98, 0, 0.2, 0, 1, 0, -0.2, 0, 0.98, 0, 1.15, 0.21154308)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate15" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.98, 0, 0.2, 0, 1, 0, -0.2, 0, 0.98, 0, 0.014682174, 1.965678)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate16" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.98, 0, 0.2, 0, 1, 0, -0.2, 0, 0.98, 0.06513405, 0.35728836, 1.3246162)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate17" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.109977216, 0, -0.9939341, 0, 1, 0, 0.9939341, 0, 0.109977216, -1.2353458, 0.4, 0.8446567)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate18" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.109977216, 0, -0.9939341, 0, 1, 0, 0.9939341, 0, 0.109977216, -1.1363659, 0.4, 1.7391975)
+use_collision = true
+size = Vector3(0.9, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate19" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.30656448, 0, -0.9520599, 0, 1, 0, 0.9520599, 0, 0.30656448, -1.1913548, 1.15, 1.2422302)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate20" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.30656448, 0, -0.9520599, 0.810808, -0.5241346, 0.2610812, -0.49900752, -0.85163546, -0.16068104, -1.244729, 0.4489314, 1.5935562)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate49" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.47664165, 0.87519944, 0.2583723)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate50" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.98, 0, 0.2, 0, 1, 0, -0.2, 0, 0.98, 0.8766422, 1.6251994, 0.2583723)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate51" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.98, 0, 0.2, 0, 1, 0, -0.2, 0, 0.98, 0.8766422, 0.48988163, 2.0125074)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate52" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.98, 0, 0.2, 0, 1, 0, -0.2, 0, 0.98, 0.9417763, 0.8324878, 1.3714435)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate53" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.109977216, 0, -0.9939341, 0, 1, 0, 0.9939341, 0, 0.109977216, -0.3587036, 0.87519944, 0.8914859)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate54" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.109977216, 0, -0.9939341, 0, 1, 0, 0.9939341, 0, 0.109977216, -0.25972366, 0.87519944, 1.7860248)
+use_collision = true
+size = Vector3(0.9, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate55" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.30656448, 0, -0.9520599, 0.810808, -0.5241346, 0.2610812, -0.49900752, -0.85163546, -0.16068104, -0.3680868, 0.92413086, 1.6403835)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate56" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.47664165, 0.87519944, 0.2583723)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate57" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.98, 0, 0.2, 0, 1, 0, -0.2, 0, 0.98, 0.8766422, 1.6251994, 0.2583723)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate58" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.98, 0, 0.2, 0, 1, 0, -0.2, 0, 0.98, 0.8766422, 0.48988163, 2.0125074)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate59" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.98, 0, 0.2, 0, 1, 0, -0.2, 0, 0.98, 0.9417763, 0.8324878, 1.3714435)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate60" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.109977216, 0, -0.9939341, 0, 1, 0, 0.9939341, 0, 0.109977216, -0.3587036, 0.87519944, 0.8914859)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate61" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.109977216, 0, -0.9939341, 0, 1, 0, 0.9939341, 0, 0.109977216, -0.25972366, 0.87519944, 1.7860248)
+use_collision = true
+size = Vector3(0.9, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate62" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.30656448, 0, -0.9520599, 0.810808, -0.5241346, 0.2610812, -0.49900752, -0.85163546, -0.16068104, -0.3680868, 0.92413086, 1.6403835)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate63" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5243206, 0.3630737, 0.2583723)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate66" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.98, 0, 0.2, 0, 1, 0, -0.2, 0, 0.98, 2.9894552, 0.3203621, 1.3714435)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate67" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.109977216, 0, -0.9939341, 0, 1, 0, 0.9939341, 0, 0.109977216, 1.6889753, 0.3630737, 0.8914859)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate68" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.109977216, 0, -0.9939341, 0, 1, 0, 0.9939341, 0, 0.109977216, 1.7879553, 0.3630737, 1.7860248)
+use_collision = true
+size = Vector3(0.9, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate69" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.30656448, 0, -0.9520599, 0.810808, -0.5241346, 0.2610812, -0.49900752, -0.85163546, -0.16068104, 1.6795921, 0.41200513, 1.6403835)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate70" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5243206, 0.3630737, 0.2583723)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate73" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.98, 0, 0.2, 0, 1, 0, -0.2, 0, 0.98, 2.9894552, 0.3203621, 1.3714435)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate74" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.109977216, 0, -0.9939341, 0, 1, 0, 0.9939341, 0, 0.109977216, 1.6889753, 0.3630737, 0.8914859)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate75" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.109977216, 0, -0.9939341, 0, 1, 0, 0.9939341, 0, 0.109977216, 1.7879553, 0.3630737, 1.7860248)
+use_collision = true
+size = Vector3(0.9, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate76" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.30656448, 0, -0.9520599, 0.810808, -0.5241346, 0.2610812, -0.49900752, -0.85163546, -0.16068104, 1.6795921, 0.41200513, 1.6403835)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate21" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.25390863, 0, 0.56534123, 0, 1, 0, -0.83844686, 0, 0.17120348, 6.5911164, 0.4, 0.300097)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("wood_mat")
+
+[node name="Crate22" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.25390863, 0, 0.56534123, 0, 1, 0, -0.83844686, 0, 0.17120348, 6.0046773, 0.4, 0.105852604)
+use_collision = true
+size = Vector3(0.9, 0.8, 0.9)
+material = SubResource("wood_mat")
+
+[node name="Crate23" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.25390863, 0, 0.56534123, 0, 1, 0, -0.83844686, 0, 0.17120348, 6.7069945, 0.4, 0.3614092)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate24" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.25390863, 0, 0.56534123, 0, 1, 0, -0.83844686, 0, 0.17120348, 6.856289, 0.4, -0.49996042)
+use_collision = true
+size = Vector3(0.9, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate25" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.0889535, 0, 0.5718239, 0, 1, 0, -0.9564618, 0, 0.053181153, 6.7733474, 1.15, -0.02142167)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate26" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.0889535, 0, 0.5718239, 0, 1, 0, -0.9564618, 0, 0.053181153, 7.7342143, 0.014682174, 0.48698568)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate27" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.0889535, 0, 0.5718239, 0, 1, 0, -0.9564618, 0, 0.053181153, 7.393863, 0.35728836, 0.23884606)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate28" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.56977934, 0, -0.19711252, 0, 1, 0, 0.10595209, 0, 1.0600135, 6.9152265, 0.4, 1.3443971)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate29" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.56977934, 0, -0.19711252, 0, 1, 0, 0.10595209, 0, 1.0600135, 7.421651, 0.4, 1.5089335)
+use_collision = true
+size = Vector3(0.9, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate30" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.57243145, 0, 0.017336365, 0, 1, 0, -0.009998078, 0, 0.9925787, 7.140304, 1.15, 1.4175243)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate31" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(-0.37356317, -0.5309615, -0.2928587, 0.6775163, -0.34143275, 0.07991188, -0.20510076, -0.1607922, 0.797378, 7.5402126, 1.2652671, 1.6274343)
+use_collision = true
+size = Vector3(0.9, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate32" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(-0.3241226, -0.5309614, -0.3507662, 0.6760406, -0.34143275, 0.2131104, -0.36522752, -0.16079219, 0.7057588, 7.323897, 0.4489314, 1.5704336)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate33" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.25390863, 0, 0.56534123, 0, 1, 0, -0.83844686, 0, 0.17120348, 6.7069945, 0.4, 0.3614092)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate34" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.0889535, 0, 0.5718239, 0, 1, 0, -0.9564618, 0, 0.053181153, 6.7733474, 1.15, -0.02142167)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate35" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.0889535, 0, 0.5718239, 0, 1, 0, -0.9564618, 0, 0.053181153, 7.7342143, 0.014682174, 0.48698568)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate36" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.0889535, 0, 0.5718239, 0, 1, 0, -0.9564618, 0, 0.053181153, 7.393863, 0.35728836, 0.23884606)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate37" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.56977934, 0, -0.19711252, 0, 1, 0, 0.10595209, 0, 1.0600135, 6.9152265, 0.4, 1.3443971)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate38" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.56977934, 0, -0.19711252, 0, 1, 0, 0.10595209, 0, 1.0600135, 7.421651, 0.4, 1.5089335)
+use_collision = true
+size = Vector3(0.9, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate39" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.57243145, 0, 0.017336365, 0, 1, 0, -0.009998078, 0, 0.9925787, 7.140304, 1.15, 1.4175243)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate40" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(-0.3241226, -0.5309614, -0.3507662, 0.6760406, -0.34143275, 0.2131104, -0.36522752, -0.16079219, 0.7057588, 7.323897, 0.4489314, 1.5704336)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate64" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.25390863, 0, 0.56534123, 0, 1, 0, -0.83844686, 0, 0.17120348, 6.878066, 0.87519944, -0.4640317)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate65" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.0889535, 0, 0.5718239, 0, 1, 0, -0.9564618, 0, 0.053181153, 6.9444194, 1.6251996, -0.84686327)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate71" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.0889535, 0, 0.5718239, 0, 1, 0, -0.9564618, 0, 0.053181153, 7.9052863, 0.48988163, -0.33845568)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate72" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.0889535, 0, 0.5718239, 0, 1, 0, -0.9564618, 0, 0.053181153, 7.5649343, 0.8324878, -0.586596)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate77" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.56977934, 0, -0.19711252, 0, 1, 0, 0.10595209, 0, 1.0600135, 7.0862985, 0.87519944, 0.5189557)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate78" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.56977934, 0, -0.19711252, 0, 1, 0, 0.10595209, 0, 1.0600135, 7.5927215, 0.87519944, 0.6834917)
+use_collision = true
+size = Vector3(0.9, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate79" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(-0.3241226, -0.5309614, -0.3507662, 0.6760406, -0.34143275, 0.2131104, -0.36522752, -0.16079219, 0.7057588, 7.494968, 0.92413086, 0.7449918)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate80" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.25390863, 0, 0.56534123, 0, 1, 0, -0.83844686, 0, 0.17120348, 6.878066, 0.87519944, -0.4640317)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate81" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.0889535, 0, 0.5718239, 0, 1, 0, -0.9564618, 0, 0.053181153, 6.9444194, 1.6251996, -0.84686327)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate82" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.0889535, 0, 0.5718239, 0, 1, 0, -0.9564618, 0, 0.053181153, 7.9052863, 0.48988163, -0.33845568)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate83" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.0889535, 0, 0.5718239, 0, 1, 0, -0.9564618, 0, 0.053181153, 7.5649343, 0.8324878, -0.586596)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate84" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.56977934, 0, -0.19711252, 0, 1, 0, 0.10595209, 0, 1.0600135, 7.0862985, 0.87519944, 0.5189557)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate85" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.56977934, 0, -0.19711252, 0, 1, 0, 0.10595209, 0, 1.0600135, 7.5927215, 0.87519944, 0.6834917)
+use_collision = true
+size = Vector3(0.9, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate86" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(-0.3241226, -0.5309614, -0.3507662, 0.6760406, -0.34143275, 0.2131104, -0.36522752, -0.16079219, 0.7057588, 7.494968, 0.92413086, 0.7449918)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate87" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.25390863, 0, 0.56534123, 0, 1, 0, -0.83844686, 0, 0.17120348, 7.2177415, 0.3630737, -2.423818)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate88" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.0889535, 0, 0.5718239, 0, 1, 0, -0.9564618, 0, 0.053181153, 7.904609, 0.3203621, -2.5463824)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate89" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.56977934, 0, -0.19711252, 0, 1, 0, 0.10595209, 0, 1.0600135, 7.4259744, 0.3630737, -1.4408307)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate90" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.56977934, 0, -0.19711252, 0, 1, 0, 0.10595209, 0, 1.0600135, 7.9323974, 0.3630737, -1.2762947)
+use_collision = true
+size = Vector3(0.9, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate91" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(-0.3241226, -0.5309614, -0.3507662, 0.6760406, -0.34143275, 0.2131104, -0.36522752, -0.16079219, 0.7057588, 7.834643, 0.41200513, -1.2147946)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate92" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.25390863, 0, 0.56534123, 0, 1, 0, -0.83844686, 0, 0.17120348, 7.2177415, 0.3630737, -2.423818)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate93" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.0889535, 0, 0.5718239, 0, 1, 0, -0.9564618, 0, 0.053181153, 7.904609, 0.3203621, -2.5463824)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate94" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.56977934, 0, -0.19711252, 0, 1, 0, 0.10595209, 0, 1.0600135, 7.4259744, 0.3630737, -1.4408307)
+use_collision = true
+size = Vector3(1, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate95" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(0.56977934, 0, -0.19711252, 0, 1, 0, 0.10595209, 0, 1.0600135, 7.9323974, 0.3630737, -1.2762947)
+use_collision = true
+size = Vector3(0.9, 0.8, 0.9)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Crate96" type="CSGBox3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(-0.3241226, -0.5309614, -0.3507662, 0.6760406, -0.34143275, 0.2131104, -0.36522752, -0.16079219, 0.7057588, 7.834643, 0.41200513, -1.2147946)
+use_collision = true
+size = Vector3(0.8, 0.7, 0.8)
+material = SubResource("StandardMaterial3D_bm6mv")
+
+[node name="Chest1" type="Marker3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -22.567417)
+metadata/chest_name = "Storage Crate"
+metadata/is_locked = false
+metadata/lock_difficulty = 10
+metadata/persistent_id = "bandit_l1_chest_1"
+
+[node name="Chest7" type="Marker3D" parent="BossRoomDecorations/EntranceCrateStack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.1233578, 0.47519946, -22.520588)
+metadata/chest_name = "Storage Crate"
+metadata/is_locked = false
+metadata/lock_difficulty = 10
+metadata/persistent_id = "bandit_l1_chest_1"
+
+[node name="EntranceBarrel" type="CSGCylinder3D" parent="BossRoomDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.2184362, 0.5, -0.12916088)
+use_collision = true
+radius = 0.4
+height = 1.0
+material = SubResource("barrel_mat")
+
+[node name="TreasureVaultDecorations" type="Node3D" parent="."]
+
+[node name="GoldCoinPile1" type="Node3D" parent="TreasureVaultDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.314379, 0, -24.587648)
+
+[node name="Base" type="CSGCylinder3D" parent="TreasureVaultDecorations/GoldCoinPile1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.075, -0.16427994)
+height = 0.15
+sides = 12
+material = SubResource("gold_mat")
+
+[node name="Middle" type="CSGCylinder3D" parent="TreasureVaultDecorations/GoldCoinPile1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.21, -0.20936203)
+radius = 0.35
+height = 0.12
+sides = 12
+material = SubResource("gold_mat")
+
+[node name="Top" type="CSGCylinder3D" parent="TreasureVaultDecorations/GoldCoinPile1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.32, -0.20936203)
+radius = 0.2
+height = 0.1
+sides = 12
+material = SubResource("gold_mat")
+
+[node name="GoldCoinPile2" type="Node3D" parent="TreasureVaultDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0.03918898, -22.44677)
+
+[node name="Base" type="CSGCylinder3D" parent="TreasureVaultDecorations/GoldCoinPile2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.075, 0)
+height = 0.15
+sides = 12
+material = SubResource("gold_mat")
+
+[node name="Middle" type="CSGCylinder3D" parent="TreasureVaultDecorations/GoldCoinPile2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.21, 0)
+radius = 0.35
+height = 0.12
+sides = 12
+material = SubResource("gold_mat")
+
+[node name="Top" type="CSGCylinder3D" parent="TreasureVaultDecorations/GoldCoinPile2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.32, 0)
+radius = 0.2
+height = 0.1
+sides = 12
+material = SubResource("gold_mat")
+
+[node name="SilverCoinPile" type="Node3D" parent="TreasureVaultDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.960722, 0, -24.439976)
+
+[node name="Base" type="CSGCylinder3D" parent="TreasureVaultDecorations/SilverCoinPile"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.075, 0)
+height = 0.15
+sides = 12
+material = SubResource("silver_mat")
+
+[node name="Middle" type="CSGCylinder3D" parent="TreasureVaultDecorations/SilverCoinPile"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.21, 0)
+radius = 0.35
+height = 0.12
+sides = 12
+material = SubResource("silver_mat")
+
+[node name="Top" type="CSGCylinder3D" parent="TreasureVaultDecorations/SilverCoinPile"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.32, 0)
+radius = 0.2
+height = 0.1
+sides = 12
+material = SubResource("silver_mat")
+
+[node name="ArmorStand1" type="Node3D" parent="TreasureVaultDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.605051, 0.305578, -25.500408)
+
+[node name="Base" type="CSGCylinder3D" parent="TreasureVaultDecorations/ArmorStand1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.075, 0)
+use_collision = true
+radius = 0.4
+height = 0.15
+material = SubResource("wood_mat")
+
+[node name="Post" type="CSGCylinder3D" parent="TreasureVaultDecorations/ArmorStand1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+use_collision = true
+radius = 0.06
+height = 1.8
+material = SubResource("wood_mat")
+
+[node name="Crossbar" type="CSGBox3D" parent="TreasureVaultDecorations/ArmorStand1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+size = Vector3(0.8, 0.08, 0.08)
+material = SubResource("wood_mat")
+
+[node name="Helmet" type="CSGSphere3D" parent="TreasureVaultDecorations/ArmorStand1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.85, 0)
+radius = 0.18
+radial_segments = 8
+rings = 4
+material = SubResource("metal_mat")
+
+[node name="Breastplate" type="CSGBox3D" parent="TreasureVaultDecorations/ArmorStand1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+size = Vector3(0.4, 0.5, 0.2)
+material = SubResource("metal_mat")
+
+[node name="ArmorStand2" type="Node3D" parent="TreasureVaultDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25.467436, 0, -26.237135)
+
+[node name="Base" type="CSGCylinder3D" parent="TreasureVaultDecorations/ArmorStand2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.075, 0)
+use_collision = true
+radius = 0.4
+height = 0.15
+material = SubResource("wood_mat")
+
+[node name="Post" type="CSGCylinder3D" parent="TreasureVaultDecorations/ArmorStand2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+use_collision = true
+radius = 0.06
+height = 1.8
+material = SubResource("wood_mat")
+
+[node name="Crossbar" type="CSGBox3D" parent="TreasureVaultDecorations/ArmorStand2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+size = Vector3(0.8, 0.08, 0.08)
+material = SubResource("wood_mat")
+
+[node name="Helmet" type="CSGSphere3D" parent="TreasureVaultDecorations/ArmorStand2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.85, 0)
+radius = 0.18
+radial_segments = 8
+rings = 4
+material = SubResource("metal_mat")
+
+[node name="Breastplate" type="CSGBox3D" parent="TreasureVaultDecorations/ArmorStand2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+size = Vector3(0.4, 0.5, 0.2)
+material = SubResource("metal_mat")
+
+[node name="VaultShelf" type="Node3D" parent="TreasureVaultDecorations"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 0, -26)
+
+[node name="FrameLeft" type="CSGBox3D" parent="TreasureVaultDecorations/VaultShelf"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1.25, 0)
+use_collision = true
+size = Vector3(0.15, 2.5, 0.15)
+material = SubResource("wood_mat")
+
+[node name="FrameRight" type="CSGBox3D" parent="TreasureVaultDecorations/VaultShelf"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1.25, 0)
+use_collision = true
+size = Vector3(0.15, 2.5, 0.15)
+material = SubResource("wood_mat")
+
+[node name="Plank0" type="CSGBox3D" parent="TreasureVaultDecorations/VaultShelf"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+size = Vector3(2.1, 0.1, 0.4)
+material = SubResource("wood_mat")
+
+[node name="Plank1" type="CSGBox3D" parent="TreasureVaultDecorations/VaultShelf"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+size = Vector3(2.1, 0.1, 0.4)
+material = SubResource("wood_mat")
+
+[node name="Plank2" type="CSGBox3D" parent="TreasureVaultDecorations/VaultShelf"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1, 0)
+size = Vector3(2.1, 0.1, 0.4)
+material = SubResource("wood_mat")
+
+[node name="Goblet0" type="CSGCylinder3D" parent="TreasureVaultDecorations/VaultShelf"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.65, 0)
+radius = 0.08
+height = 0.2
+material = SubResource("gold_mat")
+
+[node name="Goblet1" type="CSGCylinder3D" parent="TreasureVaultDecorations/VaultShelf"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.65, 0)
+radius = 0.08
+height = 0.2
+material = SubResource("gold_mat")
+
+[node name="Torches" type="Node3D" parent="."]
+
+[node name="Torch1" type="Node3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.634489, 2.8, 0)
+
+[node name="Holder" type="CSGBox3D" parent="Torches/Torch1"]
+size = Vector3(0.15, 0.4, 0.15)
+material = SubResource("torch_holder_mat")
+
+[node name="TorchLight" type="OmniLight3D" parent="Torches/Torch1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.8
+omni_range = 8.0
+
+[node name="Torch2" type="Node3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 2.8, 0)
+
+[node name="Holder" type="CSGBox3D" parent="Torches/Torch2"]
+size = Vector3(0.15, 0.4, 0.15)
+material = SubResource("torch_holder_mat")
+
+[node name="TorchLight" type="OmniLight3D" parent="Torches/Torch2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.8
+omni_range = 8.0
+
+[node name="Torch3" type="Node3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.618361, 2.5, -7.212918)
+
+[node name="Holder" type="CSGBox3D" parent="Torches/Torch3"]
+size = Vector3(0.15, 0.4, 0.15)
+material = SubResource("torch_holder_mat")
+
+[node name="TorchLight" type="OmniLight3D" parent="Torches/Torch3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.8
+omni_range = 8.0
+
+[node name="Torch4" type="Node3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.70171, 3.5, -17)
+
+[node name="Holder" type="CSGBox3D" parent="Torches/Torch4"]
+size = Vector3(0.15, 0.4, 0.15)
+material = SubResource("torch_holder_mat")
+
+[node name="TorchLight" type="OmniLight3D" parent="Torches/Torch4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.055900574, 0.29999995, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.8
+omni_range = 8.0
+
+[node name="Torch5" type="Node3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.616114, 3.5, -17)
+
+[node name="Holder" type="CSGBox3D" parent="Torches/Torch5"]
+size = Vector3(0.15, 0.4, 0.15)
+material = SubResource("torch_holder_mat")
+
+[node name="TorchLight" type="OmniLight3D" parent="Torches/Torch5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.8
+omni_range = 8.0
+
+[node name="Torch6" type="Node3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.927659, 3.5, -22)
+
+[node name="Holder" type="CSGBox3D" parent="Torches/Torch6"]
+size = Vector3(0.15, 0.4, 0.15)
+material = SubResource("torch_holder_mat")
+
+[node name="TorchLight" type="OmniLight3D" parent="Torches/Torch6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.8
+omni_range = 8.0
+
+[node name="Torch7" type="Node3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.577705, 3.5, -22)
+
+[node name="Holder" type="CSGBox3D" parent="Torches/Torch7"]
+size = Vector3(0.15, 0.4, 0.15)
+material = SubResource("torch_holder_mat")
+
+[node name="TorchLight" type="OmniLight3D" parent="Torches/Torch7"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.8
+omni_range = 8.0
+
+[node name="Torch8" type="Node3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.6239, 3.52795, -26.997864)
+
+[node name="Holder" type="CSGBox3D" parent="Torches/Torch8"]
+size = Vector3(0.15, 0.4, 0.15)
+material = SubResource("torch_holder_mat")
+
+[node name="TorchLight" type="OmniLight3D" parent="Torches/Torch8"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.8
+omni_range = 8.0
+
+[node name="Torch9" type="Node3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.580315, 3.5, -27)
+
+[node name="Holder" type="CSGBox3D" parent="Torches/Torch9"]
+size = Vector3(0.15, 0.4, 0.15)
+material = SubResource("torch_holder_mat")
+
+[node name="TorchLight" type="OmniLight3D" parent="Torches/Torch9"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.8
+omni_range = 8.0
+
+[node name="Torch10" type="Node3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.5, -20.403034)
+
+[node name="Holder" type="CSGBox3D" parent="Torches/Torch10"]
+size = Vector3(0.15, 0.4, 0.15)
+material = SubResource("torch_holder_mat")
+
+[node name="TorchLight" type="OmniLight3D" parent="Torches/Torch10"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.8
+omni_range = 8.0
+
+[node name="Torch11" type="Node3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.421003, 2.8, -19)
+
+[node name="Holder" type="CSGBox3D" parent="Torches/Torch11"]
+size = Vector3(0.15, 0.4, 0.15)
+material = SubResource("torch_holder_mat")
+
+[node name="TorchLight" type="OmniLight3D" parent="Torches/Torch11"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.8
+omni_range = 8.0
+
+[node name="Torch12" type="Node3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 2.8, -17.336557)
+
+[node name="Holder" type="CSGBox3D" parent="Torches/Torch12"]
+size = Vector3(0.15, 0.4, 0.15)
+material = SubResource("torch_holder_mat")
+
+[node name="TorchLight" type="OmniLight3D" parent="Torches/Torch12"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.8
+omni_range = 8.0
+
+[node name="Torch13" type="Node3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 2.8, -26.615932)
+
+[node name="Holder" type="CSGBox3D" parent="Torches/Torch13"]
+size = Vector3(0.15, 0.4, 0.15)
+material = SubResource("torch_holder_mat")
+
+[node name="TorchLight" type="OmniLight3D" parent="Torches/Torch13"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.8
+omni_range = 8.0
+
+[node name="Torch14" type="Node3D" parent="Torches"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 2.8, -26.70279)
+
+[node name="Holder" type="CSGBox3D" parent="Torches/Torch14"]
+size = Vector3(0.15, 0.4, 0.15)
+material = SubResource("torch_holder_mat")
+
+[node name="TorchLight" type="OmniLight3D" parent="Torches/Torch14"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.8
+omni_range = 8.0
+
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="SpawnPoint_default" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 2)
+metadata/spawn_id = "default"
+
+[node name="SpawnPoint_from_level_1" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 2)
+metadata/spawn_id = "from_level_1"
+
+[node name="SpawnPoint_default2" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(0.25390863, 0, 0.56534123, 0, 1, 0, -0.83844686, 0, 0.17120348, 4.1551194, 0.099999994, -0.9539647)
+metadata/spawn_id = "default"
+
+[node name="SpawnPoint_from_level_2" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(0.25390863, 0, 0.56534123, 0, 1, 0, -0.83844686, 0, 0.17120348, 4.1551194, 0.099999994, -0.9539647)
+metadata/spawn_id = "from_level_1"
+
+[node name="EnemySpawns" type="Node3D" parent="."]
+
+[node name="Enemy1" type="Marker3D" parent="EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 2)
+metadata/enemy_data = "res://data/enemies/human_bandit.tres"
+metadata/patrol_radius = 4
+metadata/aggro_range = 3
+
+[node name="Enemy8" type="Marker3D" parent="EnemySpawns"]
+transform = Transform3D(0.25390863, 0, 0.56534123, 0, 1, 0, -0.83844686, 0, 0.17120348, 3.6574697, 0, 1.9172659)
+metadata/enemy_data = "res://data/enemies/human_bandit.tres"
+metadata/patrol_radius = 4
+metadata/aggro_range = 3
+
+[node name="Enemy2" type="Marker3D" parent="EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 2)
+metadata/enemy_data = "res://data/enemies/human_bandit.tres"
+metadata/patrol_radius = 4
+metadata/aggro_range = 3
+
+[node name="Enemy3" type="Marker3D" parent="EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -17)
+metadata/enemy_data = "res://data/enemies/human_bandit.tres"
+metadata/patrol_radius = 4
+metadata/aggro_range = 3
+
+[node name="Enemy4" type="Marker3D" parent="EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -17)
+metadata/enemy_data = "res://data/enemies/human_bandit.tres"
+metadata/patrol_radius = 4
+metadata/aggro_range = 3
+
+[node name="Enemy5" type="Marker3D" parent="EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -25)
+metadata/enemy_data = "res://data/enemies/human_bandit.tres"
+metadata/patrol_radius = 4
+metadata/aggro_range = 3
+
+[node name="Enemy6" type="Marker3D" parent="EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -25)
+metadata/enemy_data = "res://data/enemies/human_bandit.tres"
+metadata/patrol_radius = 4
+metadata/aggro_range = 3
+
+[node name="BossEnemy" type="Marker3D" parent="EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -24)
+metadata/enemy_data = "res://data/enemies/human_bandit.tres"
+metadata/patrol_radius = 4
+metadata/aggro_range = 3
+metadata/is_boss = true
+metadata/boss_name = "BanditLeader"
+
+[node name="Enemy7" type="Marker3D" parent="EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 0, -20)
+metadata/enemy_data = "res://data/enemies/human_bandit.tres"
+metadata/patrol_radius = 4
+metadata/aggro_range = 3
+
+[node name="ChestPositions" type="Node3D" parent="."]
+
+[node name="BossChest" type="Marker3D" parent="ChestPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.679345, 0, -27.486067)
+metadata/chest_name = "Leader's Strongbox"
+metadata/is_locked = true
+metadata/lock_difficulty = 18
+metadata/persistent_id = "bandit_l2_boss_chest"
+
+[node name="VaultChest1" type="Marker3D" parent="ChestPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 0, -18)
+metadata/chest_name = "Gold Chest"
+metadata/is_locked = false
+metadata/lock_difficulty = 12
+metadata/persistent_id = "bandit_vault_chest_1"
+
+[node name="VaultChest2" type="Marker3D" parent="ChestPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, -18)
+metadata/chest_name = "Silver Chest"
+metadata/is_locked = false
+metadata/lock_difficulty = 12
+metadata/persistent_id = "bandit_vault_chest_2"
+
+[node name="VaultChest3" type="Marker3D" parent="ChestPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 0, -26)
+metadata/chest_name = "Master Vault Chest"
+metadata/is_locked = true
+metadata/lock_difficulty = 20
+metadata/persistent_id = "bandit_vault_chest_3"
+
+[node name="VaultChest4" type="Marker3D" parent="ChestPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, -26)
+metadata/chest_name = "Jewel Box"
+metadata/is_locked = true
+metadata/lock_difficulty = 15
+metadata/persistent_id = "bandit_vault_chest_4"
+
+[node name="EntranceChest" type="Marker3D" parent="ChestPositions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0)
+metadata/chest_name = "Supply Crate"
+metadata/is_locked = false
+metadata/lock_difficulty = 8
+metadata/persistent_id = "bandit_l2_entrance_chest"
+
+[node name="DoorPositions" type="Node3D" parent="."]
+
+[node name="Door1" type="Marker3D" parent="DoorPositions"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 4)
+metadata/target_scene = "res://scenes/levels/bandit_hideout_level_1.tscn"
+metadata/spawn_id = "from_level_2"
+metadata/door_label = "Return to Upper Level"
+metadata/show_frame = true
+
+[node name="Door2" type="Marker3D" parent="DoorPositions"]
+transform = Transform3D(-0.25390863, 0, -0.56534123, 0, 1, 0, 0.83844686, 0, -0.17120348, 5.2506647, 0, -0.37429762)
+metadata/target_scene = "res://scenes/levels/bandit_hideout_level_1.tscn"
+metadata/spawn_id = "from_level_2"
+metadata/door_label = "Return to Upper Level"
+metadata/show_frame = true
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]

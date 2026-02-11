@@ -1,0 +1,282 @@
+{
+  "towns": [
+    {"id": "elder_moor", "hex_id": "Town-06", "q": 31, "r": 12, "terrain": "swamp", "elevation": "low", "notes": "Starter town - moor-edge town on wet ground near river"},
+    {"id": "Town-01", "q": 5, "r": 18, "terrain": "plains", "elevation": "low", "notes": "small town on lowland near west water access"},
+    {"id": "Town-02", "q": 4, "r": 30, "terrain": "coast", "elevation": "sea", "notes": "coastal town on sheltered shoreline"},
+    {"id": "kazan_dun", "hex_id": "Town-03", "q": 10, "r": 6, "terrain": "mountains", "elevation": "high", "notes": "Dwarven stronghold - mountain hold carved into high ridgeline"},
+    {"id": "Town-04", "q": 18, "r": 40, "terrain": "coast", "elevation": "sea", "notes": "coastal roadhead town on west shore"},
+    {"id": "dalhurst", "hex_id": "Town-05", "q": 23, "r": 10, "terrain": "plains", "elevation": "low", "notes": "Major trade hub - town at road junction near river reach"},
+    {"id": "Town-07", "q": 44, "r": 3, "terrain": "hills", "elevation": "mid", "notes": "foothill town near NE approach"},
+    {"id": "Town-08", "q": 46, "r": 14, "terrain": "plains", "elevation": "low", "notes": "roadside town on east plains near river bend"},
+    {"id": "Town-09", "q": 38, "r": 35, "terrain": "plains", "elevation": "low", "notes": "valley town where routes converge"},
+    {"id": "Town-10", "q": 27, "r": 40, "terrain": "plains", "elevation": "low", "notes": "market town along the main west-east road"},
+    {"id": "desert_camp", "hex_id": "Town-11", "q": 44, "r": 46, "terrain": "desert", "elevation": "low", "notes": "Nomadic trading post - desert-edge camp town near small lake"},
+    {"id": "elven_city", "q": -12, "r": 35, "terrain": "forest", "elevation": "low", "notes": "Major elven city across the western sea - accessible by boat from Town-02 and Town-04"}
+  ],
+  "points_of_interest": [
+    {"id": "Ruin-01", "q": 24, "r": 4, "terrain": "hills", "tags": ["ruin"], "notes": "ruin site on northern upland above travel corridor"},
+    {"id": "Ruin-02", "q": 45, "r": 28, "terrain": "badlands", "tags": ["ruin"], "notes": "ruin in rough ground beside the road"},
+    {"id": "Tower-01", "q": 37, "r": 8, "terrain": "mountains", "tags": ["watchtower", "pass"], "notes": "tower overlooking mountain pass route"},
+    {"id": "Tower-02", "q": 47, "r": 7, "terrain": "hills", "tags": ["watchtower"], "notes": "ridge watchtower above the main road"},
+    {"id": "Tower-03", "q": 28, "r": 26, "terrain": "mountains", "tags": ["watchtower"], "notes": "guarded gate/watch point at range edge"},
+    {"id": "elven_watchtower", "q": -6, "r": 34, "terrain": "water", "tags": ["watchtower", "elven"], "notes": "Elven watchtower on rocky outcrop guarding the sea approach to the elven city"},
+    {"id": "island_01", "q": -4, "r": 28, "terrain": "island", "tags": ["island", "pirate"], "notes": "Small rocky island - known pirate hideout"},
+    {"id": "island_02", "q": -2, "r": 38, "terrain": "island", "tags": ["island"], "notes": "Forested island with fresh water spring"},
+    {"id": "island_03", "q": 2, "r": 33, "terrain": "island", "tags": ["island", "ruins"], "notes": "Island with ancient ruins - possible treasure site"},
+    {"id": "ghost_ship_wreck", "q": -1, "r": 31, "terrain": "water", "tags": ["wreck", "undead", "encounter"], "notes": "Haunted shipwreck visible at low tide - ghost pirates roam at night"}
+  ],
+  "water": {
+    "id": "western_sea",
+    "description": "Large body of water separating the main continent from the elven lands",
+    "bounds": {
+      "q_min": -15,
+      "q_max": 3,
+      "r_min": 20,
+      "r_max": 45
+    },
+    "ports": [
+      {"town_id": "Town-02", "q": 4, "r": 30, "notes": "Sheltered harbor for small vessels"},
+      {"town_id": "Town-04", "q": 18, "r": 40, "notes": "Main port for crossing to elven lands"},
+      {"town_id": "elven_city", "q": -12, "r": 35, "notes": "Elven harbor with magical lighthouse"}
+    ],
+    "sea_routes": [
+      {"id": "route_coast_to_elven", "from": "Town-02", "to": "elven_city", "waypoints": [[-4, 28], [-6, 34]], "notes": "Northern route via islands - longer but safer"},
+      {"id": "route_port_to_elven", "from": "Town-04", "to": "elven_city", "waypoints": [[-2, 38]], "notes": "Direct southern route - shorter but more exposed"}
+    ],
+    "encounter_zones": [
+      {"id": "pirate_waters", "q_center": -3, "r_center": 30, "radius": 5, "encounter_types": ["pirate", "ghost_pirate"], "notes": "Waters around the pirate island"},
+      {"id": "deep_waters", "q_center": -8, "r_center": 36, "radius": 4, "encounter_types": ["sea_monster"], "notes": "Deep waters where large creatures dwell"}
+    ]
+  },
+  "rivers": [
+    {"id": "River-01", "hexes": [[42,6],[41,7],[40,8],[39,9],[38,10],[37,11],[36,12],[35,13],[34,14],[33,15],[32,16],[31,17],[30,18],[29,19],[28,20],[27,21],[26,22],[25,23],[24,24],[23,25],[22,26],[21,27],[20,28],[19,29],[18,30],[17,31],[16,32],[15,33],[14,34]]},
+    {"id": "River-02", "hexes": [[34,33],[35,34],[36,35],[37,36],[38,37],[39,38],[40,39],[41,40]]}
+  ],
+  "roads": [
+    {
+      "id": "road_01",
+      "name": "Elder Moor Trade Road",
+      "description": "Main road from Elder Moor to Dalhurst",
+      "connects": ["elder_moor", "dalhurst"],
+      "hexes": [[31,12],[30,12],[29,11],[28,11],[27,11],[26,10],[25,10],[24,10],[23,10]],
+      "danger_level": 0.8,
+      "patrol_faction": "dalhurst_guard",
+      "terrain_type": "swamp_to_plains"
+    },
+    {
+      "id": "road_02",
+      "name": "Kazan-Dun Mountain Road",
+      "description": "Treacherous mountain path from Dalhurst to the Dwarven stronghold",
+      "connects": ["dalhurst", "kazan_dun"],
+      "hexes": [[23,10],[22,9],[21,9],[20,8],[19,8],[18,7],[17,7],[16,6],[15,6],[14,6],[13,6],[12,6],[11,6],[10,6]],
+      "danger_level": 1.4,
+      "patrol_faction": "kazan_dun_guard",
+      "terrain_type": "plains_to_mountains"
+    },
+    {
+      "id": "road_03",
+      "name": "Eastern Road",
+      "description": "Road from Elder Moor east to Town-08",
+      "connects": ["elder_moor", "Town-08"],
+      "hexes": [[31,12],[32,12],[33,13],[34,13],[35,13],[36,13],[37,13],[38,14],[39,14],[40,14],[41,14],[42,14],[43,14],[44,14],[45,14],[46,14]],
+      "danger_level": 1.0,
+      "patrol_faction": "eastern_militia",
+      "terrain_type": "swamp_to_plains"
+    },
+    {
+      "id": "road_04",
+      "name": "Northern Highway",
+      "description": "Road from Town-08 north to Town-07",
+      "connects": ["Town-08", "Town-07"],
+      "hexes": [[46,14],[46,13],[45,12],[45,11],[45,10],[45,9],[45,8],[45,7],[45,6],[45,5],[45,4],[44,3]],
+      "danger_level": 1.1,
+      "patrol_faction": "northern_rangers",
+      "terrain_type": "plains_to_hills"
+    },
+    {
+      "id": "road_05",
+      "name": "Western Coastal Road",
+      "description": "Road from Town-01 south to coastal Town-02",
+      "connects": ["Town-01", "Town-02"],
+      "hexes": [[5,18],[5,19],[5,20],[5,21],[5,22],[5,23],[5,24],[5,25],[5,26],[5,27],[5,28],[5,29],[4,30]],
+      "danger_level": 0.7,
+      "patrol_faction": "coastal_watch",
+      "terrain_type": "plains_to_coast"
+    },
+    {
+      "id": "road_06",
+      "name": "Southern Port Road",
+      "description": "Road from Town-02 to the southern port Town-04",
+      "connects": ["Town-02", "Town-04"],
+      "hexes": [[4,30],[5,31],[6,32],[7,33],[8,34],[9,35],[10,36],[11,37],[12,38],[13,38],[14,39],[15,39],[16,40],[17,40],[18,40]],
+      "danger_level": 0.9,
+      "patrol_faction": "port_guard",
+      "terrain_type": "coast"
+    },
+    {
+      "id": "road_07",
+      "name": "Central Valley Road",
+      "description": "Main road through the central valley connecting Town-09 and Town-10",
+      "connects": ["Town-09", "Town-10"],
+      "hexes": [[38,35],[37,35],[36,36],[35,36],[34,37],[33,37],[32,38],[31,38],[30,39],[29,39],[28,40],[27,40]],
+      "danger_level": 0.85,
+      "patrol_faction": "valley_militia",
+      "terrain_type": "plains"
+    },
+    {
+      "id": "road_08",
+      "name": "Desert Trail",
+      "description": "Sandy trail from Town-09 to Desert Camp",
+      "connects": ["Town-09", "desert_camp"],
+      "hexes": [[38,35],[39,36],[40,37],[41,38],[42,39],[43,40],[43,41],[44,42],[44,43],[44,44],[44,45],[44,46]],
+      "danger_level": 1.5,
+      "patrol_faction": "desert_nomads",
+      "terrain_type": "plains_to_desert"
+    },
+    {
+      "id": "road_09",
+      "name": "Mountain Pass Road",
+      "description": "Dangerous road through the mountain pass near Tower-01",
+      "connects": ["Town-07", "Town-08"],
+      "hexes": [[44,3],[43,4],[42,5],[41,5],[40,6],[39,6],[38,7],[37,8],[38,9],[39,10],[40,11],[41,12],[42,13],[43,13],[44,14],[45,14],[46,14]],
+      "danger_level": 1.6,
+      "patrol_faction": "pass_wardens",
+      "terrain_type": "mountains_to_plains"
+    },
+    {
+      "id": "road_10",
+      "name": "Dalhurst South Road",
+      "description": "Trade road from Dalhurst south to Town-01",
+      "connects": ["dalhurst", "Town-01"],
+      "hexes": [[23,10],[22,11],[21,12],[20,12],[19,13],[18,13],[17,14],[16,14],[15,15],[14,15],[13,16],[12,16],[11,17],[10,17],[9,17],[8,18],[7,18],[6,18],[5,18]],
+      "danger_level": 0.9,
+      "patrol_faction": "dalhurst_guard",
+      "terrain_type": "plains"
+    },
+    {
+      "id": "road_11",
+      "name": "Eastern Valley Connection",
+      "description": "Road connecting the eastern towns to the central valley",
+      "connects": ["Town-08", "Town-09"],
+      "hexes": [[46,14],[45,15],[44,16],[43,17],[42,18],[41,19],[40,20],[40,21],[39,22],[39,23],[38,24],[38,25],[38,26],[38,27],[38,28],[38,29],[38,30],[38,31],[38,32],[38,33],[38,34],[38,35]],
+      "danger_level": 1.2,
+      "patrol_faction": "eastern_militia",
+      "terrain_type": "plains_to_hills"
+    }
+  ],
+  "biome_regions": [
+    {
+      "id": "elder_moor_swamps",
+      "name": "Elder Moor Swamps",
+      "biome": "swamp",
+      "hex_bounds": {"q_min": 28, "q_max": 35, "r_min": 10, "r_max": 16},
+      "danger_modifier": 1.3,
+      "dominant_enemies": ["giant_spider", "skeleton", "wolf"]
+    },
+    {
+      "id": "dalhurst_plains",
+      "name": "Dalhurst Plains",
+      "biome": "plains",
+      "hex_bounds": {"q_min": 18, "q_max": 28, "r_min": 8, "r_max": 15},
+      "danger_modifier": 0.8,
+      "dominant_enemies": ["wolf", "human_bandit"]
+    },
+    {
+      "id": "iron_mountains",
+      "name": "Iron Mountains",
+      "biome": "mountains",
+      "hex_bounds": {"q_min": 10, "q_max": 22, "r_min": 5, "r_max": 10},
+      "danger_modifier": 1.5,
+      "dominant_enemies": ["orc", "troll", "goblin"]
+    },
+    {
+      "id": "eastern_reaches",
+      "name": "Eastern Reaches",
+      "biome": "plains",
+      "hex_bounds": {"q_min": 40, "q_max": 50, "r_min": 10, "r_max": 20},
+      "danger_modifier": 1.0,
+      "dominant_enemies": ["wolf", "human_bandit", "goblin"]
+    },
+    {
+      "id": "tenger_desert",
+      "name": "Tenger Desert",
+      "biome": "desert",
+      "hex_bounds": {"q_min": 40, "q_max": 50, "r_min": 40, "r_max": 50},
+      "danger_modifier": 1.4,
+      "dominant_enemies": ["human_bandit", "giant_scorpion", "snake"]
+    },
+    {
+      "id": "western_coast",
+      "name": "Western Coast",
+      "biome": "coast",
+      "hex_bounds": {"q_min": 2, "q_max": 10, "r_min": 25, "r_max": 42},
+      "danger_modifier": 0.7,
+      "dominant_enemies": ["pirate", "smuggler"]
+    }
+  ],
+  "patrol_factions": [
+    {
+      "id": "dalhurst_guard",
+      "name": "Dalhurst City Guard",
+      "friendly": true,
+      "patrol_strength": "medium",
+      "response_time": "fast"
+    },
+    {
+      "id": "kazan_dun_guard",
+      "name": "Kazan-Dun Iron Guard",
+      "friendly": true,
+      "patrol_strength": "strong",
+      "response_time": "slow"
+    },
+    {
+      "id": "eastern_militia",
+      "name": "Eastern Militia",
+      "friendly": true,
+      "patrol_strength": "weak",
+      "response_time": "medium"
+    },
+    {
+      "id": "northern_rangers",
+      "name": "Northern Rangers",
+      "friendly": true,
+      "patrol_strength": "medium",
+      "response_time": "medium"
+    },
+    {
+      "id": "coastal_watch",
+      "name": "Coastal Watch",
+      "friendly": true,
+      "patrol_strength": "weak",
+      "response_time": "slow"
+    },
+    {
+      "id": "port_guard",
+      "name": "Port Authority Guard",
+      "friendly": true,
+      "patrol_strength": "medium",
+      "response_time": "fast"
+    },
+    {
+      "id": "valley_militia",
+      "name": "Central Valley Militia",
+      "friendly": true,
+      "patrol_strength": "medium",
+      "response_time": "medium"
+    },
+    {
+      "id": "desert_nomads",
+      "name": "Desert Nomad Guides",
+      "friendly": true,
+      "patrol_strength": "weak",
+      "response_time": "slow"
+    },
+    {
+      "id": "pass_wardens",
+      "name": "Mountain Pass Wardens",
+      "friendly": true,
+      "patrol_strength": "strong",
+      "response_time": "slow"
+    }
+  ]
+}

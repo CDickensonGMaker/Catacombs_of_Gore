@@ -1,0 +1,53 @@
+{
+	"id": "kazan_dun_traditionalist_path",
+	"title": "The Regent's Burden",
+	"description": "You have declared support for Regent Borin and the crowning of the infant prince. The traditionalist faction is grateful, but Thane Grimjaw and his Rite-Seekers refuse to accept this outcome without proper ceremony. Borin asks you to recover the Crown of the Mountain Kings from the treasury - now looted by goblins - to legitimize the coronation.",
+	"is_main_quest": true,
+	"quest_source": "story",
+	"giver_npc_id": "regent_borin",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "kazan_dun",
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "regent_borin",
+	"turn_in_zone": "kazan_dun_level_1",
+	"objectives": [
+		{
+			"id": "search_treasury",
+			"description": "Search the looted treasury in the Deep Vaults for the Crown",
+			"type": "reach",
+			"target": "kazan_dun_level_5_treasury",
+			"required_count": 1,
+			"is_optional": false
+		},
+		{
+			"id": "recover_crown",
+			"description": "Recover the Crown of the Mountain Kings",
+			"type": "collect",
+			"target": "crown_of_mountain_kings",
+			"required_count": 1,
+			"is_optional": false
+		},
+		{
+			"id": "return_crown",
+			"description": "Return the Crown to Regent Borin",
+			"type": "talk",
+			"target": "regent_borin",
+			"required_count": 1,
+			"is_optional": false
+		}
+	],
+	"rewards": {
+		"gold": 3000,
+		"xp": 20000,
+		"items": ["dwarven_royal_ring"],
+		"reputation": {
+			"kazan_dun_traditionalists": 500,
+			"kazan_dun_rite_seekers": -200
+		}
+	},
+	"prerequisites": ["kazan_dun_succession_choice"],
+	"faction_outcome": {
+		"faction": "traditionalists",
+		"result": "The infant prince is crowned with Borin as regent. The bloodline continues, and stability returns to Kazan-Dun - though some whisper that Grimjaw plots from the shadows."
+	}
+}

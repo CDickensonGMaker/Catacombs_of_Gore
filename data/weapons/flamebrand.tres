@@ -1,0 +1,45 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "flamebrand"
+display_name = "Flamebrand"
+description = "An enchanted blade wreathed in eternal flames. Burns foes on contact."
+weapon_type = 1
+weapon_class = 2
+two_handed = false
+base_damage = Array[int]([5, 6, 0])
+damage_type = 0
+secondary_damage_type = 1
+secondary_damage = Array[int]([2, 6, 0])
+attack_speed = 1.0
+reach = 2.0
+stagger_power = 1.0
+armor_pierce = 0.0
+crit_chance = 0.08
+crit_multiplier = 2.0
+is_ranged = false
+projectile_speed = 30.0
+max_range = 320.0
+reload_time = 0.0
+ammo_type = ""
+inflicts_condition = 3
+condition_chance = 0.3
+condition_duration = 5.0
+lifesteal_percent = 0.0
+is_homing = false
+required_grit = 5
+required_agility = 0
+required_knowledge = 3
+base_value = 1500
+weight = 3.5
+mesh_path = ""
+icon_path = ""
+attack_animation = "attack_slash"
+heavy_attack_animation = "attack_heavy_slash"
+fps_sprite_path = "res://Sprite folders grab bag/arm swing 4x4fixed.png"
+fps_h_frames = 4
+fps_v_frames = 4
+fps_sprite_size = Vector2(322, 322)

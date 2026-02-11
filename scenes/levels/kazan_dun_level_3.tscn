@@ -1,0 +1,275 @@
+[gd_scene load_steps=15 format=3 uid="uid://cwgkbd48n5x8j"]
+
+[ext_resource type="Script" uid="uid://do1fcgan1s0tt" path="res://scripts/levels/kazan_dun_level_3.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/world/zone_door_instance.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/kazan_dun/kd_treasury.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/kazan_dun/kd_armory.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/kazan_dun/kd_command_center.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/kazan_dun/kd_rune_ward_hall.tscn" id="8"]
+[ext_resource type="Material" path="res://assets/materials/dungeon/wooden_crate3_mat.tres" id="8_q5ooe"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/kazan_dun/kd_corridor_straight.tscn" id="9"]
+[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://Sprite folders grab bag/stonewall.png" id="9_8usxh"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/kazan_dun/kd_stairwell_down.tscn" id="10"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xotnb"]
+albedo_color = Color(0.4, 0.38, 0.36, 1)
+albedo_texture = ExtResource("9_8usxh")
+roughness = 0.85
+uv1_scale = Vector3(4, 2, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kypa3"]
+albedo_color = Color(0.38, 0.36, 0.34, 1)
+albedo_texture = ExtResource("9_8usxh")
+roughness = 0.86
+uv1_scale = Vector3(2, 2, 1)
+texture_filter = 0
+
+[node name="KazanDunLevel3Modular" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Rooms" type="Node3D" parent="."]
+
+[node name="CommandCenter" parent="Rooms" instance=ExtResource("7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -8, -30)
+
+[node name="Armory" parent="Rooms" instance=ExtResource("6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35, -8, -30)
+
+[node name="Treasury" parent="Rooms" instance=ExtResource("5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, -8, -30)
+
+[node name="Corridor1" parent="Rooms" instance=ExtResource("9")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -8, -55)
+
+[node name="RuneWardHall" parent="Rooms" instance=ExtResource("8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -8, -85)
+
+[node name="StairwellDown" parent="Rooms" instance=ExtResource("10")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -8, -110)
+
+[node name="StairwellUp2" parent="Rooms" instance=ExtResource("10")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -8.31105, 0.33626842)
+
+[node name="FloorUpper" parent="Rooms/StairwellUp2/Terrain" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.34051514, -19.181694)
+size = Vector3(12, 1.3189697, 4.3563843)
+
+[node name="FloorLower" parent="Rooms/StairwellUp2/Terrain" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.54076, -3.1440058)
+
+[node name="CeilingUpper" parent="Rooms/StairwellUp2/Terrain" index="2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, -18.325045)
+size = Vector3(12, 0.5, 3.8564453)
+
+[node name="CeilingLower" parent="Rooms/StairwellUp2/Terrain" index="3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.148452, -9.859105)
+size = Vector3(12, 0.5, 20.354202)
+
+[node name="CeilingMiddle" parent="Rooms/StairwellUp2/Terrain" index="4"]
+transform = Transform3D(0.0007586323, -0.0071275276, -0.9999742, 0.41583368, 0.9094199, -0.006166634, 0.9094407, -0.4158186, 0.0036537803, 0.4211598, 2.3572628, -12.297308)
+size = Vector3(14.252777, 1.5516815, 7.0683594)
+material = ExtResource("8_q5ooe")
+
+[node name="CeilingMiddle2" type="CSGBox3D" parent="Rooms/StairwellUp2/Terrain" index="5"]
+transform = Transform3D(-0.8797027, 0.47018662, 0.07105089, 0.4707752, 0.8822044, -0.009265476, -0.06703794, 0.025298184, -0.9974293, 34.785778, -4.7127094, -114.540665)
+use_collision = true
+size = Vector3(18.35735, 1.0308456, 6.7070313)
+material = ExtResource("8_q5ooe")
+
+[node name="WallNorthL" parent="Rooms/StairwellUp2/Terrain" index="6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 4, -20.144005)
+
+[node name="WallNorthR" parent="Rooms/StairwellUp2/Terrain" index="7"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 4, -20.144005)
+
+[node name="WallNorthTop" parent="Rooms/StairwellUp2/Terrain" index="8"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, -20.144005)
+
+[node name="WallSouthL" parent="Rooms/StairwellUp2/Terrain" index="9"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 10.04076, -0.14400578)
+
+[node name="WallSouthR" parent="Rooms/StairwellUp2/Terrain" index="10"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 8.258317, -0.14400578)
+size = Vector3(4, 11.47998, 1)
+
+[node name="WallSouthTop" parent="Rooms/StairwellUp2/Terrain" index="11"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 13.04076, -0.14400578)
+
+[node name="WallEast" parent="Rooms/StairwellUp2/Terrain" index="12"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 3.2253418, -10.144006)
+size = Vector3(1, 22.450684, 20)
+
+[node name="WallEast2" type="CSGBox3D" parent="Rooms/StairwellUp2/Terrain" index="13"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5215206, 3.2253418, -10.144006)
+use_collision = true
+size = Vector3(1, 22.450684, 20)
+material = SubResource("StandardMaterial3D_xotnb")
+
+[node name="WallWest" parent="Rooms/StairwellUp2/Terrain" index="14"]
+transform = Transform3D(-0.0015533324, 0, -0.9999989, 0, 1, 0, 0.9999989, 0, -0.0015533324, 0.32433963, 6.194622, -0.119771)
+size = Vector3(1, 16, 12.60321)
+
+[node name="Stairs" parent="Rooms/StairwellUp2/Props" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.913261, -4.149542, 0.46672153)
+
+[node name="Step1" parent="Rooms/StairwellUp2/Props/Stairs" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74.086365, -0.5, 20.460796)
+
+[node name="Step2" parent="Rooms/StairwellUp2/Props/Stairs" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74.086365, -1, 21.460796)
+
+[node name="Step3" parent="Rooms/StairwellUp2/Props/Stairs" index="2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74.086365, -1.5, 22.460796)
+
+[node name="Step4" parent="Rooms/StairwellUp2/Props/Stairs" index="3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74.086365, -2, 23.460796)
+
+[node name="Step5" parent="Rooms/StairwellUp2/Props/Stairs" index="4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74.086365, -2.5, 24.460796)
+
+[node name="Step6" parent="Rooms/StairwellUp2/Props/Stairs" index="5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74.086365, -3, 25.460796)
+
+[node name="Step7" parent="Rooms/StairwellUp2/Props/Stairs" index="6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74.086365, -3.5, 26.460796)
+
+[node name="Step8" parent="Rooms/StairwellUp2/Props/Stairs" index="7"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74.086365, -4, 27.460796)
+
+[node name="StairsUnder" parent="Rooms/StairwellUp2/Props/Stairs" index="8"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55.097298, -10.068182, 29.014568)
+
+[node name="Stairs2" type="Node3D" parent="Rooms/StairwellUp2/Props" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.913261, -0.54461026, -6.204649)
+
+[node name="Step1" type="CSGBox3D" parent="Rooms/StairwellUp2/Props/Stairs2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 73.67559, -0.5, 20.460796)
+use_collision = true
+size = Vector3(6, 0.5, 1)
+material = SubResource("StandardMaterial3D_kypa3")
+
+[node name="Step2" type="CSGBox3D" parent="Rooms/StairwellUp2/Props/Stairs2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74.086365, -1, 21.460796)
+use_collision = true
+size = Vector3(6, 0.5, 1)
+material = SubResource("StandardMaterial3D_kypa3")
+
+[node name="Step3" type="CSGBox3D" parent="Rooms/StairwellUp2/Props/Stairs2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74.086365, -1.5, 22.460796)
+use_collision = true
+size = Vector3(6, 0.5, 1)
+material = SubResource("StandardMaterial3D_kypa3")
+
+[node name="Step4" type="CSGBox3D" parent="Rooms/StairwellUp2/Props/Stairs2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74.086365, -2, 23.460796)
+use_collision = true
+size = Vector3(6, 0.5, 1)
+material = SubResource("StandardMaterial3D_kypa3")
+
+[node name="Step5" type="CSGBox3D" parent="Rooms/StairwellUp2/Props/Stairs2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74.086365, -2.5, 24.460796)
+use_collision = true
+size = Vector3(6, 0.5, 1)
+material = SubResource("StandardMaterial3D_kypa3")
+
+[node name="Step6" type="CSGBox3D" parent="Rooms/StairwellUp2/Props/Stairs2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74.086365, -3, 25.460796)
+use_collision = true
+size = Vector3(6, 0.5, 1)
+material = SubResource("StandardMaterial3D_kypa3")
+
+[node name="Step7" type="CSGBox3D" parent="Rooms/StairwellUp2/Props/Stairs2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74.086365, -3.5, 26.460796)
+use_collision = true
+size = Vector3(6, 0.5, 1)
+material = SubResource("StandardMaterial3D_kypa3")
+
+[node name="Step8" type="CSGBox3D" parent="Rooms/StairwellUp2/Props/Stairs2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74.086365, -4, 27.460796)
+use_collision = true
+size = Vector3(6, 0.5, 1)
+material = SubResource("StandardMaterial3D_kypa3")
+
+[node name="Railing1" parent="Rooms/StairwellUp2/Props" index="2"]
+transform = Transform3D(0.0035430342, 0, -0.9999937, 0, 1, 0, 0.9999937, 0, 0.0035430342, 0.055851102, 10.507783, -20.12583)
+size = Vector3(0.15, 8.259644, 11.242676)
+
+[node name="Railing3" type="CSGBox3D" parent="Rooms/StairwellUp2/Props" index="3"]
+transform = Transform3D(0.0035430342, 0, -0.9999937, 0, 1, 0, 0.9999937, 0, 0.0035430342, 0.055851102, -0.9778013, -39.604458)
+use_collision = true
+size = Vector3(0.15, 2.26997, 11.242676)
+material = SubResource("StandardMaterial3D_xotnb")
+
+[node name="Railing2" parent="Rooms/StairwellUp2/Props" index="4"]
+transform = Transform3D(1, 0, 0, 0, 0.97688913, 0.21374653, 0, -0.21374653, 0.97688913, 47.079582, 6.138712, 22.85278)
+size = Vector3(0.15, 0.9526367, 10.165161)
+
+[node name="Bracket" parent="Rooms/StairwellUp2/Lighting/WallTorchUpper" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10.144005)
+
+[node name="Flame" parent="Rooms/StairwellUp2/Lighting/WallTorchUpper" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3499999, 0.20000005, -10.144005)
+
+[node name="Light" parent="Rooms/StairwellUp2/Lighting/WallTorchUpper" index="2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3499999, 0.20000005, -10.144005)
+
+[node name="StairsUnder" type="CSGBox3D" parent="Rooms/StairwellUp2/Lighting/WallTorchUpper" index="3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46.13504, -18.933815, 39.68366)
+use_collision = true
+size = Vector3(6, 4, 8)
+material = SubResource("StandardMaterial3D_xotnb")
+
+[node name="WallTorchLower" parent="Rooms/StairwellUp2/Lighting" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.4246883, -4.5, 7)
+
+[node name="Bracket" parent="Rooms/StairwellUp2/Lighting/WallTorchLower" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.04076, -10.144006)
+
+[node name="Flame" parent="Rooms/StairwellUp2/Lighting/WallTorchLower" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0046110153, 14.24076, -10.144006)
+
+[node name="Light" parent="Rooms/StairwellUp2/Lighting/WallTorchLower" index="2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0046110153, 14.24076, -10.144006)
+
+[node name="DoorNorth" parent="Rooms/StairwellUp2/Connections/DoorPositions" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -16.73026)
+
+[node name="DoorSouth" parent="Rooms/StairwellUp2/Connections/DoorPositions" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.04076, 2.2697392)
+
+[node name="Doors" type="Node3D" parent="."]
+
+[node name="Level2Door" parent="Doors" instance=ExtResource("4")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -0.032658577, -2.0481803, -0.7038312)
+target_scene = "res://scenes/levels/kazan_dun_level_2.tscn"
+spawn_point_id = "from_level_3"
+door_name = "Ascend to Residential Level"
+
+[node name="Level4Door" parent="Doors" instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -16, -120)
+target_scene = "res://scenes/levels/kazan_dun_level_4.tscn"
+spawn_point_id = "from_level_3"
+door_name = "Descend to Deep Mines"
+
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="from_level_2" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -1.0835953)
+
+[node name="from_level_4" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, -15.9, -115)
+
+[node name="default" type="Marker3D" parent="SpawnPoints" groups=["default_spawn", "spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -1.0835953)
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+
+[node name="Player" parent="." instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.2301083, -2.4123602)
+
+[node name="HUD" parent="." instance=ExtResource("3")]
+
+[editable path="Rooms/StairwellUp2"]

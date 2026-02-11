@@ -1,0 +1,37 @@
+{
+	"id": "report_to_nathan",
+	"title": "Return to Nathan",
+	"description": "Tharin confirms the threat is real - dark forces stir within the mountain depths. He asks you to return to Nathan in Dalhurst with this grave news.",
+	"is_main_quest": true,
+	"quest_source": "story",
+	"giver_npc_id": "tharin_the_dwarf",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "kazan_dun",
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "nathan_the_squire",
+	"turn_in_zone": "dalhurst",
+	"next_quest": "report_to_knight",
+	"objectives": [
+		{
+			"id": "return_to_dalhurst",
+			"description": "Return to Dalhurst",
+			"type": "reach",
+			"target": "city_dalhurst",
+			"required_count": 1,
+			"is_optional": false
+		},
+		{
+			"id": "report_to_nathan",
+			"description": "Report to Nathan the Squire",
+			"type": "talk",
+			"target": "nathan_the_squire",
+			"required_count": 1,
+			"is_optional": false
+		}
+	],
+	"rewards": {
+		"gold": 500,
+		"xp": 6000
+	},
+	"prerequisites": ["journey_to_kazandun"]
+}

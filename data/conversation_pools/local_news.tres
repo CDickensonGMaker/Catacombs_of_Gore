@@ -1,0 +1,527 @@
+[gd_resource type="Resource" script_class="ConversationResponsePool" load_steps=42 format=3 uid="uid://c1local_news_pool"]
+
+[ext_resource type="Script" path="res://scripts/dialogue/conversation_response_pool.gd" id="1_pool"]
+[ext_resource type="Script" path="res://scripts/dialogue/conversation_response.gd" id="2_resp"]
+
+# =============================================================================
+# GENERIC TOWN HAPPENINGS
+# =============================================================================
+
+[sub_resource type="Resource" id="news_generic_1"]
+script = ExtResource("2_resp")
+text = "Things have been quiet around {town_name} lately. Too quiet, some say."
+topic_type = 0
+personality_affinity = ["observant", "cautious"]
+min_disposition = 25
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_generic_1"
+
+[sub_resource type="Resource" id="news_generic_2"]
+script = ExtResource("2_resp")
+text = "Same old, same old. Nothing much changes around here."
+topic_type = 0
+personality_affinity = ["bored", "complacent"]
+min_disposition = 30
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_generic_2"
+
+[sub_resource type="Resource" id="news_generic_3"]
+script = ExtResource("2_resp")
+text = "The guards have been more active lately. Must be trouble brewing."
+topic_type = 0
+personality_affinity = ["observant", "nervous"]
+min_disposition = 25
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_generic_3"
+
+[sub_resource type="Resource" id="news_generic_4"]
+script = ExtResource("2_resp")
+text = "More travelers passing through than usual. Wonder what's brought them here."
+topic_type = 0
+personality_affinity = ["curious", "sociable"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_generic_4"
+
+[sub_resource type="Resource" id="news_hostile"]
+script = ExtResource("2_resp")
+text = "Why would I tell you anything? Mind your own business."
+topic_type = 0
+personality_affinity = ["hostile", "suspicious"]
+min_disposition = 0
+max_disposition = 25
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_hostile"
+
+# =============================================================================
+# ELDER MOOR SPECIFIC NEWS
+# =============================================================================
+
+[sub_resource type="Resource" id="news_eldermoor_1"]
+script = ExtResource("2_resp")
+text = "The moors have been restless of late. Strange lights in the fog at night. Folk are saying the old spirits are waking."
+topic_type = 0
+personality_affinity = ["superstitious", "nervous"]
+min_disposition = 30
+max_disposition = 100
+required_knowledge = ["elder_moor"]
+weight = 1.2
+actions = []
+conditions = []
+response_id = "news_eldermoor_1"
+
+[sub_resource type="Resource" id="news_eldermoor_2"]
+script = ExtResource("2_resp")
+text = "Elder Moor gets its name from what lies beneath, you know. Old bones. Old magic. Best not to dig too deep in this swamp."
+topic_type = 0
+personality_affinity = ["superstitious", "knowledgeable"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["elder_moor"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_eldermoor_2"
+
+[sub_resource type="Resource" id="news_eldermoor_3"]
+script = ExtResource("2_resp")
+text = "The boardwalks need mending again. Always rotting, what with all the damp. Town council's been squabbling over who pays for it."
+topic_type = 0
+personality_affinity = ["practical", "grumpy"]
+min_disposition = 30
+max_disposition = 100
+required_knowledge = ["elder_moor"]
+weight = 1.1
+actions = []
+conditions = []
+response_id = "news_eldermoor_3"
+
+# =============================================================================
+# MERCHANT AND TRADE NEWS
+# =============================================================================
+
+[sub_resource type="Resource" id="news_merchant_1"]
+script = ExtResource("2_resp")
+text = "A caravan came in from Dalhurst yesterday. Fresh goods, fair prices. Won't last long though."
+topic_type = 0
+personality_affinity = ["mercantile", "helpful"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["trade"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_merchant_1"
+
+[sub_resource type="Resource" id="news_merchant_2"]
+script = ExtResource("2_resp")
+text = "The roads have been dangerous lately. Fewer merchants coming through means higher prices for everyone."
+topic_type = 0
+personality_affinity = ["practical", "concerned"]
+min_disposition = 30
+max_disposition = 100
+required_knowledge = ["trade"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_merchant_2"
+
+[sub_resource type="Resource" id="news_merchant_3"]
+script = ExtResource("2_resp")
+text = "Word is a merchant from the desert camp is setting up shop. Exotic goods, if you've got the coin for it."
+topic_type = 0
+personality_affinity = ["curious", "mercantile"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["trade"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_merchant_3"
+
+# =============================================================================
+# GUARD AND PATROL NEWS
+# =============================================================================
+
+[sub_resource type="Resource" id="news_guard_1"]
+script = ExtResource("2_resp")
+text = "The guard captain's doubled the night watch. Something's got the higher-ups spooked."
+topic_type = 0
+personality_affinity = ["observant", "suspicious"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_guard_1"
+
+[sub_resource type="Resource" id="news_guard_2"]
+script = ExtResource("2_resp")
+text = "Guards caught a thief near the market square last night. Threw him in the stockade. Serves him right."
+topic_type = 0
+personality_affinity = ["law-abiding", "satisfied"]
+min_disposition = 30
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_guard_2"
+
+[sub_resource type="Resource" id="news_guard_3"]
+script = ExtResource("2_resp")
+text = "Patrol found tracks in the swamp. Big ones. They're being tight-lipped about it, which worries me more than if they'd just told us."
+topic_type = 0
+personality_affinity = ["worried", "observant"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_guard_3"
+
+# =============================================================================
+# WEATHER AND ENVIRONMENT
+# =============================================================================
+
+[sub_resource type="Resource" id="news_weather_1"]
+script = ExtResource("2_resp")
+text = "This weather has everyone on edge. Hard to work when the skies won't cooperate."
+topic_type = 0
+personality_affinity = ["practical", "concerned"]
+min_disposition = 30
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_weather_1"
+
+[sub_resource type="Resource" id="news_weather_2"]
+script = ExtResource("2_resp")
+text = "The old-timers say weather like this means something dark is stirring."
+topic_type = 0
+personality_affinity = ["superstitious", "worried"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_weather_2"
+
+[sub_resource type="Resource" id="news_weather_3"]
+script = ExtResource("2_resp")
+text = "The swamp mists have been thicker than usual. Makes it hard to see the boardwalks. Two folk slipped into the bog just this week."
+topic_type = 0
+personality_affinity = ["concerned", "observant"]
+min_disposition = 30
+max_disposition = 100
+required_knowledge = ["elder_moor"]
+weight = 1.1
+actions = []
+conditions = []
+response_id = "news_weather_3"
+
+[sub_resource type="Resource" id="news_weather_4"]
+script = ExtResource("2_resp")
+text = "The rains have been good to us. The harvest should be plentiful, if Gaela smiles on us."
+topic_type = 0
+personality_affinity = ["optimistic", "devout"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = []
+weight = 0.9
+actions = []
+conditions = []
+response_id = "news_weather_4"
+
+# =============================================================================
+# TEMPLE OF THREE GODS NEWS
+# =============================================================================
+
+[sub_resource type="Resource" id="news_temple_1"]
+script = ExtResource("2_resp")
+text = "The Temple of Three Gods has been busy lately. More folk seeking blessings than I've seen in years. Troubled times bring folk to prayer, I suppose."
+topic_type = 0
+personality_affinity = ["observant", "devout"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_temple_1"
+
+[sub_resource type="Resource" id="news_temple_2"]
+script = ExtResource("2_resp")
+text = "The priests of Chronos have been making pronouncements about the turning of ages. Cryptic stuff, but folk are listening."
+topic_type = 0
+personality_affinity = ["curious", "nervous"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["religion"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_temple_2"
+
+[sub_resource type="Resource" id="news_temple_3"]
+script = ExtResource("2_resp")
+text = "Gaela's shrine at the temple has been overflowing with offerings. Farmers want a good harvest after last year's blight."
+topic_type = 0
+personality_affinity = ["devout", "practical"]
+min_disposition = 30
+max_disposition = 100
+required_knowledge = ["religion"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_temple_3"
+
+[sub_resource type="Resource" id="news_temple_4"]
+script = ExtResource("2_resp")
+text = "Someone was found dead near the temple. Natural causes, they say, but the Morthane priests took a keen interest. Something about unfinished business with the cycle."
+topic_type = 0
+personality_affinity = ["gossipy", "morbid"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["religion"]
+weight = 0.9
+actions = []
+conditions = []
+response_id = "news_temple_4"
+
+[sub_resource type="Resource" id="news_temple_5"]
+script = ExtResource("2_resp")
+text = "The temple bell rang at midnight last fortnight. Priests won't say why. Some say it was a warning from the Three."
+topic_type = 0
+personality_affinity = ["superstitious", "worried"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_temple_5"
+
+# =============================================================================
+# GUILD HALL NEWS
+# =============================================================================
+
+[sub_resource type="Resource" id="news_guild_1"]
+script = ExtResource("2_resp")
+text = "The Guild Hall's been posting new contracts. Dangerous work, but pays well if you've got the skills."
+topic_type = 0
+personality_affinity = ["adventurous", "practical"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["guild"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_guild_1"
+
+[sub_resource type="Resource" id="news_guild_2"]
+script = ExtResource("2_resp")
+text = "Word at the Guild Hall is they're looking for new blood. Not enough hands for all the work coming in."
+topic_type = 0
+personality_affinity = ["helpful", "sociable"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["guild"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_guild_2"
+
+[sub_resource type="Resource" id="news_guild_3"]
+script = ExtResource("2_resp")
+text = "Two guild members came back from a job last night, looking rough. Whatever they found out there, they're not talking about it."
+topic_type = 0
+personality_affinity = ["observant", "curious"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["guild"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_guild_3"
+
+[sub_resource type="Resource" id="news_guild_4"]
+script = ExtResource("2_resp")
+text = "The Guild Hall raised their rates for monster bounties. Either there's more coin flowing, or the monsters are getting worse."
+topic_type = 0
+personality_affinity = ["mercantile", "cautious"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["guild"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_guild_4"
+
+# =============================================================================
+# LOCAL GOSSIP - NPC REFERENCES
+# =============================================================================
+
+[sub_resource type="Resource" id="news_gossip_1"]
+script = ExtResource("2_resp")
+text = "Old Henrick at the tavern's been drinking more than usual. Says he's seen things in the swamp. Nobody takes him seriously anymore."
+topic_type = 0
+personality_affinity = ["gossipy", "dismissive"]
+min_disposition = 30
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_gossip_1"
+
+[sub_resource type="Resource" id="news_gossip_2"]
+script = ExtResource("2_resp")
+text = "The blacksmith's daughter ran off with a traveling bard. Her father's been in a foul mood ever since. I'd wait a few days before bringing him business."
+topic_type = 0
+personality_affinity = ["gossipy", "helpful"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_gossip_2"
+
+[sub_resource type="Resource" id="news_gossip_3"]
+script = ExtResource("2_resp")
+text = "The innkeeper's been asking questions about strangers. Acting on behalf of someone, but won't say who. Watch what you say around him."
+topic_type = 0
+personality_affinity = ["suspicious", "secretive"]
+min_disposition = 45
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_gossip_3"
+
+[sub_resource type="Resource" id="news_gossip_4"]
+script = ExtResource("2_resp")
+text = "The alchemist has been ordering strange ingredients. Nightshade, bone dust, that sort of thing. Folk are starting to wonder what he's brewing."
+topic_type = 0
+personality_affinity = ["curious", "suspicious"]
+min_disposition = 40
+max_disposition = 100
+required_knowledge = ["occult"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_gossip_4"
+
+[sub_resource type="Resource" id="news_gossip_5"]
+script = ExtResource("2_resp")
+text = "The mayor's been having visitors at odd hours. Hooded types who come and go before dawn. Politics, or something darker? Who can say."
+topic_type = 0
+personality_affinity = ["observant", "suspicious"]
+min_disposition = 50
+max_disposition = 100
+required_knowledge = []
+weight = 0.9
+actions = []
+conditions = []
+response_id = "news_gossip_5"
+
+# =============================================================================
+# ARCHETYPE-SPECIFIC RESPONSES
+# =============================================================================
+
+[sub_resource type="Resource" id="news_priest_1"]
+script = ExtResource("2_resp")
+text = "The faithful have been generous of late. The temple's coffers are full, and we've been able to help more of the needy."
+topic_type = 0
+personality_affinity = ["devout", "generous"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["religion"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_priest_1"
+
+[sub_resource type="Resource" id="news_priest_2"]
+script = ExtResource("2_resp")
+text = "We've had more souls seeking guidance lately. The Three are testing us all, it seems. But faith endures."
+topic_type = 0
+personality_affinity = ["devout", "wise"]
+min_disposition = 30
+max_disposition = 100
+required_knowledge = ["religion"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_priest_2"
+
+[sub_resource type="Resource" id="news_civilian_1"]
+script = ExtResource("2_resp")
+text = "Just trying to get by, same as everyone else. The price of bread's gone up again, but what can you do?"
+topic_type = 0
+personality_affinity = ["practical", "resigned"]
+min_disposition = 25
+max_disposition = 100
+required_knowledge = []
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_civilian_1"
+
+[sub_resource type="Resource" id="news_civilian_2"]
+script = ExtResource("2_resp")
+text = "My cousin in Dalhurst says trade's been good there. Makes you wonder if we'd be better off leaving the moor."
+topic_type = 0
+personality_affinity = ["discontented", "dreamy"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = []
+weight = 0.9
+actions = []
+conditions = []
+response_id = "news_civilian_2"
+
+[sub_resource type="Resource" id="news_merchant_archetype_1"]
+script = ExtResource("2_resp")
+text = "Business has been steady. Not booming, but steady. I'll take that over excitement any day - excitement usually means trouble."
+topic_type = 0
+personality_affinity = ["practical", "mercantile"]
+min_disposition = 35
+max_disposition = 100
+required_knowledge = ["trade"]
+weight = 1.0
+actions = []
+conditions = []
+response_id = "news_merchant_archetype_1"
+
+[resource]
+script = ExtResource("1_pool")
+responses = [SubResource("news_generic_1"), SubResource("news_generic_2"), SubResource("news_generic_3"), SubResource("news_generic_4"), SubResource("news_hostile"), SubResource("news_eldermoor_1"), SubResource("news_eldermoor_2"), SubResource("news_eldermoor_3"), SubResource("news_merchant_1"), SubResource("news_merchant_2"), SubResource("news_merchant_3"), SubResource("news_guard_1"), SubResource("news_guard_2"), SubResource("news_guard_3"), SubResource("news_weather_1"), SubResource("news_weather_2"), SubResource("news_weather_3"), SubResource("news_weather_4"), SubResource("news_temple_1"), SubResource("news_temple_2"), SubResource("news_temple_3"), SubResource("news_temple_4"), SubResource("news_temple_5"), SubResource("news_guild_1"), SubResource("news_guild_2"), SubResource("news_guild_3"), SubResource("news_guild_4"), SubResource("news_gossip_1"), SubResource("news_gossip_2"), SubResource("news_gossip_3"), SubResource("news_gossip_4"), SubResource("news_gossip_5"), SubResource("news_priest_1"), SubResource("news_priest_2"), SubResource("news_civilian_1"), SubResource("news_civilian_2"), SubResource("news_merchant_archetype_1")]
+pool_id = "local_news"
+description = "LOCAL_NEWS topic responses including generic town happenings, Elder Moor specific news, merchant and trade news, guard patrol updates, weather comments, Temple of Three Gods references, Guild Hall news, local NPC gossip, and archetype-specific responses for priests, civilians, and merchants"

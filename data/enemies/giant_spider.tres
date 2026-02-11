@@ -1,0 +1,118 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/data/enemy_attack_data.gd" id="2"]
+
+[sub_resource type="Resource" id="1"]
+script = ExtResource("2")
+id = "venomous_bite"
+display_name = "Venomous Bite"
+damage = Array[int]([1, 6, 0])
+damage_type = 4
+windup_time = 0.3
+active_time = 0.15
+recovery_time = 0.25
+cooldown = 1.2
+range_distance = 2.0
+is_ranged = false
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 0.0
+inflicts_condition = 3
+condition_chance = 0.35
+condition_duration = 8.0
+stagger_power = 0.5
+knockback_force = 1.0
+weight = 1.0
+min_range = 0.0
+max_range = 2.0
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[sub_resource type="Resource" id="2"]
+script = ExtResource("2")
+id = "web_spray"
+display_name = "Web Spray"
+damage = Array[int]([0, 0, 0])
+damage_type = 0
+windup_time = 0.4
+active_time = 0.2
+recovery_time = 0.4
+cooldown = 4.0
+range_distance = 6.0
+is_ranged = true
+is_aoe = true
+aoe_radius = 2.0
+projectile_speed = 12.0
+inflicts_condition = 4
+condition_chance = 0.8
+condition_duration = 3.0
+stagger_power = 0.0
+knockback_force = 0.0
+weight = 0.5
+min_range = 2.0
+max_range = 6.0
+requires_los = true
+animation_name = "ranged"
+sound_effect = ""
+
+[resource]
+script = ExtResource("1")
+id = "giant_spider"
+display_name = "Giant Spider"
+description = "A dog-sized arachnid with venomous fangs and the ability to spray sticky webs."
+max_hp = 18
+armor_value = 8
+movement_speed = 4.5
+turn_speed = 6.0
+grit = 3
+agility = 7
+will = 2
+knowledge = 1
+behavior = 1
+faction = 2
+aggro_range = 10.0
+attack_range = 2.0
+preferred_distance = 4.0
+flee_hp_threshold = 0.15
+is_boss = false
+attacks = Array[ExtResource("2")]([SubResource("1"), SubResource("2")])
+can_block = false
+block_chance = 0.0
+stagger_resistance = 0.1
+fire_resistance = 0.0
+frost_resistance = 0.0
+lightning_resistance = 0.0
+poison_resistance = 0.8
+necrotic_resistance = 0.0
+physical_resistance = 0.0
+fire_weakness = 0.5
+frost_weakness = 0.0
+lightning_weakness = 0.0
+holy_weakness = 0.0
+causes_horror = true
+horror_difficulty = 8
+loot_table_av = 2
+gold_drop = Array[int]([5, 15])
+guaranteed_drops = Array[String]([])
+drop_table = {
+"spider_silk": 0.4,
+"spider_venom": 0.25,
+"spider_fang": 0.15
+}
+xp_reward = 35
+scene_path = ""
+icon_path = "res://Sprite folders grab bag/evilspider.png"
+scale = 0.8
+sprite_path = "res://Sprite folders grab bag/evilspider.png"
+attack_sprite_path = ""
+sprite_hframes = 1
+sprite_vframes = 1
+attack_hframes = 1
+attack_vframes = 1
+sprite_pixel_size = 0.012
+idle_sounds = Array[String]([])
+attack_sounds = Array[String]([])
+hurt_sounds = Array[String]([])
+death_sounds = Array[String]([])

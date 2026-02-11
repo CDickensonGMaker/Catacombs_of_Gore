@@ -1,0 +1,120 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/data/enemy_attack_data.gd" id="2"]
+
+[sub_resource type="Resource" id="1"]
+script = ExtResource("2")
+id = "berserker_cleave"
+display_name = "Berserker Cleave"
+damage = Array[int]([4, 10, 4])
+damage_type = 0
+windup_time = 0.35
+active_time = 0.25
+recovery_time = 0.3
+cooldown = 1.3
+range_distance = 2.5
+is_ranged = false
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 0.0
+inflicts_condition = 6
+condition_chance = 0.35
+condition_duration = 6.0
+stagger_power = 1.0
+knockback_force = 4.0
+weight = 1.0
+min_range = 0.0
+max_range = 2.8
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[sub_resource type="Resource" id="2"]
+script = ExtResource("2")
+id = "berserker_frenzy"
+display_name = "Blood Frenzy"
+damage = Array[int]([3, 8, 3])
+damage_type = 0
+windup_time = 0.2
+active_time = 0.35
+recovery_time = 0.4
+cooldown = 4.0
+range_distance = 2.5
+is_ranged = false
+is_aoe = true
+aoe_radius = 2.5
+projectile_speed = 0.0
+inflicts_condition = 6
+condition_chance = 0.5
+condition_duration = 8.0
+stagger_power = 0.8
+knockback_force = 3.0
+weight = 0.3
+min_range = 0.0
+max_range = 3.0
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[resource]
+script = ExtResource("1")
+id = "tenger_berserker"
+display_name = "Tenger Berserker"
+description = "A frenzied Tenger warrior who has given himself over to bloodlust. These savage fighters feel no pain and attack with reckless, murderous abandon."
+max_hp = 75
+armor_value = 8
+movement_speed = 5.5
+turn_speed = 6.0
+grit = 8
+agility = 6
+will = 2
+knowledge = 1
+bravery = 10
+behavior = 4
+faction = 8
+aggro_range = 20.0
+attack_range = 2.5
+preferred_distance = 1.5
+flee_hp_threshold = 0.0
+is_boss = false
+attacks = Array[ExtResource("2")]([SubResource("1"), SubResource("2")])
+can_block = false
+block_chance = 0.0
+stagger_resistance = 0.4
+fire_resistance = 0.05
+frost_resistance = -0.15
+lightning_resistance = 0.0
+poison_resistance = 0.2
+necrotic_resistance = 0.0
+physical_resistance = 0.05
+fire_weakness = 0.0
+frost_weakness = 0.15
+lightning_weakness = 0.0
+holy_weakness = 0.0
+causes_horror = true
+horror_difficulty = 12
+loot_table_av = 4
+gold_drop = Array[int]([40, 100])
+guaranteed_drops = Array[String]([])
+drop_table = {
+"health_potion": 0.25,
+"cooked_meat": 0.3,
+"leather": 0.2,
+"ale": 0.15
+}
+xp_reward = 110
+scene_path = ""
+icon_path = ""
+scale = 1.1
+sprite_path = "res://Sprite folders grab bag/tegner_attacking.png"
+attack_sprite_path = "res://Sprite folders grab bag/tegner_attacking.png"
+sprite_hframes = 4
+sprite_vframes = 1
+attack_hframes = 4
+attack_vframes = 1
+sprite_pixel_size = 0.032
+idle_sounds = Array[String]([])
+attack_sounds = Array[String]([])
+hurt_sounds = Array[String]([])
+death_sounds = Array[String]([])
