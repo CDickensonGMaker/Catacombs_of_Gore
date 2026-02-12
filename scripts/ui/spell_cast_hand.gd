@@ -63,7 +63,13 @@ func _connect_to_spell_caster() -> void:
 			spell_caster.cast_interrupted.connect(_on_cast_interrupted)
 
 func _on_cast_started(spell: SpellData) -> void:
-	# Show the hand animation
+	# Only show casting hand in first-person view
+	var player := get_tree().get_first_node_in_group("player")
+	if player:
+		var camera_pivot = player.get_node_or_null("CameraPivot")
+		if camera_pivot and camera_pivot.has_method("is_first_person"):
+			if not camera_pivot.is_first_person():
+				return  # Don't show in third-person
 	show_cast_animation(spell)
 
 func _on_cast_completed(_spell: SpellData) -> void:

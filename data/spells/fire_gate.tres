@@ -1,0 +1,55 @@
+[gd_resource type="Resource" script_class="SpellData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "fire_gate"
+display_name = "Fire Gate"
+description = "Creates a burning portal that damages enemies within 5 meters over 30 seconds. Enemies that enter the zone take continuous fire damage."
+school = 0
+spell_level = 4
+target_type = 3
+slot_cost = 4
+stamina_cost = 0.0
+cast_time = 0.8
+cooldown = 5.0
+range_distance = 25.0
+aoe_radius = 5.0
+cone_angle = 45.0
+beam_width = 0.5
+base_effect = Array[int]([2, 6, 2])
+damage_type = 1
+is_healing = false
+scales_with_knowledge = true
+inflicts_condition = 3
+condition_chance = 0.8
+condition_duration = 5.0
+projectile_speed = 25.0
+is_homing = false
+homing_strength = 5.0
+piercing = false
+chain_targets = 0
+chain_range = 5.0
+summon_scene_path = ""
+summon_duration = 30.0
+summon_leash_range = 6.0
+max_summons = 1
+dot_damage = Array[int]([2, 6, 0])
+dot_interval = 1.0
+dot_duration = 30.0
+lifesteal_percent = 0.0
+manasteal_percent = 0.0
+creates_hazard_zone = true
+hazard_duration = 60.0
+hazard_tick_interval = 1.0
+hazard_tick_damage = Array[int]([2, 6, 0])
+required_knowledge = 4
+required_will = 4
+required_arcana_lore = 3
+cast_animation = "cast"
+projectile_scene_path = ""
+impact_effect_path = ""
+cast_sound = ""
+impact_sound = ""
+icon_path = ""

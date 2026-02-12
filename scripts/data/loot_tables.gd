@@ -57,9 +57,10 @@ var ammo_pools: Dictionary = {
 }
 
 var scroll_pools: Dictionary = {
-	LootTier.UNCOMMON: ["scroll_healing_light"],
-	LootTier.RARE: ["scroll_magic_missile"],
-	LootTier.EPIC: ["scroll_lightning_bolt", "scroll_soul_drain"],
+	LootTier.UNCOMMON: ["scroll_healing_light", "scroll_armor"],
+	LootTier.RARE: ["scroll_magic_missile", "scroll_blind"],
+	LootTier.EPIC: ["scroll_lightning_bolt", "scroll_soul_drain", "scroll_dispel_magic", "scroll_fireball", "scroll_haste", "scroll_slow", "scroll_ice_storm", "scroll_fire_gate"],
+	LootTier.LEGENDARY: ["scroll_cone_of_cold", "scroll_iron_guard", "scroll_chain_lightning"],
 }
 
 var tool_pools: Dictionary = {

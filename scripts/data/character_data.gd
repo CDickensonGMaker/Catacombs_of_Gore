@@ -52,6 +52,10 @@ var skills: Dictionary = {}
 ## Active conditions dictionary (Enums.Condition -> time_remaining)
 var conditions: Dictionary = {}
 
+## DOT (Damage Over Time) configuration
+const DOT_TICK_INTERVAL: float = 1.5  # Seconds between damage ticks
+var dot_tick_timers: Dictionary = {}  # Tracks time until next tick per condition
+
 func _init() -> void:
 	# Initialize all skills to 0
 	for skill in Enums.Skill.values():
@@ -352,6 +356,9 @@ func apply_condition(condition: Enums.Condition, duration: float) -> void:
 func remove_condition(condition: Enums.Condition) -> void:
 	if conditions.has(condition):
 		conditions.erase(condition)
+		# Clean up DOT timer if present
+		if dot_tick_timers.has(condition):
+			dot_tick_timers.erase(condition)
 		condition_removed.emit(condition)
 
 ## Check if has a condition
@@ -359,15 +366,61 @@ func has_condition(condition: Enums.Condition) -> bool:
 	return conditions.has(condition) and conditions[condition] > 0
 
 ## Update conditions (call every frame with delta)
-func update_conditions(delta: float) -> void:
+## Returns a dictionary of DOT damage to apply: { DamageType: damage_amount }
+func update_conditions(delta: float) -> Dictionary:
+	var dot_damage: Dictionary = {}
 	var to_remove: Array = []
+
 	for condition in conditions:
 		conditions[condition] -= delta
 		if conditions[condition] <= 0:
 			to_remove.append(condition)
+		else:
+			# Process DOT conditions
+			var dot_result: Dictionary = _process_dot_condition(condition, delta)
+			if not dot_result.is_empty():
+				for damage_type in dot_result:
+					if dot_damage.has(damage_type):
+						dot_damage[damage_type] += dot_result[damage_type]
+					else:
+						dot_damage[damage_type] = dot_result[damage_type]
 
 	for condition in to_remove:
 		remove_condition(condition)
+
+	return dot_damage
+
+## Process DOT damage for a specific condition
+## Returns { DamageType: damage } if damage should be dealt this frame, empty otherwise
+func _process_dot_condition(condition: Enums.Condition, delta: float) -> Dictionary:
+	# Only process DOT conditions
+	if condition not in [Enums.Condition.POISONED, Enums.Condition.BLEEDING, Enums.Condition.BURNING]:
+		return {}
+
+	# Initialize timer if not present
+	if not dot_tick_timers.has(condition):
+		dot_tick_timers[condition] = DOT_TICK_INTERVAL
+
+	# Decrement timer
+	dot_tick_timers[condition] -= delta
+
+	# Check if it's time to tick
+	if dot_tick_timers[condition] <= 0:
+		dot_tick_timers[condition] = DOT_TICK_INTERVAL
+
+		# Return damage based on condition type
+		match condition:
+			Enums.Condition.POISONED:
+				# Poison: 2-3 damage per tick
+				return { Enums.DamageType.POISON: randi_range(2, 3) }
+			Enums.Condition.BLEEDING:
+				# Bleeding: 1-2 damage per tick
+				return { Enums.DamageType.PHYSICAL: randi_range(1, 2) }
+			Enums.Condition.BURNING:
+				# Burning: 3-4 damage per tick
+				return { Enums.DamageType.FIRE: randi_range(3, 4) }
+
+	return {}
 
 # =============================================================================
 # COMBAT SCALING - Build choices matter in combat

@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "scroll_cone_of_cold"
+display_name = "Scroll of Cone of Cold"
+description = "An ancient scroll encased in permanent frost that contains the knowledge of Cone of Cold. Reading it will teach you the spell permanently."
+item_type = 4
+is_stackable = true
+max_stack = 10
+consumable_effect = 0
+effect_value = Array[int]([0, 0, 0])
+effect_duration = 0.0
+effect_percent = 0.0
+teaches_spell_id = "cone_of_cold"
+requires_literacy = true
+literacy_dc = 16
+base_value = 1200
+weight = 0.1
+icon_path = ""
+mesh_path = ""
+use_sound = ""

@@ -230,14 +230,14 @@ shadow_bias = 0.02
 [node name="Terrain" type="Node3D" parent="."]
 
 [node name="CityGround" type="CSGBox3D" parent="Terrain"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.020769358, -0.51799345, -0.04103756)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.020769358, -0.51799345, 4.169839)
 use_collision = true
-size = Vector3(120, 1, 100)
+size = Vector3(120, 1, 108.42175)
 material = SubResource("mat_cobble")
 
 [node name="MainStreet" type="CSGBox3D" parent="Terrain"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
-size = Vector3(10, 0.05, 100)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 4.3398438)
+size = Vector3(10, 0.05, 108.67969)
 material = SubResource("mat_street")
 
 [node name="CrossStreet" type="CSGBox3D" parent="Terrain"]
@@ -1275,7 +1275,7 @@ shop_type = "armor"
 [node name="Merchant_Alchemist" parent="NPCs/Merchants" instance=ExtResource("7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.901911, 0, -13.118561)
 merchant_name = "Dockside Alchemist"
-shop_tier = 2
+shop_tier = 5
 shop_type = "alchemist"
 
 [node name="Merchant_Weapons" parent="NPCs/Merchants" instance=ExtResource("7")]
@@ -1343,7 +1343,7 @@ spawn_point_id = "from_dalhurst"
 door_name = "Leave City (Wilderness)"
 
 [node name="Player" parent="." instance=ExtResource("2")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 40)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5991025, 1, 10.92503)
 
 [node name="HUD" parent="." instance=ExtResource("3")]
 

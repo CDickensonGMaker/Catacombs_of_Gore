@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "axe"
+display_name = "Axe"
+description = "A sturdy axe balanced for both offense and defense."
+weapon_class = 1
+base_damage = Array[int]([3, 6, 4])
+required_grit = 4
+base_value = 150
+weight = 3.0
+mesh_path = "res://assets/weapons/melee/right_fist_axe.glb"
+fps_sprite_path = "res://Sprite folders grab bag/arm swing 4x4fixed.png"
+fps_v_frames = 4
+fps_sprite_size = Vector2(300, 300)
+fps_mesh_path = "res://assets/weapons/melee/right_fist_axe.glb"
+fps_mesh_scale = Vector3(0.85, 0.85, 0.85)
+fps_mesh_position = Vector3(-0.117, -0.450, 0.302)
+fps_mesh_rotation = Vector3(26.3, -82.4, 0.9)

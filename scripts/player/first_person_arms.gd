@@ -1,6 +1,7 @@
 # File: scripts/player/first_person_arms.gd
 # Attach to: Player/CameraPivot/Camera3D/FirstPersonArms (CanvasLayer)
 # Handles first-person weapon/spell sprites and animations (DOOM-style)
+# Also supports 3D weapon meshes rendered via SubViewport
 extends CanvasLayer
 class_name FirstPersonArms
 
@@ -46,6 +47,27 @@ var spell_base_position: Vector2 = Vector2(0, 0)
 ## Track if arms should be shown (set by camera_pivot)
 var _should_be_visible: bool = false
 
+## 3D Weapon System
+var using_3d_weapon: bool = false
+var weapon_viewport: SubViewport
+var weapon_viewport_container: Control  # TextureRect that displays the weapon viewport
+var weapon_camera: Camera3D
+var weapon_3d_root: Node3D
+var weapon_mesh_instance: Node3D  # The loaded GLB scene
+var weapon_3d_base_position: Vector3 = Vector3.ZERO
+var weapon_3d_base_rotation: Vector3 = Vector3.ZERO
+
+## Debug visualization
+@export var show_viewmodel_debug: bool = false  # Toggle in Inspector to show debug box
+var debug_box: ColorRect
+var debug_cube: MeshInstance3D
+
+## 3D Weapon Configuration
+@export var idle_bob_3d_amount: float = 0.02  # Units of 3D bobbing
+@export var idle_bob_3d_speed: float = 2.0    # Bob cycles per second
+@export var attack_swing_angle: float = 90.0  # Degrees of swing during attack
+@export var attack_swing_speed: float = 3.0   # Speed multiplier for attack swing
+
 ## Signals
 signal attack_animation_finished
 signal cast_animation_finished
@@ -60,6 +82,9 @@ func _ready() -> void:
 
 	# Start hidden until first person mode activates
 	visible = false
+
+	# Connect to viewport resize to update 3D weapon viewport size
+	get_viewport().size_changed.connect(_on_viewport_size_changed)
 
 	# Connect to inventory changes to update weapon display
 	# Use call_deferred to ensure InventoryManager is ready
@@ -112,8 +137,89 @@ func _setup_ui() -> void:
 	spell_sprite.visible = false
 	container.add_child(spell_sprite)
 
+	# Setup 3D weapon viewport system
+	_setup_3d_weapon_viewport(container)
+
+	# Setup debug visualization
+	_setup_debug_box(container)
+
 	# Position weapon sprite at bottom center
 	_position_sprites()
+	# Position 3D weapon display in lower-right
+	_position_3d_weapon_display()
+
+
+func _setup_3d_weapon_viewport(container: Control) -> void:
+	# Create a TextureRect to display the viewport
+	var texture_rect := TextureRect.new()
+	texture_rect.name = "Weapon3DTextureRect"
+	texture_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	texture_rect.visible = false  # Hidden until 3D weapon equipped
+	texture_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	texture_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	container.add_child(texture_rect)
+
+	# Store reference
+	weapon_viewport_container = texture_rect
+
+	# Create SubViewport with transparency
+	weapon_viewport = SubViewport.new()
+	weapon_viewport.name = "WeaponViewport"
+	weapon_viewport.transparent_bg = true
+	weapon_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	weapon_viewport.handle_input_locally = false
+	weapon_viewport.size = Vector2i(512, 512)
+	# Use own world so it doesn't render the main scene
+	weapon_viewport.own_world_3d = true
+	add_child(weapon_viewport)
+
+	# Connect the viewport texture to the TextureRect
+	texture_rect.texture = weapon_viewport.get_texture()
+
+	# Create Camera3D for the weapon viewport
+	weapon_camera = Camera3D.new()
+	weapon_camera.name = "WeaponCamera"
+	weapon_camera.fov = 70.0
+	weapon_camera.near = 0.01
+	weapon_camera.far = 10.0
+	weapon_camera.current = true
+	weapon_camera.position = Vector3(0, 0, 1.0)  # Camera pulled back to see weapon
+	weapon_viewport.add_child(weapon_camera)
+
+	# Create root node for 3D weapon at origin
+	weapon_3d_root = Node3D.new()
+	weapon_3d_root.name = "Weapon3DRoot"
+	weapon_viewport.add_child(weapon_3d_root)
+
+	# Add lighting for the weapon
+	var weapon_light := DirectionalLight3D.new()
+	weapon_light.name = "WeaponLight"
+	weapon_light.light_energy = 1.2
+	weapon_light.rotation_degrees = Vector3(-30, 45, 0)
+	weapon_viewport.add_child(weapon_light)
+
+	# Add fill light from below/front
+	var fill_light := DirectionalLight3D.new()
+	fill_light.name = "FillLight"
+	fill_light.light_energy = 0.4
+	fill_light.rotation_degrees = Vector3(30, -30, 0)
+	weapon_viewport.add_child(fill_light)
+
+
+## Setup debug visualization (outline around viewport area)
+func _setup_debug_box(container: Control) -> void:
+	debug_box = ColorRect.new()
+	debug_box.name = "DebugBox"
+	debug_box.color = Color(1, 0, 0, 0.3)  # Semi-transparent red
+	debug_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	debug_box.visible = show_viewmodel_debug
+	container.add_child(debug_box)
+
+
+## Handle viewport resize - position the 3D weapon display
+func _on_viewport_size_changed() -> void:
+	_position_sprites()
+	_position_3d_weapon_display()
 
 
 ## Horizontal offset to adjust weapon centering (positive = shift right)
@@ -145,12 +251,45 @@ func _position_sprites() -> void:
 		spell_sprite.size = spell_size
 
 
+## Position the 3D weapon display centered at bottom of screen
+func _position_3d_weapon_display() -> void:
+	if not weapon_viewport_container:
+		return
+
+	var viewport_size := get_viewport().get_visible_rect().size
+
+	# Large display area to show full weapon
+	var display_size := Vector2(800, 600)
+
+	# Position centered horizontally, at bottom of screen
+	weapon_viewport_container.position = Vector2(
+		(viewport_size.x - display_size.x) / 2.0,
+		viewport_size.y - display_size.y
+	)
+	weapon_viewport_container.size = display_size
+
+	# Update debug box to match viewport area
+	if debug_box:
+		debug_box.position = weapon_viewport_container.position
+		debug_box.size = display_size
+		debug_box.visible = show_viewmodel_debug
+
+
 func _process(delta: float) -> void:
-	# Hide weapon sprite when menus are open
+	# Hide weapon when menus are open
 	var should_show := _should_be_visible and not GameManager.is_in_menu
 
-	if weapon_sprite:
-		weapon_sprite.visible = should_show and weapon_atlas != null
+	# Handle visibility based on weapon type
+	if using_3d_weapon:
+		if weapon_sprite:
+			weapon_sprite.visible = false
+		if weapon_viewport_container:
+			weapon_viewport_container.visible = should_show
+	else:
+		if weapon_sprite:
+			weapon_sprite.visible = should_show and weapon_atlas != null
+		if weapon_viewport_container:
+			weapon_viewport_container.visible = false
 
 	if not should_show:
 		return
@@ -160,16 +299,23 @@ func _process(delta: float) -> void:
 	# Handle animation state
 	match current_state:
 		ArmState.IDLE:
-			_process_idle(delta)
+			if using_3d_weapon:
+				_process_idle_3d(delta)
+			else:
+				_process_idle(delta)
 		ArmState.ATTACKING:
-			_process_attack(delta)
+			if using_3d_weapon:
+				_process_attack_3d(delta)
+			else:
+				_process_attack(delta)
 		ArmState.CASTING:
 			_process_cast(delta)
 		ArmState.RELOADING:
 			_process_reload(delta)
 
-	# Update sprite frame based on animation
-	_update_sprite_frame()
+	# Update sprite frame based on animation (only for 2D)
+	if not using_3d_weapon:
+		_update_sprite_frame()
 
 
 func _process_idle(delta: float) -> void:
@@ -237,6 +383,70 @@ func _process_reload(delta: float) -> void:
 		current_state = ArmState.IDLE
 
 
+## 3D Weapon idle animation - gentle bobbing
+func _process_idle_3d(_delta: float) -> void:
+	if not weapon_mesh_instance:
+		return
+
+	# Gentle bobbing motion in Y axis
+	var bob_offset := sin(time_elapsed * idle_bob_3d_speed * TAU) * idle_bob_3d_amount
+	# Slight sway in X axis
+	var sway_offset := sin(time_elapsed * idle_bob_3d_speed * 0.7 * TAU) * (idle_bob_3d_amount * 0.5)
+
+	weapon_mesh_instance.position = weapon_3d_base_position + Vector3(sway_offset, bob_offset, 0)
+	weapon_mesh_instance.rotation_degrees = weapon_3d_base_rotation
+
+
+## 3D Weapon attack animation - swing motion
+func _process_attack_3d(delta: float) -> void:
+	if not weapon_mesh_instance:
+		_finish_attack()
+		return
+
+	animation_timer -= delta
+
+	# Calculate attack progress (0 to 1)
+	var progress := 1.0 - (animation_timer / attack_duration)
+	progress = clampf(progress, 0.0, 1.0)
+
+	# Swing animation phases:
+	# 0.0-0.2: Wind up (pull back)
+	# 0.2-0.6: Swing forward
+	# 0.6-1.0: Follow through and return
+
+	var swing_rotation := 0.0
+	var forward_offset := 0.0
+	var side_offset := 0.0
+
+	if progress < 0.2:
+		# Wind up - pull back and rotate slightly back
+		var wind_up := progress / 0.2
+		swing_rotation = -20.0 * wind_up  # Rotate back
+		forward_offset = 0.1 * wind_up    # Pull back slightly
+		side_offset = -0.05 * wind_up     # Pull to side
+	elif progress < 0.6:
+		# Main swing - fast forward rotation
+		var swing := (progress - 0.2) / 0.4
+		var eased := 1.0 - pow(1.0 - swing, 3)  # Ease out for impact feel
+		swing_rotation = -20.0 + (attack_swing_angle + 20.0) * eased
+		forward_offset = 0.1 - 0.25 * eased  # Thrust forward
+		side_offset = -0.05 + 0.15 * eased   # Swing across
+	else:
+		# Follow through and return
+		var return_progress := (progress - 0.6) / 0.4
+		var eased := return_progress * return_progress  # Ease in for smooth return
+		swing_rotation = attack_swing_angle * (1.0 - eased)
+		forward_offset = -0.15 * (1.0 - eased)
+		side_offset = 0.1 * (1.0 - eased)
+
+	# Apply the swing animation
+	weapon_mesh_instance.position = weapon_3d_base_position + Vector3(side_offset, 0, forward_offset)
+	weapon_mesh_instance.rotation_degrees = weapon_3d_base_rotation + Vector3(swing_rotation, 0, 0)
+
+	if animation_timer <= 0:
+		_finish_attack()
+
+
 func _update_sprite_frame() -> void:
 	# Update the atlas texture region to show the correct frame
 	if not weapon_atlas or not weapon_base_texture:
@@ -279,6 +489,13 @@ func _finish_cast() -> void:
 	current_state = ArmState.IDLE
 	animation_playing = false
 	spell_sprite.visible = false
+
+	# Show weapon again after casting
+	if weapon_sprite and not using_3d_weapon:
+		weapon_sprite.visible = true
+	if weapon_mesh_instance and using_3d_weapon:
+		weapon_mesh_instance.visible = true
+
 	emit_signal("cast_animation_finished")
 
 
@@ -299,15 +516,26 @@ func hide_arms() -> void:
 	visible = false  # Hide the CanvasLayer
 	if weapon_sprite:
 		weapon_sprite.visible = false
+	if weapon_viewport_container:
+		weapon_viewport_container.visible = false
 
 
 ## Update the displayed weapon based on inventory
 func update_equipped_weapon() -> void:
 	var weapon: WeaponData = InventoryManager.get_equipped_weapon()
-	print("[FPSArms] update_equipped_weapon - weapon: %s, fps_path: %s" % [
-		weapon.display_name if weapon else "NONE",
-		weapon.fps_sprite_path if weapon else "N/A"
+	print("[FPSArms] update_equipped_weapon - weapon: %s" % [
+		weapon.display_name if weapon else "NONE"
 	])
+
+	# Check for 3D mesh first (takes priority over sprite)
+	if weapon and not weapon.fps_mesh_path.is_empty():
+		print("[FPSArms] Using 3D mesh: %s" % weapon.fps_mesh_path)
+		_setup_3d_weapon(weapon)
+		return
+
+	# Fall back to 2D sprite system
+	using_3d_weapon = false
+	_clear_3d_weapon()
 
 	if weapon and not weapon.fps_sprite_path.is_empty():
 		# Load the FPS weapon sprite sheet
@@ -370,6 +598,64 @@ func update_equipped_weapon() -> void:
 			_position_sprites()
 
 
+## Setup a 3D weapon mesh
+func _setup_3d_weapon(weapon: WeaponData) -> void:
+	_clear_3d_weapon()
+
+	# Load the mesh resource (GLB loads as PackedScene, OBJ loads as Mesh)
+	var resource = load(weapon.fps_mesh_path)
+	if not resource:
+		print("[FPSArms] ERROR: Failed to load 3D mesh: %s" % weapon.fps_mesh_path)
+		using_3d_weapon = false
+		_show_placeholder_weapon()
+		return
+
+	# Handle different resource types
+	if resource is PackedScene:
+		weapon_mesh_instance = resource.instantiate()
+	elif resource is Mesh:
+		# OBJ files load as Mesh - wrap in MeshInstance3D
+		var mesh_inst := MeshInstance3D.new()
+		mesh_inst.mesh = resource
+		weapon_mesh_instance = mesh_inst
+	else:
+		print("[FPSArms] ERROR: Unsupported resource type: %s" % resource.get_class())
+		using_3d_weapon = false
+		_show_placeholder_weapon()
+		return
+
+	if not weapon_mesh_instance:
+		print("[FPSArms] ERROR: Failed to create 3D mesh instance")
+		using_3d_weapon = false
+		_show_placeholder_weapon()
+		return
+
+	# Apply weapon-specific transforms
+	weapon_mesh_instance.scale = weapon.fps_mesh_scale
+	weapon_3d_base_position = weapon.fps_mesh_position
+	weapon_3d_base_rotation = weapon.fps_mesh_rotation
+	weapon_mesh_instance.position = weapon_3d_base_position
+	weapon_mesh_instance.rotation_degrees = weapon_3d_base_rotation
+
+	# Add to the 3D root
+	weapon_3d_root.add_child(weapon_mesh_instance)
+
+	using_3d_weapon = true
+	weapon_sprite.visible = false
+	weapon_viewport_container.visible = _should_be_visible
+
+	print("[FPSArms] 3D weapon setup complete - scale: %s, pos: %s, rot: %s" % [
+		weapon.fps_mesh_scale, weapon_3d_base_position, weapon_3d_base_rotation
+	])
+
+
+## Clear any existing 3D weapon
+func _clear_3d_weapon() -> void:
+	if weapon_mesh_instance and is_instance_valid(weapon_mesh_instance):
+		weapon_mesh_instance.queue_free()
+		weapon_mesh_instance = null
+
+
 func _show_placeholder_weapon() -> void:
 	# Show a placeholder or empty hands
 	# For now, create a simple colored rectangle as placeholder
@@ -386,7 +672,9 @@ func play_attack() -> void:
 	current_state = ArmState.ATTACKING
 	animation_timer = attack_duration
 	current_frame = 0
-	_update_sprite_frame()
+
+	if not using_3d_weapon:
+		_update_sprite_frame()
 
 
 ## Trigger spell cast animation
@@ -398,6 +686,12 @@ func play_cast(spell: SpellData = null) -> void:
 	current_state = ArmState.CASTING
 	animation_timer = cast_duration
 	current_frame = 0
+
+	# Hide weapon while casting
+	if weapon_sprite:
+		weapon_sprite.visible = false
+	if weapon_mesh_instance and using_3d_weapon:
+		weapon_mesh_instance.visible = false
 
 	# Show spell hands
 	spell_sprite.visible = true
@@ -436,3 +730,27 @@ func set_spell_size(size: Vector2) -> void:
 	if spell_sprite:
 		spell_sprite.custom_minimum_size = size
 		_position_sprites()
+
+
+## Apply weapon recoil animation (for musket kick)
+func apply_recoil(kick_back: float, duration: float) -> void:
+	if not weapon_mesh_instance or not using_3d_weapon:
+		return
+
+	var original_pos := weapon_3d_base_position
+	var original_rot := weapon_3d_base_rotation
+
+	var recoil_tween := create_tween()
+	recoil_tween.set_parallel(true)
+
+	# Kick back and rotate up
+	recoil_tween.tween_property(weapon_mesh_instance, "position",
+		original_pos + Vector3(0, 0.05, kick_back), duration * 0.2).set_ease(Tween.EASE_OUT)
+	recoil_tween.tween_property(weapon_mesh_instance, "rotation_degrees",
+		original_rot + Vector3(-15, 0, 3), duration * 0.2).set_ease(Tween.EASE_OUT)
+
+	# Return to original position
+	recoil_tween.chain().tween_property(weapon_mesh_instance, "position",
+		original_pos, duration * 0.8).set_ease(Tween.EASE_IN_OUT)
+	recoil_tween.tween_property(weapon_mesh_instance, "rotation_degrees",
+		original_rot, duration * 0.8).set_ease(Tween.EASE_IN_OUT)

@@ -191,7 +191,7 @@ func _setup_default_inventory() -> void:
 			print("[Merchant] General store: fixed inventory (lockpicks, repair kits)")
 		return
 
-	# Other shop types use LootTables random generation
+	# All shop types (including alchemist) use LootTables random generation
 	if DEBUG:
 		print("[Merchant] InventoryManager database sizes: weapons=%d, armor=%d, items=%d" % [
 			InventoryManager.weapon_database.size(),

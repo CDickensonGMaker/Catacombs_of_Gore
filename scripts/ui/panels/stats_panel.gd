@@ -30,65 +30,67 @@ func _ready() -> void:
 	refresh()
 
 func refresh() -> void:
+	# DEBUG: Print what we're reading
+	if GameManager.player_data:
+		print("STATS PANEL REFRESH - Will: %d, Knowledge: %d, Arcana Lore: %d" % [
+			GameManager.player_data.will,
+			GameManager.player_data.knowledge,
+			GameManager.player_data.get_skill(Enums.Skill.ARCANA_LORE)
+		])
+	else:
+		print("STATS PANEL REFRESH - No player_data!")
+
 	_update_character_info()
 	_update_core_stats()
 	_update_derived_stats()
 	_update_skills()
 
 func _update_character_info() -> void:
-	var player := get_tree().get_first_node_in_group("player")
-	if not player:
+	var char_data: CharacterData = GameManager.player_data
+	if not char_data:
 		return
 
 	if name_label:
-		name_label.text = player.character_name if player.has_method("get") and "character_name" in player else "Unknown"
+		name_label.text = char_data.character_name
 	if race_label:
-		race_label.text = "Race: " + (player.race if "race" in player else "Human")
+		race_label.text = "Race: " + Enums.Race.keys()[char_data.race]
 	if career_label:
-		career_label.text = "Career: " + (player.career if "career" in player else "Adventurer")
+		career_label.text = "Career: " + Enums.Career.keys()[char_data.career]
 	if level_label:
-		level_label.text = "Level: %d" % (player.level if "level" in player else 1)
+		level_label.text = "Level: %d" % char_data.level
 
 func _update_core_stats() -> void:
-	var player := get_tree().get_first_node_in_group("player")
-	if not player:
+	var char_data: CharacterData = GameManager.player_data
+	if not char_data:
 		return
 
-	# Get stats from player or use defaults
-	var stats: Dictionary = player.stats if "stats" in player else {}
-
+	# Use actual CharacterData attributes
 	if strength_label:
-		strength_label.text = "Strength: %d" % stats.get("strength", 10)
+		strength_label.text = "Grit: %d" % char_data.grit
 	if agility_label:
-		agility_label.text = "Agility: %d" % stats.get("agility", 10)
+		agility_label.text = "Agility: %d" % char_data.agility
 	if toughness_label:
-		toughness_label.text = "Toughness: %d" % stats.get("toughness", 10)
+		toughness_label.text = "Vitality: %d" % char_data.vitality
 	if intelligence_label:
-		intelligence_label.text = "Intelligence: %d" % stats.get("intelligence", 10)
+		intelligence_label.text = "Knowledge: %d" % char_data.knowledge
 	if willpower_label:
-		willpower_label.text = "Willpower: %d" % stats.get("willpower", 10)
+		willpower_label.text = "Will: %d" % char_data.will
 	if fellowship_label:
-		fellowship_label.text = "Fellowship: %d" % stats.get("fellowship", 10)
+		fellowship_label.text = "Speech: %d" % char_data.speech
 
 func _update_derived_stats() -> void:
-	var player := get_tree().get_first_node_in_group("player")
-	if not player:
+	var char_data: CharacterData = GameManager.player_data
+	if not char_data:
 		return
 
 	if health_label:
-		var hp: int = player.current_health if "current_health" in player else 100
-		var max_hp: int = player.max_health if "max_health" in player else 100
-		health_label.text = "Health: %d / %d" % [hp, max_hp]
+		health_label.text = "Health: %d / %d" % [char_data.current_hp, char_data.max_hp]
 
 	if stamina_label:
-		var sp: int = player.current_stamina if "current_stamina" in player else 100
-		var max_sp: int = player.max_stamina if "max_stamina" in player else 100
-		stamina_label.text = "Stamina: %d / %d" % [sp, max_sp]
+		stamina_label.text = "Stamina: %d / %d" % [char_data.current_stamina, char_data.max_stamina]
 
 	if mana_label:
-		var mp: int = player.current_mana if "current_mana" in player else 50
-		var max_mp: int = player.max_mana if "max_mana" in player else 50
-		mana_label.text = "Mana: %d / %d" % [mp, max_mp]
+		mana_label.text = "Mana: %d / %d" % [char_data.current_mana, char_data.max_mana]
 
 	if armor_label:
 		var armor: int = _calculate_total_armor()
@@ -130,15 +132,13 @@ func _update_skills() -> void:
 
 	skills_list.clear()
 
-	var player := get_tree().get_first_node_in_group("player")
-	if not player or not "skills" in player:
-		# Add some default skills for display
-		skills_list.add_item("Melee Combat: 1")
-		skills_list.add_item("Dodge: 1")
-		skills_list.add_item("Block: 1")
+	var char_data: CharacterData = GameManager.player_data
+	if not char_data:
 		return
 
-	var skills: Dictionary = player.skills
-	for skill_name in skills:
-		var skill_level: int = skills[skill_name]
-		skills_list.add_item("%s: %d" % [skill_name, skill_level])
+	# Display all skills with level > 0
+	for skill_enum in Enums.Skill.values():
+		var skill_level: int = char_data.get_skill(skill_enum)
+		if skill_level > 0:
+			var skill_name: String = Enums.Skill.keys()[skill_enum].capitalize().replace("_", " ")
+			skills_list.add_item("%s: %d" % [skill_name, skill_level])

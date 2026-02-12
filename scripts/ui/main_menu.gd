@@ -408,9 +408,9 @@ func _create_random_character_and_start() -> void:
 	InventoryManager.add_item("lockpick", 5)
 	InventoryManager.add_gold(100)
 
-	print("[MainMenu] DEV: Created random %s named %s" % [Enums.Race.keys()[char_data.race], char_data.character_name])
+	print("[MainMenu] Quick start COMPLETE: %s the %s" % [char_data.character_name, Enums.Race.keys()[char_data.race]])
 
-	# Go directly to game
+	# Start in Elder Moor
 	_fade_to_scene("res://scenes/levels/elder_moor.tscn")
 
 

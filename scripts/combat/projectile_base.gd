@@ -109,6 +109,10 @@ func initialize(data: ProjectileData, source: Node, dir: Vector3, target: Node3D
 	if not data.fire_sound.is_empty():
 		AudioManager.play_sfx_3d(data.fire_sound, global_position)
 
+	# Spawn muzzle effect (smoke puff, flash, etc.)
+	if not data.muzzle_effect_path.is_empty():
+		_spawn_muzzle_effect()
+
 	# Initialize velocity
 	velocity = direction * current_speed
 
@@ -119,23 +123,31 @@ func _setup_visuals() -> void:
 	# Load mesh if specified
 	if not projectile_data.mesh_path.is_empty():
 		var mesh_res = load(projectile_data.mesh_path)
-		if mesh_res is Mesh:
+		if mesh_res is PackedScene:
+			# Replace default mesh_instance with loaded scene
+			if mesh_instance:
+				mesh_instance.queue_free()
+			var scene_instance: Node3D = mesh_res.instantiate()
+			scene_instance.name = "ProjectileMesh"
+			scene_instance.scale = projectile_data.scale
+			add_child(scene_instance)
+			mesh_instance = scene_instance
+		elif mesh_res is Mesh:
 			mesh_instance.mesh = mesh_res
+			mesh_instance.scale = projectile_data.scale
 	else:
 		# Default sphere mesh
 		var sphere := SphereMesh.new()
 		sphere.radius = projectile_data.collision_radius
 		sphere.height = projectile_data.collision_radius * 2
 		mesh_instance.mesh = sphere
+		mesh_instance.scale = projectile_data.scale
 
-	# Apply scale
-	mesh_instance.scale = projectile_data.scale
-
-	# Load material if specified
-	if not projectile_data.material_path.is_empty():
+	# Load material if specified (only for MeshInstance3D)
+	if mesh_instance is MeshInstance3D and not projectile_data.material_path.is_empty():
 		var mat_res = load(projectile_data.material_path)
 		if mat_res is Material:
-			mesh_instance.material_override = mat_res
+			(mesh_instance as MeshInstance3D).material_override = mat_res
 
 func _setup_trail() -> void:
 	if trail:
@@ -390,6 +402,23 @@ func _spawn_impact_effect() -> void:
 	if effect is Node3D:
 		(effect as Node3D).global_position = global_position
 		(effect as Node3D).scale = Vector3.ONE * projectile_data.impact_scale
+
+
+func _spawn_muzzle_effect() -> void:
+	if not projectile_data or projectile_data.muzzle_effect_path.is_empty():
+		return
+
+	var effect_scene := load(projectile_data.muzzle_effect_path) as PackedScene
+	if not effect_scene:
+		return
+
+	var effect := effect_scene.instantiate()
+	get_tree().current_scene.add_child(effect)
+	if effect is Node3D:
+		(effect as Node3D).global_position = global_position
+		(effect as Node3D).scale = Vector3.ONE * projectile_data.muzzle_effect_scale
+		# Face the direction of fire
+		(effect as Node3D).look_at(global_position + direction)
 
 func _expire() -> void:
 	if not is_active:

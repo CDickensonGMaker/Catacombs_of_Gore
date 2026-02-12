@@ -254,6 +254,35 @@ func create_new_character(char_name: String, race: Enums.Race, career: Enums.Car
 	player_data.current_hp = player_data.max_hp
 	player_data.current_stamina = player_data.max_stamina
 
+## Apply dev/testing stats to a character (high magic stats for testing spells)
+## Call this during development to quickly test magic systems
+func apply_dev_stats(char_data: CharacterData) -> void:
+	print("[DEV] Applying dev stats for magic testing...")
+
+	# High base stats for magic
+	char_data.will = 10          # High mana pool
+	char_data.knowledge = 10     # Spell power, prereqs
+
+	# High skills for magic (use set_skill to emit signals properly)
+	char_data.set_skill(Enums.Skill.ARCANA_LORE, 8)      # Read all scrolls
+	char_data.set_skill(Enums.Skill.CONCENTRATION, 8)   # Spell casting
+
+	# Bonus improvement points for testing
+	char_data.improvement_points += 100000
+
+	# Recalculate and restore resources
+	char_data.recalculate_derived_stats()
+	char_data.current_hp = char_data.max_hp
+	char_data.current_stamina = char_data.max_stamina
+	char_data.current_mana = char_data.max_mana
+
+	print("[DEV] Stats applied - Will: %d, Knowledge: %d, Arcana Lore: %d, Concentration: %d" % [
+		char_data.will,
+		char_data.knowledge,
+		char_data.get_skill(Enums.Skill.ARCANA_LORE),
+		char_data.get_skill(Enums.Skill.CONCENTRATION)
+	])
+
 ## Get weather effects
 func get_weather_effects() -> Dictionary:
 	var effects := {

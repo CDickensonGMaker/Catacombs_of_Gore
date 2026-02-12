@@ -92,6 +92,10 @@ var quest_tracker_progress: Label
 var minimap: Minimap = null
 var minimap_coord_label: Label = null
 
+## Conditions display (below mana bar)
+var conditions_container: HBoxContainer = null
+var condition_labels: Dictionary = {}  # Condition enum -> PanelContainer
+
 ## Town/settlement zone IDs - used for quest routing and turn-in
 const TOWN_ZONES: Array[String] = [
 	"elder_moor", "village_elder_moor",
@@ -172,6 +176,7 @@ func _ready() -> void:
 	_setup_minimap()
 	_setup_bounty_indicator()
 	_setup_quest_tracker()
+	_setup_conditions_display()
 	_connect_signals()
 	_setup_menus()
 	_connect_scene_signals()
@@ -612,39 +617,156 @@ func _update_notifications(delta: float) -> void:
 			notification_label.text = ""
 			_show_next_notification()
 
+## Setup the conditions display container below mana bar
+func _setup_conditions_display() -> void:
+	# Find or create parent container (TopLeft VBox)
+	var top_left := get_node_or_null("TopLeft")
+	if not top_left:
+		return
+
+	# Create conditions container below existing bars
+	conditions_container = HBoxContainer.new()
+	conditions_container.name = "ConditionsContainer"
+	conditions_container.add_theme_constant_override("separation", 8)
+	top_left.add_child(conditions_container)
+
+	# Move it to be after mana bar if possible
+	if mana_bar:
+		var mana_idx := mana_bar.get_index()
+		top_left.move_child(conditions_container, mana_idx + 1)
+
 func _update_conditions() -> void:
-	if not condition_icons_container:
+	if not conditions_container:
 		return
 
 	var char_data := GameManager.player_data
 	if not char_data:
 		return
 
-	# Clear existing icons
-	for child in condition_icons_container.get_children():
-		child.queue_free()
+	# CharacterData.conditions is a Dictionary of { Condition -> time_remaining }
+	var active_conditions: Dictionary = char_data.conditions
 
-	# Add icon for each active condition
-	for condition in char_data.conditions:
-		var icon := TextureRect.new()
-		icon.custom_minimum_size = Vector2(24, 24)
-		# Would load appropriate icon based on condition type
-		icon.modulate = _get_condition_color(condition)
-		condition_icons_container.add_child(icon)
+	# Track which conditions we need to add/update/remove
+	var conditions_to_remove: Array = []
+	for condition in condition_labels.keys():
+		if not active_conditions.has(condition):
+			conditions_to_remove.append(condition)
+
+	# Remove labels for expired conditions
+	for condition in conditions_to_remove:
+		var label_panel: Control = condition_labels[condition]
+		if is_instance_valid(label_panel):
+			label_panel.queue_free()
+		condition_labels.erase(condition)
+
+	# Update or add labels for active conditions
+	for condition in active_conditions.keys():
+		var time_left: float = active_conditions[condition]
+
+		if condition_labels.has(condition):
+			# Update existing label
+			_update_condition_label(condition, time_left)
+		else:
+			# Create new label
+			_create_condition_label(condition, time_left)
+
+## Create a condition label with colored panel
+func _create_condition_label(condition: Enums.Condition, time_left: float) -> void:
+	var panel := PanelContainer.new()
+
+	# Create stylebox for background color
+	var style := StyleBoxFlat.new()
+	var is_buff := _is_buff_condition(condition)
+	if is_buff:
+		style.bg_color = Color(0.1, 0.3, 0.1, 0.8)  # Dark green for buffs
+	else:
+		style.bg_color = Color(0.3, 0.1, 0.1, 0.8)  # Dark red for debuffs
+	style.corner_radius_top_left = 4
+	style.corner_radius_top_right = 4
+	style.corner_radius_bottom_left = 4
+	style.corner_radius_bottom_right = 4
+	style.content_margin_left = 6
+	style.content_margin_right = 6
+	style.content_margin_top = 2
+	style.content_margin_bottom = 2
+	panel.add_theme_stylebox_override("panel", style)
+
+	# Create label
+	var label := Label.new()
+	label.name = "ConditionLabel"
+	var condition_name := _get_condition_name(condition)
+	label.text = "%s %.1fs" % [condition_name, time_left]
+	label.add_theme_color_override("font_color", _get_condition_text_color(condition))
+	label.add_theme_font_size_override("font_size", 14)
+	panel.add_child(label)
+
+	conditions_container.add_child(panel)
+	condition_labels[condition] = panel
+
+## Update an existing condition label's time display
+func _update_condition_label(condition: Enums.Condition, time_left: float) -> void:
+	if not condition_labels.has(condition):
+		return
+
+	var panel: PanelContainer = condition_labels[condition]
+	if not is_instance_valid(panel):
+		condition_labels.erase(condition)
+		return
+
+	var label := panel.get_node_or_null("ConditionLabel") as Label
+	if label:
+		var condition_name := _get_condition_name(condition)
+		label.text = "%s %.1fs" % [condition_name, time_left]
+
+## Check if a condition is a buff (beneficial) or debuff (harmful)
+func _is_buff_condition(condition: Enums.Condition) -> bool:
+	match condition:
+		Enums.Condition.ARMORED: return true
+		Enums.Condition.HASTED: return true
+		_: return false
+
+## Get display name for a condition
+func _get_condition_name(condition: Enums.Condition) -> String:
+	match condition:
+		Enums.Condition.NONE: return ""
+		Enums.Condition.KNOCKED_DOWN: return "DOWNED"
+		Enums.Condition.POISONED: return "POISONED"
+		Enums.Condition.BURNING: return "BURNING"
+		Enums.Condition.FROZEN: return "FROZEN"
+		Enums.Condition.HORRIFIED: return "FEARED"
+		Enums.Condition.BLEEDING: return "BLEEDING"
+		Enums.Condition.STUNNED: return "STUNNED"
+		Enums.Condition.SILENCED: return "SILENCED"
+		Enums.Condition.ARMORED: return "ARMORED"
+		Enums.Condition.BLINDED: return "BLINDED"
+		Enums.Condition.SLOWED: return "SLOWED"
+		Enums.Condition.HASTED: return "HASTED"
+		_: return "UNKNOWN"
 
 func _update_time() -> void:
 	if time_label:
 		time_label.text = "Day %d - %s" % [GameManager.current_day, GameManager.get_time_string()]
 
-func _get_condition_color(condition: Enums.Condition) -> Color:
+## Get text color for condition display
+func _get_condition_text_color(condition: Enums.Condition) -> Color:
 	match condition:
-		Enums.Condition.POISONED: return Color.GREEN
-		Enums.Condition.BURNING: return Color.ORANGE
-		Enums.Condition.FROZEN: return Color.CYAN
-		Enums.Condition.BLEEDING: return Color.DARK_RED
-		Enums.Condition.HORRIFIED: return Color.PURPLE
-		Enums.Condition.STUNNED: return Color.YELLOW
+		Enums.Condition.POISONED: return Color(0.4, 0.9, 0.3)  # Bright green
+		Enums.Condition.BURNING: return Color(1.0, 0.6, 0.2)  # Orange
+		Enums.Condition.FROZEN: return Color(0.5, 0.9, 1.0)  # Cyan
+		Enums.Condition.BLEEDING: return Color(0.9, 0.3, 0.3)  # Red
+		Enums.Condition.HORRIFIED: return Color(0.7, 0.3, 0.9)  # Purple
+		Enums.Condition.STUNNED: return Color(1.0, 0.9, 0.3)  # Yellow
+		Enums.Condition.SILENCED: return Color(0.6, 0.6, 0.8)  # Pale blue
+		Enums.Condition.ARMORED: return Color(1.0, 0.85, 0.3)  # Gold
+		Enums.Condition.BLINDED: return Color(1.0, 1.0, 0.8)  # White-yellow
+		Enums.Condition.SLOWED: return Color(0.6, 0.4, 0.9)  # Purple
+		Enums.Condition.HASTED: return Color(1.0, 0.85, 0.3)  # Gold
+		Enums.Condition.KNOCKED_DOWN: return Color(0.8, 0.5, 0.3)  # Brown
 		_: return Color.WHITE
+
+func _get_condition_color(condition: Enums.Condition) -> Color:
+	# Legacy function kept for compatibility
+	return _get_condition_text_color(condition)
 
 ## Show a notification message
 func show_notification(message: String) -> void:
@@ -774,18 +896,6 @@ func _update_quick_slot(slot: int) -> void:
 		var count_label := slot_ui.get_node_or_null("Count") as Label
 		if count_label:
 			count_label.text = str(count) if count > 1 else ""
-
-func _get_condition_name(condition: Enums.Condition) -> String:
-	match condition:
-		Enums.Condition.POISONED: return "Poisoned"
-		Enums.Condition.BURNING: return "Burning"
-		Enums.Condition.FROZEN: return "Frozen"
-		Enums.Condition.BLEEDING: return "Bleeding"
-		Enums.Condition.HORRIFIED: return "Horrified"
-		Enums.Condition.STUNNED: return "Stunned"
-		Enums.Condition.KNOCKED_DOWN: return "Knocked Down"
-		Enums.Condition.SILENCED: return "Silenced"
-		_: return "Unknown"
 
 ## Setup interaction prompt label
 func _setup_interaction_prompt() -> void:

@@ -1674,6 +1674,10 @@ func _update_movement(delta: float) -> void:
 	if current_state == AIState.DISENGAGE:
 		speed *= leash_return_speed_mult
 
+	# Apply SLOWED condition penalty (-50% speed)
+	if has_condition(Enums.Condition.SLOWED):
+		speed *= 0.5
+
 	# If looking around during search, don't move
 	if current_alert_state == AlertState.SEARCHING and look_around_timer > 0:
 		velocity.x = 0
@@ -1998,6 +2002,9 @@ func apply_stagger(power: float) -> void:
 
 func apply_condition(condition: Enums.Condition, duration: float) -> void:
 	active_conditions[condition] = duration
+
+func has_condition(condition: Enums.Condition) -> bool:
+	return active_conditions.has(condition) and active_conditions[condition] > 0
 
 func is_dead() -> bool:
 	return current_state == AIState.DEAD

@@ -172,21 +172,33 @@ func _cast_self_spell(spell: SpellData) -> void:
 	if not owner_entity:
 		return
 
+	var target_pos := owner_entity.global_position + Vector3(0, 1.0, 0)
+
 	if spell.is_healing:
 		CombatManager.apply_spell_damage(owner_entity, owner_entity, spell)
+		# Spawn healing VFX
+		_spawn_healing_effect(target_pos)
 	else:
 		# Apply buff or self-effect
 		if spell.inflicts_condition != Enums.Condition.NONE:
 			if owner_entity.has_method("apply_condition"):
 				owner_entity.apply_condition(spell.inflicts_condition, spell.condition_duration)
+			# Spawn buff VFX via BuffVFXManager if available
+			var buff_mgr := owner_entity.get_node_or_null("BuffVFXManager")
+			if buff_mgr and buff_mgr.has_method("on_condition_applied"):
+				buff_mgr.on_condition_applied(spell.inflicts_condition, spell.condition_duration)
 
-## Single target spell
+## Single target spell (debuffs like Blind, Slow)
 func _cast_single_target_spell(spell: SpellData, target_allies: bool) -> void:
 	var target := _find_target(spell.range_distance, target_allies)
 	if not target:
 		return
 
 	CombatManager.apply_spell_damage(owner_entity, target, spell)
+
+	# Spawn debuff VFX if this spell inflicts a condition
+	if spell.inflicts_condition != Enums.Condition.NONE and target is Node3D:
+		_spawn_debuff_effect(target as Node3D, spell.inflicts_condition)
 
 ## Projectile spell (Magic Missile, etc.)
 func _cast_projectile_spell(spell: SpellData) -> void:
@@ -227,7 +239,12 @@ func _cast_projectile_spell(spell: SpellData) -> void:
 
 ## AOE spell at point
 func _cast_aoe_spell(spell: SpellData, center: Vector3) -> void:
-	# Find all targets in radius
+	# Check if this spell creates a persistent hazard zone
+	if spell.creates_hazard_zone:
+		_spawn_hazard_zone(spell, center)
+		return
+
+	# Find all targets in radius (instant AOE)
 	var targets: Array[Node] = []
 	if spell.is_healing:
 		# For healing spells, target caster (and allies if we had them)
@@ -242,6 +259,52 @@ func _cast_aoe_spell(spell: SpellData, center: Vector3) -> void:
 
 	# Spawn visual effect
 	_spawn_aoe_effect(spell, center)
+
+## Spawn a persistent hazard zone (Fire Gate, Ice Storm)
+func _spawn_hazard_zone(spell: SpellData, center: Vector3) -> void:
+	# Determine colors based on damage type
+	var particle_color: Color
+	var decal_color: Color
+
+	match spell.damage_type:
+		Enums.DamageType.FIRE:
+			particle_color = Color(1.0, 0.5, 0.15, 0.85)  # Orange flames
+			decal_color = Color(0.9, 0.3, 0.1, 0.5)
+		Enums.DamageType.FROST:
+			particle_color = Color(0.5, 0.8, 1.0, 0.8)  # Ice blue
+			decal_color = Color(0.4, 0.7, 0.95, 0.5)
+		Enums.DamageType.LIGHTNING:
+			particle_color = Color(0.6, 0.8, 1.0, 0.85)
+			decal_color = Color(0.5, 0.7, 1.0, 0.4)
+		Enums.DamageType.POISON:
+			particle_color = Color(0.3, 0.8, 0.2, 0.8)
+			decal_color = Color(0.2, 0.6, 0.15, 0.5)
+		Enums.DamageType.NECROTIC:
+			particle_color = Color(0.5, 0.2, 0.6, 0.8)
+			decal_color = Color(0.4, 0.15, 0.5, 0.5)
+		_:
+			particle_color = Color(0.8, 0.6, 1.0, 0.8)
+			decal_color = Color(0.6, 0.4, 0.8, 0.5)
+
+	# Spawn the hazard zone
+	HazardZone.spawn_hazard_zone(
+		get_tree().current_scene,
+		center,
+		owner_entity,
+		spell.aoe_radius,
+		spell.hazard_duration,
+		spell.hazard_tick_interval,
+		spell.hazard_tick_damage,
+		spell.damage_type,
+		spell.inflicts_condition,
+		spell.condition_chance,
+		spell.condition_duration,
+		particle_color,
+		decal_color
+	)
+
+	# Play spawn sound
+	AudioManager.play_sfx_3d("projectile_fire", center)
 
 ## Cone spell (Flame Burst)
 func _cast_cone_spell(spell: SpellData) -> void:
@@ -274,7 +337,7 @@ func _cast_cone_spell(spell: SpellData) -> void:
 	# Spawn cone effect
 	_spawn_cone_effect(spell, origin, forward)
 
-## Beam spell (Soul Drain)
+## Beam spell (Soul Drain, Lightning Bolt, Chain Lightning)
 func _cast_beam_spell(spell: SpellData) -> void:
 	if not owner_entity:
 		return
@@ -298,6 +361,7 @@ func _cast_beam_spell(spell: SpellData) -> void:
 	var result := space_state.intersect_ray(query)
 
 	var hit_targets: Array[Node] = []
+	var chain_targets: Array[Node] = []
 	if result:
 		var target: Node = result.collider as Node
 		if target.has_method("take_damage") or target.get_parent().has_method("take_damage"):
@@ -307,8 +371,8 @@ func _cast_beam_spell(spell: SpellData) -> void:
 
 			# Chain to nearby enemies if spell has chain_targets
 			if spell.chain_targets > 0 and actual_target is Node3D:
-				var chain_origin: Vector3 = (actual_target as Node3D).global_position
-				var nearby := CombatManager.get_enemies_in_range(chain_origin, spell.chain_range)
+				var chain_origin_pos: Vector3 = (actual_target as Node3D).global_position
+				var nearby := CombatManager.get_enemies_in_range(chain_origin_pos, spell.chain_range)
 				var chains_left := spell.chain_targets
 				for enemy in nearby:
 					if chains_left <= 0:
@@ -317,10 +381,15 @@ func _cast_beam_spell(spell: SpellData) -> void:
 						continue
 					CombatManager.apply_spell_damage(owner_entity, enemy, spell)
 					hit_targets.append(enemy)
+					chain_targets.append(enemy)
 					chains_left -= 1
 
-	# Spawn beam effect
-	_spawn_beam_effect(spell, origin, result.position if result else end_point)
+	# Spawn beam effect - use sustained beam for lightning type
+	var hit_point: Vector3 = result.position if result else end_point
+	if spell.damage_type == Enums.DamageType.LIGHTNING:
+		_spawn_sustained_beam_effect(spell, origin, hit_point, chain_targets)
+	else:
+		_spawn_beam_effect(spell, origin, hit_point)
 
 ## Summon spell
 func cast_summon_spell(spell: SpellData) -> void:
@@ -482,8 +551,248 @@ func _spawn_aoe_effect(spell: SpellData, center: Vector3) -> void:
 	tween.tween_property(mat, "albedo_color:a", 0.0, 0.5)
 	tween.tween_callback(ring.queue_free)
 
-func _spawn_cone_effect(_spell: SpellData, _origin: Vector3, _direction: Vector3) -> void:
-	pass  # TODO: Implement cone visual
+func _spawn_cone_effect(spell: SpellData, origin: Vector3, direction: Vector3) -> void:
+	# Create GPUParticles3D for cone effect (ice particles for Cone of Cold)
+	var particles := GPUParticles3D.new()
+	particles.emitting = true
+	particles.one_shot = true
+	particles.explosiveness = 0.9
+	particles.amount = 80
+	particles.lifetime = 0.6
+
+	# Create particle material
+	var mat := ParticleProcessMaterial.new()
+	mat.direction = Vector3(0, 0, -1)  # Forward direction
+	mat.spread = 30.0  # 60-degree total cone (30 each side)
+	mat.initial_velocity_min = 15.0
+	mat.initial_velocity_max = 25.0
+	mat.gravity = Vector3.ZERO
+	mat.damping_min = 2.0
+	mat.damping_max = 4.0
+
+	# Color based on spell
+	var spell_color := _get_spell_color(spell)
+	mat.color = spell_color
+
+	# Scale particles
+	mat.scale_min = 0.15
+	mat.scale_max = 0.35
+
+	particles.process_material = mat
+
+	# Create a simple sphere mesh for particles
+	var draw_pass := SphereMesh.new()
+	draw_pass.radius = 0.1
+	draw_pass.height = 0.2
+	particles.draw_pass_1 = draw_pass
+
+	# Add glow material to the mesh
+	var mesh_mat := StandardMaterial3D.new()
+	mesh_mat.albedo_color = spell_color
+	mesh_mat.emission_enabled = true
+	mesh_mat.emission = spell_color
+	mesh_mat.emission_energy_multiplier = 3.0
+	mesh_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mesh_mat.albedo_color.a = 0.8
+	draw_pass.material = mesh_mat
+
+	# Position and orient the particles
+	get_tree().current_scene.add_child(particles)
+	particles.global_position = origin
+	particles.look_at(origin + direction, Vector3.UP)
+
+	# Auto-cleanup after particles finish
+	get_tree().create_timer(1.0).timeout.connect(particles.queue_free)
+
+	# Play frost sound
+	AudioManager.play_sfx_3d("projectile_fire", origin)
+
+## Spawn a sustained beam effect for lightning-type spells (2.5 second duration with jitter)
+func _spawn_sustained_beam_effect(spell: SpellData, origin: Vector3, end: Vector3, chain_targets: Array[Node] = []) -> void:
+	var beam_duration := 2.5
+	var beam_color := _get_spell_color(spell)
+
+	# Create container for all beam segments
+	var beam_container := Node3D.new()
+	get_tree().current_scene.add_child(beam_container)
+
+	# Create main beam with jagged segments
+	var segment_count := randi_range(8, 12)
+	var beam_segments: Array[MeshInstance3D] = []
+	var glow_segments: Array[MeshInstance3D] = []
+
+	# Build the jagged lightning path
+	var points: Array[Vector3] = [origin]
+	var total_dist := origin.distance_to(end)
+	var segment_length := total_dist / segment_count
+
+	for i in range(1, segment_count):
+		var t: float = float(i) / segment_count
+		var base_point: Vector3 = origin.lerp(end, t)
+		# Add random offset perpendicular to beam direction
+		var jitter_amount: float = 0.3 * (1.0 - abs(t - 0.5) * 2.0)  # More jitter in middle
+		var offset: Vector3 = Vector3(
+			randf_range(-jitter_amount, jitter_amount),
+			randf_range(-jitter_amount, jitter_amount),
+			randf_range(-jitter_amount, jitter_amount)
+		)
+		points.append(base_point + offset)
+	points.append(end)
+
+	# Create mesh for each segment
+	for i in range(points.size() - 1):
+		var seg_start: Vector3 = points[i]
+		var seg_end: Vector3 = points[i + 1]
+		var seg_length := seg_start.distance_to(seg_end)
+
+		# Main beam segment
+		var beam := MeshInstance3D.new()
+		var box := BoxMesh.new()
+		var beam_width := maxf(spell.beam_width, 0.25)
+		box.size = Vector3(beam_width, beam_width, seg_length)
+		beam.mesh = box
+
+		var mat := StandardMaterial3D.new()
+		mat.albedo_color = beam_color
+		mat.emission_enabled = true
+		mat.emission = beam_color
+		mat.emission_energy_multiplier = 6.0
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		mat.albedo_color.a = 0.95
+		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		beam.material_override = mat
+
+		# Outer glow
+		var glow := MeshInstance3D.new()
+		var glow_box := BoxMesh.new()
+		glow_box.size = Vector3(beam_width * 3.0, beam_width * 3.0, seg_length)
+		glow.mesh = glow_box
+
+		var glow_mat := StandardMaterial3D.new()
+		glow_mat.albedo_color = beam_color
+		glow_mat.albedo_color.a = 0.25
+		glow_mat.emission_enabled = true
+		glow_mat.emission = beam_color
+		glow_mat.emission_energy_multiplier = 2.0
+		glow_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		glow_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		glow.material_override = glow_mat
+
+		# Position segments
+		var midpoint: Vector3 = (seg_start + seg_end) / 2.0
+		beam.global_position = midpoint
+		beam.look_at(seg_end, Vector3.UP)
+		glow.global_position = midpoint
+		glow.look_at(seg_end, Vector3.UP)
+
+		beam_container.add_child(beam)
+		beam_container.add_child(glow)
+		beam_segments.append(beam)
+		glow_segments.append(glow)
+
+	# Create chain beams to secondary targets
+	for target in chain_targets:
+		if target is Node3D:
+			var chain_end: Vector3 = (target as Node3D).global_position + Vector3(0, 1.0, 0)
+			_spawn_chain_beam(beam_container, end, chain_end, beam_color, spell.beam_width)
+
+	# Animate the beam with jitter over duration
+	var timer := 0.0
+	var update_interval := 0.05  # Update jitter every 50ms
+
+	# Create a timer to animate the beam
+	var anim_timer := Timer.new()
+	anim_timer.wait_time = update_interval
+	anim_timer.autostart = true
+	beam_container.add_child(anim_timer)
+
+	anim_timer.timeout.connect(func():
+		timer += update_interval
+		if timer >= beam_duration:
+			beam_container.queue_free()
+			return
+
+		# Update segment positions with new jitter
+		for i in range(1, points.size() - 1):
+			var t: float = float(i) / (points.size() - 1)
+			var base_point: Vector3 = origin.lerp(end, t)
+			var jitter_amount: float = 0.25 * (1.0 - abs(t - 0.5) * 2.0)
+			var offset: Vector3 = Vector3(
+				randf_range(-jitter_amount, jitter_amount),
+				randf_range(-jitter_amount, jitter_amount),
+				randf_range(-jitter_amount, jitter_amount)
+			)
+			points[i] = base_point + offset
+
+		# Reposition segments
+		for i in range(beam_segments.size()):
+			var seg_start: Vector3 = points[i]
+			var seg_end_pt: Vector3 = points[i + 1]
+			var midpoint: Vector3 = (seg_start + seg_end_pt) / 2.0
+			beam_segments[i].global_position = midpoint
+			beam_segments[i].look_at(seg_end_pt, Vector3.UP)
+			glow_segments[i].global_position = midpoint
+			glow_segments[i].look_at(seg_end_pt, Vector3.UP)
+
+		# Fade out in last 0.5 seconds
+		if timer > beam_duration - 0.5:
+			var fade_t: float = (timer - (beam_duration - 0.5)) / 0.5
+			for seg in beam_segments:
+				var mat: StandardMaterial3D = seg.material_override
+				mat.albedo_color.a = 0.95 * (1.0 - fade_t)
+			for seg in glow_segments:
+				var mat: StandardMaterial3D = seg.material_override
+				mat.albedo_color.a = 0.25 * (1.0 - fade_t)
+	)
+
+	# Play sustained electric sound
+	AudioManager.play_sfx_3d("projectile_fire", origin)
+
+## Helper to spawn a chain beam between two points
+func _spawn_chain_beam(parent: Node3D, start: Vector3, end_point: Vector3, color: Color, width: float) -> void:
+	var chain_length := start.distance_to(end_point)
+	if chain_length < 0.1:
+		return
+
+	# Create 4-6 jagged segments for chain
+	var seg_count := randi_range(4, 6)
+	var chain_points: Array[Vector3] = [start]
+
+	for i in range(1, seg_count):
+		var t: float = float(i) / seg_count
+		var base: Vector3 = start.lerp(end_point, t)
+		var jitter: float = 0.2 * (1.0 - abs(t - 0.5) * 2.0)
+		chain_points.append(base + Vector3(
+			randf_range(-jitter, jitter),
+			randf_range(-jitter, jitter),
+			randf_range(-jitter, jitter)
+		))
+	chain_points.append(end_point)
+
+	for i in range(chain_points.size() - 1):
+		var seg_start: Vector3 = chain_points[i]
+		var seg_end: Vector3 = chain_points[i + 1]
+		var seg_len := seg_start.distance_to(seg_end)
+
+		var beam := MeshInstance3D.new()
+		var box := BoxMesh.new()
+		box.size = Vector3(width * 0.6, width * 0.6, seg_len)
+		beam.mesh = box
+
+		var mat := StandardMaterial3D.new()
+		mat.albedo_color = color
+		mat.emission_enabled = true
+		mat.emission = color
+		mat.emission_energy_multiplier = 5.0
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		mat.albedo_color.a = 0.85
+		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		beam.material_override = mat
+
+		var midpoint: Vector3 = (seg_start + seg_end) / 2.0
+		beam.global_position = midpoint
+		beam.look_at(seg_end, Vector3.UP)
+		parent.add_child(beam)
 
 func _spawn_beam_effect(spell: SpellData, origin: Vector3, end: Vector3) -> void:
 	var beam_length := origin.distance_to(end)
@@ -530,7 +839,7 @@ func _spawn_beam_effect(spell: SpellData, origin: Vector3, end: Vector3) -> void
 	get_tree().current_scene.add_child(glow)
 
 	# Position at midpoint and rotate to face end
-	var midpoint := (origin + end) / 2.0
+	var midpoint: Vector3 = (origin + end) / 2.0
 	beam.global_position = midpoint
 	beam.look_at(end, Vector3.UP)
 	glow.global_position = midpoint
@@ -568,6 +877,185 @@ func _get_spell_color(spell: SpellData) -> Color:
 		_:
 			return Color(0.8, 0.6, 1.0)  # Default arcane purple
 
+## Spawn healing VFX (golden rising particles)
+func _spawn_healing_effect(target_pos: Vector3) -> void:
+	var particles := GPUParticles3D.new()
+	particles.emitting = true
+	particles.one_shot = true
+	particles.explosiveness = 0.8
+	particles.amount = 30
+	particles.lifetime = 1.2
+
+	var mat := ParticleProcessMaterial.new()
+	mat.direction = Vector3(0, 1, 0)  # Rise upward
+	mat.spread = 25.0
+	mat.initial_velocity_min = 1.5
+	mat.initial_velocity_max = 3.0
+	mat.gravity = Vector3(0, -0.5, 0)  # Slight downward pull
+	mat.damping_min = 0.5
+	mat.damping_max = 1.0
+
+	# Golden healing color
+	mat.color = Color(1.0, 0.85, 0.3, 1.0)
+
+	mat.scale_min = 0.08
+	mat.scale_max = 0.15
+
+	particles.process_material = mat
+
+	# Simple sphere mesh
+	var draw_pass := SphereMesh.new()
+	draw_pass.radius = 0.08
+	draw_pass.height = 0.16
+	particles.draw_pass_1 = draw_pass
+
+	var mesh_mat := StandardMaterial3D.new()
+	mesh_mat.albedo_color = Color(1.0, 0.9, 0.4, 0.9)
+	mesh_mat.emission_enabled = true
+	mesh_mat.emission = Color(1.0, 0.85, 0.3)
+	mesh_mat.emission_energy_multiplier = 4.0
+	mesh_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	draw_pass.material = mesh_mat
+
+	get_tree().current_scene.add_child(particles)
+	particles.global_position = target_pos
+
+	# Cleanup after effect finishes
+	get_tree().create_timer(1.5).timeout.connect(particles.queue_free)
+
+	AudioManager.play_sfx_3d("item_use", target_pos)
+
+## Spawn debuff VFX based on condition type
+func _spawn_debuff_effect(target: Node3D, condition: Enums.Condition) -> void:
+	if not target:
+		return
+
+	var target_pos := target.global_position + Vector3(0, 1.0, 0)
+
+	match condition:
+		Enums.Condition.BLINDED:
+			_spawn_blind_flash(target_pos)
+		Enums.Condition.SLOWED:
+			_spawn_slow_particles(target)
+		_:
+			# Generic debuff burst
+			_spawn_generic_debuff_burst(target_pos)
+
+## Bright white flash burst for Blind spell
+func _spawn_blind_flash(pos: Vector3) -> void:
+	# Create a bright expanding sphere that fades quickly
+	var flash := MeshInstance3D.new()
+	var sphere := SphereMesh.new()
+	sphere.radius = 0.5
+	sphere.height = 1.0
+	flash.mesh = sphere
+
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color(1.0, 1.0, 1.0, 0.95)
+	mat.emission_enabled = true
+	mat.emission = Color.WHITE
+	mat.emission_energy_multiplier = 10.0
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	flash.material_override = mat
+
+	get_tree().current_scene.add_child(flash)
+	flash.global_position = pos
+
+	# Expand and fade
+	var tween := get_tree().create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(flash, "scale", Vector3(4.0, 4.0, 4.0), 0.3)
+	tween.tween_property(mat, "albedo_color:a", 0.0, 0.3)
+	tween.set_parallel(false)
+	tween.tween_callback(flash.queue_free)
+
+	AudioManager.play_sfx_3d("projectile_hit", pos)
+
+## Purple temporal particles orbiting target for Slow spell
+func _spawn_slow_particles(target: Node3D) -> void:
+	var particles := GPUParticles3D.new()
+	particles.emitting = true
+	particles.one_shot = false
+	particles.amount = 20
+	particles.lifetime = 2.0
+
+	var mat := ParticleProcessMaterial.new()
+	mat.direction = Vector3(0, 0, 0)
+	mat.spread = 180.0
+	mat.initial_velocity_min = 0.5
+	mat.initial_velocity_max = 1.0
+	mat.gravity = Vector3.ZERO
+	mat.orbit_velocity_min = 0.5
+	mat.orbit_velocity_max = 1.0
+
+	# Purple temporal color
+	mat.color = Color(0.6, 0.2, 0.8, 0.8)
+
+	mat.scale_min = 0.1
+	mat.scale_max = 0.2
+
+	particles.process_material = mat
+
+	var draw_pass := SphereMesh.new()
+	draw_pass.radius = 0.06
+	draw_pass.height = 0.12
+	particles.draw_pass_1 = draw_pass
+
+	var mesh_mat := StandardMaterial3D.new()
+	mesh_mat.albedo_color = Color(0.6, 0.2, 0.8, 0.7)
+	mesh_mat.emission_enabled = true
+	mesh_mat.emission = Color(0.5, 0.1, 0.7)
+	mesh_mat.emission_energy_multiplier = 2.0
+	mesh_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	draw_pass.material = mesh_mat
+
+	# Attach to target so it follows
+	target.add_child(particles)
+	particles.position = Vector3(0, 1.0, 0)
+
+	# Stop and cleanup after 3 seconds
+	get_tree().create_timer(3.0).timeout.connect(func():
+		if is_instance_valid(particles):
+			particles.emitting = false
+			get_tree().create_timer(2.0).timeout.connect(func():
+				if is_instance_valid(particles):
+					particles.queue_free()
+			)
+	)
+
+## Generic debuff burst effect
+func _spawn_generic_debuff_burst(pos: Vector3) -> void:
+	var particles := GPUParticles3D.new()
+	particles.emitting = true
+	particles.one_shot = true
+	particles.explosiveness = 1.0
+	particles.amount = 15
+	particles.lifetime = 0.6
+
+	var mat := ParticleProcessMaterial.new()
+	mat.direction = Vector3(0, 0, 0)
+	mat.spread = 180.0
+	mat.initial_velocity_min = 2.0
+	mat.initial_velocity_max = 4.0
+	mat.gravity = Vector3(0, -2.0, 0)
+
+	mat.color = Color(0.8, 0.2, 0.2, 0.9)
+	mat.scale_min = 0.1
+	mat.scale_max = 0.2
+
+	particles.process_material = mat
+
+	var draw_pass := SphereMesh.new()
+	draw_pass.radius = 0.08
+	draw_pass.height = 0.16
+	particles.draw_pass_1 = draw_pass
+
+	get_tree().current_scene.add_child(particles)
+	particles.global_position = pos
+
+	get_tree().create_timer(1.0).timeout.connect(particles.queue_free)
+
 ## Equip spell to quick slot
 func equip_spell(spell: SpellData, slot: int) -> void:
 	if slot >= 0 and slot < 4:
@@ -575,16 +1063,24 @@ func equip_spell(spell: SpellData, slot: int) -> void:
 
 ## Learn a new spell
 func learn_spell(spell: SpellData) -> bool:
+	print("[SpellCaster] learn_spell called for: %s (id=%s)" % [spell.display_name if spell else "null", spell.id if spell else ""])
 	if spell in known_spells:
+		print("[SpellCaster] Spell already known!")
 		return false
 	known_spells.append(spell)
+	print("[SpellCaster] Spell learned! Now know %d spells." % known_spells.size())
 	return true
 
 ## Learn spell by ID
 func learn_spell_by_id(spell_id: String) -> bool:
+	print("[SpellCaster] learn_spell_by_id called for: %s" % spell_id)
+	print("[SpellCaster] Spell database has %d spells: %s" % [spell_database.size(), spell_database.keys()])
 	if not spell_database.has(spell_id):
+		print("[SpellCaster] ERROR: Spell '%s' not found in database!" % spell_id)
 		return false
-	return learn_spell(spell_database[spell_id])
+	var result := learn_spell(spell_database[spell_id])
+	print("[SpellCaster] learn_spell result: %s, total known spells: %d" % [result, known_spells.size()])
+	return result
 
 ## Cast equipped spell by slot
 func cast_equipped_spell(slot: int, target: Node = null) -> bool:

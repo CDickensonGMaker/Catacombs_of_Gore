@@ -52,6 +52,9 @@ var lock_on_target: Node3D = null  # Current lock-on target for combat
 var current_interactable: Node = null  # Currently highlighted interactable
 var mana_regen_accumulator: float = 0.0  # Accumulates fractional mana regen
 
+## Buff VFX manager for visual effects on conditions
+var buff_vfx_manager: BuffVFXManager = null
+
 func _ready() -> void:
 	# Add to player group
 	add_to_group("player")
@@ -64,6 +67,12 @@ func _ready() -> void:
 		hurtbox.set_owner_entity(self)
 		if DEBUG:
 			print("[Player] Hurtbox set up with owner_entity")
+
+	# Create and attach buff VFX manager
+	buff_vfx_manager = BuffVFXManager.new()
+	buff_vfx_manager.name = "BuffVFXManager"
+	buff_vfx_manager.owner_entity = self
+	add_child(buff_vfx_manager)
 
 func _unhandled_input(event: InputEvent) -> void:
 	# Don't process input if in menu or dialogue
@@ -192,6 +201,18 @@ func _physics_process(delta: float) -> void:
 	if is_overencumbered:
 		speed *= 0.5
 
+	# --- Apply HASTED condition bonus (+50% speed) ---
+	if GameManager.player_data and GameManager.player_data.has_condition(Enums.Condition.HASTED):
+		speed *= 1.5
+
+	# --- Apply SLOWED condition penalty (-50% speed) ---
+	if GameManager.player_data and GameManager.player_data.has_condition(Enums.Condition.SLOWED):
+		speed *= 0.5
+
+	# --- Apply FROZEN condition penalty (-75% speed, worse than slowed) ---
+	if GameManager.player_data and GameManager.player_data.has_condition(Enums.Condition.FROZEN):
+		speed *= 0.25
+
 	# --- Horizontal velocity with acceleration ---
 	var target_vel := desired_dir * speed
 	velocity.x = move_toward(velocity.x, target_vel.x, acceleration * delta)
@@ -213,6 +234,9 @@ func _physics_process(delta: float) -> void:
 
 	# --- Mana regeneration ---
 	_regenerate_mana(delta)
+
+	# --- Update conditions and apply DOT damage ---
+	_update_conditions(delta)
 
 	# --- Smoothly rotate ONLY the visuals (Model) toward movement direction ---
 	if desired_dir.length() > 0.001:
@@ -418,9 +442,10 @@ func _do_ranged_attack(weapon: WeaponData) -> void:
 	# Play fire sound event
 	AudioManager.play_sfx_3d("projectile_fire", spawn_pos)
 
-	# Screen shake for musket
+	# Heavy recoil for musket - screen shake, knockback, and weapon kick
 	if weapon.weapon_type == Enums.WeaponType.MUSKET:
-		_apply_screen_shake(0.3, 0.15)
+		_apply_screen_shake(0.5, 0.25)
+		_apply_musket_recoil(direction)
 
 	# Degrade weapon with each attack
 	InventoryManager.degrade_weapon(1)
@@ -463,6 +488,35 @@ func _apply_screen_shake(intensity: float, duration: float) -> void:
 			tween.tween_property(camera_pivot, "position", original_pos + offset, 0.02)
 			shake_time += 0.02
 		tween.tween_property(camera_pivot, "position", original_pos, 0.02)
+
+
+## Apply heavy musket recoil - knockback and camera kick
+func _apply_musket_recoil(fire_direction: Vector3) -> void:
+	# Knockback - push player backward
+	var knockback_direction := -fire_direction
+	knockback_direction.y = 0.0
+	knockback_direction = knockback_direction.normalized()
+	velocity += knockback_direction * 8.0  # Strong backward push
+
+	# Camera kick - pitch up sharply then recover
+	if camera_pivot:
+		var original_rotation := camera_pivot.rotation_degrees.x
+		var kick_tween := create_tween()
+		kick_tween.set_ease(Tween.EASE_OUT)
+		kick_tween.set_trans(Tween.TRANS_EXPO)
+		# Kick up sharply
+		kick_tween.tween_property(camera_pivot, "rotation_degrees:x", original_rotation - 12.0, 0.08)
+		# Recover slowly
+		kick_tween.set_ease(Tween.EASE_IN_OUT)
+		kick_tween.set_trans(Tween.TRANS_QUAD)
+		kick_tween.tween_property(camera_pivot, "rotation_degrees:x", original_rotation, 0.35)
+
+	# FPS arms recoil - kick the weapon model back
+	if camera_pivot and camera_pivot.has_method("get_fps_arms"):
+		var fps_arms: FirstPersonArms = camera_pivot.get_fps_arms()
+		if fps_arms and fps_arms.has_method("apply_recoil"):
+			fps_arms.apply_recoil(0.15, 0.4)
+
 
 ## Show out of ammo feedback message
 func _show_out_of_ammo_message(ammo_type: String) -> void:
@@ -666,6 +720,22 @@ func _show_cast_feedback(message: String) -> void:
 	var hud := get_tree().get_first_node_in_group("hud")
 	if hud and hud.has_method("show_notification"):
 		hud.show_notification(message)
+
+## Update conditions and apply DOT damage
+func _update_conditions(delta: float) -> void:
+	if not GameManager.player_data:
+		return
+
+	# Update conditions and get any DOT damage to apply
+	var dot_damage: Dictionary = GameManager.player_data.update_conditions(delta)
+
+	# Apply DOT damage
+	for damage_type in dot_damage:
+		var amount: int = dot_damage[damage_type]
+		if amount > 0:
+			take_damage(amount, damage_type, null)
+			if DEBUG:
+				print("[Player] DOT damage: ", amount, " type: ", damage_type)
 
 ## Regenerate mana over time
 func _regenerate_mana(delta: float) -> void:

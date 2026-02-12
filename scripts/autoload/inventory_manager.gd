@@ -39,7 +39,7 @@ var hotbar: Array[Dictionary] = []
 var equipped_spell: SpellData = null
 
 ## Gold
-var gold: int = 10000  # Starting gold
+var gold: int = 300  # Starting gold
 
 ## Item database references (loaded from resources)
 var weapon_database: Dictionary = {}
@@ -101,13 +101,23 @@ func _load_item_databases() -> void:
 	var item_files := [
 		"health_potion", "stamina_potion", "mana_potion", "antidote",
 		"arrows", "bolts", "lead_balls",
+		# Original scrolls
 		"scroll_magic_missile", "scroll_lightning_bolt",
 		"scroll_healing_light", "scroll_soul_drain",
+		# New scrolls
+		"scroll_armor", "scroll_blind", "scroll_dispel_magic",
+		"scroll_fireball", "scroll_haste", "scroll_slow",
+		"scroll_ice_storm", "scroll_fire_gate",
+		"scroll_cone_of_cold", "scroll_iron_guard", "scroll_chain_lightning",
+		# Quest items
 		"corrupted_totem_shard", "goblin_war_horn", "bandit_bounty_note",
+		# Materials
 		"iron_ore", "iron_ingot", "gold_ore", "stone_block",
 		"steel_ingot", "coal", "leather", "leather_strip",
 		"wood_plank", "red_herb", "empty_vial",
+		# Food and consumables
 		"bread", "cheese", "cooked_meat", "ale",
+		# Tools
 		"lockpick", "repair_kit", "bedroll"
 	]
 	for item_id in item_files:
@@ -121,7 +131,11 @@ func _load_item_databases() -> void:
 
 	# Load spells - explicitly list known spell files
 	var spell_files := [
-		"magic_missile", "lightning_bolt", "healing_light", "soul_drain"
+		# Original spells
+		"magic_missile", "lightning_bolt", "healing_light", "soul_drain",
+		# New spells
+		"armor", "blind", "dispel_magic", "fireball", "haste", "slow",
+		"ice_storm", "fire_gate", "cone_of_cold", "iron_guard", "chain_lightning"
 	]
 	for spell_id in spell_files:
 		var path := "res://data/spells/%s.tres" % spell_id
@@ -429,13 +443,18 @@ func use_item(inventory_index: int) -> bool:
 
 ## Use a spell scroll to learn the spell
 func _use_scroll(item: ItemData) -> bool:
+	print("[InventoryManager] _use_scroll called for: %s" % item.id)
+
 	if item.teaches_spell_id.is_empty():
 		push_warning("Scroll has no teaches_spell_id: " + item.id)
 		return false
 
+	print("[InventoryManager] Scroll teaches spell: %s" % item.teaches_spell_id)
+
 	# Get player's SpellCaster component
 	var player := GameManager.get_tree().get_first_node_in_group("player")
 	if not player:
+		print("[InventoryManager] ERROR: No player found!")
 		return false
 
 	var spell_caster: SpellCaster = player.get_node_or_null("SpellCaster")
@@ -448,29 +467,49 @@ func _use_scroll(item: ItemData) -> bool:
 
 	if not spell_caster:
 		push_warning("Player has no SpellCaster component")
+		print("[InventoryManager] ERROR: No SpellCaster component found on player!")
 		return false
+
+	print("[InventoryManager] Found SpellCaster at path: %s, current known spells: %d" % [spell_caster.get_path(), spell_caster.known_spells.size()])
 
 	# Check if already knows the spell
 	for known in spell_caster.known_spells:
 		if known and known.id == item.teaches_spell_id:
 			push_warning("Player already knows spell: " + item.teaches_spell_id)
+			# Show notification that spell is already known
+			var hud = GameManager.get_tree().get_first_node_in_group("hud")
+			if hud and hud.has_method("show_notification"):
+				hud.show_notification("You already know this spell!")
 			return false
 
-	# Check arcana_lore requirement (using literacy_dc as skill check)
-	var player_data := GameManager.player_data
-	if player_data:
-		var arcana_lore: int = player_data.get_skill(Enums.Skill.ARCANA_LORE)
-		# Simple check: arcana_lore must be >= literacy_dc / 5 (scaled down)
-		@warning_ignore("integer_division")
-		var required_skill := item.literacy_dc / 5
-		if arcana_lore < required_skill:
-			push_warning("Insufficient Arcana Lore to read scroll. Need: %d, Have: %d" % [required_skill, arcana_lore])
-			return false
+	# REMOVED: Arcana Lore skill check - scrolls can now be read without skill requirements
+	# var player_data := GameManager.player_data
+	# if player_data:
+	# 	var arcana_lore: int = player_data.get_skill(Enums.Skill.ARCANA_LORE)
+	# 	# Simple check: arcana_lore must be >= literacy_dc / 5 (scaled down)
+	# 	@warning_ignore("integer_division")
+	# 	var required_skill := item.literacy_dc / 5
+	# 	if arcana_lore < required_skill:
+	# 		push_warning("Insufficient Arcana Lore to read scroll. Need: %d, Have: %d" % [required_skill, arcana_lore])
+	# 		# Show notification for insufficient skill
+	# 		var hud = GameManager.get_tree().get_first_node_in_group("hud")
+	# 		if hud and hud.has_method("show_notification"):
+	# 			hud.show_notification("You lack the Arcana Lore to read this scroll!")
+	# 		return false
 
 	# Learn the spell
+	print("[InventoryManager] Attempting to learn spell: %s" % item.teaches_spell_id)
 	if spell_caster.learn_spell_by_id(item.teaches_spell_id):
+		print("[InventoryManager] SUCCESS: Spell learned!")
+		# Show notification for new spell learned
+		var hud = GameManager.get_tree().get_first_node_in_group("hud")
+		if hud and hud.has_method("show_notification"):
+			var spell: SpellData = spell_database.get(item.teaches_spell_id)
+			var spell_name: String = spell.display_name if spell else item.teaches_spell_id
+			hud.show_notification("NEW SPELL LEARNED: " + spell_name)
 		return true
 
+	print("[InventoryManager] FAILED: learn_spell_by_id returned false")
 	return false
 
 ## Apply consumable effect
@@ -761,6 +800,33 @@ func _cast_equipped_spell() -> bool:
 ## Get currently equipped spell
 func get_equipped_spell() -> SpellData:
 	return equipped_spell
+
+## Set equipped spell by ID without checking known_spells (for save/load restoration)
+## Use equip_spell() for normal gameplay which validates the player knows the spell
+func set_equipped_spell_by_id(spell_id: String) -> bool:
+	if spell_id.is_empty():
+		equipped_spell = null
+		return true
+
+	var spell: SpellData = null
+
+	# Try to find in spell database
+	if spell_database.has(spell_id):
+		spell = spell_database[spell_id]
+	else:
+		# Try to load directly
+		var spell_path := "res://data/spells/%s.tres" % spell_id
+		if ResourceLoader.exists(spell_path):
+			spell = load(spell_path) as SpellData
+
+	if not spell:
+		push_warning("set_equipped_spell_by_id: Spell not found: " + spell_id)
+		return false
+
+	var old_spell := equipped_spell
+	equipped_spell = spell
+	equipped_spell_changed.emit(old_spell, equipped_spell)
+	return true
 
 ## Get hotbar slot data
 func get_hotbar_slot(slot_index: int) -> Dictionary:
@@ -1173,10 +1239,10 @@ func from_dict(data: Dictionary) -> void:
 		if hotbar_data[i] is Dictionary:
 			hotbar[i] = hotbar_data[i].duplicate()
 
-	# Load equipped spell
+	# Load equipped spell (use set_equipped_spell_by_id to bypass known_spells check during restoration)
 	var spell_id: String = data.get("equipped_spell_id", "")
 	if not spell_id.is_empty():
-		equip_spell(spell_id)
+		set_equipped_spell_by_id(spell_id)
 
 # ============================================================================
 # DURABILITY AND DEGRADATION SYSTEM
@@ -1526,7 +1592,7 @@ func reset_for_new_game() -> void:
 		equipment[slot] = {}
 
 	# Reset gold to starting amount
-	gold = 10000
+	gold = 300
 
 	# Clear quick slots
 	quick_slots = ["", "", "", ""]

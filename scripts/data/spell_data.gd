@@ -62,6 +62,16 @@ extends Resource
 @export var lifesteal_percent: float = 0.0  # For Soul Drain etc.
 @export var manasteal_percent: float = 0.0  # Restore mana based on damage dealt
 
+@export_group("Hazard Zone (Fire Gate, Ice Storm)")
+## If true, creates a persistent ground hazard zone instead of instant AOE
+@export var creates_hazard_zone: bool = false
+## Duration of the hazard zone in seconds (default 60s = 1 minute)
+@export var hazard_duration: float = 60.0
+## Time between damage ticks
+@export var hazard_tick_interval: float = 1.0
+## Damage per tick: [num_dice, die_size, flat_bonus]
+@export var hazard_tick_damage: Array[int] = [2, 6, 0]
+
 @export_group("Requirements")
 @export var required_knowledge: int = 0
 @export var required_will: int = 0

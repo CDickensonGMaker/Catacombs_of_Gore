@@ -1458,9 +1458,11 @@ func _build_magic_panel() -> Control:
 	return scroll
 
 func _refresh_magic() -> void:
+	print("[GameMenu] _refresh_magic called")
 	var panel = tab_panels[MenuTab.MAGIC]
 	var vbox = panel.find_child("MagicContent", true, false)
 	if not vbox:
+		print("[GameMenu] ERROR: MagicContent vbox not found!")
 		return
 
 	_clear_children_immediate(vbox)
@@ -1479,12 +1481,17 @@ func _refresh_magic() -> void:
 
 	# Get player's SpellCaster to show known spells
 	var spell_caster: SpellCaster = _get_player_spell_caster()
+	print("[GameMenu] SpellCaster found: %s" % (spell_caster != null))
+	if spell_caster:
+		print("[GameMenu] SpellCaster.known_spells.size() = %d" % spell_caster.known_spells.size())
 
 	if spell_caster and spell_caster.known_spells.size() > 0:
+		print("[GameMenu] Creating spell list with %d spells" % spell_caster.known_spells.size())
 		# Use ItemList for better mouse tracking
 		var spell_list := ItemList.new()
 		spell_list.name = "SpellList"
 		spell_list.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		spell_list.custom_minimum_size.y = 350  # More room for spell list
 		spell_list.mouse_exited.connect(_on_spell_list_mouse_exited)
 		spell_list.gui_input.connect(_on_spell_list_gui_input)
 		_style_item_list(spell_list)
@@ -1492,34 +1499,45 @@ func _refresh_magic() -> void:
 		spell_list_ref = spell_list
 
 		for spell in spell_caster.known_spells:
+			print("[GameMenu] Processing spell: %s (is null: %s)" % [spell, spell == null])
 			if spell:
 				# Display: "Spell Name [X slots]"
 				var spell_text := "%s [%s]" % [spell.display_name, spell.get_cost_string()]
+				print("[GameMenu] Adding spell to list: %s" % spell_text)
 				spell_list.add_item(spell_text)
+			else:
+				print("[GameMenu] WARNING: Null spell in known_spells!")
+		print("[GameMenu] Spell list now has %d items" % spell_list.item_count)
 	else:
+		print("[GameMenu] No spells known, showing empty message")
 		vbox.add_child(_make_label("No spells known yet.", COL_DIM))
 		vbox.add_child(_make_label("Learn spells from scrolls or trainers.", COL_DIM))
 
-	vbox.add_child(HSeparator.new())
-	vbox.add_child(_make_label("EQUIPPED SPELL", COL_GOLD))
-
-	# Show currently equipped spell
+	# Show equipped spell in compact format (saves vertical space)
 	var equipped_spell := InventoryManager.get_equipped_spell()
-	if equipped_spell:
-		vbox.add_child(_make_label(equipped_spell.display_name, COL_TEXT))
-	else:
-		vbox.add_child(_make_label("None equipped", COL_DIM))
+	var equipped_text: String = "Equipped: " + (equipped_spell.display_name if equipped_spell else "None")
+	var equipped_color: Color = COL_GOLD if equipped_spell else COL_DIM
+	vbox.add_child(_make_label(equipped_text, equipped_color))
 
 func _get_player_spell_caster() -> SpellCaster:
 	var player := get_tree().get_first_node_in_group("player")
 	if not player:
+		print("[GameMenu] _get_player_spell_caster: No player in group!")
 		return null
+
+	print("[GameMenu] _get_player_spell_caster: Found player: %s" % player.name)
 
 	var spell_caster: SpellCaster = player.get_node_or_null("SpellCaster")
 	if not spell_caster:
+		print("[GameMenu] SpellCaster not direct child, searching all children...")
 		for child in player.get_children():
+			print("[GameMenu]   Child: %s (%s)" % [child.name, child.get_class()])
 			if child is SpellCaster:
+				print("[GameMenu]   Found SpellCaster as child!")
 				return child
+		print("[GameMenu] No SpellCaster found in any child!")
+	else:
+		print("[GameMenu] Found SpellCaster at path: %s, known_spells=%d" % [spell_caster.get_path(), spell_caster.known_spells.size()])
 	return spell_caster
 
 func _on_spell_list_mouse_exited() -> void:

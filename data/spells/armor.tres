@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="SpellData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "armor"
+display_name = "Armor"
+description = "Wraps the caster in magical protection, reducing all incoming damage by 25% for 60 seconds."
+school = 4
+spell_level = 1
+target_type = 0
+slot_cost = 1
+stamina_cost = 0.0
+cast_time = 0.5
+cooldown = 0.0
+range_distance = 0.0
+aoe_radius = 0.0
+cone_angle = 45.0
+beam_width = 0.5
+base_effect = Array[int]([0, 0, 0])
+damage_type = 0
+is_healing = false
+scales_with_knowledge = false
+inflicts_condition = 9
+condition_chance = 1.0
+condition_duration = 60.0
+projectile_speed = 25.0
+is_homing = false
+homing_strength = 5.0
+piercing = false
+chain_targets = 0
+chain_range = 5.0
+summon_scene_path = ""
+summon_duration = 60.0
+summon_leash_range = 6.0
+max_summons = 1
+dot_damage = Array[int]([0, 0, 0])
+dot_interval = 1.0
+dot_duration = 0.0
+lifesteal_percent = 0.0
+required_knowledge = 1
+required_will = 2
+required_arcana_lore = 0
+cast_animation = "cast"
+projectile_scene_path = ""
+impact_effect_path = ""
+cast_sound = ""
+impact_sound = ""
+icon_path = ""

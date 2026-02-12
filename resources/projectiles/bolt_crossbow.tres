@@ -1,0 +1,55 @@
+[gd_resource type="Resource" script_class="ProjectileData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/projectile_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "bolt_crossbow"
+display_name = "Crossbow Bolt"
+speed = 35.0
+acceleration = 0.0
+max_speed = 60.0
+min_speed = 10.0
+gravity_scale = 0.05
+lifetime = 5.0
+is_homing = false
+homing_strength = 5.0
+homing_acquire_range = 30.0
+homing_delay = 0.0
+base_damage = Array[int]([2, 6, 2])
+damage_type = 0
+can_crit = true
+crit_multiplier = 2.5
+inflicts_condition = 0
+condition_chance = 0.0
+condition_duration = 5.0
+stagger_power = 0.6
+knockback_force = 5.0
+is_piercing = true
+max_pierces = 1
+pierce_damage_falloff = 0.4
+chain_targets = 0
+chain_range = 5.0
+chain_damage_falloff = 0.3
+aoe_radius = 0.0
+aoe_damage_falloff = true
+collision_radius = 0.12
+hits_enemies = true
+hits_players = false
+hits_world = true
+mesh_path = "res://scenes/effects/projectile_bolt.tscn"
+material_path = ""
+scale = Vector3(1.0, 1.0, 1.0)
+rotation_speed = 0.0
+has_trail = false
+trail_color = Color(0.4, 0.35, 0.3, 1)
+trail_length = 0.6
+trail_width = 0.03
+trail_lifetime = 0.2
+impact_effect_path = ""
+impact_scale = 1.0
+muzzle_effect_path = ""
+muzzle_effect_scale = 1.0
+fire_sound = ""
+travel_sound = ""
+impact_sound = ""

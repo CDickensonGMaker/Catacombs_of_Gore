@@ -45,3 +45,7 @@ fps_sprite_path = "res://assets/weapons/musket/musket_fps_sheet.png"
 fps_h_frames = 4
 fps_v_frames = 4
 fps_sprite_size = Vector2(300, 300)
+fps_mesh_path = "res://assets/weapons/musket/ps1_musket_fp.obj"
+fps_mesh_scale = Vector3(2.55, 2.55, 2.55)
+fps_mesh_position = Vector3(0.419, -0.300, -0.125)
+fps_mesh_rotation = Vector3(-8.4, 90.0, 0.0)

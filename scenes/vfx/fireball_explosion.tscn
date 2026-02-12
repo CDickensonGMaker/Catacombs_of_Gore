@@ -1,0 +1,112 @@
+[gd_scene load_steps=10 format=3 uid="uid://fireball_explosion"]
+
+[sub_resource type="ParticleProcessMaterial" id="1"]
+direction = Vector3(0, 0, 0)
+spread = 180.0
+initial_velocity_min = 8.0
+initial_velocity_max = 15.0
+gravity = Vector3(0, -2, 0)
+damping_min = 2.0
+damping_max = 4.0
+scale_min = 0.3
+scale_max = 0.8
+color = Color(1, 0.5, 0.15, 0.9)
+
+[sub_resource type="StandardMaterial3D" id="2"]
+albedo_color = Color(1, 0.6, 0.2, 0.9)
+emission_enabled = true
+emission = Color(1, 0.4, 0.1, 1)
+emission_energy_multiplier = 6.0
+transparency = 1
+
+[sub_resource type="SphereMesh" id="3"]
+radius = 0.2
+height = 0.4
+material = SubResource("2")
+
+[sub_resource type="ParticleProcessMaterial" id="4"]
+direction = Vector3(0, 1, 0)
+spread = 45.0
+initial_velocity_min = 3.0
+initial_velocity_max = 6.0
+gravity = Vector3(0, 1, 0)
+damping_min = 1.0
+damping_max = 2.0
+scale_min = 0.4
+scale_max = 1.0
+color = Color(0.3, 0.3, 0.3, 0.6)
+
+[sub_resource type="StandardMaterial3D" id="5"]
+albedo_color = Color(0.4, 0.4, 0.4, 0.5)
+transparency = 1
+
+[sub_resource type="SphereMesh" id="6"]
+radius = 0.3
+height = 0.6
+material = SubResource("5")
+
+[sub_resource type="StandardMaterial3D" id="7"]
+albedo_color = Color(1, 0.7, 0.3, 0.8)
+emission_enabled = true
+emission = Color(1, 0.5, 0.15, 1)
+emission_energy_multiplier = 8.0
+transparency = 1
+shading_mode = 0
+
+[sub_resource type="SphereMesh" id="8"]
+radius = 1.0
+height = 2.0
+material = SubResource("7")
+
+[sub_resource type="GDScript" id="9"]
+script/source = "extends Node3D
+
+func _ready() -> void:
+	# Auto-cleanup after 3 seconds
+	var timer := get_tree().create_timer(3.0)
+	timer.timeout.connect(queue_free)
+
+	# Animate the flash sphere - expand and fade
+	var flash := $FlashSphere
+	var mat: StandardMaterial3D = flash.mesh.material
+
+	var tween := create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(flash, \"scale\", Vector3(4.0, 4.0, 4.0), 0.3)
+	tween.tween_property(mat, \"albedo_color:a\", 0.0, 0.3)
+	tween.tween_property($OmniLight3D, \"light_energy\", 0.0, 0.5)
+
+	# Play explosion sound
+	AudioManager.play_sfx_3d(\"projectile_hit\", global_position)
+"
+
+[node name="FireballExplosion" type="Node3D"]
+script = SubResource("9")
+
+[node name="FireBurst" type="GPUParticles3D" parent="."]
+emitting = true
+amount = 60
+one_shot = true
+explosiveness = 0.95
+lifetime = 0.8
+process_material = SubResource("1")
+draw_pass_1 = SubResource("3")
+
+[node name="Smoke" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+emitting = true
+amount = 30
+one_shot = true
+explosiveness = 0.7
+lifetime = 1.5
+process_material = SubResource("4")
+draw_pass_1 = SubResource("6")
+
+[node name="FlashSphere" type="MeshInstance3D" parent="."]
+mesh = SubResource("8")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+light_color = Color(1, 0.5, 0.15, 1)
+light_energy = 10.0
+omni_range = 12.0
+omni_attenuation = 1.0

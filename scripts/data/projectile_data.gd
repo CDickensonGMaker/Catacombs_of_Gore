@@ -68,6 +68,10 @@ extends Resource
 @export var impact_effect_path: String = ""
 @export var impact_scale: float = 1.0
 
+@export_group("Muzzle Effect")
+@export var muzzle_effect_path: String = ""  ## Particle effect at spawn point (smoke, flash)
+@export var muzzle_effect_scale: float = 1.0
+
 @export_group("Audio")
 @export var fire_sound: String = ""
 @export var travel_sound: String = ""  ## Looping sound while in flight

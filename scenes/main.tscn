@@ -44,12 +44,9 @@ func _dev_quick_start() -> void:
 		var stat: String = stats[randi() % stats.size()]
 		char_data.set(stat, char_data.get(stat) + 1)
 
-	# Finalize
-	char_data.recalculate_derived_stats()
-	char_data.current_hp = char_data.max_hp
-	char_data.current_stamina = char_data.max_stamina
-	char_data.current_mana = char_data.max_mana
+	# Set as active character and apply dev stats
 	GameManager.player_data = char_data
+	GameManager.apply_dev_stats(char_data)
 
 	# Starting gear
 	InventoryManager.add_item(\"iron_sword\", 1)
@@ -60,7 +57,7 @@ func _dev_quick_start() -> void:
 	print(\"[DEV] Quick start: %s the %s\" % [char_data.character_name, Enums.Race.keys()[char_data.race]])
 
 	# Load game
-	get_tree().change_scene_to_file(\"res://scenes/levels/elder_moor.tscn\")
+	get_tree().change_scene_to_file(\"res://scenes/levels/dalhurst.tscn\")
 "
 
 [node name="Main" type="Node"]

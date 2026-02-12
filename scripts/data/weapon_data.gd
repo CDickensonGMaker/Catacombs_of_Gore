@@ -68,6 +68,16 @@ extends Resource
 ## Size of the weapon in first-person view (pixels)
 @export var fps_sprite_size: Vector2 = Vector2(256, 256)
 
+@export_group("First Person 3D Mesh")
+## Path to a 3D mesh for first-person view (overrides sprite if set)
+@export var fps_mesh_path: String = ""
+## Scale of the 3D mesh in first-person view
+@export var fps_mesh_scale: Vector3 = Vector3(1.0, 1.0, 1.0)
+## Position offset of the 3D mesh (local to camera)
+@export var fps_mesh_position: Vector3 = Vector3(0.4, -0.3, -0.5)
+## Rotation offset of the 3D mesh in degrees
+@export var fps_mesh_rotation: Vector3 = Vector3(0.0, 0.0, 0.0)
+
 ## Roll damage using the dice notation
 func roll_damage(quality: Enums.ItemQuality = Enums.ItemQuality.AVERAGE) -> int:
 	var total := 0

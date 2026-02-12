@@ -103,11 +103,20 @@ func apply_melee_damage(
 		total_damage = int(total_damage * weapon.crit_multiplier)
 		critical_hit.emit(attacker, target)
 
+	# Check if attacker is BLINDED (-50% accuracy)
+	if _has_condition(attacker, Enums.Condition.BLINDED):
+		if randf() < 0.5:  # 50% chance to miss
+			return 0  # Attack missed
+
 	# Apply armor reduction
 	var target_av: int = _get_target_armor(target)
 	var armor_pierce: float = weapon.armor_pierce
 	var effective_av: float = target_av * (1.0 - armor_pierce)
 	total_damage = _reduce_by_armor(total_damage, effective_av)
+
+	# Apply ARMORED condition damage reduction (25% reduction)
+	if _has_condition(target, Enums.Condition.ARMORED):
+		total_damage = int(total_damage * 0.75)
 
 	# Apply damage type resistance/weakness
 	total_damage = _apply_damage_type_modifier(total_damage, weapon.damage_type, target)
@@ -200,9 +209,18 @@ func apply_ranged_damage(
 		total_damage = int(total_damage * weapon.crit_multiplier)
 		critical_hit.emit(attacker, target)
 
+	# Check if attacker is BLINDED (-50% accuracy)
+	if _has_condition(attacker, Enums.Condition.BLINDED):
+		if randf() < 0.5:  # 50% chance to miss
+			return 0  # Attack missed
+
 	# Armor reduction
 	var target_av: int = _get_target_armor(target)
 	total_damage = _reduce_by_armor(total_damage, target_av * (1.0 - weapon.armor_pierce))
+
+	# Apply ARMORED condition damage reduction (25% reduction)
+	if _has_condition(target, Enums.Condition.ARMORED):
+		total_damage = int(total_damage * 0.75)
 
 	# Damage type
 	total_damage = _apply_damage_type_modifier(total_damage, weapon.damage_type, target)
@@ -267,6 +285,10 @@ func apply_spell_damage(
 		if target_data:
 			magic_resist = target_data.get_magic_resistance()
 	total_damage = int(total_damage * (1.0 - magic_resist))
+
+	# Apply ARMORED condition damage reduction (25% reduction)
+	if _has_condition(target, Enums.Condition.ARMORED):
+		total_damage = int(total_damage * 0.75)
 
 	total_damage = max(1, total_damage)
 
@@ -647,3 +669,15 @@ func get_projectile_stats() -> Dictionary:
 func clear_all_projectiles() -> void:
 	if projectile_pool:
 		projectile_pool.clear_all()
+
+## Check if entity has a specific condition active
+func _has_condition(entity: Node, condition: Enums.Condition) -> bool:
+	if not is_instance_valid(entity):
+		return false
+	if entity.has_method("has_condition"):
+		return entity.has_condition(condition)
+	if entity.has_method("get_character_data"):
+		var char_data: CharacterData = entity.get_character_data()
+		if char_data and char_data.has_method("has_condition"):
+			return char_data.has_condition(condition)
+	return false

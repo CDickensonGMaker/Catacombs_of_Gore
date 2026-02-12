@@ -214,10 +214,15 @@ func is_first_person() -> bool:
 func is_third_person() -> bool:
 	return current_mode == CameraMode.THIRD_PERSON
 
-## Trigger attack animation on first-person arms
+## Trigger attack animation on first-person arms or third-person weapon
 func play_attack_animation() -> void:
-	if _fps_arms and is_first_person():
-		_fps_arms.play_attack()
+	if is_first_person():
+		if _fps_arms:
+			_fps_arms.play_attack()
+	else:
+		# Third-person mode - animate the weapon swing
+		if _tp_weapon and _tp_weapon.has_method("play_attack_swing"):
+			_tp_weapon.play_attack_swing()
 
 ## Trigger spell cast animation on first-person arms
 func play_cast_animation(spell: SpellData = null) -> void:

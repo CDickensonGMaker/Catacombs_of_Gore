@@ -3,12 +3,26 @@
 extends Node3D
 class_name ThirdPersonWeapon
 
-## Currently displayed weapon mesh instance
-var weapon_mesh_instance: MeshInstance3D = null
+## Signal emitted when attack animation finishes
+signal attack_finished
+
+## Currently displayed weapon - can be MeshInstance3D or scene root Node3D
+var weapon_mesh_instance: Node3D = null
+var weapon_scene_root: Node3D = null  # The root node to animate and free
 var current_weapon_id: String = ""
 
 ## Material for weapons (simple shaded look)
 var weapon_material: StandardMaterial3D
+
+## Animation state
+enum AnimState { IDLE, ATTACKING }
+var anim_state: AnimState = AnimState.IDLE
+var anim_timer: float = 0.0
+var attack_duration: float = 0.4  # Total swing time
+
+## Store base transform for animation
+var base_rotation: Vector3 = Vector3.ZERO
+var base_position: Vector3 = Vector3.ZERO
 
 
 func _ready() -> void:
@@ -63,7 +77,21 @@ func update_weapon_display() -> void:
 		print("[TPWeapon] Failed to load mesh: %s" % weapon.mesh_path)
 		return
 
-	# Create mesh instance
+	# Handle different resource types
+	if mesh_resource is PackedScene:
+		# GLB/GLTF files load as PackedScene
+		var scene_instance: Node3D = mesh_resource.instantiate()
+		if scene_instance:
+			scene_instance.name = "WeaponMesh"
+			_apply_weapon_transform_node(weapon, scene_instance)
+			add_child(scene_instance)
+			# Store scene root for cleanup and animation
+			weapon_scene_root = scene_instance
+			weapon_mesh_instance = scene_instance  # Animate the root
+			print("[TPWeapon] Displayed weapon (GLB): %s" % weapon.display_name)
+		return
+
+	# Create mesh instance for direct Mesh resources
 	weapon_mesh_instance = MeshInstance3D.new()
 	weapon_mesh_instance.name = "WeaponMesh"
 
@@ -90,30 +118,76 @@ func update_weapon_display() -> void:
 func _apply_weapon_transform(weapon: WeaponData) -> void:
 	if not weapon_mesh_instance:
 		return
+	_apply_weapon_transform_node(weapon, weapon_mesh_instance)
+
+
+## Apply transform to any Node3D (for GLB scenes)
+func _apply_weapon_transform_node(weapon: WeaponData, node: Node3D) -> void:
+	if not node:
+		return
 
 	# Default transform - weapon held at side, pointing forward
 	# Adjust rotation so weapon barrel/blade points forward (-Z)
 
+	# NOTE: All Y rotations have +180 added because models face backward in editor
+	# When using viewmodel editor, subtract 180 from Y to get the value to paste here
 	match weapon.weapon_type:
-		Enums.WeaponType.MUSKET, Enums.WeaponType.CROSSBOW, Enums.WeaponType.BOW:
-			# Ranged weapons - held across body, barrel forward
-			weapon_mesh_instance.rotation_degrees = Vector3(0, 90, -10)
-			weapon_mesh_instance.position = Vector3(0.1, 0, -0.2)
-			weapon_mesh_instance.scale = Vector3(1.5, 1.5, 1.5)
-		Enums.WeaponType.SWORD, Enums.WeaponType.DAGGER:
-			# Swords - blade pointing down when idle
-			weapon_mesh_instance.rotation_degrees = Vector3(90, 0, 0)
-			weapon_mesh_instance.position = Vector3(0, 0, 0)
-			weapon_mesh_instance.scale = Vector3(1.2, 1.2, 1.2)
+		Enums.WeaponType.MUSKET:
+			# Musket (tuned in viewmodel editor, +180 Y flip)
+			node.rotation_degrees = Vector3(-1.9, 281.3, 1.3)
+			node.position = Vector3(-0.025, 0.510, -0.283)
+			node.scale = Vector3(1.50, 1.50, 1.50)
+		Enums.WeaponType.BOW:
+			# Bow (tuned in viewmodel editor, +180 Y flip)
+			node.rotation_degrees = Vector3(-18.8, 75.9, 13.4)
+			node.position = Vector3(-0.713, 0.240, -0.054)
+			node.scale = Vector3(1.50, 1.50, 1.50)
+		Enums.WeaponType.CROSSBOW:
+			# Crossbow (tuned in viewmodel editor, +180 Y flip)
+			node.rotation_degrees = Vector3(0.0, 368.4, -10.0)
+			node.position = Vector3(-0.046, 0.542, 0.081)
+			node.scale = Vector3(1.50, 1.50, 1.50)
+		Enums.WeaponType.SWORD:
+			# Swords (tuned in viewmodel editor, +180 Y flip)
+			node.rotation_degrees = Vector3(8.4, 81.6, 0.0)
+			node.position = Vector3(-0.271, 0.375, -0.698)
+			node.scale = Vector3(1.2, 1.2, 1.2)
+		Enums.WeaponType.DAGGER:
+			# Daggers (tuned in viewmodel editor, +180 Y flip)
+			node.rotation_degrees = Vector3(8.4, 114.4, 0.0)
+			node.position = Vector3(-0.188, 0.292, -0.427)
+			node.scale = Vector3(1.20, 1.20, 1.20)
+		Enums.WeaponType.AXE:
+			# Axes (tuned in viewmodel editor, +180 Y flip)
+			node.rotation_degrees = Vector3(0.9, 84.4, 0.0)
+			node.position = Vector3(-0.489, 0.521, -0.583)
+			node.scale = Vector3(1.20, 1.20, 1.20)
 		_:
-			# Default - weapon pointing forward
-			weapon_mesh_instance.rotation_degrees = Vector3(0, 90, 0)
-			weapon_mesh_instance.position = Vector3.ZERO
-			weapon_mesh_instance.scale = Vector3(1.5, 1.5, 1.5)
+			# Default (with +180 Y flip)
+			node.rotation_degrees = Vector3(0, 270, 0)
+			node.position = Vector3.ZERO
+			node.scale = Vector3(1.5, 1.5, 1.5)
+
+
+## Find the first MeshInstance3D in a scene tree
+func _find_mesh_instance(node: Node) -> MeshInstance3D:
+	if node is MeshInstance3D:
+		return node
+	for child in node.get_children():
+		var found: MeshInstance3D = _find_mesh_instance(child)
+		if found:
+			return found
+	return null
 
 
 func _clear_weapon() -> void:
-	if weapon_mesh_instance:
+	# Clear scene root first (for GLB scenes)
+	if weapon_scene_root:
+		weapon_scene_root.queue_free()
+		weapon_scene_root = null
+		weapon_mesh_instance = null
+	elif weapon_mesh_instance:
+		# Direct mesh instance (non-GLB)
 		weapon_mesh_instance.queue_free()
 		weapon_mesh_instance = null
 
@@ -122,3 +196,77 @@ func _clear_weapon() -> void:
 func set_weapon_visible(is_visible: bool) -> void:
 	if weapon_mesh_instance:
 		weapon_mesh_instance.visible = is_visible
+
+
+func _process(delta: float) -> void:
+	if anim_state == AnimState.ATTACKING:
+		_process_attack(delta)
+
+
+## Play third-person attack swing animation
+func play_attack_swing() -> void:
+	if not weapon_mesh_instance:
+		return
+
+	# Store the idle pose
+	base_rotation = weapon_mesh_instance.rotation_degrees
+	base_position = weapon_mesh_instance.position
+
+	anim_state = AnimState.ATTACKING
+	anim_timer = 0.0
+
+
+## Process attack swing animation
+func _process_attack(delta: float) -> void:
+	if not weapon_mesh_instance:
+		_finish_attack()
+		return
+
+	anim_timer += delta
+	var progress: float = anim_timer / attack_duration
+
+	if progress >= 1.0:
+		_finish_attack()
+		return
+
+	# Swing phases:
+	# 0.0-0.2: Wind up (raise weapon back)
+	# 0.2-0.6: Swing down/forward (main attack)
+	# 0.6-1.0: Follow through and return to idle
+
+	var swing_angle: float = 0.0
+	var forward_offset: float = 0.0
+
+	if progress < 0.2:
+		# Wind up - pull weapon back
+		var t: float = progress / 0.2
+		swing_angle = -45.0 * t  # Rotate back
+		forward_offset = 0.1 * t  # Pull back slightly
+	elif progress < 0.6:
+		# Main swing - fast forward rotation
+		var t: float = (progress - 0.2) / 0.4
+		var eased: float = 1.0 - pow(1.0 - t, 3)  # Ease out for impact
+		swing_angle = -45.0 + 135.0 * eased  # Swing from -45 to +90
+		forward_offset = 0.1 - 0.3 * eased  # Thrust forward
+	else:
+		# Return to idle
+		var t: float = (progress - 0.6) / 0.4
+		var eased: float = t * t  # Ease in
+		swing_angle = 90.0 * (1.0 - eased)  # Return from +90 to 0
+		forward_offset = -0.2 * (1.0 - eased)
+
+	# Apply animation - rotate around X axis for vertical swing
+	weapon_mesh_instance.rotation_degrees = base_rotation + Vector3(swing_angle, 0, 0)
+	weapon_mesh_instance.position = base_position + Vector3(0, 0, forward_offset)
+
+
+func _finish_attack() -> void:
+	anim_state = AnimState.IDLE
+	anim_timer = 0.0
+
+	# Reset to base pose
+	if weapon_mesh_instance:
+		weapon_mesh_instance.rotation_degrees = base_rotation
+		weapon_mesh_instance.position = base_position
+
+	attack_finished.emit()

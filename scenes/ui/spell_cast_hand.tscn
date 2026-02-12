@@ -18,7 +18,7 @@ script = ExtResource("1")
 
 [node name="HandSprite" type="Sprite2D" parent="."]
 position = Vector2(150, 175)
-scale = Vector2(3, 3)
+scale = Vector2(1.5, 1.5)
 texture = ExtResource("2")
 hframes = 5
 frame = 0

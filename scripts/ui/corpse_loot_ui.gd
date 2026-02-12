@@ -53,12 +53,11 @@ func _build_ui() -> void:
 
 	# Main panel - centered, smaller than full screen
 	var main_panel := PanelContainer.new()
-	main_panel.set_anchors_preset(Control.PRESET_CENTER)
-	main_panel.custom_minimum_size = Vector2(400, 500)
-	main_panel.offset_left = -200
-	main_panel.offset_right = 200
-	main_panel.offset_top = -250
-	main_panel.offset_bottom = 250
+	main_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
+	main_panel.offset_left = 150
+	main_panel.offset_right = -150
+	main_panel.offset_top = 100
+	main_panel.offset_bottom = -100
 
 	var main_style := StyleBoxFlat.new()
 	main_style.bg_color = COL_BG

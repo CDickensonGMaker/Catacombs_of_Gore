@@ -96,9 +96,14 @@ func _handle_hit(target: Node) -> void:
 	if target in hit_targets:
 		return
 
-	# Check if valid target
-	if not target.is_in_group("enemies") and not target.is_in_group("player"):
-		# Hit world geometry - stop
+	# Check if valid target (enemies, player, or world geometry)
+	var is_valid_combat_target: bool = target.is_in_group("enemies") or target.is_in_group("player")
+
+	if not is_valid_combat_target:
+		# Hit world geometry - trigger explosion if AOE spell, then stop
+		if spell_data and spell_data.aoe_radius > 0:
+			_apply_aoe_damage(null)
+			_spawn_impact_effect()
 		if not is_piercing:
 			_expire()
 		return
@@ -106,9 +111,13 @@ func _handle_hit(target: Node) -> void:
 	hit_targets.append(target)
 	hit_target.emit(target)
 
-	# Apply damage
+	# Apply direct damage to hit target
 	if spell_data:
 		CombatManager.apply_spell_damage(caster, target, spell_data)
+
+	# Apply AOE damage to nearby enemies (if spell has aoe_radius)
+	if spell_data and spell_data.aoe_radius > 0:
+		_apply_aoe_damage(target)
 
 	# Play impact effect
 	_spawn_impact_effect()
@@ -120,6 +129,16 @@ func _handle_hit(target: Node) -> void:
 		_expire()
 	else:
 		pierce_count += 1
+
+## Apply AOE damage to enemies in radius (excluding direct hit target)
+func _apply_aoe_damage(direct_hit_target: Node) -> void:
+	if not spell_data or spell_data.aoe_radius <= 0:
+		return
+
+	var nearby: Array[Node] = CombatManager.get_enemies_in_range(global_position, spell_data.aoe_radius)
+	for enemy in nearby:
+		if enemy != direct_hit_target and enemy != caster:
+			CombatManager.apply_spell_damage(caster, enemy, spell_data)
 
 func _chain_to_next_target() -> void:
 	# Find nearby enemy that hasn't been hit

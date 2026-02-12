@@ -72,7 +72,11 @@ enum Condition {
 	HORRIFIED,
 	BLEEDING,
 	STUNNED,
-	SILENCED
+	SILENCED,
+	ARMORED,
+	BLINDED,
+	SLOWED,
+	HASTED
 }
 
 # Weapon Categories

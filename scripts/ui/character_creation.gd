@@ -406,10 +406,10 @@ func _on_start_pressed() -> void:
 	if selected_career == Enums.Career.MERCHANT:
 		InventoryManager.add_gold(200)  # Extra starting gold
 
-	# Give bonus improvement points for testing
-	GameManager.player_data.improvement_points += 100000
+	# DEV: Apply testing stats (high magic stats, improvement points)
+	GameManager.apply_dev_stats(GameManager.player_data)
 
 	character_created.emit()
 
 	# Transition to game
-	get_tree().change_scene_to_file("res://scenes/levels/elder_moor.tscn")
+	get_tree().change_scene_to_file("res://scenes/levels/dalhurst.tscn")

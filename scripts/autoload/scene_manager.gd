@@ -519,6 +519,16 @@ func _transition_to_wilderness_room(coords: Vector2i, from_direction: int) -> vo
 		push_warning("[SceneManager] Already loading!")
 		return
 
+	# Preserve known spells before wilderness transition
+	var player := get_tree().get_first_node_in_group("player")
+	if player:
+		var spell_caster: SpellCaster = player.get_node_or_null("SpellCaster")
+		if spell_caster:
+			SaveManager.pending_known_spells.clear()
+			for spell in spell_caster.known_spells:
+				if spell:
+					SaveManager.pending_known_spells.append(spell.id)
+
 	is_loading = true
 	current_room_coords = coords
 

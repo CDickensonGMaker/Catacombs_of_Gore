@@ -28,6 +28,13 @@ var selected_index: int = -1
 func _ready() -> void:
 	_connect_buttons()
 	refresh()
+	# Refresh when panel becomes visible
+	visibility_changed.connect(_on_visibility_changed)
+
+func _on_visibility_changed() -> void:
+	if visible:
+		print("[MagicPanel] Panel became visible, refreshing...")
+		refresh()
 
 func _connect_buttons() -> void:
 	if spell_list:
@@ -43,32 +50,41 @@ func _connect_buttons() -> void:
 		assign_slot_4_button.pressed.connect(func(): _assign_to_slot(3))
 
 func refresh() -> void:
+	print("[MagicPanel] refresh() called")
 	_load_known_spells()
 	_refresh_spell_list()
 	_update_quick_slots_display()
 
 func _load_known_spells() -> void:
 	known_spells.clear()
+	print("[MagicPanel] _load_known_spells called")
 
-	# Get player's known spells
+	# Get player's SpellCaster component - this is where known spells are stored
 	var player := get_tree().get_first_node_in_group("player")
-	if player and "known_spells" in player:
-		known_spells = player.known_spells.duplicate()
+	if not player:
+		print("[MagicPanel] ERROR: No player found in group 'player'")
+		return
+
+	print("[MagicPanel] Found player: %s" % player.name)
+
+	var spell_caster: SpellCaster = player.get_node_or_null("SpellCaster")
+	if not spell_caster:
+		print("[MagicPanel] SpellCaster not found as direct child, searching children...")
+		# Try to find it as any child
+		for child in player.get_children():
+			print("[MagicPanel]   Child: %s (%s)" % [child.name, child.get_class()])
+			if child is SpellCaster:
+				spell_caster = child
+				break
+
+	if spell_caster:
+		print("[MagicPanel] Found SpellCaster with %d known spells" % spell_caster.known_spells.size())
+		known_spells = spell_caster.known_spells.duplicate()
+		for spell in known_spells:
+			print("[MagicPanel]   - %s" % (spell.display_name if spell else "null"))
 	else:
-		# Load from spell database as fallback (show all available spells)
-		var spell_dir := "res://data/spells/"
-		if DirAccess.dir_exists_absolute(spell_dir):
-			var dir := DirAccess.open(spell_dir)
-			if dir:
-				dir.list_dir_begin()
-				var file_name := dir.get_next()
-				while file_name != "":
-					if file_name.ends_with(".tres") or file_name.ends_with(".res"):
-						var spell_path := spell_dir + file_name
-						var spell := load(spell_path)
-						if spell:
-							known_spells.append(spell)
-					file_name = dir.get_next()
+		print("[MagicPanel] ERROR: No SpellCaster found on player!")
+	# No fallback - only show spells the player has actually learned
 
 func _refresh_spell_list() -> void:
 	if not spell_list:
@@ -78,7 +94,7 @@ func _refresh_spell_list() -> void:
 	selected_index = -1
 
 	for spell in known_spells:
-		var spell_name: String = spell.spell_name if "spell_name" in spell else spell.get("name", "Unknown Spell")
+		var spell_name: String = spell.display_name if spell else "Unknown Spell"
 		spell_list.add_item(spell_name)
 
 	if known_spells.is_empty():
@@ -97,7 +113,7 @@ func _on_spell_selected(index: int) -> void:
 
 func _display_spell_details(spell) -> void:
 	if spell_name_label:
-		spell_name_label.text = spell.spell_name if "spell_name" in spell else "Unknown"
+		spell_name_label.text = spell.display_name if spell else "Unknown"
 
 	if spell_description_label:
 		spell_description_label.text = spell.description if "description" in spell else "No description."
@@ -187,6 +203,6 @@ func _get_spell_name(spell_id: String) -> String:
 	for spell in known_spells:
 		var id: String = spell.id if "id" in spell else ""
 		if id == spell_id:
-			return spell.spell_name if "spell_name" in spell else spell_id
+			return spell.display_name if spell else spell_id
 
 	return spell_id
