@@ -21,10 +21,12 @@ class CellData:
 	var discovered: bool = false  # Has player visited?
 	var is_road: bool = false  # Is this a road cell (safer travel)?
 	var background_asset: String = ""  # Horizon skybox image
+	var cell_scene_path: String = ""  # Path to hand-placed cell scene (empty = procedural)
 
 	func _init(b: Biome = Biome.FOREST, loc_type: LocationType = LocationType.NONE,
 			   loc_id: String = "", loc_name: String = "", region: String = "",
-			   passable: bool = true, road: bool = false, bg: String = "") -> void:
+			   passable: bool = true, road: bool = false, bg: String = "",
+			   scene_path: String = "") -> void:
 		biome = b
 		location_type = loc_type
 		location_id = loc_id
@@ -33,6 +35,7 @@ class CellData:
 		is_passable = passable
 		is_road = road
 		background_asset = bg
+		cell_scene_path = scene_path
 
 
 ## World grid - Dictionary of Vector2i -> CellData
@@ -321,9 +324,10 @@ static func initialize() -> void:
 ## Helper to set a cell
 static func _set_cell(x: int, y: int, biome: Biome, loc_type: LocationType,
 					   loc_id: String, loc_name: String, region: String,
-					   passable: bool = true, road: bool = false, bg: String = "") -> void:
+					   passable: bool = true, road: bool = false, bg: String = "",
+					   scene_path: String = "") -> void:
 	var coords := Vector2i(x, y)
-	world_grid[coords] = CellData.new(biome, loc_type, loc_id, loc_name, region, passable, road, bg)
+	world_grid[coords] = CellData.new(biome, loc_type, loc_id, loc_name, region, passable, road, bg, scene_path)
 
 
 ## Get cell data for coordinates (returns null if not defined)
@@ -403,6 +407,15 @@ static func get_background_asset(coords: Vector2i) -> String:
 		Biome.DESERT: return "res://Sprite folders grab bag/" + BG_DESERT
 		Biome.FOREST: return "res://Sprite folders grab bag/" + BG_ENCHANTED
 		_: return "res://Sprite folders grab bag/" + BG_PLAINS
+
+
+## Get cell scene path for hand-placed wilderness cells
+## Returns empty string if no hand-placed scene (use procedural generation)
+static func get_cell_scene(coords: Vector2i) -> String:
+	var cell := get_cell(coords)
+	if cell:
+		return cell.cell_scene_path
+	return ""
 
 
 ## Mark a cell as discovered

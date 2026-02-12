@@ -1,0 +1,147 @@
+[gd_scene load_steps=6 format=3 uid="uid://b30yv8x0vbg6u"]
+
+[ext_resource type="Script" uid="uid://btte4v5fy5he" path="res://scripts/generation/wilderness_tile.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://3n10xxlfowu0" path="res://Sprite folders grab bag/gravehead_1.png" id="2_grave1"]
+[ext_resource type="Texture2D" uid="uid://bckkygbm0evmf" path="res://Sprite folders grab bag/gravehead_2.png" id="3_grave2"]
+[ext_resource type="Texture2D" uid="uid://6txm5lvoa7gm" path="res://Sprite folders grab bag/gravehead_3.png" id="4_grave3"]
+[ext_resource type="Texture2D" uid="uid://dp638nqqpv431" path="res://Sprite folders grab bag/swamp_downtree1.png" id="5_deadtree"]
+
+[node name="WildernessTile_Undead_Template" type="Node3D"]
+script = ExtResource("1")
+biome = "undead"
+variant = 0
+danger_level = 1.5
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="Ground" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(100, 1, 100)
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="Gravestone_01" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 1.5, 5)
+pixel_size = 0.018
+billboard = 2
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("2_grave1")
+
+[node name="Gravestone_02" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.1777096, 12)
+pixel_size = 0.016
+billboard = 2
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("3_grave2")
+
+[node name="Gravestone_03" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0.47119713, -10)
+pixel_size = 0.015
+billboard = 2
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("4_grave3")
+
+[node name="Gravestone_04" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 1.2622721, -15)
+pixel_size = 0.017
+billboard = 2
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("2_grave1")
+
+[node name="Gravestone_05" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.491535, 1.1934981, 26.610872)
+pixel_size = 0.014
+billboard = 2
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("3_grave2")
+
+[node name="Gravestone_06" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.63347054, -25)
+pixel_size = 0.016
+billboard = 2
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("4_grave3")
+
+[node name="Gravestone_07" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.777912, 0.9624349, -18.01236)
+pixel_size = 0.015
+billboard = 2
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("2_grave1")
+
+[node name="Gravestone_08" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 1.5, 30)
+pixel_size = 0.018
+billboard = 2
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("3_grave2")
+
+[node name="DeadTree_01" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 3, 25)
+pixel_size = 0.025
+billboard = 2
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("5_deadtree")
+
+[node name="DeadTree_02" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 3.5, -20)
+pixel_size = 0.028
+billboard = 2
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("5_deadtree")
+
+[node name="DeadTree_03" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 2.6940355, -15)
+pixel_size = 0.022
+billboard = 2
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("5_deadtree")
+
+[node name="CryptEntrance" type="CSGBox3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+use_collision = true
+size = Vector3(4, 2, 3)
+
+[node name="Spawns" type="Node3D" parent="."]
+
+[node name="EnemySpawn_01" type="Marker3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0.5, 15)
+
+[node name="EnemySpawn_02" type="Marker3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0.5, -15)
+
+[node name="EnemySpawn_03" type="Marker3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 0.5, -25)
+
+[node name="EnemySpawn_04" type="Marker3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 0.5, 25)
+
+[node name="Exits" type="Node3D" parent="."]
+
+[node name="Exit_North" type="Marker3D" parent="Exits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -48)
+
+[node name="Exit_South" type="Marker3D" parent="Exits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 48)
+
+[node name="Exit_East" type="Marker3D" parent="Exits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, 0.5, 0)
+
+[node name="Exit_West" type="Marker3D" parent="Exits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48, 0.5, 0)
+
+[node name="POIs" type="Node3D" parent="."]
+
+[node name="Lights" type="Node3D" parent="."]

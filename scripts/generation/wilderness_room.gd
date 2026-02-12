@@ -31,6 +31,33 @@ enum Biome { FOREST, PLAINS, SWAMP, HILLS, ROCKY }
 @export var enemy_count_max: int = 5
 @export var cursed_totem_chance: float = 0.25  # 25% chance for cursed totem near ruins
 
+## 3D Terrain prop settings
+@export var terrain_prop_chance: float = 0.4  # 40% chance to spawn 3D terrain props
+@export var terrain_prop_count_min: int = 1
+@export var terrain_prop_count_max: int = 3
+
+## 3D terrain model paths by prop type
+const TERRAIN_MODELS: Dictionary = {
+	"hill": [
+		"res://assets/models/terrain/low_hills.glb"
+	],
+	"rock": [],  # Add rock GLB models here
+	"boulder": [],  # Add boulder GLB models here
+	"cliff": [],  # Add cliff GLB models here
+	"stump": [],  # Add stump GLB models here
+	"log": []  # Add log GLB models here
+}
+
+## 3D statue model paths
+const STATUE_MODELS: Array[String] = [
+	"res://assets/models/statues/sword_statue.glb"
+]
+
+## Statue spawn settings
+@export var statue_near_ruins_chance: float = 0.8  # 80% chance per ruin
+@export var statue_standalone_chance: float = 0.5  # 50% chance for standalone statue
+@export var statue_near_dungeon_chance: float = 0.9  # 90% chance near dungeon entrance
+
 ## Road visualization settings
 @export var road_width: float = 8.0  # Width of dirt road
 @export var road_prop_density_multiplier: float = 0.3  # Reduce props to 30% on roads
@@ -79,6 +106,10 @@ func _process(_delta: float) -> void:
 	pass
 
 
+## Reference to loaded hand-placed cell scene (if any)
+var hand_placed_cell: Node3D = null
+
+
 ## Generate the room with given seed
 func generate(seed_value: int = 0, coords: Vector2i = Vector2i.ZERO) -> void:
 	grid_coords = coords
@@ -90,7 +121,14 @@ func generate(seed_value: int = 0, coords: Vector2i = Vector2i.ZERO) -> void:
 	# Check if this is a road cell
 	is_road_cell = WorldData.is_road(coords)
 
-	print("[WildernessRoom] Generating room at %s with seed %d, biome: %s, is_road: %s" % [
+	# Check for hand-placed cell scene
+	var cell_scene_path: String = WorldData.get_cell_scene(coords)
+	if not cell_scene_path.is_empty() and ResourceLoader.exists(cell_scene_path):
+		print("[WildernessRoom] Loading hand-placed cell at %s: %s" % [coords, cell_scene_path])
+		_load_hand_placed_cell(cell_scene_path)
+		return
+
+	print("[WildernessRoom] Generating procedural room at %s with seed %d, biome: %s, is_road: %s" % [
 		coords, room_seed, Biome.keys()[biome], is_road_cell
 	])
 
@@ -104,11 +142,110 @@ func generate(seed_value: int = 0, coords: Vector2i = Vector2i.ZERO) -> void:
 	_spawn_ruins()
 	_spawn_cursed_totems()  # Skeleton spawners near ruins
 	_spawn_dungeon_entrance()
+	_spawn_statues()  # Decorative statues near ruins and dungeons
 	_spawn_environment()
 	_spawn_enemies()
 	_spawn_fireplace()
 	_spawn_traveling_merchant()
 	_spawn_signposts_if_road()  # Add signposts pointing to destinations
+	_create_boundary_props()
+
+	room_generated.emit(self)
+
+
+## Load and instantiate a hand-placed cell scene
+func _load_hand_placed_cell(scene_path: String) -> void:
+	var cell_scene: PackedScene = load(scene_path)
+	if not cell_scene:
+		push_error("[WildernessRoom] Failed to load hand-placed cell: %s" % scene_path)
+		# Fall back to procedural generation
+		_generate_procedural()
+		return
+
+	hand_placed_cell = cell_scene.instantiate()
+	hand_placed_cell.name = "HandPlacedCell"
+	add_child(hand_placed_cell)
+
+	# Check if it's a WildernessTile with proper structure
+	if hand_placed_cell is WildernessTile:
+		var tile: WildernessTile = hand_placed_cell as WildernessTile
+		tile.apply_biome_effects()
+		print("[WildernessRoom] Loaded hand-placed tile: %s" % tile.get_tile_info())
+
+		# Spawn enemies at designated points
+		_spawn_enemies_at_tile_markers(tile)
+
+	# Still need basic infrastructure (edges, spawn points, walls, environment)
+	_setup_materials()
+	_create_sky_environment()
+	_create_edges()
+	_create_spawn_points()
+	_set_background_for_biome()
+	_create_invisible_walls()
+
+	room_generated.emit(self)
+
+
+## Spawn enemies at hand-placed tile's enemy spawn markers
+func _spawn_enemies_at_tile_markers(tile: WildernessTile) -> void:
+	var spawn_points: Array[Node3D] = tile.get_enemy_spawn_points()
+	if spawn_points.is_empty():
+		return
+
+	for spawn_point in spawn_points:
+		# Get enemy config for this biome
+		var enemy_config: Dictionary = _get_enemy_config_for_biome()
+
+		var enemy: Node = null
+		var pos: Vector3 = spawn_point.global_position
+
+		# Check if this is a skeleton enemy
+		if enemy_config.get("is_skeleton", false):
+			enemy = EnemyBase.spawn_skeleton_enemy(
+				self,
+				pos,
+				enemy_config.data_path
+			)
+		else:
+			# Load sprite texture for regular enemies
+			var sprite_tex: Texture2D = load(enemy_config.sprite_path)
+			if not sprite_tex:
+				push_warning("[WildernessRoom] Failed to load sprite: %s" % enemy_config.sprite_path)
+				continue
+
+			# Spawn regular billboard enemy
+			enemy = EnemyBase.spawn_billboard_enemy(
+				self,
+				pos,
+				enemy_config.data_path,
+				sprite_tex,
+				enemy_config.h_frames,
+				enemy_config.v_frames
+			)
+
+		if enemy:
+			enemies.append(enemy)
+			print("[WildernessRoom] Spawned %s at marker %s" % [enemy_config.display_name, pos])
+
+
+## Generate procedural room (extracted for fallback use)
+func _generate_procedural() -> void:
+	_setup_materials()
+	_create_ground()
+	_create_road_if_needed()
+	_create_sky_environment()
+	_create_edges()
+	_create_spawn_points()
+	_set_background_for_biome()
+	_spawn_ruins()
+	_spawn_cursed_totems()
+	_spawn_dungeon_entrance()
+	_spawn_statues()  # Decorative statues near ruins and dungeons
+	_spawn_environment()
+	_spawn_enemies()
+	_spawn_fireplace()
+	_spawn_traveling_merchant()
+	_spawn_signposts_if_road()
 	_create_boundary_props()
 
 	room_generated.emit(self)
@@ -169,6 +306,9 @@ func _create_ground() -> void:
 
 	# Spawn environmental props on the ground
 	_spawn_ground_props()
+
+	# Spawn 3D terrain props (hills, rocks, etc.)
+	_spawn_terrain_props()
 
 
 ## Create dirt road mesh if this is a road cell
@@ -427,6 +567,93 @@ func _get_biome_prop_tint() -> Color:
 			return Color.WHITE
 
 
+## Spawn 3D terrain props (hills, rocks, boulders) using GLB models
+func _spawn_terrain_props() -> void:
+	# Check if we should spawn terrain props at all
+	if rng.randf() > terrain_prop_chance:
+		return
+
+	# On road cells, reduce terrain prop spawning
+	if is_road_cell:
+		return  # Skip terrain props on roads
+
+	var terrain_container := Node3D.new()
+	terrain_container.name = "TerrainProps"
+	add_child(terrain_container)
+
+	# Determine which prop types to spawn based on biome
+	var prop_types: Array[String] = _get_terrain_prop_types_for_biome()
+	if prop_types.is_empty():
+		return
+
+	var num_props: int = rng.randi_range(terrain_prop_count_min, terrain_prop_count_max)
+	var half_size: float = room_size / 2.0 - 10.0  # Keep away from edges
+
+	for i in range(num_props):
+		var prop_type: String = prop_types[rng.randi() % prop_types.size()]
+		var models: Array = TERRAIN_MODELS.get(prop_type, [])
+		if models.is_empty():
+			continue
+
+		var model_path: String = models[rng.randi() % models.size()]
+		if not ResourceLoader.exists(model_path):
+			continue
+
+		var pos := Vector3(
+			rng.randf_range(-half_size, half_size),
+			0.0,
+			rng.randf_range(-half_size, half_size)
+		)
+
+		# Use TerrainProp class to spawn and texture the model
+		var biome_name: String = _get_biome_name_string()
+		var scale_val: float = rng.randf_range(0.8, 1.5)
+
+		var prop: TerrainProp = TerrainProp.spawn_prop(
+			terrain_container,
+			pos,
+			model_path,
+			prop_type,
+			biome_name,
+			scale_val
+		)
+
+		if prop:
+			props.append(prop)
+
+
+## Get terrain prop types appropriate for current biome
+func _get_terrain_prop_types_for_biome() -> Array[String]:
+	match biome:
+		Biome.HILLS, Biome.ROCKY:
+			return ["hill", "rock", "boulder", "cliff"]
+		Biome.FOREST:
+			return ["hill", "stump", "log", "rock"]
+		Biome.PLAINS:
+			return ["hill", "rock"]
+		Biome.SWAMP:
+			return ["log", "stump"]
+		_:
+			return ["hill", "rock"]
+
+
+## Convert biome enum to string for TerrainProp
+func _get_biome_name_string() -> String:
+	match biome:
+		Biome.FOREST:
+			return "forest"
+		Biome.PLAINS:
+			return "plains"
+		Biome.SWAMP:
+			return "swamp"
+		Biome.HILLS:
+			return "hills"
+		Biome.ROCKY:
+			return "rocky"
+		_:
+			return "plains"
+
+
 ## PS1-style distance fog settings (tight visibility for retro feel)
 const FOG_START := 8.0    # Distance where fog begins
 const FOG_END := 15.0     # Distance where fog is fully opaque
@@ -663,6 +890,88 @@ func _spawn_cursed_totems() -> void:
 		if totem:
 			cursed_totems.append(totem)
 			print("[WildernessRoom] Spawned Cursed Totem near ruin at %s" % totem_pos)
+
+
+## Spawn decorative statues near ruins, dungeons, and standalone
+func _spawn_statues() -> void:
+	if STATUE_MODELS.is_empty():
+		push_warning("[WildernessRoom] No statue models defined")
+		return
+
+	var statues_container := Node3D.new()
+	statues_container.name = "Statues"
+	add_child(statues_container)
+
+	var biome_name: String = _get_biome_name_string()
+	var statues_spawned: int = 0
+
+	# Spawn statues near ruins
+	for ruin in ruins:
+		if rng.randf() > statue_near_ruins_chance:
+			continue
+
+		var angle := rng.randf() * TAU
+		var distance := rng.randf_range(5.0, 10.0)
+		var offset := Vector3(cos(angle) * distance, 0, sin(angle) * distance)
+		var statue_pos: Vector3 = ruin.position + offset
+
+		var model_path: String = STATUE_MODELS[rng.randi() % STATUE_MODELS.size()]
+		var scale_val: float = rng.randf_range(1.0, 1.5)
+
+		var statue: TerrainProp = TerrainProp.spawn_prop(
+			statues_container,
+			statue_pos,
+			model_path,
+			"statue",
+			biome_name,
+			scale_val
+		)
+		if statue:
+			props.append(statue)
+			statues_spawned += 1
+
+	# Spawn statue near dungeon entrance
+	if dungeon_entrance and rng.randf() <= statue_near_dungeon_chance:
+		var angle := rng.randf() * TAU
+		var distance := rng.randf_range(4.0, 8.0)
+		var offset := Vector3(cos(angle) * distance, 0, sin(angle) * distance)
+		var statue_pos: Vector3 = dungeon_entrance.position + offset
+
+		var model_path: String = STATUE_MODELS[rng.randi() % STATUE_MODELS.size()]
+		var scale_val: float = rng.randf_range(1.2, 1.8)  # Slightly larger near dungeons
+
+		var statue: TerrainProp = TerrainProp.spawn_prop(
+			statues_container,
+			statue_pos,
+			model_path,
+			"statue",
+			biome_name,
+			scale_val
+		)
+		if statue:
+			props.append(statue)
+			statues_spawned += 1
+
+	# Chance for standalone statue in the wilderness
+	if rng.randf() <= statue_standalone_chance:
+		var pos := _get_random_content_position()
+		var model_path: String = STATUE_MODELS[rng.randi() % STATUE_MODELS.size()]
+		var scale_val: float = rng.randf_range(0.8, 1.3)
+
+		var statue: TerrainProp = TerrainProp.spawn_prop(
+			statues_container,
+			pos,
+			model_path,
+			"statue",
+			biome_name,
+			scale_val
+		)
+		if statue:
+			props.append(statue)
+			statues_spawned += 1
+
+	if statues_spawned > 0:
+		print("[WildernessRoom] Spawned %d statue(s)" % statues_spawned)
 
 
 ## Create a ruin structure
@@ -1973,6 +2282,11 @@ func _reset_for_reuse() -> void:
 
 ## Clear all generated content (for chunk recycling)
 func _clear_content() -> void:
+	# Clear hand-placed cell if present
+	if hand_placed_cell and is_instance_valid(hand_placed_cell):
+		hand_placed_cell.queue_free()
+	hand_placed_cell = null
+
 	# Clear ruins
 	for ruin: Node3D in ruins:
 		if is_instance_valid(ruin):

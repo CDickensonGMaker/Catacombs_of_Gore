@@ -1,0 +1,125 @@
+[gd_scene load_steps=7 format=3 uid="uid://bnuqi8huoushu"]
+
+[ext_resource type="Script" uid="uid://btte4v5fy5he" path="res://scripts/generation/wilderness_tile.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://beam5tg2ivf4m" path="res://Sprite folders grab bag/swamp_tree1.png" id="2_swamp_tree1"]
+[ext_resource type="Texture2D" uid="uid://bsqharnu3p1ap" path="res://Sprite folders grab bag/swamp_tree2.png" id="3_swamp_tree2"]
+[ext_resource type="Texture2D" uid="uid://dp638nqqpv431" path="res://Sprite folders grab bag/swamp_downtree1.png" id="4_fallen1"]
+[ext_resource type="Texture2D" uid="uid://ct6ewfouf2pmf" path="res://Sprite folders grab bag/swamp_downtree2.png" id="5_fallen2"]
+[ext_resource type="Texture2D" uid="uid://3n10xxlfowu0" path="res://Sprite folders grab bag/gravehead_1.png" id="6_grave"]
+
+[node name="WildernessTile_Swamp_Template" type="Node3D"]
+script = ExtResource("1")
+biome = "swamp"
+variant = 0
+danger_level = 1.3
+movement_modifier = 0.7
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="Ground" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(100, 1, 100)
+
+[node name="WaterPatch_01" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0.02, 10)
+size = Vector3(12, 0.05, 8)
+
+[node name="WaterPatch_02" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0.02, -15)
+size = Vector3(10, 0.05, 12)
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="SwampTree_01" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 3.5509472, 20)
+pixel_size = 0.028
+billboard = 2
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("2_swamp_tree1")
+
+[node name="SwampTree_02" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 8, 30)
+pixel_size = 0.032
+billboard = 2
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("3_swamp_tree2")
+
+[node name="SwampTree_03" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 3.243351, -15)
+pixel_size = 0.026
+billboard = 2
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("2_swamp_tree1")
+
+[node name="SwampTree_04" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 4.3593674, -25)
+pixel_size = 0.03
+billboard = 2
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("3_swamp_tree2")
+
+[node name="FallenTree_01" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2.5, -5)
+pixel_size = 0.022
+billboard = 2
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("4_fallen1")
+
+[node name="FallenTree_02" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 2, 5)
+pixel_size = 0.02
+billboard = 2
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("5_fallen2")
+
+[node name="Gravestone_01" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 1.5, 25)
+pixel_size = 0.015
+billboard = 2
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("6_grave")
+
+[node name="Gravestone_02" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 0.93000114, 0.3675565, 0, -0.3675565, 0.93000114, -10.072438, 0.97548056, -30.101233)
+pixel_size = 0.014
+billboard = 2
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("6_grave")
+
+[node name="Spawns" type="Node3D" parent="."]
+
+[node name="EnemySpawn_01" type="Marker3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0.5, 25)
+
+[node name="EnemySpawn_02" type="Marker3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 0.5, -20)
+
+[node name="EnemySpawn_03" type="Marker3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="Exits" type="Node3D" parent="."]
+
+[node name="Exit_North" type="Marker3D" parent="Exits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -48)
+
+[node name="Exit_South" type="Marker3D" parent="Exits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 48)
+
+[node name="Exit_East" type="Marker3D" parent="Exits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, 0.5, 0)
+
+[node name="Exit_West" type="Marker3D" parent="Exits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48, 0.5, 0)
+
+[node name="POIs" type="Node3D" parent="."]
+
+[node name="Lights" type="Node3D" parent="."]

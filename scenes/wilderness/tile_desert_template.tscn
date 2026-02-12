@@ -1,0 +1,121 @@
+[gd_scene load_steps=3 format=3 uid="uid://desert_template_tile"]
+
+[ext_resource type="Script" path="res://scripts/generation/wilderness_tile.gd" id="1"]
+[ext_resource type="Texture2D" path="res://Sprite folders grab bag/barren_bush.png" id="2_bush"]
+
+[node name="WildernessTile_Desert_Template" type="Node3D"]
+script = ExtResource("1")
+biome = "desert"
+variant = 0
+danger_level = 1.1
+ambient_sound = "desert_wind"
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="Ground" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(100, 1, 100)
+
+[node name="Dune_01" type="CSGSphere3D" parent="Terrain"]
+transform = Transform3D(1.5, 0, 0, 0, 0.15, 0, 0, 0, 1, 25, 0, 20)
+use_collision = true
+radius = 12.0
+radial_segments = 8
+rings = 4
+
+[node name="Dune_02" type="CSGSphere3D" parent="Terrain"]
+transform = Transform3D(1.2, 0, 0, 0, 0.12, 0, 0, 0, 1, -20, 0, -25)
+use_collision = true
+radius = 10.0
+radial_segments = 8
+rings = 4
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="DeadBush_01" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 1.5, 10)
+pixel_size = 0.015
+billboard = 2
+texture_filter = 0
+alpha_cut = 1
+texture = ExtResource("2_bush")
+
+[node name="DeadBush_02" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 1.5, -15)
+pixel_size = 0.014
+billboard = 2
+texture_filter = 0
+alpha_cut = 1
+texture = ExtResource("2_bush")
+
+[node name="DeadBush_03" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 1.5, -30)
+pixel_size = 0.012
+billboard = 2
+texture_filter = 0
+alpha_cut = 1
+texture = ExtResource("2_bush")
+
+[node name="DeadBush_04" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 1.5, 25)
+pixel_size = 0.016
+billboard = 2
+texture_filter = 0
+alpha_cut = 1
+texture = ExtResource("2_bush")
+
+[node name="Rock_01" type="CSGBox3D" parent="Props"]
+transform = Transform3D(0.866, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866, 35, 0.5, 0)
+use_collision = true
+size = Vector3(2.5, 1.0, 2.0)
+
+[node name="Rock_02" type="CSGBox3D" parent="Props"]
+transform = Transform3D(0.707, 0, 0.707, 0, 1, 0, -0.707, 0, 0.707, -35, 0.6, -10)
+use_collision = true
+size = Vector3(3.0, 1.2, 2.5)
+
+[node name="Rock_03" type="CSGBox3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 35)
+use_collision = true
+size = Vector3(2.0, 0.8, 1.5)
+
+[node name="Cactus_01" type="CSGCylinder3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2, 5)
+use_collision = true
+radius = 0.4
+height = 4
+sides = 8
+
+[node name="Cactus_02" type="CSGCylinder3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 2.5, -20)
+use_collision = true
+radius = 0.5
+height = 5
+sides = 8
+
+[node name="Spawns" type="Node3D" parent="."]
+
+[node name="EnemySpawn_01" type="Marker3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0.5, 25)
+
+[node name="EnemySpawn_02" type="Marker3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 0.5, -20)
+
+[node name="Exits" type="Node3D" parent="."]
+
+[node name="Exit_North" type="Marker3D" parent="Exits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -48)
+
+[node name="Exit_South" type="Marker3D" parent="Exits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 48)
+
+[node name="Exit_East" type="Marker3D" parent="Exits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, 0.5, 0)
+
+[node name="Exit_West" type="Marker3D" parent="Exits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48, 0.5, 0)
+
+[node name="POIs" type="Node3D" parent="."]
+
+[node name="Lights" type="Node3D" parent="."]

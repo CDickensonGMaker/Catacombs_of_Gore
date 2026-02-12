@@ -1,0 +1,122 @@
+[gd_scene load_steps=4 format=3 uid="uid://bwpuj2eba6vg1"]
+
+[ext_resource type="Script" uid="uid://btte4v5fy5he" path="res://scripts/generation/wilderness_tile.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dm1oi24nn67ji" path="res://Sprite folders grab bag/autumntree.png" id="2_tree"]
+[ext_resource type="Texture2D" uid="uid://dovm6l8knmabf" path="res://Sprite folders grab bag/grassland_2.png" id="3_grass"]
+
+[node name="WildernessTile_Hills_Template" type="Node3D"]
+script = ExtResource("1")
+biome = "hills"
+variant = 0
+danger_level = 1.2
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="Ground" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(100, 1, 100)
+
+[node name="Hill_01" type="CSGSphere3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 0.3, 0, 0, 0, 1, 20, 0, 15)
+use_collision = true
+radius = 12.0
+radial_segments = 8
+rings = 4
+
+[node name="Hill_02" type="CSGSphere3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 0.25, 0, 0, 0, 1, -25, 0, -20)
+use_collision = true
+radius = 10.0
+radial_segments = 8
+rings = 4
+
+[node name="Hill_03" type="CSGSphere3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 0.2, 0, 0, 0, 1, 5, 0, -30)
+use_collision = true
+radius = 8.0
+radial_segments = 8
+rings = 4
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="Tree_01" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 2.0894732, 30)
+pixel_size = 0.02
+billboard = 2
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("2_tree")
+
+[node name="Tree_02" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35, 1.8396931, 25)
+pixel_size = 0.022
+billboard = 2
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("2_tree")
+
+[node name="Rock_01" type="CSGBox3D" parent="Props"]
+transform = Transform3D(0.866, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866, 10, 0.6, -10)
+use_collision = true
+size = Vector3(2.5, 1.2, 2)
+
+[node name="Rock_02" type="CSGBox3D" parent="Props"]
+transform = Transform3D(0.707, 0, 0.707, 0, 1, 0, -0.707, 0, 0.707, -15, 0.8, 10)
+use_collision = true
+size = Vector3(3, 1.6, 2.5)
+
+[node name="Rock_03" type="CSGBox3D" parent="Props"]
+transform = Transform3D(0.94, 0, -0.342, 0, 1, 0, 0.342, 0, 0.94, 30, 0.5, -25)
+use_collision = true
+size = Vector3(2, 1, 1.5)
+
+[node name="Rock_04" type="CSGBox3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 0.7, -35)
+use_collision = true
+size = Vector3(2.8, 1.4, 2.2)
+
+[node name="Grass_01" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.81527853, 0)
+pixel_size = 0.012
+billboard = 2
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("3_grass")
+
+[node name="Grass_02" type="Sprite3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 1.5, 35)
+pixel_size = 0.014
+billboard = 2
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("3_grass")
+
+[node name="Spawns" type="Node3D" parent="."]
+
+[node name="EnemySpawn_01" type="Marker3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 0.5, 20)
+
+[node name="EnemySpawn_02" type="Marker3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0.5, -15)
+
+[node name="EnemySpawn_03" type="Marker3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.5, 30)
+
+[node name="Exits" type="Node3D" parent="."]
+
+[node name="Exit_North" type="Marker3D" parent="Exits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -48)
+
+[node name="Exit_South" type="Marker3D" parent="Exits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 48)
+
+[node name="Exit_East" type="Marker3D" parent="Exits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, 0.5, 0)
+
+[node name="Exit_West" type="Marker3D" parent="Exits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48, 0.5, 0)
+
+[node name="POIs" type="Node3D" parent="."]
+
+[node name="Lights" type="Node3D" parent="."]

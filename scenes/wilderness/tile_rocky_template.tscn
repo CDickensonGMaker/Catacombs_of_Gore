@@ -1,0 +1,69 @@
+[gd_scene load_steps=2 format=3 uid="uid://bn2yjkjyi6sbu"]
+
+[ext_resource type="Script" uid="uid://btte4v5fy5he" path="res://scripts/generation/wilderness_tile.gd" id="1"]
+
+[node name="WildernessTile_Rocky_Template" type="Node3D"]
+script = ExtResource("1")
+biome = "rocky"
+variant = 0
+danger_level = 1.2
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="Ground" type="CSGBox3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(100, 1, 100)
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="Rock_01" type="CSGBox3D" parent="Props"]
+transform = Transform3D(0.866, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866, 10, 0.8, -5)
+use_collision = true
+size = Vector3(3, 1.6, 2.5)
+
+[node name="Rock_02" type="CSGBox3D" parent="Props"]
+transform = Transform3D(0.707, 0, 0.707, 0, 1, 0, -0.707, 0, 0.707, -30, 1, 0)
+use_collision = true
+size = Vector3(4, 2, 3)
+
+[node name="Rock_03" type="CSGBox3D" parent="Props"]
+transform = Transform3D(0.94, 0, 0.342, 0, 1, 0, -0.342, 0, 0.94, 35, 0.6, -35)
+use_collision = true
+size = Vector3(2.5, 1.2, 2)
+
+[node name="Rock_04" type="CSGBox3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.9, 15)
+use_collision = true
+size = Vector3(3.5, 1.8, 2.8)
+
+[node name="Rock_05" type="CSGBox3D" parent="Props"]
+transform = Transform3D(0.82, 0, -0.574, 0, 1, 0, 0.574, 0, 0.82, 0, 0.7, -25)
+use_collision = true
+size = Vector3(2.8, 1.4, 2.2)
+
+[node name="Spawns" type="Node3D" parent="."]
+
+[node name="EnemySpawn_01" type="Marker3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 0.5, 25)
+
+[node name="EnemySpawn_02" type="Marker3D" parent="Spawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0.5, -25)
+
+[node name="Exits" type="Node3D" parent="."]
+
+[node name="Exit_North" type="Marker3D" parent="Exits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -48)
+
+[node name="Exit_South" type="Marker3D" parent="Exits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 48)
+
+[node name="Exit_East" type="Marker3D" parent="Exits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, 0.5, 0)
+
+[node name="Exit_West" type="Marker3D" parent="Exits"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48, 0.5, 0)
+
+[node name="POIs" type="Node3D" parent="."]
+
+[node name="Lights" type="Node3D" parent="."]

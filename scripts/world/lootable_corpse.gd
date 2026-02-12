@@ -44,7 +44,9 @@ func _ready() -> void:
 	add_to_group("interactable")
 	add_to_group("corpses")
 
-	collision_layer = 1
+	# No collision - player can walk through corpses
+	# Interaction is handled by the Area3D (interaction_area)
+	collision_layer = 0
 	collision_mask = 0
 
 	_create_corpse_mesh()
@@ -270,13 +272,8 @@ static func spawn_corpse(parent: Node, pos: Vector3, p_corpse_name: String, p_en
 	instance.enemy_id = p_enemy_id
 	instance.enemy_level = p_level
 
-	# Add collision shape
-	var col_shape := CollisionShape3D.new()
-	var box := BoxShape3D.new()
-	box.size = Vector3(0.6, 0.15, 1.2)
-	col_shape.shape = box
-	col_shape.position = Vector3(0, 0.075, 0)
-	instance.add_child(col_shape)
+	# No collision shape needed - corpses don't block movement
+	# Player interaction is handled by Area3D in _create_interaction_area()
 
 	parent.add_child(instance)
 	return instance
