@@ -1,4 +1,4 @@
-[gd_scene load_steps=51 format=3 uid="uid://bfi17vads61ti"]
+[gd_scene load_steps=52 format=3 uid="uid://bfi17vads61ti"]
 
 [ext_resource type="Script" uid="uid://jey01ic3cvl" path="res://scripts/levels/dalhurst.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
@@ -14,6 +14,7 @@
 [ext_resource type="PackedScene" path="res://scenes/world/zone_door_instance.tscn" id="12"]
 [ext_resource type="Texture2D" uid="uid://dpdehw6py1vin" path="res://Sprite folders grab bag/cat_animiation.png" id="13"]
 [ext_resource type="Texture2D" uid="uid://nl8fdo0bmq3w" path="res://Sprite folders grab bag/cow animiation.png" id="14"]
+[ext_resource type="PackedScene" uid="uid://4ykj44g24gpj" path="res://assets/models/statues/sword_statue.glb" id="15_28san"]
 
 [sub_resource type="Environment" id="Environment_dalhurst"]
 background_mode = 2
@@ -1077,7 +1078,16 @@ omni_range = 7.0
 [node name="SpawnPoints" type="Node3D" parent="."]
 
 [node name="from_wilderness" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 48)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 0.1, 0)
+
+[node name="from_wilderness_south" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 25)
+
+[node name="from_wilderness_north" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -25)
+
+[node name="from_wilderness_east" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 0.1, 0)
 
 [node name="from_inn" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.5, 0.1, 0)
@@ -1342,11 +1352,6 @@ target_scene = "RETURN_TO_WILDERNESS"
 spawn_point_id = "from_dalhurst"
 door_name = "Leave City (Wilderness)"
 
-[node name="Player" parent="." instance=ExtResource("2")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5991025, 1, 10.92503)
-
-[node name="HUD" parent="." instance=ExtResource("3")]
-
 [node name="AmbientAnimals" type="Node3D" parent="."]
 
 [node name="Cat_0" type="Sprite3D" parent="AmbientAnimals"]
@@ -1388,3 +1393,9 @@ alpha_cut = 2
 texture = ExtResource("14")
 hframes = 5
 frame = 2
+
+[node name="sword_statue2" parent="." instance=ExtResource("15_28san")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.901411, 3.6925817, 19.852474)
+
+[node name="sword_statue3" parent="." instance=ExtResource("15_28san")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.4353695, 3.6925817, 19.852474)

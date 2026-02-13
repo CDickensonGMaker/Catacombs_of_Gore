@@ -8,8 +8,15 @@
 extends Node3D
 
 const ZONE_ID := "hamlet_thornfield"
+const ZONE_SIZE := 50.0  # Thornfield is 50x50 units
+
+## Thornfield grid coordinates (from WorldData GRID_DATA)
+const GRID_COORDS := Vector2i(9, 4)
 
 @onready var nav_region: NavigationRegion3D = $NavigationRegion3D
+
+## Edge triggers for wilderness transitions
+var edge_triggers: Dictionary = {}
 
 
 func _ready() -> void:
@@ -20,8 +27,9 @@ func _ready() -> void:
 	_setup_spawn_point_metadata()
 	_setup_navigation()
 	_create_invisible_border_walls()
+	_setup_edge_exits()  # Add edge triggers for wilderness transitions
 	DayNightCycle.add_to_level(self)
-	print("[Thornfield] Forest hamlet loaded - Woodcutters & Hunters Theme")
+	print("[Thornfield] Forest hamlet loaded at %s - Woodcutters & Hunters Theme" % GRID_COORDS)
 
 
 ## Setup the WorldEnvironment with proper settings
@@ -159,45 +167,93 @@ func _spawn_interactables() -> void:
 	print("[Thornfield] Spawned interactables")
 
 
-## Spawn zone doors for exits
+## Spawn zone doors for interiors only (not edge exits)
 func _spawn_doors() -> void:
 	var doors := Node3D.new()
 	doors.name = "Doors"
 	add_child(doors)
 
-	# Exit to wilderness (south - main entrance)
-	var south_exit := ZoneDoor.spawn_door(
-		doors,
-		Vector3(0, 0, 24),
-		SceneManager.RETURN_TO_WILDERNESS,
-		"from_thornfield",
-		"Road to Wilderness"
-	)
-	south_exit.rotation.y = PI  # Face south
-	south_exit.show_frame = false
+	# Only spawn doors for INTERIOR connections (buildings, dungeons)
+	# Edge exits to wilderness are handled by _setup_edge_exits()
 
-	# Exit to Elder Moor (west - connects to Elder Moor)
-	var elder_moor_exit := ZoneDoor.spawn_door(
-		doors,
-		Vector3(-24, 0, 0),
-		"res://scenes/levels/elder_moor.tscn",
-		"from_thornfield",
-		"Road to Elder Moor"
-	)
-	elder_moor_exit.rotation.y = PI / 2  # Face west
-	elder_moor_exit.show_frame = false
+	print("[Thornfield] Spawned interior doors")
 
-	# Exit to bandit hideout area (north - leads to bandit territory)
-	var bandit_exit := ZoneDoor.spawn_door(
-		doors,
-		Vector3(0, 0, -24),
-		"res://scenes/levels/bandit_hideout_exterior.tscn",
-		"from_thornfield",
-		"Forest Path (Bandit Territory)"
-	)
-	bandit_exit.show_frame = false
 
-	print("[Thornfield] Spawned doors")
+## Setup edge exits for transitioning to adjacent wilderness cells
+## Thornfield at (9, 4) - West/North/South are passable, East is blocked (collapsed pass)
+func _setup_edge_exits() -> void:
+	var edges_container := Node3D.new()
+	edges_container.name = "EdgeExits"
+	add_child(edges_container)
+
+	# Check each direction and create edge trigger if passable
+	var directions: Array[Dictionary] = [
+		{"dir": RoomEdge.Direction.NORTH, "offset": Vector2i(0, -1)},
+		{"dir": RoomEdge.Direction.SOUTH, "offset": Vector2i(0, 1)},
+		{"dir": RoomEdge.Direction.EAST, "offset": Vector2i(1, 0)},
+		{"dir": RoomEdge.Direction.WEST, "offset": Vector2i(-1, 0)}
+	]
+
+	var distance: float = ZONE_SIZE / 2.0
+
+	for dir_data: Dictionary in directions:
+		var direction: int = dir_data["dir"]
+		var offset: Vector2i = dir_data["offset"]
+		var adjacent_coords: Vector2i = GRID_COORDS + offset
+
+		# Check if adjacent cell is passable
+		if WorldData.is_passable(adjacent_coords):
+			var edge := RoomEdge.new()
+			edge.direction = direction
+			edge.room_size = ZONE_SIZE
+
+			# Position edge at boundary
+			match direction:
+				RoomEdge.Direction.NORTH:
+					edge.position = Vector3(0, 0, -distance - 5)
+					edge.name = "NorthEdge"
+				RoomEdge.Direction.SOUTH:
+					edge.position = Vector3(0, 0, distance + 5)
+					edge.name = "SouthEdge"
+				RoomEdge.Direction.EAST:
+					edge.position = Vector3(distance + 5, 0, 0)
+					edge.name = "EastEdge"
+				RoomEdge.Direction.WEST:
+					edge.position = Vector3(-distance - 5, 0, 0)
+					edge.name = "WestEdge"
+
+			edges_container.add_child(edge)
+			edge.setup_collision()
+			edge.edge_entered.connect(_on_edge_entered)
+			edge_triggers[direction] = edge
+			print("[Thornfield] Created %s edge exit to %s" % [RoomEdge.Direction.keys()[direction], adjacent_coords])
+		else:
+			print("[Thornfield] %s edge blocked (impassable terrain at %s)" % [RoomEdge.Direction.keys()[direction], adjacent_coords])
+
+
+## Handle player entering an edge trigger
+func _on_edge_entered(direction: RoomEdge.Direction) -> void:
+	print("[Thornfield] Player entered %s edge, transitioning to wilderness" % RoomEdge.Direction.keys()[direction])
+
+	# Calculate target coords
+	var offset: Vector2i
+	match direction:
+		RoomEdge.Direction.NORTH:
+			offset = Vector2i(0, -1)
+		RoomEdge.Direction.SOUTH:
+			offset = Vector2i(0, 1)
+		RoomEdge.Direction.EAST:
+			offset = Vector2i(1, 0)
+		RoomEdge.Direction.WEST:
+			offset = Vector2i(-1, 0)
+
+	var target_coords: Vector2i = GRID_COORDS + offset
+
+	# Store current coords for potential return
+	SceneManager.current_room_coords = GRID_COORDS
+
+	# Enter wilderness at the adjacent cell
+	SceneManager.enter_wilderness(direction, target_coords)
 
 
 ## Setup metadata on spawn points from the scene
@@ -237,102 +293,71 @@ func _bake_navigation() -> void:
 		print("[Thornfield] Navigation mesh baked!")
 
 
-## Create invisible collision walls at borders
+## Create invisible collision walls at borders - with gaps for passable edges
 func _create_invisible_border_walls() -> void:
-	var zone_size := 50.0
-	var distance := zone_size / 2.0
-	var wall_height := 4.0
-	var wall_thickness := 1.0
-	var gap_half := 5.0  # Half-width of exit gaps
+	var distance: float = ZONE_SIZE / 2.0  # 25 units
+	var wall_height: float = 4.0
+	var wall_thickness: float = 1.0
+	var gap_half: float = 5.0  # Gap width for passable exits
+	var section_length: float = distance - gap_half
 
-	# North wall (with gap for bandit path exit)
-	var section_length := distance - gap_half
+	# North wall - check if north is passable
+	var north_passable: bool = WorldData.is_passable(GRID_COORDS + Vector2i(0, -1))
+	if north_passable:
+		# Create two sections with gap in center
+		_create_wall_section("NorthWestBorder", Vector3(-distance + section_length / 2.0, wall_height / 2.0, -distance),
+			Vector3(section_length, wall_height, wall_thickness))
+		_create_wall_section("NorthEastBorder", Vector3(distance - section_length / 2.0, wall_height / 2.0, -distance),
+			Vector3(section_length, wall_height, wall_thickness))
+	else:
+		_create_wall_section("NorthBorder", Vector3(0, wall_height / 2.0, -distance),
+			Vector3(distance * 2, wall_height, wall_thickness))
 
-	# North-west section
-	var nw := StaticBody3D.new()
-	nw.name = "NorthWestBorder"
-	nw.collision_layer = 1
-	nw.collision_mask = 0
-	add_child(nw)
-	var nw_col := CollisionShape3D.new()
-	var nw_box := BoxShape3D.new()
-	nw_box.size = Vector3(section_length, wall_height, wall_thickness)
-	nw_col.shape = nw_box
-	nw_col.position = Vector3(-distance + section_length / 2.0, wall_height / 2.0, -distance)
-	nw.add_child(nw_col)
+	# South wall - check if south is passable
+	var south_passable: bool = WorldData.is_passable(GRID_COORDS + Vector2i(0, 1))
+	if south_passable:
+		_create_wall_section("SouthWestBorder", Vector3(-distance + section_length / 2.0, wall_height / 2.0, distance),
+			Vector3(section_length, wall_height, wall_thickness))
+		_create_wall_section("SouthEastBorder", Vector3(distance - section_length / 2.0, wall_height / 2.0, distance),
+			Vector3(section_length, wall_height, wall_thickness))
+	else:
+		_create_wall_section("SouthBorder", Vector3(0, wall_height / 2.0, distance),
+			Vector3(distance * 2, wall_height, wall_thickness))
 
-	# North-east section
-	var ne := StaticBody3D.new()
-	ne.name = "NorthEastBorder"
-	ne.collision_layer = 1
-	ne.collision_mask = 0
-	add_child(ne)
-	var ne_col := CollisionShape3D.new()
-	var ne_box := BoxShape3D.new()
-	ne_box.size = Vector3(section_length, wall_height, wall_thickness)
-	ne_col.shape = ne_box
-	ne_col.position = Vector3(distance - section_length / 2.0, wall_height / 2.0, -distance)
-	ne.add_child(ne_col)
+	# East wall - check if east is passable (should be blocked - collapsed pass)
+	var east_passable: bool = WorldData.is_passable(GRID_COORDS + Vector2i(1, 0))
+	if east_passable:
+		_create_wall_section("EastNorthBorder", Vector3(distance, wall_height / 2.0, -distance + section_length / 2.0),
+			Vector3(wall_thickness, wall_height, section_length))
+		_create_wall_section("EastSouthBorder", Vector3(distance, wall_height / 2.0, distance - section_length / 2.0),
+			Vector3(wall_thickness, wall_height, section_length))
+	else:
+		_create_wall_section("EastBorder", Vector3(distance, wall_height / 2.0, 0),
+			Vector3(wall_thickness, wall_height, distance * 2))
 
-	# South wall (with gap for main entrance)
-	var sw := StaticBody3D.new()
-	sw.name = "SouthWestBorder"
-	sw.collision_layer = 1
-	sw.collision_mask = 0
-	add_child(sw)
-	var sw_col := CollisionShape3D.new()
-	var sw_box := BoxShape3D.new()
-	sw_box.size = Vector3(section_length, wall_height, wall_thickness)
-	sw_col.shape = sw_box
-	sw_col.position = Vector3(-distance + section_length / 2.0, wall_height / 2.0, distance)
-	sw.add_child(sw_col)
+	# West wall - check if west is passable (should be passable - wilderness)
+	var west_passable: bool = WorldData.is_passable(GRID_COORDS + Vector2i(-1, 0))
+	if west_passable:
+		_create_wall_section("WestNorthBorder", Vector3(-distance, wall_height / 2.0, -distance + section_length / 2.0),
+			Vector3(wall_thickness, wall_height, section_length))
+		_create_wall_section("WestSouthBorder", Vector3(-distance, wall_height / 2.0, distance - section_length / 2.0),
+			Vector3(wall_thickness, wall_height, section_length))
+	else:
+		_create_wall_section("WestBorder", Vector3(-distance, wall_height / 2.0, 0),
+			Vector3(wall_thickness, wall_height, distance * 2))
 
-	var se := StaticBody3D.new()
-	se.name = "SouthEastBorder"
-	se.collision_layer = 1
-	se.collision_mask = 0
-	add_child(se)
-	var se_col := CollisionShape3D.new()
-	var se_box := BoxShape3D.new()
-	se_box.size = Vector3(section_length, wall_height, wall_thickness)
-	se_col.shape = se_box
-	se_col.position = Vector3(distance - section_length / 2.0, wall_height / 2.0, distance)
-	se.add_child(se_col)
 
-	# West wall (with gap for Elder Moor exit)
-	var wn := StaticBody3D.new()
-	wn.name = "WestNorthBorder"
-	wn.collision_layer = 1
-	wn.collision_mask = 0
-	add_child(wn)
-	var wn_col := CollisionShape3D.new()
-	var wn_box := BoxShape3D.new()
-	wn_box.size = Vector3(wall_thickness, wall_height, section_length)
-	wn_col.shape = wn_box
-	wn_col.position = Vector3(-distance, wall_height / 2.0, -distance + section_length / 2.0)
-	wn.add_child(wn_col)
+## Helper to create an invisible wall section
+func _create_wall_section(wall_name: String, position: Vector3, size: Vector3) -> void:
+	var wall := StaticBody3D.new()
+	wall.name = wall_name
+	wall.collision_layer = 1
+	wall.collision_mask = 0
+	add_child(wall)
 
-	var ws := StaticBody3D.new()
-	ws.name = "WestSouthBorder"
-	ws.collision_layer = 1
-	ws.collision_mask = 0
-	add_child(ws)
-	var ws_col := CollisionShape3D.new()
-	var ws_box := BoxShape3D.new()
-	ws_box.size = Vector3(wall_thickness, wall_height, section_length)
-	ws_col.shape = ws_box
-	ws_col.position = Vector3(-distance, wall_height / 2.0, distance - section_length / 2.0)
-	ws.add_child(ws_col)
-
-	# East wall (solid - no exit on east side)
-	var east := StaticBody3D.new()
-	east.name = "EastBorder"
-	east.collision_layer = 1
-	east.collision_mask = 0
-	add_child(east)
-	var east_col := CollisionShape3D.new()
-	var east_box := BoxShape3D.new()
-	east_box.size = Vector3(wall_thickness, wall_height, distance * 2)
-	east_col.shape = east_box
-	east_col.position = Vector3(distance, wall_height / 2.0, 0)
-	east.add_child(east_col)
+	var col := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = size
+	col.shape = box
+	col.position = position
+	wall.add_child(col)

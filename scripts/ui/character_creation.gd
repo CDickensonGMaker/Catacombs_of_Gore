@@ -411,5 +411,5 @@ func _on_start_pressed() -> void:
 
 	character_created.emit()
 
-	# Transition to game
-	get_tree().change_scene_to_file("res://scenes/levels/dalhurst.tscn")
+	# Transition to game - start at Elder Moor
+	get_tree().change_scene_to_file("res://scenes/levels/elder_moor.tscn")

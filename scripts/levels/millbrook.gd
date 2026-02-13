@@ -4,8 +4,15 @@
 extends Node3D
 
 const ZONE_ID := "hamlet_millbrook"
+const ZONE_SIZE := 40.0  # Millbrook is 40x40 units
+
+## Millbrook grid coordinates (from WorldData GRID_DATA)
+const GRID_COORDS := Vector2i(3, 9)
 
 @onready var nav_region: NavigationRegion3D = $NavigationRegion3D
+
+## Edge triggers for wilderness transitions
+var edge_triggers: Dictionary = {}
 
 
 func _ready() -> void:
@@ -16,10 +23,11 @@ func _ready() -> void:
 	_spawn_npcs()
 	_spawn_fast_travel_shrine()
 	_spawn_rest_spot()
-	_spawn_portals()
 	_setup_navigation()
 	_setup_day_night_cycle()
-	print("[Mill Brook] Farming hamlet loaded")
+	_create_invisible_border_walls()
+	_setup_edge_exits()
+	print("[Mill Brook] Farming hamlet loaded at %s" % GRID_COORDS)
 
 
 ## Setup dynamic day/night lighting
@@ -109,35 +117,143 @@ func _spawn_rest_spot() -> void:
 	print("[Mill Brook] Spawned rest spot")
 
 
-## Spawn zone exit portals at marker positions
-func _spawn_portals() -> void:
-	var west_marker: Marker3D = get_node_or_null("Interactables/DoorPosition_West")
-	var east_marker: Marker3D = get_node_or_null("Interactables/DoorPosition_East")
+## Setup edge exits for transitioning to adjacent wilderness cells
+## Millbrook at (3, 9) - all directions should be passable
+func _setup_edge_exits() -> void:
+	var edges_container := Node3D.new()
+	edges_container.name = "EdgeExits"
+	add_child(edges_container)
 
-	var west_pos: Vector3 = west_marker.global_position if west_marker else Vector3(-20, 0, 0)
-	var east_pos: Vector3 = east_marker.global_position if east_marker else Vector3(20, 0, 0)
+	var directions: Array[Dictionary] = [
+		{"dir": RoomEdge.Direction.NORTH, "offset": Vector2i(0, -1)},
+		{"dir": RoomEdge.Direction.SOUTH, "offset": Vector2i(0, 1)},
+		{"dir": RoomEdge.Direction.EAST, "offset": Vector2i(1, 0)},
+		{"dir": RoomEdge.Direction.WEST, "offset": Vector2i(-1, 0)}
+	]
 
-	# West exit - Road to Dalhurst
-	var west_portal := ZoneDoor.spawn_door(
-		self,
-		west_pos,
-		SceneManager.RETURN_TO_WILDERNESS,
-		"from_millbrook_east",
-		"Road to Dalhurst (West)"
-	)
-	west_portal.rotation.y = PI / 2
+	var distance: float = ZONE_SIZE / 2.0
 
-	# East exit - Road to Kazan-Dun
-	var east_portal := ZoneDoor.spawn_door(
-		self,
-		east_pos,
-		SceneManager.RETURN_TO_WILDERNESS,
-		"from_millbrook_west",
-		"Road to Kazan-Dun (East)"
-	)
-	east_portal.rotation.y = -PI / 2
+	for dir_data: Dictionary in directions:
+		var direction: int = dir_data["dir"]
+		var offset: Vector2i = dir_data["offset"]
+		var adjacent_coords: Vector2i = GRID_COORDS + offset
 
-	print("[Mill Brook] Spawned zone portals")
+		if WorldData.is_passable(adjacent_coords):
+			var edge := RoomEdge.new()
+			edge.direction = direction
+			edge.room_size = ZONE_SIZE
+
+			match direction:
+				RoomEdge.Direction.NORTH:
+					edge.position = Vector3(0, 0, -distance - 5)
+					edge.name = "NorthEdge"
+				RoomEdge.Direction.SOUTH:
+					edge.position = Vector3(0, 0, distance + 5)
+					edge.name = "SouthEdge"
+				RoomEdge.Direction.EAST:
+					edge.position = Vector3(distance + 5, 0, 0)
+					edge.name = "EastEdge"
+				RoomEdge.Direction.WEST:
+					edge.position = Vector3(-distance - 5, 0, 0)
+					edge.name = "WestEdge"
+
+			edges_container.add_child(edge)
+			edge.setup_collision()
+			edge.edge_entered.connect(_on_edge_entered)
+			edge_triggers[direction] = edge
+			print("[Mill Brook] Created %s edge exit to %s" % [RoomEdge.Direction.keys()[direction], adjacent_coords])
+		else:
+			print("[Mill Brook] %s edge blocked (impassable terrain at %s)" % [RoomEdge.Direction.keys()[direction], adjacent_coords])
+
+
+## Handle player entering an edge trigger
+func _on_edge_entered(direction: RoomEdge.Direction) -> void:
+	print("[Mill Brook] Player entered %s edge, transitioning to wilderness" % RoomEdge.Direction.keys()[direction])
+
+	var offset: Vector2i
+	match direction:
+		RoomEdge.Direction.NORTH:
+			offset = Vector2i(0, -1)
+		RoomEdge.Direction.SOUTH:
+			offset = Vector2i(0, 1)
+		RoomEdge.Direction.EAST:
+			offset = Vector2i(1, 0)
+		RoomEdge.Direction.WEST:
+			offset = Vector2i(-1, 0)
+
+	var target_coords: Vector2i = GRID_COORDS + offset
+
+	SceneManager.current_room_coords = GRID_COORDS
+	SceneManager.enter_wilderness(direction, target_coords)
+
+
+## Create invisible collision walls at borders
+func _create_invisible_border_walls() -> void:
+	var distance: float = ZONE_SIZE / 2.0
+	var wall_height: float = 4.0
+	var wall_thickness: float = 1.0
+	var gap_half: float = 5.0
+	var section_length: float = distance - gap_half
+
+	# North wall
+	var north_passable: bool = WorldData.is_passable(GRID_COORDS + Vector2i(0, -1))
+	if north_passable:
+		_create_wall_section("NorthWestBorder", Vector3(-distance + section_length / 2.0, wall_height / 2.0, -distance),
+			Vector3(section_length, wall_height, wall_thickness))
+		_create_wall_section("NorthEastBorder", Vector3(distance - section_length / 2.0, wall_height / 2.0, -distance),
+			Vector3(section_length, wall_height, wall_thickness))
+	else:
+		_create_wall_section("NorthBorder", Vector3(0, wall_height / 2.0, -distance),
+			Vector3(distance * 2, wall_height, wall_thickness))
+
+	# South wall
+	var south_passable: bool = WorldData.is_passable(GRID_COORDS + Vector2i(0, 1))
+	if south_passable:
+		_create_wall_section("SouthWestBorder", Vector3(-distance + section_length / 2.0, wall_height / 2.0, distance),
+			Vector3(section_length, wall_height, wall_thickness))
+		_create_wall_section("SouthEastBorder", Vector3(distance - section_length / 2.0, wall_height / 2.0, distance),
+			Vector3(section_length, wall_height, wall_thickness))
+	else:
+		_create_wall_section("SouthBorder", Vector3(0, wall_height / 2.0, distance),
+			Vector3(distance * 2, wall_height, wall_thickness))
+
+	# East wall
+	var east_passable: bool = WorldData.is_passable(GRID_COORDS + Vector2i(1, 0))
+	if east_passable:
+		_create_wall_section("EastNorthBorder", Vector3(distance, wall_height / 2.0, -distance + section_length / 2.0),
+			Vector3(wall_thickness, wall_height, section_length))
+		_create_wall_section("EastSouthBorder", Vector3(distance, wall_height / 2.0, distance - section_length / 2.0),
+			Vector3(wall_thickness, wall_height, section_length))
+	else:
+		_create_wall_section("EastBorder", Vector3(distance, wall_height / 2.0, 0),
+			Vector3(wall_thickness, wall_height, distance * 2))
+
+	# West wall
+	var west_passable: bool = WorldData.is_passable(GRID_COORDS + Vector2i(-1, 0))
+	if west_passable:
+		_create_wall_section("WestNorthBorder", Vector3(-distance, wall_height / 2.0, -distance + section_length / 2.0),
+			Vector3(wall_thickness, wall_height, section_length))
+		_create_wall_section("WestSouthBorder", Vector3(-distance, wall_height / 2.0, distance - section_length / 2.0),
+			Vector3(wall_thickness, wall_height, section_length))
+	else:
+		_create_wall_section("WestBorder", Vector3(-distance, wall_height / 2.0, 0),
+			Vector3(wall_thickness, wall_height, distance * 2))
+
+
+## Helper to create an invisible wall section
+func _create_wall_section(wall_name: String, pos: Vector3, size: Vector3) -> void:
+	var wall := StaticBody3D.new()
+	wall.name = wall_name
+	wall.collision_layer = 1
+	wall.collision_mask = 0
+	add_child(wall)
+
+	var col := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = size
+	col.shape = box
+	col.position = pos
+	wall.add_child(col)
 
 
 ## Setup navigation mesh

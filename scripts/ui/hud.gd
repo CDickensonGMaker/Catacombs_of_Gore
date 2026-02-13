@@ -53,7 +53,9 @@ var death_screen: ColorRect
 var death_load_autosave_button: Button
 var death_load_save_button: Button
 var death_restart_button: Button
+var death_main_menu_button: Button
 var death_save_select_panel: Control
+var death_load_failure_count: int = 0  # Track consecutive load failures
 
 ## Durability warning
 var durability_warning_label: Label
@@ -241,6 +243,11 @@ func _is_menu_open() -> bool:
 func _open_game_menu() -> void:
 	if game_menu:
 		game_menu.open()
+		# Hide minimap when game menu opens (Tab menu)
+		if minimap:
+			minimap.visible = false
+		if minimap_coord_label:
+			minimap_coord_label.visible = false
 
 func _open_pause_menu() -> void:
 	if pause_menu:
@@ -248,7 +255,11 @@ func _open_pause_menu() -> void:
 
 func _on_menu_closed() -> void:
 	# Menu handles GameManager.exit_menu() itself
-	pass
+	# Restore minimap visibility when menus close
+	if minimap:
+		minimap.visible = true
+	if minimap_coord_label:
+		minimap_coord_label.visible = true
 
 ## Connect to scene manager signals for zone transition cleanup
 func _connect_scene_signals() -> void:
@@ -464,6 +475,11 @@ func _connect_signals() -> void:
 		QuestManager.quest_completed.connect(_on_quest_completed)
 	if QuestManager.has_signal("objective_completed"):
 		QuestManager.objective_completed.connect(_on_objective_completed)
+
+	# World/cell change signals - for immediate location name updates
+	if WorldManager and WorldManager.has_signal("cell_entered"):
+		if not WorldManager.cell_entered.is_connected(_on_cell_entered):
+			WorldManager.cell_entered.connect(_on_cell_entered)
 
 ## Disconnect signals from old player_data to prevent "signal connected to freed object" errors
 func _disconnect_player_data_signals() -> void:
@@ -989,6 +1005,14 @@ func _setup_death_screen() -> void:
 	death_restart_button.pressed.connect(_on_death_new_game)
 	button_container.add_child(death_restart_button)
 
+	# Main Menu button (escape to title screen)
+	death_main_menu_button = Button.new()
+	death_main_menu_button.name = "MainMenuButton"
+	death_main_menu_button.text = "Main Menu"
+	death_main_menu_button.custom_minimum_size = Vector2(220, 40)
+	death_main_menu_button.pressed.connect(_on_death_main_menu)
+	button_container.add_child(death_main_menu_button)
+
 	# Create save select panel (hidden by default)
 	_setup_death_save_select()
 
@@ -1099,9 +1123,20 @@ func _load_save_slot(slot: int) -> void:
 	# Load the save data (restores player stats, inventory, etc.)
 	if not SaveManager.load_game(slot):
 		push_error("[HUD] Failed to load save slot %d" % slot)
+		death_load_failure_count += 1
+
 		# Show death screen again on failure
 		show_death_screen()
+
+		# After 2 failures, highlight the Main Menu button as escape option
+		if death_load_failure_count >= 2 and death_main_menu_button:
+			death_main_menu_button.add_theme_color_override("font_color", Color(1.0, 0.5, 0.2))
+			death_main_menu_button.text = "Main Menu (Escape)"
+			show_notification("Save may be corrupted. Use 'Main Menu' to escape.")
 		return
+
+	# Reset failure counter on success
+	death_load_failure_count = 0
 
 	# Change to the saved scene
 	print("[HUD] Loading save - changing to scene: %s" % scene_path)
@@ -1176,6 +1211,9 @@ func _on_death_save_select_back() -> void:
 
 ## Start a completely new game
 func _on_death_new_game() -> void:
+	# Reset failure counter
+	death_load_failure_count = 0
+
 	# Unpause first
 	get_tree().paused = false
 
@@ -1187,6 +1225,19 @@ func _on_death_new_game() -> void:
 
 	# Go to character creation for a fresh start
 	get_tree().change_scene_to_file("res://scenes/ui/character_creation.tscn")
+
+
+## Return to main menu (escape from broken save state)
+func _on_death_main_menu() -> void:
+	# Reset failure counter
+	death_load_failure_count = 0
+
+	# Unpause first
+	get_tree().paused = false
+
+	# Go to title screen without resetting game state
+	# This allows player to potentially load a different save
+	get_tree().change_scene_to_file("res://scenes/ui/title_screen.tscn")
 
 ## Setup durability warning label
 func _setup_durability_warning() -> void:
@@ -1516,6 +1567,7 @@ func _setup_minimap() -> void:
 
 
 ## Update minimap cell coordinates display
+## Shows: location_name if available, otherwise "Biome Wilderness", or zone name for dungeons/towns
 func _update_minimap_coordinates() -> void:
 	if not minimap_coord_label or not _cached_player:
 		return
@@ -1524,7 +1576,21 @@ func _update_minimap_coordinates() -> void:
 	var wilderness_room := get_tree().get_first_node_in_group("wilderness_room")
 	if wilderness_room and "grid_coords" in wilderness_room:
 		var coords: Vector2i = wilderness_room.grid_coords
-		minimap_coord_label.text = "(%d, %d)" % [coords.x, coords.y]
+
+		# Get cell data from WorldData to show location name
+		var cell: WorldData.CellData = WorldData.get_cell(coords)
+		if cell:
+			if cell.location_name and not cell.location_name.is_empty():
+				# Show specific location name (e.g., "Elder Moor", "Dalhurst")
+				minimap_coord_label.text = cell.location_name
+			else:
+				# Show biome + "Wilderness" for unnamed cells
+				var biome_name: String = WorldData.Biome.keys()[cell.biome].capitalize()
+				minimap_coord_label.text = "%s Wilderness" % biome_name
+		else:
+			# Fallback if no cell data
+			minimap_coord_label.text = "Wilderness (%d, %d)" % [coords.x, coords.y]
+
 		minimap_coord_label.visible = true
 	else:
 		# In a dungeon or town - show zone name instead
@@ -1534,6 +1600,22 @@ func _update_minimap_coordinates() -> void:
 		else:
 			minimap_coord_label.text = zone_name.replace("_", " ").capitalize()
 			minimap_coord_label.visible = true
+
+
+## Handle cell entered signal from WorldManager for immediate location updates
+func _on_cell_entered(coords: Vector2i, cell: WorldData.CellData) -> void:
+	if not minimap_coord_label:
+		return
+
+	# Immediately update location display - prioritize cell.location_name
+	if cell.location_name and not cell.location_name.is_empty():
+		minimap_coord_label.text = cell.location_name
+	else:
+		# Show "Biome Wilderness" for unnamed cells
+		var biome_name: String = WorldData.Biome.keys()[cell.biome].capitalize()
+		minimap_coord_label.text = "%s Wilderness" % biome_name
+
+	minimap_coord_label.visible = true
 
 
 ## Update compass based on player rotation

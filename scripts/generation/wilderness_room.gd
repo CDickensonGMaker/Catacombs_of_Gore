@@ -17,9 +17,12 @@ var seamless_mode: bool = false
 @export var room_size: float = 100.0
 @export var room_seed: int = 0  # 0 = random
 
-## Biome types
-enum Biome { FOREST, PLAINS, SWAMP, HILLS, ROCKY }
+## Biome types (must match WorldData.to_wilderness_biome() output)
+enum Biome { FOREST, PLAINS, SWAMP, HILLS, ROCKY, DESERT, COAST }
 @export var biome: Biome = Biome.FOREST
+
+## Terrain type from WorldData (for terrain-specific visuals like roads, POIs, coast)
+var terrain_type: int = 0  # WorldData.Terrain enum value
 
 ## Content settings (from plan: 1-3 ruins, 0-1 dungeons at 30%)
 @export var min_ruins: int = 1
@@ -135,6 +138,7 @@ func generate(seed_value: int = 0, coords: Vector2i = Vector2i.ZERO) -> void:
 	_setup_materials()
 	_create_ground()
 	_create_road_if_needed()  # Add dirt road on road cells
+	_create_terrain_specific_features()  # POI landmarks, coastal edges based on terrain_type
 	_create_sky_environment()
 	_create_edges()
 	_create_spawn_points()  # Directional spawn points for cell transitions
@@ -286,6 +290,12 @@ func _setup_materials() -> void:
 		Biome.ROCKY:
 			ground_material.albedo_color = Color(0.3, 0.28, 0.25)  # Rocky ground
 			rock_material.albedo_color = Color(0.35, 0.32, 0.3)
+		Biome.DESERT:
+			ground_material.albedo_color = Color(0.6, 0.5, 0.35)  # Sandy tan
+			rock_material.albedo_color = Color(0.55, 0.48, 0.38)  # Desert rock
+		Biome.COAST:
+			ground_material.albedo_color = Color(0.55, 0.52, 0.42)  # Sandy beach
+			rock_material.albedo_color = Color(0.45, 0.43, 0.38)   # Wet rocks
 
 
 ## Create ground plane with simple solid color (PS1 style - no complex textures)
@@ -304,11 +314,101 @@ func _create_ground() -> void:
 	ground.material = simple_mat
 	add_child(ground)
 
+	# Spawn biome-specific floor detail textures
+	_spawn_floor_details()
+
 	# Spawn environmental props on the ground
 	_spawn_ground_props()
 
 	# Spawn 3D terrain props (hills, rocks, etc.)
 	_spawn_terrain_props()
+
+
+## Spawn biome-specific floor detail textures as flat decals
+func _spawn_floor_details() -> void:
+	var floor_container := Node3D.new()
+	floor_container.name = "FloorDetails"
+	add_child(floor_container)
+
+	# Get floor textures based on biome
+	var floor_textures: Array[String] = _get_floor_textures_for_biome()
+	if floor_textures.is_empty():
+		return
+
+	# Number of floor detail patches - large random patterns
+	var num_patches: int = rng.randi_range(12, 20)
+	var half_size: float = room_size / 2.0 - 8.0  # Keep away from edges
+
+	for i in range(num_patches):
+		var tex_path: String = floor_textures[rng.randi() % floor_textures.size()]
+		if not ResourceLoader.exists(tex_path):
+			continue
+
+		var detail := Sprite3D.new()
+		detail.name = "FloorDetail_%d" % i
+		detail.texture = load(tex_path)
+		detail.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+
+		# Lay flat on ground (rotate -90 on X axis)
+		detail.rotation_degrees.x = -90
+
+		# Random Y rotation for variety
+		detail.rotation_degrees.y = rng.randf_range(0, 360)
+
+		# Large pixel size for big floor patterns
+		detail.pixel_size = rng.randf_range(0.08, 0.15)
+
+		# Position on ground (slightly above to prevent z-fighting)
+		detail.position = Vector3(
+			rng.randf_range(-half_size, half_size),
+			0.02,
+			rng.randf_range(-half_size, half_size)
+		)
+
+		# Apply subtle biome tint
+		detail.modulate = _get_biome_prop_tint()
+
+		floor_container.add_child(detail)
+
+
+## Get floor detail textures based on current biome
+func _get_floor_textures_for_biome() -> Array[String]:
+	match biome:
+		Biome.FOREST:
+			# Mix of full leaves and half leaves for forest floor
+			return [
+				"res://Sprite folders grab bag/fullelaves.png",
+				"res://Sprite folders grab bag/half leaves.png",
+				"res://Sprite folders grab bag/fullelaves.png",  # Weight full leaves more
+			]
+		Biome.PLAINS:
+			# Plains floor textures
+			return [
+				"res://Sprite folders grab bag/plains_floor1.png",
+				"res://Sprite folders grab bag/plains_floor2.png",
+				"res://Sprite folders grab bag/plains_floor3.png",
+			]
+		Biome.SWAMP:
+			# Swamp flood textures
+			return [
+				"res://Sprite folders grab bag/swamp_flood1.png",
+				"res://Sprite folders grab bag/swamp_flood2.png",
+			]
+		Biome.HILLS, Biome.ROCKY, Biome.DESERT:
+			# Rock/hill floor textures for hills, rocky, and desert biomes
+			return [
+				"res://Sprite folders grab bag/rockhill_floor1.png",
+				"res://Sprite folders grab bag/rockhill_floor2.png",
+				"res://Sprite folders grab bag/rockhill_floor3.png",
+			]
+		Biome.COAST:
+			# Coastal floor textures (sandy beach with rocks)
+			return [
+				"res://Sprite folders grab bag/rockhill_floor1.png",
+				"res://Sprite folders grab bag/plains_floor1.png",
+			]
+		_:
+			return []
 
 
 ## Create dirt road mesh if this is a road cell
@@ -408,6 +508,295 @@ func _create_road_if_needed() -> void:
 	print("[WildernessRoom] Created dirt road (N:%s S:%s E:%s W:%s)" % [
 		north_road, south_road, east_road, west_road
 	])
+
+
+## Create terrain-specific visual features based on terrain_type from WorldData
+## This adds visual distinctiveness for Roads, POIs, Coast cells, etc.
+func _create_terrain_specific_features() -> void:
+	# terrain_type comes from WorldData.Terrain enum:
+	# BLOCKED=0, HIGHLANDS=1, FOREST=2, WATER=3, COAST=4, SWAMP=5, ROAD=6, POI=7, DESERT=8
+	match terrain_type:
+		6:  # ROAD - already handled by _create_road_if_needed(), but add road markers
+			pass  # Road visuals handled elsewhere
+		7:  # POI - Add landmark (standing stones, old ruins, signpost)
+			_create_poi_landmark()
+		4:  # COAST - Add water edge and sandy shore
+			_create_coastal_edge()
+		1:  # HIGHLANDS - Add rocky outcrops
+			_create_highland_features()
+		_:
+			pass  # Other terrains use standard biome generation
+
+
+## Create POI landmark - standing stones, old ruins, or waymarker
+func _create_poi_landmark() -> void:
+	var poi_container := Node3D.new()
+	poi_container.name = "POILandmark"
+	add_child(poi_container)
+
+	# Choose a random landmark type
+	var landmark_type: int = rng.randi() % 3
+
+	match landmark_type:
+		0:  # Standing stones (stone circle)
+			_create_standing_stones(poi_container)
+		1:  # Old waymarker/signpost
+			_create_waymarker(poi_container)
+		2:  # Ancient shrine
+			_create_ancient_shrine(poi_container)
+
+	print("[WildernessRoom] Created POI landmark type %d" % landmark_type)
+
+
+## Create a circle of standing stones
+func _create_standing_stones(parent: Node3D) -> void:
+	var num_stones: int = rng.randi_range(4, 7)
+	var radius: float = rng.randf_range(8.0, 12.0)
+
+	var stone_mat := StandardMaterial3D.new()
+	stone_mat.albedo_color = Color(0.35, 0.33, 0.3)
+	stone_mat.roughness = 0.95
+
+	for i in range(num_stones):
+		var angle: float = (TAU / num_stones) * i + rng.randf_range(-0.2, 0.2)
+		var stone := CSGBox3D.new()
+		stone.name = "StandingStone_%d" % i
+		var height: float = rng.randf_range(2.5, 4.5)
+		var width: float = rng.randf_range(0.6, 1.2)
+		stone.size = Vector3(width, height, width * 0.6)
+		stone.position = Vector3(
+			cos(angle) * radius,
+			height / 2.0,
+			sin(angle) * radius
+		)
+		stone.rotation.y = angle + rng.randf_range(-0.3, 0.3)
+		# Slight tilt for weathered look
+		stone.rotation.x = rng.randf_range(-0.1, 0.1)
+		stone.rotation.z = rng.randf_range(-0.1, 0.1)
+		stone.material = stone_mat
+		parent.add_child(stone)
+
+
+## Create a waymarker post
+func _create_waymarker(parent: Node3D) -> void:
+	var post_mat := StandardMaterial3D.new()
+	post_mat.albedo_color = Color(0.4, 0.32, 0.25)
+	post_mat.roughness = 0.9
+
+	# Main post
+	var post := CSGBox3D.new()
+	post.name = "WaymarkerPost"
+	post.size = Vector3(0.3, 3.0, 0.3)
+	post.position = Vector3(0, 1.5, 0)
+	post.material = post_mat
+	parent.add_child(post)
+
+	# Directional signs (2-3 pointing different ways)
+	var num_signs: int = rng.randi_range(2, 3)
+	for i in range(num_signs):
+		var sign_board := CSGBox3D.new()
+		sign_board.name = "Sign_%d" % i
+		sign_board.size = Vector3(1.5, 0.4, 0.1)
+		var sign_height: float = 2.0 + i * 0.5
+		var sign_angle: float = rng.randf_range(0, TAU)
+		sign_board.position = Vector3(cos(sign_angle) * 0.8, sign_height, sin(sign_angle) * 0.8)
+		sign_board.rotation.y = sign_angle
+		sign_board.material = post_mat
+		parent.add_child(sign_board)
+
+
+## Create an ancient shrine structure
+func _create_ancient_shrine(parent: Node3D) -> void:
+	var stone_mat := StandardMaterial3D.new()
+	stone_mat.albedo_color = Color(0.4, 0.38, 0.35)
+	stone_mat.roughness = 0.9
+
+	# Base platform
+	var base := CSGBox3D.new()
+	base.name = "ShrineBase"
+	base.size = Vector3(4.0, 0.4, 4.0)
+	base.position = Vector3(0, 0.2, 0)
+	base.material = stone_mat
+	parent.add_child(base)
+
+	# Central altar
+	var altar := CSGBox3D.new()
+	altar.name = "Altar"
+	altar.size = Vector3(1.5, 1.0, 1.0)
+	altar.position = Vector3(0, 0.9, 0)
+	altar.material = stone_mat
+	parent.add_child(altar)
+
+	# Corner pillars
+	var pillar_positions: Array[Vector3] = [
+		Vector3(-1.5, 1.2, -1.5),
+		Vector3(1.5, 1.2, -1.5),
+		Vector3(-1.5, 1.2, 1.5),
+		Vector3(1.5, 1.2, 1.5)
+	]
+	for i in range(pillar_positions.size()):
+		var pillar := CSGCylinder3D.new()
+		pillar.name = "Pillar_%d" % i
+		pillar.radius = 0.25
+		pillar.height = 2.4
+		pillar.position = pillar_positions[i]
+		pillar.material = stone_mat
+		parent.add_child(pillar)
+
+
+## Create coastal edge - water on one side
+func _create_coastal_edge() -> void:
+	var coast_container := Node3D.new()
+	coast_container.name = "CoastalEdge"
+	add_child(coast_container)
+
+	# Determine which edge has water (based on adjacent cells)
+	var water_direction: int = _get_water_direction()
+	if water_direction == -1:
+		# No adjacent water, just add some shore features
+		_create_beach_features(coast_container)
+		return
+
+	# Create water plane on the water side
+	var water_mat := StandardMaterial3D.new()
+	water_mat.albedo_color = Color(0.2, 0.35, 0.5, 0.8)
+	water_mat.roughness = 0.2
+	water_mat.metallic = 0.1
+	water_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+
+	var water := CSGBox3D.new()
+	water.name = "WaterPlane"
+	water.size = Vector3(room_size + 20, 0.5, 25.0)
+	water.material = water_mat
+
+	var half_size: float = room_size / 2.0
+
+	# Position water based on direction
+	match water_direction:
+		0:  # NORTH - water at -Z
+			water.position = Vector3(0, -0.3, -half_size - 10)
+		1:  # SOUTH - water at +Z
+			water.position = Vector3(0, -0.3, half_size + 10)
+		2:  # EAST - water at +X
+			water.rotation.y = PI / 2.0
+			water.position = Vector3(half_size + 10, -0.3, 0)
+		3:  # WEST - water at -X
+			water.rotation.y = PI / 2.0
+			water.position = Vector3(-half_size - 10, -0.3, 0)
+
+	coast_container.add_child(water)
+
+	# Add sandy shore transition
+	_create_beach_features(coast_container)
+
+	print("[WildernessRoom] Created coastal edge with water at direction %d" % water_direction)
+
+
+## Determine which direction has water (returns -1 if none)
+func _get_water_direction() -> int:
+	var directions: Array[Vector2i] = [
+		Vector2i(0, -1),  # North
+		Vector2i(0, 1),   # South
+		Vector2i(1, 0),   # East
+		Vector2i(-1, 0)   # West
+	]
+
+	for i in range(directions.size()):
+		var adj_coords: Vector2i = grid_coords + directions[i]
+		var adj_terrain: int = WorldData.get_terrain(adj_coords)
+		# WorldData.Terrain.WATER = 3
+		if adj_terrain == 3:
+			return i
+
+	return -1
+
+
+## Create beach features (driftwood, rocks, shells)
+func _create_beach_features(parent: Node3D) -> void:
+	var half_size: float = room_size / 2.0 - 10.0
+	var num_features: int = rng.randi_range(5, 10)
+
+	var rock_mat := StandardMaterial3D.new()
+	rock_mat.albedo_color = Color(0.45, 0.43, 0.4)
+	rock_mat.roughness = 0.85
+
+	var drift_mat := StandardMaterial3D.new()
+	drift_mat.albedo_color = Color(0.5, 0.42, 0.32)
+	drift_mat.roughness = 0.9
+
+	for i in range(num_features):
+		var pos := Vector3(
+			rng.randf_range(-half_size, half_size),
+			0.1,
+			rng.randf_range(-half_size, half_size)
+		)
+
+		if rng.randf() < 0.6:
+			# Beach rock
+			var rock := CSGSphere3D.new()
+			rock.name = "BeachRock_%d" % i
+			rock.radius = rng.randf_range(0.3, 0.8)
+			rock.position = pos
+			rock.scale = Vector3(1.0, rng.randf_range(0.4, 0.7), rng.randf_range(0.8, 1.2))
+			rock.material = rock_mat
+			parent.add_child(rock)
+		else:
+			# Driftwood log
+			var log := CSGCylinder3D.new()
+			log.name = "Driftwood_%d" % i
+			log.radius = rng.randf_range(0.1, 0.2)
+			log.height = rng.randf_range(1.0, 2.5)
+			log.rotation.z = PI / 2.0
+			log.rotation.y = rng.randf_range(0, TAU)
+			log.position = pos
+			log.material = drift_mat
+			parent.add_child(log)
+
+
+## Create highland rocky features
+func _create_highland_features() -> void:
+	var highland_container := Node3D.new()
+	highland_container.name = "HighlandFeatures"
+	add_child(highland_container)
+
+	var half_size: float = room_size / 2.0 - 10.0
+	var num_outcrops: int = rng.randi_range(3, 6)
+
+	var rock_mat := StandardMaterial3D.new()
+	rock_mat.albedo_color = Color(0.42, 0.4, 0.38)
+	rock_mat.roughness = 0.95
+
+	for i in range(num_outcrops):
+		var outcrop := Node3D.new()
+		outcrop.name = "RockOutcrop_%d" % i
+		outcrop.position = Vector3(
+			rng.randf_range(-half_size, half_size),
+			0,
+			rng.randf_range(-half_size, half_size)
+		)
+		highland_container.add_child(outcrop)
+
+		# Create cluster of rocks
+		var cluster_size: int = rng.randi_range(2, 5)
+		for j in range(cluster_size):
+			var rock := CSGBox3D.new()
+			rock.name = "Rock_%d" % j
+			var rock_size: float = rng.randf_range(0.8, 2.0)
+			rock.size = Vector3(rock_size, rock_size * rng.randf_range(0.5, 1.5), rock_size * rng.randf_range(0.6, 1.0))
+			rock.position = Vector3(
+				rng.randf_range(-2, 2),
+				rock.size.y / 2.0,
+				rng.randf_range(-2, 2)
+			)
+			rock.rotation = Vector3(
+				rng.randf_range(-0.2, 0.2),
+				rng.randf_range(0, TAU),
+				rng.randf_range(-0.2, 0.2)
+			)
+			rock.material = rock_mat
+			outcrop.add_child(rock)
+
+	print("[WildernessRoom] Created %d highland rock outcrops" % num_outcrops)
 
 
 ## Spawn environmental props (trees, grass, gravestones) based on biome
@@ -563,6 +952,8 @@ func _get_biome_prop_tint() -> Color:
 			return Color(1.0, 0.95, 0.85)  # Warm yellow
 		Biome.ROCKY:
 			return Color(0.85, 0.85, 0.9)  # Cool gray
+		Biome.DESERT:
+			return Color(1.0, 0.9, 0.7)  # Warm sandy tint
 		_:
 			return Color.WHITE
 
@@ -627,6 +1018,8 @@ func _get_terrain_prop_types_for_biome() -> Array[String]:
 	match biome:
 		Biome.HILLS, Biome.ROCKY:
 			return ["hill", "rock", "boulder", "cliff"]
+		Biome.DESERT:
+			return ["rock", "boulder"]  # Desert has scattered rocks
 		Biome.FOREST:
 			return ["hill", "stump", "log", "rock"]
 		Biome.PLAINS:
@@ -650,6 +1043,8 @@ func _get_biome_name_string() -> String:
 			return "hills"
 		Biome.ROCKY:
 			return "rocky"
+		Biome.DESERT:
+			return "desert"
 		_:
 			return "plains"
 
@@ -694,6 +1089,11 @@ func _create_sky_environment() -> void:
 			sky_mat.sky_horizon_color = Color(0.6, 0.65, 0.7)
 			sky_mat.ground_horizon_color = Color(0.4, 0.42, 0.35)
 			fog_color = Color(0.5, 0.5, 0.55)  # Light gray fog
+		Biome.DESERT:
+			sky_mat.sky_top_color = Color(0.5, 0.55, 0.7)  # Bright blue desert sky
+			sky_mat.sky_horizon_color = Color(0.8, 0.75, 0.65)  # Warm sandy horizon
+			sky_mat.ground_horizon_color = Color(0.6, 0.5, 0.4)  # Sandy ground
+			fog_color = Color(0.7, 0.6, 0.5)  # Dusty tan fog
 		_:  # PLAINS and default
 			sky_mat.sky_top_color = Color(0.35, 0.55, 0.75)
 			sky_mat.sky_horizon_color = Color(0.65, 0.75, 0.85)
@@ -1236,6 +1636,11 @@ func _spawn_environment() -> void:
 			bush_count = rng.randi_range(5, 10)   # Few bushes
 			rock_count = rng.randi_range(20, 35)  # Lots of rocks
 			grass_count = rng.randi_range(5, 10)  # Very sparse grass
+		Biome.DESERT:
+			tree_count = rng.randi_range(0, 2)    # Almost no trees
+			bush_count = rng.randi_range(2, 5)    # Very few bushes
+			rock_count = rng.randi_range(15, 25)  # Scattered rocks
+			grass_count = rng.randi_range(3, 8)   # Minimal scrub grass
 
 	# Reduce prop density on road cells
 	if is_road_cell:

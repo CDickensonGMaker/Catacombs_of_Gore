@@ -10,6 +10,9 @@ const WILDERNESS_ROOM_SCENE := "res://scenes/levels/wilderness_room.tscn"
 ## Dev mode - enables fast travel to any location
 var dev_mode: bool = true  # Set to false for release
 
+## Fog of war toggle - when false, all map cells/locations are revealed
+var fog_of_war_enabled: bool = true  # Set to false in dev mode to reveal all
+
 signal scene_load_started(scene_path: String)
 signal scene_load_progress(progress: float)
 signal scene_load_completed(scene_path: String)
@@ -32,8 +35,8 @@ var scene_cache: Dictionary = {}
 var max_cached_scenes: int = 3
 
 ## Wilderness Room Grid System
-## Current position in the room grid
-var current_room_coords: Vector2i = Vector2i.ZERO
+## Current position in the room grid (default to Elder Moor from JSON)
+var current_room_coords: Vector2i = WorldData.PLAYER_START
 
 ## Room seeds per character (character_id -> {Vector2i -> seed})
 ## Ensures same character always sees same rooms
@@ -43,7 +46,7 @@ var room_seeds: Dictionary = {}
 var in_wilderness: bool = false
 
 ## Last wilderness coordinates (for returning from dungeons)
-var last_wilderness_coords: Vector2i = Vector2i.ZERO
+var last_wilderness_coords: Vector2i = WorldData.PLAYER_START
 
 ## Direction player is entering from (for spawn placement)
 var entering_from_direction: int = -1  # RoomEdge.Direction enum value
@@ -204,6 +207,11 @@ func _handle_player_spawn() -> void:
 		# Apply rotation if player has MeshRoot
 		if player.has_node("MeshRoot"):
 			player.get_node("MeshRoot").rotation.y = pending_player_rotation
+		# Also sync camera pivot yaw so camera faces same direction
+		if player.has_node("CameraPivot"):
+			var camera_pivot := player.get_node("CameraPivot")
+			if camera_pivot.has_method("set_yaw"):
+				camera_pivot.set_yaw(pending_player_rotation)
 		has_pending_position = false
 		print("[SceneManager] Player spawned at saved position: %s" % pending_player_position)
 		return
@@ -238,12 +246,18 @@ func _handle_player_spawn() -> void:
 	var default_spawn := get_tree().get_first_node_in_group("default_spawn")
 	if default_spawn and default_spawn is Node3D:
 		player_3d.global_position = (default_spawn as Node3D).global_position
+		# Still apply rotation based on spawn_point_id if we have one
+		if not spawn_point_id.is_empty():
+			_apply_spawn_rotation(player_3d, spawn_point_id)
 		print("[SceneManager] Player spawned at default: %s" % player_3d.global_position)
 		return
 
 	# Try any spawn point as last resort
 	if spawn_points.size() > 0 and spawn_points[0] is Node3D:
 		player_3d.global_position = (spawn_points[0] as Node3D).global_position
+		# Still apply rotation based on spawn_point_id if we have one
+		if not spawn_point_id.is_empty():
+			_apply_spawn_rotation(player_3d, spawn_point_id)
 		print("[SceneManager] Player spawned at fallback spawn point: %s" % player_3d.global_position)
 		return
 
@@ -363,20 +377,34 @@ func get_previous_scene() -> String:
 ## ============================================================================
 
 ## Enter the wilderness room system from a town
-## direction: 0=NORTH, 1=SOUTH, 2=EAST, 3=WEST (matches RoomEdge.Direction)
-func enter_wilderness(from_direction: int, starting_coords: Vector2i = Vector2i.ZERO) -> void:
+## travel_direction: The direction the player is TRAVELING (0=NORTH, 1=SOUTH, 2=EAST, 3=WEST)
+## starting_coords: Grid position to enter. Use Vector2i(-1,-1) for default (Elder Moor)
+## NOTE: Player should spawn at the OPPOSITE edge of the cell they're entering
+## (e.g., traveling EAST means entering from WEST, so spawn at west edge)
+func enter_wilderness(travel_direction: int, starting_coords: Vector2i = Vector2i(-1, -1)) -> void:
+	# Default to player start (Elder Moor) if sentinel value passed
+	if starting_coords == Vector2i(-1, -1):
+		starting_coords = WorldData.PLAYER_START
 	current_room_coords = starting_coords
 	in_wilderness = true
-	entering_from_direction = from_direction
+
+	# Convert travel direction to entry direction (opposite)
+	# Traveling EAST means entering from WEST
+	var entry_direction := _opposite_direction(travel_direction)
+	entering_from_direction = entry_direction
 
 	# Store previous scene for returning
 	var current := get_current_scene_path()
 	if not current.is_empty() and not _is_interior_scene(current):
 		previous_scene_path = current
-		previous_spawn_id = _get_spawn_id_from_direction(_opposite_direction(from_direction))
+		previous_spawn_id = _get_spawn_id_from_direction(travel_direction)
 
-	print("[SceneManager] Entering wilderness at %s from direction %d" % [starting_coords, from_direction])
-	await _transition_to_wilderness_room(starting_coords, from_direction)
+	print("[SceneManager] Entering wilderness at %s, traveled %s, entering from %s" % [
+		starting_coords,
+		["NORTH", "SOUTH", "EAST", "WEST"][travel_direction],
+		["NORTH", "SOUTH", "EAST", "WEST"][entry_direction]
+	])
+	await _transition_to_wilderness_room(starting_coords, entry_direction)
 
 
 ## Transition to an adjacent wilderness room
@@ -398,9 +426,24 @@ func transition_to_adjacent_room(direction: int) -> void:
 	# Check if transitioning to a special location (town/dungeon)
 	var location_id := WorldData.get_location_id(new_coords)
 	if location_id != "":
-		print("[SceneManager] Entering location: %s" % location_id)
-		# Mark as discovered before leaving wilderness
+		print("[SceneManager] Entering location: %s from direction %d" % [location_id, direction])
+		# Mark cell as discovered before leaving wilderness
 		WorldData.discover_cell(new_coords)
+		# If this is a dungeon, also mark it as discovered (reveals icon on map)
+		WorldData.discover_dungeon(new_coords)
+
+		# Calculate directional spawn ID based on which direction player came from
+		# Player enters from direction X, so they should spawn at the opposite edge
+		var spawn_id := "from_wilderness"
+		match direction:
+			0:  # NORTH - player traveled north, enters from south edge
+				spawn_id = "from_wilderness_south"
+			1:  # SOUTH - player traveled south, enters from north edge
+				spawn_id = "from_wilderness_north"
+			2:  # EAST - player traveled east, enters from west edge
+				spawn_id = "from_wilderness_west"
+			3:  # WEST - player traveled west, enters from east edge
+				spawn_id = "from_wilderness_east"
 
 		# Check if this is a procedural town or hand-crafted scene
 		if _should_use_procedural_town(location_id):
@@ -416,25 +459,9 @@ func transition_to_adjacent_room(direction: int) -> void:
 			if location_scene != "":
 				in_wilderness = false
 				current_room_coords = new_coords
-				await change_scene(location_scene, "from_wilderness")
+				await change_scene(location_scene, spawn_id)
 				room_changed.emit(old_coords, new_coords)
 				return
-
-	# Check if transitioning back to Elder Moor (room 0,0)
-	if new_coords == Vector2i.ZERO:
-		print("[SceneManager] Transitioning back to Elder Moor from %s" % old_coords)
-		var spawn_id := "from_wilderness_west"
-		if old_coords.x > 0:
-			spawn_id = "from_wilderness_east"
-		elif old_coords.y > 0:
-			spawn_id = "from_wilderness_north"
-		elif old_coords.y < 0:
-			spawn_id = "from_wilderness_south"
-
-		in_wilderness = false
-		current_room_coords = Vector2i.ZERO
-		await change_scene("res://scenes/levels/elder_moor.tscn", spawn_id)
-		return
 
 	# Mark cell as discovered
 	WorldData.discover_cell(new_coords)
@@ -448,13 +475,36 @@ func transition_to_adjacent_room(direction: int) -> void:
 ## Get scene path for a location ID (only for hand-crafted scenes)
 func _get_scene_for_location(location_id: String) -> String:
 	# Map location IDs to hand-crafted scene paths
+	# IDs MUST match WorldData.LOCATIONS from the JSON "bible"
 	# Locations not listed here will use procedural generation
 	match location_id:
-		# SETTLEMENTS - Hand-crafted
-		"village_elder_moor":
-			return "res://scenes/levels/elder_moor.tscn"
-		"city_dalhurst":
+		# === DEMO ZONE LOCATIONS (from JSON) ===
+		# Towns
+		"dalhurst":
 			return "res://scenes/levels/dalhurst.tscn"
+		"thornfield":
+			return "res://scenes/levels/thornfield.tscn"
+		"millbrook":
+			return "res://scenes/levels/millbrook.tscn"
+		# Landmarks
+		"elder_moor":
+			return "res://scenes/levels/elder_moor.tscn"
+		"crossroads":
+			return ""  # Procedural wilderness
+		# Dungeons
+		"willow_dale":
+			return "res://scenes/levels/willow_dale.tscn"
+		"sunken_crypts":
+			return "res://scenes/levels/sunken_crypt.tscn"
+		"bandit_hideout":
+			return "res://scenes/levels/bandit_hideout_exterior.tscn"
+		"kazer_dun_entrance":
+			return "res://scenes/levels/kazan_dun_entrance.tscn"
+		# Blocked (no scene - impassable)
+		"collapsed_pass":
+			return ""
+
+		# === LEGACY LOCATIONS (outside demo zone, may be added later) ===
 		"city_kazan_dun":
 			return "res://scenes/levels/kazan_dun.tscn"
 		"town_aberdeen":
@@ -469,10 +519,6 @@ func _get_scene_for_location(location_id: String) -> String:
 			return "res://scenes/levels/elven_outpost.tscn"
 		"outpost_tenger_camp":
 			return "res://scenes/levels/tenger_camp.tscn"
-		"hamlet_thornfield":
-			return "res://scenes/levels/thornfield.tscn"
-		"hamlet_millbrook":
-			return "res://scenes/levels/millbrook.tscn"
 		"village_stonehaven":
 			return "res://scenes/levels/stonehaven.tscn"
 		"hamlet_dusty_hollow":
@@ -481,7 +527,6 @@ func _get_scene_for_location(location_id: String) -> String:
 			return "res://scenes/levels/windmere.tscn"
 		"village_old_crossing":
 			return "res://scenes/levels/old_crossing.tscn"
-		# Additional existing scenes (may need WorldData entries)
 		"town_duncaster":
 			return "res://scenes/levels/duncaster.tscn"
 		"town_east_hollow":
@@ -492,13 +537,10 @@ func _get_scene_for_location(location_id: String) -> String:
 			return "res://scenes/levels/pola_perron.tscn"
 		"town_whalers_abyss":
 			return "res://scenes/levels/whalers_abyss.tscn"
-		# DUNGEONS - Hand-crafted
-		"dungeon_willow_dale":
-			return "res://scenes/levels/willow_dale.tscn"
 		"dungeon_vampire_crypt":
 			return "res://scenes/levels/vampire_crypt.tscn"
-		"dungeon_whalers_abyss":
-			return "res://scenes/levels/whalers_abyss.tscn"
+		"dungeon_mosshall_tombs":
+			return "res://scenes/levels/mosshall_tombs.tscn"
 		_:
 			return ""  # Use procedural generation
 
@@ -568,6 +610,11 @@ func _transition_to_wilderness_room(coords: Vector2i, from_direction: int) -> vo
 		# Determine biome based on distance from origin
 		var biome := _get_biome_for_coords(coords)
 		wilderness_room.biome = biome
+
+		# Pass terrain type from WorldData for terrain-specific visuals
+		var cell := WorldData.get_cell(coords)
+		if cell:
+			wilderness_room.terrain_type = cell.terrain
 
 		# Set entry direction so barriers don't block return path
 		wilderness_room.entry_direction = from_direction
@@ -808,17 +855,19 @@ func _get_biome_for_coords(coords: Vector2i) -> int:
 	return WorldData.to_wilderness_biome(world_biome)
 
 ## Get adjacent room coordinates based on direction
-## WorldData uses: X = East/West (+ = East), Y = North/South (+ = North)
-## 3D Space: NORTH is -Z, SOUTH is +Z
+## JSON Grid: col = X (0-16, West to East), row = Y (0-16, North to South)
+## 3D Space: NORTH is -Z, SOUTH is +Z, EAST is +X, WEST is -X
 func _get_adjacent_coords(coords: Vector2i, direction: int) -> Vector2i:
+	# Grid system: Row 0 = NORTH, Row 16 = SOUTH (per JSON)
+	# So NORTH decreases row (Y), SOUTH increases row (Y)
 	match direction:
-		0:  # NORTH (-Z in 3D) = +Y in grid
-			return coords + Vector2i(0, 1)
-		1:  # SOUTH (+Z in 3D) = -Y in grid
+		0:  # NORTH (-Z in 3D) = -Y in grid (toward row 0)
 			return coords + Vector2i(0, -1)
-		2:  # EAST (+X)
+		1:  # SOUTH (+Z in 3D) = +Y in grid (toward row 16)
+			return coords + Vector2i(0, 1)
+		2:  # EAST (+X) = +X in grid (toward col 16)
 			return coords + Vector2i(1, 0)
-		3:  # WEST (-X)
+		3:  # WEST (-X) = -X in grid (toward col 0)
 			return coords + Vector2i(-1, 0)
 	return coords
 
@@ -844,24 +893,22 @@ func _get_spawn_id_from_direction(direction: int) -> String:
 
 
 ## Apply rotation to player based on spawn point ID
-## Player should face the direction they were traveling (continue momentum)
+## Player should continue facing the direction they were traveling (preserve momentum)
+## NOTE: We do NOT change player rotation on cell transitions - player maintains their heading
 func _apply_spawn_rotation(player: Node3D, spawn_id: String) -> void:
-	# Calculate the rotation: player should face INWARD (toward center of zone)
-	# from_north = spawned at north edge = traveling south = face south (PI)
-	# from_south = spawned at south edge = traveling north = face north (0)
-	# from_east = spawned at east edge = traveling west = face west (-PI/2)
-	# from_west = spawned at west edge = traveling east = face east (PI/2)
+	# For wilderness cell transitions, preserve player's current rotation
+	# Only apply rotation when entering a town/location from wilderness
+	if spawn_id.begins_with("from_north") or spawn_id.begins_with("from_south") or \
+	   spawn_id.begins_with("from_east") or spawn_id.begins_with("from_west"):
+		# These are wilderness cell-to-cell transitions - don't change rotation
+		# Player should keep facing their travel direction
+		return
+
+	# For entering towns/locations from wilderness, face inward
 	var target_rotation: float = 0.0
+	var should_rotate: bool = true
 
 	match spawn_id:
-		"from_north":
-			target_rotation = PI  # Face south (continuing travel direction)
-		"from_south":
-			target_rotation = 0.0  # Face north (continuing travel direction)
-		"from_east":
-			target_rotation = -PI / 2.0  # Face west (continuing travel direction)
-		"from_west":
-			target_rotation = PI / 2.0  # Face east (continuing travel direction)
 		"from_wilderness_north", "from_open_world_north":
 			# Entered town from NORTH, so player was traveling SOUTH, face south
 			target_rotation = PI
@@ -875,7 +922,10 @@ func _apply_spawn_rotation(player: Node3D, spawn_id: String) -> void:
 			# Entered town from WEST, so player was traveling EAST, face east
 			target_rotation = PI / 2.0
 		_:
-			return  # Unknown spawn ID, don't change rotation
+			should_rotate = false  # Unknown spawn ID, don't change rotation
+
+	if not should_rotate:
+		return
 
 	# Apply rotation to MeshRoot if it exists (common pattern for player controller)
 	if player.has_node("MeshRoot"):
@@ -886,11 +936,18 @@ func _apply_spawn_rotation(player: Node3D, spawn_id: String) -> void:
 		player.rotation.y = target_rotation
 		print("[SceneManager] Applied spawn rotation to player: %.2f radians" % target_rotation)
 
+	# Also sync the camera pivot yaw so camera faces same direction as player
+	if player.has_node("CameraPivot"):
+		var camera_pivot := player.get_node("CameraPivot")
+		if camera_pivot.has_method("set_yaw"):
+			camera_pivot.set_yaw(target_rotation)
+			print("[SceneManager] Synced camera yaw: %.2f radians" % target_rotation)
+
 
 ## Exit wilderness and return to town
 func exit_wilderness_to_town(town_scene: String, spawn_id: String) -> void:
 	in_wilderness = false
-	current_room_coords = Vector2i.ZERO
+	current_room_coords = WorldData.PLAYER_START
 	entering_from_direction = -1
 	await change_scene(town_scene, spawn_id)
 
@@ -899,9 +956,10 @@ func exit_wilderness_to_town(town_scene: String, spawn_id: String) -> void:
 ## Uses last_wilderness_coords to return player to where they entered the dungeon
 func return_to_wilderness() -> void:
 	var return_coords := last_wilderness_coords
-	if return_coords == Vector2i.ZERO:
-		# Fallback to Elder Moor starting area if no coords saved
-		return_coords = Vector2i(0, 0)
+	# Check if we have valid saved coords (not the sentinel value)
+	if return_coords == Vector2i(-1, -1) or not WorldData.is_in_bounds(return_coords):
+		# Fallback to Elder Moor starting area
+		return_coords = WorldData.PLAYER_START
 
 	print("[SceneManager] Returning to wilderness at %s" % return_coords)
 

@@ -1,32 +1,47 @@
 ## world_data.gd - World grid data defining biomes and locations per cell
 ## Each cell is a wilderness room in the grid-based world system
-## CANONICAL WORLD MAP - Permanent layout for all playthroughs
+## DEMO ZONE MAP - 17x17 grid based on canonical JSON data
 class_name WorldData
 extends RefCounted
+
+## Grid dimensions
+const GRID_COLS := 17
+const GRID_ROWS := 17
+
+## Player start position
+const PLAYER_START := Vector2i(7, 4)  # Elder Moor
+
+## Terrain types from JSON map
+enum Terrain { BLOCKED, HIGHLANDS, FOREST, WATER, COAST, SWAMP, ROAD, POI, DESERT }
 
 ## Biome types matching WildernessRoom.Biome
 enum Biome { FOREST, PLAINS, SWAMP, HILLS, ROCKY, MOUNTAINS, COAST, UNDEAD, HORDE, DESERT }
 
 ## Location types for special cells
-enum LocationType { NONE, VILLAGE, TOWN, CITY, CAPITAL, DUNGEON, LANDMARK, BRIDGE, OUTPOST }
+enum LocationType { NONE, VILLAGE, TOWN, CITY, CAPITAL, DUNGEON, LANDMARK, BRIDGE, OUTPOST, BLOCKED }
 
 ## Cell data structure
 class CellData:
+	var terrain: Terrain = Terrain.FOREST
 	var biome: Biome = Biome.FOREST
 	var location_type: LocationType = LocationType.NONE
 	var location_id: String = ""  # Zone ID for towns/dungeons
 	var location_name: String = ""  # Display name
 	var region_name: String = ""  # Region this cell belongs to
 	var is_passable: bool = true  # Can player enter this cell?
-	var discovered: bool = false  # Has player visited?
+	var discovered: bool = false  # Has player visited this cell?
+	var dungeon_discovered: bool = false  # Has player found the dungeon entrance? (for DUNGEON cells)
 	var is_road: bool = false  # Is this a road cell (safer travel)?
 	var background_asset: String = ""  # Horizon skybox image
 	var cell_scene_path: String = ""  # Path to hand-placed cell scene (empty = procedural)
+	var description: String = ""  # Location description for map tooltip
 
-	func _init(b: Biome = Biome.FOREST, loc_type: LocationType = LocationType.NONE,
+	func _init(t: Terrain = Terrain.FOREST, b: Biome = Biome.FOREST,
+			   loc_type: LocationType = LocationType.NONE,
 			   loc_id: String = "", loc_name: String = "", region: String = "",
 			   passable: bool = true, road: bool = false, bg: String = "",
-			   scene_path: String = "") -> void:
+			   desc: String = "") -> void:
+		terrain = t
 		biome = b
 		location_type = loc_type
 		location_id = loc_id
@@ -35,25 +50,55 @@ class CellData:
 		is_passable = passable
 		is_road = road
 		background_asset = bg
-		cell_scene_path = scene_path
+		description = desc
+		# Towns/cities are auto-discovered when cell is visited, dungeons are not
+		dungeon_discovered = (loc_type != LocationType.DUNGEON)
 
 
 ## World grid - Dictionary of Vector2i -> CellData
-## Coordinates: X = East/West (+ = East), Y = North/South (+ = South in this layout)
-## Elder Moor is at (0, 0), Dalhurst south at (0, -3), etc.
+## Coordinates: col = x (0-16), row = y (0-16)
+## Row 0 is NORTH, Row 16 is SOUTH
+## Elder Moor is at (7, 4)
 static var world_grid: Dictionary = {}
 
-## Region names
-const REGION_ELDER_MOOR := "Elder Moor Swamps"
-const REGION_DALHURST := "Dalhurst Coast"
-const REGION_KAZAN_DUN := "Kazan-Dun Mountains"
-const REGION_ABERDEEN := "Aberdeen Foothills"
-const REGION_LARTON := "Larton Bay"
-const REGION_EASTERN := "Eastern Reaches"
-const REGION_TENGER := "Tenger Desert"
-const REGION_FALKENHAFEN := "Falkenhafen Province"
-const REGION_ELVEN := "Elven Lands"
-const REGION_MOUNTAINS := "Iron Mountains"
+## Terrain character to enum mapping
+const TERRAIN_MAP: Dictionary = {
+	"B": Terrain.BLOCKED,
+	"H": Terrain.HIGHLANDS,
+	"F": Terrain.FOREST,
+	"W": Terrain.WATER,
+	"C": Terrain.COAST,
+	"S": Terrain.SWAMP,
+	"R": Terrain.ROAD,
+	"P": Terrain.POI,
+	"D": Terrain.DESERT
+}
+
+## Terrain to biome mapping
+const TERRAIN_TO_BIOME: Dictionary = {
+	Terrain.BLOCKED: Biome.MOUNTAINS,
+	Terrain.HIGHLANDS: Biome.ROCKY,
+	Terrain.FOREST: Biome.FOREST,
+	Terrain.WATER: Biome.COAST,
+	Terrain.COAST: Biome.COAST,
+	Terrain.SWAMP: Biome.SWAMP,
+	Terrain.ROAD: Biome.PLAINS,
+	Terrain.POI: Biome.PLAINS,
+	Terrain.DESERT: Biome.DESERT
+}
+
+## Terrain colors for map rendering (from JSON)
+const TERRAIN_COLORS: Dictionary = {
+	Terrain.BLOCKED: Color("3a3a3a"),    # Dark gray mountains
+	Terrain.HIGHLANDS: Color("6a6a5a"),  # Rocky highlands
+	Terrain.FOREST: Color("3d6b30"),     # Green forest
+	Terrain.WATER: Color("38578a"),      # Blue water
+	Terrain.COAST: Color("3e5e3e"),      # Coastal green
+	Terrain.SWAMP: Color("2e4a28"),      # Dark swamp green
+	Terrain.ROAD: Color("7a6545"),       # Brown road
+	Terrain.POI: Color("6a5a2a"),        # POI brown
+	Terrain.DESERT: Color("a89840")      # Sandy desert
+}
 
 ## Background assets
 const BG_SWAMP := "swampbackground.png"
@@ -62,272 +107,237 @@ const BG_ROCKY := "rockhill_background.png"
 const BG_MOUNTAIN := "mountianforest_background.png"
 const BG_SEAPORT := "seaport_city_background.png"
 const BG_DESERT := "desertcity_background.png"
-const BG_KAZAN := "road_to_kazan_dun_background.png"
-const BG_ENCHANTED := "enchantedforest_background.png"
-const BG_BATTLEFIELD := "forgottenbattlefield_background.png"
-const BG_SPOOKY := "spookytemple_background.png"
+const BG_FOREST := "enchantedforest_background.png"
 const BG_GRAVEYARD := "spookygraveyard_background.png"
 
+## The canonical 17x17 terrain grid from JSON
+## Row 0 = North edge, Row 16 = South edge
+const GRID_DATA: Array = [
+	["B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B"],
+	["W","W","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B"],
+	["W","W","W","B","B","P","F","F","F","H","B","B","B","B","B","B","B"],
+	["W","W","W","C","F","R","F","F","F","P","B","B","B","B","B","B","B"],
+	["W","W","W","P","R","R","R","P","R","P","B","B","B","B","B","B","B"],
+	["W","W","C","F","F","R","P","S","S","H","H","B","B","B","B","B","B"],
+	["W","W","C","F","F","R","S","F","F","F","H","H","B","B","B","B","B"],
+	["W","W","C","F","F","R","F","F","F","F","F","H","B","B","B","B","B"],
+	["W","W","C","F","F","R","F","F","F","F","F","H","H","B","B","B","B"],
+	["W","W","C","P","R","R","F","F","F","F","F","F","H","B","B","B","B"],
+	["W","C","F","F","F","R","F","F","F","F","H","H","H","B","B","B","B"],
+	["W","C","F","F","H","R","F","F","H","H","B","B","B","B","B","B","B"],
+	["W","C","F","H","H","P","H","H","B","B","B","B","B","B","B","B","B"],
+	["W","B","B","B","B","B","B","B","B","F","F","H","F","F","F","F","F"],
+	["W","C","F","F","S","F","F","F","F","S","F","F","F","F","H","F","F"],
+	["W","F","F","F","F","F","H","F","F","F","F","F","F","H","H","F","F"],
+	["W","F","F","F","F","F","F","F","F","F","F","F","F","F","F","F","F"]
+]
 
-## Initialize the world grid with all cell data
-## CANONICAL WORLD LAYOUT:
-##
-##                Elder Moor (0,0) - START
-##                      |
-##                 [Road South]
-##                      |
-##                Dalhurst (0,-3) - Port City
-##                      |
-##                 [Mountain Road]
-##                      |
-##                Kazan-Dun (0,-6) - Dwarf Hold
-##                      |
-##                 [Mountain Pass]
-##                      |
-##                Aberdeen (0,-9) - Isolated Town
-##                 /          \
-##            Larton         [Road East] --> Falkenhafen
-##           (-3,-9)                           (7,-9)
-##              |
-##           [WATER]
-##              |
-##         Elven Forest (-4,-12) - Boat Required
-##
+## Location definitions from JSON
+const LOCATIONS: Array = [
+	{
+		"id": "willow_dale",
+		"name": "Willow Dale Ruins",
+		"col": 5, "row": 2,
+		"type": "dungeon",
+		"dungeon_levels": 0,
+		"description": "Crumbling stone ruins deep in the foothills. Ancient carvings cover the walls."
+	},
+	{
+		"id": "dalhurst",
+		"name": "Dalhurst",
+		"col": 3, "row": 4,
+		"type": "town",
+		"description": "A quiet settlement on the western road, close to the lakeshore. Has a tavern and general store."
+	},
+	{
+		"id": "crossroads",
+		"name": "Crossroads",
+		"col": 5, "row": 4,
+		"type": "landmark",
+		"description": "A weathered signpost marks where the roads meet."
+	},
+	{
+		"id": "elder_moor",
+		"name": "Elder Moor",
+		"col": 7, "row": 4,
+		"type": "landmark",
+		"is_start": true,
+		"description": "Rolling moorland dotted with standing stones. Your journey begins here."
+	},
+	{
+		"id": "thornfield",
+		"name": "Thornfield",
+		"col": 9, "row": 4,
+		"type": "town",
+		"description": "The easternmost town in the valley. The pass beyond has collapsed."
+	},
+	{
+		"id": "collapsed_pass",
+		"name": "Collapsed Pass",
+		"col": 10, "row": 4,
+		"type": "blocked",
+		"unlock_quest": "clear_the_pass",
+		"description": "A massive rockslide has sealed the mountain pass. A future quest may clear the way."
+	},
+	{
+		"id": "sunken_crypts",
+		"name": "Sunken Crypts",
+		"col": 6, "row": 5,
+		"type": "dungeon",
+		"dungeon_levels": 3,
+		"description": "A sunken entrance half-hidden by swamp growth leads down into a sprawling three-level crypt."
+	},
+	{
+		"id": "bandit_hideout",
+		"name": "Bandit Hideout",
+		"col": 9, "row": 3,
+		"type": "dungeon",
+		"dungeon_levels": 2,
+		"description": "A fortified cave entrance north of Thornfield, crawling with bandits."
+	},
+	{
+		"id": "millbrook",
+		"name": "Millbrook",
+		"col": 3, "row": 9,
+		"type": "town",
+		"description": "A rickety little town clinging to the lakeshore. Last stop before Kazer-Dun."
+	},
+	{
+		"id": "kazer_dun_entrance",
+		"name": "Kazer-Dun Entrance",
+		"col": 5, "row": 12,
+		"type": "dungeon",
+		"is_demo_wall": true,
+		"description": "The great northern gate of Kazer-Dun Dwarf Hold. The doors remain sealed. For now."
+	}
+]
+
+## Road connections from JSON [[from_col, from_row], [to_col, to_row]]
+const ROADS: Array = [
+	[[3,4],[4,4]], [[4,4],[5,4]],
+	[[5,4],[6,4]], [[6,4],[7,4]],
+	[[7,4],[8,4]], [[8,4],[9,4]],
+	[[9,4],[10,4]],
+	[[9,4],[9,3]],
+	[[5,4],[5,3]], [[5,3],[5,2]],
+	[[5,4],[5,5]], [[5,5],[5,6]], [[5,6],[5,7]], [[5,7],[5,8]], [[5,8],[5,9]],
+	[[5,9],[4,9]], [[4,9],[3,9]],
+	[[3,9],[4,9]], [[4,9],[5,9]],
+	[[5,9],[5,10]], [[5,10],[5,11]], [[5,11],[5,12]]
+]
+
+## Region definitions (for grouping cells)
+const REGION_WESTERN_SHORE := "Western Shore"
+const REGION_ELDER_MOOR := "Elder Moor"
+const REGION_EASTERN_HIGHLANDS := "Eastern Highlands"
+const REGION_SWAMPLANDS := "Swamplands"
+const REGION_SOUTHERN_FOREST := "Southern Forest"
+const REGION_MOUNTAINS := "Iron Mountains"
+
+
+## Initialize the world grid from the canonical JSON data
 static func initialize() -> void:
 	world_grid.clear()
 
-	# ============================================
-	# ELDER MOOR AREA (0,0) - Starting Zone
-	# Swamp village surrounded by swamp/forest
-	# ============================================
-	_set_cell(0, 0, Biome.SWAMP, LocationType.VILLAGE, "village_elder_moor", "Elder Moor", REGION_ELDER_MOOR, true, true, BG_SWAMP)
+	# First pass: Create cells from terrain grid
+	for row in range(GRID_ROWS):
+		for col in range(GRID_COLS):
+			var terrain_char: String = GRID_DATA[row][col]
+			var terrain: Terrain = TERRAIN_MAP.get(terrain_char, Terrain.FOREST)
+			var biome: Biome = TERRAIN_TO_BIOME.get(terrain, Biome.FOREST)
+			var passable: bool = (terrain != Terrain.BLOCKED and terrain != Terrain.WATER)
+			var is_road: bool = (terrain == Terrain.ROAD)
 
-	# Elder Moor surroundings (swamp/forest)
-	_set_cell(1, 0, Biome.SWAMP, LocationType.NONE, "", "", REGION_ELDER_MOOR, true, false, BG_SWAMP)
-	_set_cell(-1, 0, Biome.SWAMP, LocationType.NONE, "", "", REGION_ELDER_MOOR, true, false, BG_SWAMP)
-	_set_cell(0, 1, Biome.FOREST, LocationType.NONE, "", "", REGION_ELDER_MOOR, true, false, BG_SWAMP)
-	_set_cell(1, 1, Biome.FOREST, LocationType.NONE, "", "", REGION_ELDER_MOOR, true, false, BG_SWAMP)
-	_set_cell(-1, 1, Biome.FOREST, LocationType.NONE, "", "", REGION_ELDER_MOOR, true, false, BG_SWAMP)
-	_set_cell(1, -1, Biome.SWAMP, LocationType.NONE, "", "", REGION_ELDER_MOOR, true, false, BG_SWAMP)
-	_set_cell(-1, -1, Biome.SWAMP, LocationType.NONE, "", "", REGION_ELDER_MOOR, true, false, BG_SWAMP)
+			# Determine region based on position
+			var region: String = _get_region_for_coords(col, row)
 
-	# Mountains blocking north of Elder Moor
-	_set_cell(0, 2, Biome.MOUNTAINS, LocationType.NONE, "", "Northern Mountains", REGION_MOUNTAINS, false, false, BG_MOUNTAIN)
-	_set_cell(1, 2, Biome.MOUNTAINS, LocationType.NONE, "", "Northern Mountains", REGION_MOUNTAINS, false, false, BG_MOUNTAIN)
-	_set_cell(-1, 2, Biome.MOUNTAINS, LocationType.NONE, "", "Northern Mountains", REGION_MOUNTAINS, false, false, BG_MOUNTAIN)
-	_set_cell(2, 1, Biome.MOUNTAINS, LocationType.NONE, "", "Eastern Barrier", REGION_MOUNTAINS, false, false, BG_MOUNTAIN)
-	_set_cell(-2, 1, Biome.MOUNTAINS, LocationType.NONE, "", "Western Barrier", REGION_MOUNTAINS, false, false, BG_MOUNTAIN)
+			# Determine background asset based on biome
+			var bg: String = _get_background_for_biome(biome)
 
-	# ============================================
-	# ROAD: Elder Moor to Dalhurst (0,-1 to 0,-3)
-	# The ONLY road out of Elder Moor goes south
-	# ============================================
-	_set_cell(0, -1, Biome.SWAMP, LocationType.NONE, "", "Southern Road", REGION_ELDER_MOOR, true, true, BG_SWAMP)
-	_set_cell(0, -2, Biome.PLAINS, LocationType.NONE, "", "Dalhurst Road", REGION_DALHURST, true, true, BG_PLAINS)
+			# Create cell
+			var cell := CellData.new(terrain, biome, LocationType.NONE, "", "", region, passable, is_road, bg)
+			world_grid[Vector2i(col, row)] = cell
 
-	# ============================================
-	# DALHURST (0,-3) - Major Port City
-	# Coastal city, main trade hub
-	# ============================================
-	_set_cell(0, -3, Biome.COAST, LocationType.CITY, "city_dalhurst", "Dalhurst", REGION_DALHURST, true, true, BG_SEAPORT)
+	# Second pass: Add location data
+	for loc: Dictionary in LOCATIONS:
+		var col: int = loc.get("col", 0)
+		var row: int = loc.get("row", 0)
+		var coords := Vector2i(col, row)
 
-	# Dalhurst surroundings
-	_set_cell(1, -3, Biome.PLAINS, LocationType.NONE, "", "", REGION_DALHURST, true, false, BG_PLAINS)
-	_set_cell(-1, -3, Biome.COAST, LocationType.NONE, "", "Dalhurst Bay", REGION_DALHURST, true, false, BG_SEAPORT)
-	_set_cell(-2, -3, Biome.COAST, LocationType.NONE, "", "Western Waters", REGION_DALHURST, false, false, BG_SEAPORT)  # Water
-	_set_cell(1, -2, Biome.PLAINS, LocationType.NONE, "", "", REGION_DALHURST, true, false, BG_PLAINS)
-	_set_cell(-1, -2, Biome.PLAINS, LocationType.NONE, "", "", REGION_DALHURST, true, false, BG_PLAINS)
+		var cell: CellData = world_grid.get(coords)
+		if not cell:
+			continue
 
-	# Willow Dale Dungeon - west of Dalhurst
-	_set_cell(-2, -2, Biome.FOREST, LocationType.DUNGEON, "dungeon_willow_dale", "Willow Dale Ruins", REGION_DALHURST, true, false, BG_SPOOKY)
+		cell.location_id = loc.get("id", "")
+		cell.location_name = loc.get("name", "")
+		cell.description = loc.get("description", "")
 
-	# ============================================
-	# ROAD: Dalhurst to Kazan-Dun (0,-4 to 0,-6)
-	# Mountain road through rocky terrain
-	# ============================================
-	_set_cell(0, -4, Biome.ROCKY, LocationType.NONE, "", "Mountain Road", REGION_KAZAN_DUN, true, true, BG_KAZAN)
-	_set_cell(0, -5, Biome.ROCKY, LocationType.NONE, "", "Kazan Approach", REGION_KAZAN_DUN, true, true, BG_KAZAN)
+		# Set location type
+		var type_str: String = loc.get("type", "")
+		match type_str:
+			"dungeon":
+				cell.location_type = LocationType.DUNGEON
+				cell.dungeon_discovered = false
+			"town":
+				cell.location_type = LocationType.TOWN
+			"landmark":
+				cell.location_type = LocationType.LANDMARK
+			"blocked":
+				cell.location_type = LocationType.BLOCKED
+				cell.is_passable = false
+			_:
+				cell.location_type = LocationType.NONE
 
-	# Mountain walls flanking the road
-	_set_cell(1, -4, Biome.MOUNTAINS, LocationType.NONE, "", "Iron Mountains", REGION_MOUNTAINS, false, false, BG_MOUNTAIN)
-	_set_cell(-1, -4, Biome.MOUNTAINS, LocationType.NONE, "", "Iron Mountains", REGION_MOUNTAINS, false, false, BG_MOUNTAIN)
-	_set_cell(1, -5, Biome.MOUNTAINS, LocationType.NONE, "", "Iron Mountains", REGION_MOUNTAINS, false, false, BG_MOUNTAIN)
-	_set_cell(-1, -5, Biome.MOUNTAINS, LocationType.NONE, "", "Iron Mountains", REGION_MOUNTAINS, false, false, BG_MOUNTAIN)
+	# Third pass: Mark road cells from road connections
+	for road: Array in ROADS:
+		if road.size() >= 2:
+			var from: Array = road[0]
+			var to: Array = road[1]
+			if from.size() >= 2 and to.size() >= 2:
+				var from_coords := Vector2i(from[0], from[1])
+				var to_coords := Vector2i(to[0], to[1])
+				var from_cell: CellData = world_grid.get(from_coords)
+				var to_cell: CellData = world_grid.get(to_coords)
+				if from_cell:
+					from_cell.is_road = true
+				if to_cell:
+					to_cell.is_road = true
 
-	# ============================================
-	# KAZAN-DUN (0,-6) - Dwarven Hold
-	# Mountain stronghold of the dwarves
-	# ============================================
-	_set_cell(0, -6, Biome.ROCKY, LocationType.CITY, "city_kazan_dun", "Kazan-Dun", REGION_KAZAN_DUN, true, true, BG_KAZAN)
-
-	# Kazan-Dun surroundings (mountains)
-	_set_cell(1, -6, Biome.ROCKY, LocationType.NONE, "", "Eastern Gate", REGION_KAZAN_DUN, true, false, BG_ROCKY)
-	_set_cell(-1, -6, Biome.ROCKY, LocationType.NONE, "", "Western Gate", REGION_KAZAN_DUN, true, false, BG_ROCKY)
-	_set_cell(2, -6, Biome.MOUNTAINS, LocationType.NONE, "", "Deep Mountains", REGION_MOUNTAINS, false, false, BG_MOUNTAIN)
-	_set_cell(-2, -6, Biome.MOUNTAINS, LocationType.NONE, "", "Deep Mountains", REGION_MOUNTAINS, false, false, BG_MOUNTAIN)
-
-	# ============================================
-	# ROAD: Kazan-Dun to Aberdeen (0,-7 to 0,-9)
-	# Mountain pass descending to foothills
-	# ============================================
-	_set_cell(0, -7, Biome.ROCKY, LocationType.NONE, "", "Southern Pass", REGION_KAZAN_DUN, true, true, BG_ROCKY)
-	_set_cell(0, -8, Biome.HILLS, LocationType.NONE, "", "Aberdeen Foothills", REGION_ABERDEEN, true, true, BG_ROCKY)
-
-	# Mountain walls continue
-	_set_cell(1, -7, Biome.MOUNTAINS, LocationType.NONE, "", "Iron Mountains", REGION_MOUNTAINS, false, false, BG_MOUNTAIN)
-	_set_cell(-1, -7, Biome.MOUNTAINS, LocationType.NONE, "", "Iron Mountains", REGION_MOUNTAINS, false, false, BG_MOUNTAIN)
-	_set_cell(1, -8, Biome.HILLS, LocationType.NONE, "", "", REGION_ABERDEEN, true, false, BG_ROCKY)
-	_set_cell(-1, -8, Biome.HILLS, LocationType.NONE, "", "", REGION_ABERDEEN, true, false, BG_ROCKY)
-
-	# ============================================
-	# ABERDEEN (0,-9) - Isolated Town
-	# Cut-off from regular supplies, crossroads
-	# ============================================
-	_set_cell(0, -9, Biome.HILLS, LocationType.TOWN, "town_aberdeen", "Aberdeen", REGION_ABERDEEN, true, true, BG_MOUNTAIN)
-
-	# Aberdeen surroundings
-	_set_cell(0, -10, Biome.PLAINS, LocationType.NONE, "", "Southern Fields", REGION_ABERDEEN, true, false, BG_PLAINS)
-	_set_cell(-2, -8, Biome.HILLS, LocationType.NONE, "", "", REGION_ABERDEEN, true, false, BG_ROCKY)
-
-	# ============================================
-	# ROAD WEST: Aberdeen to Larton (-1,-9 to -3,-9)
-	# ============================================
-	_set_cell(-1, -9, Biome.PLAINS, LocationType.NONE, "", "Western Road", REGION_LARTON, true, true, BG_PLAINS)
-	_set_cell(-2, -9, Biome.PLAINS, LocationType.NONE, "", "Larton Road", REGION_LARTON, true, true, BG_PLAINS)
-
-	# ============================================
-	# LARTON (-3,-9) - Western Port Town
-	# Coastal town, boat access to Elven lands
-	# ============================================
-	_set_cell(-3, -9, Biome.COAST, LocationType.TOWN, "town_larton", "Larton", REGION_LARTON, true, true, BG_SEAPORT)
-
-	# Larton surroundings
-	_set_cell(-3, -8, Biome.PLAINS, LocationType.NONE, "", "", REGION_LARTON, true, false, BG_PLAINS)
-	_set_cell(-4, -9, Biome.COAST, LocationType.NONE, "", "Larton Harbor", REGION_LARTON, false, false, BG_SEAPORT)  # Water
-	_set_cell(-3, -10, Biome.COAST, LocationType.NONE, "", "Southern Waters", REGION_LARTON, false, false, BG_SEAPORT)  # Water
-
-	# Water barrier between Larton and Elven Forest
-	_set_cell(-4, -10, Biome.COAST, LocationType.NONE, "", "Open Sea", REGION_LARTON, false, false, BG_SEAPORT)
-	_set_cell(-4, -11, Biome.COAST, LocationType.NONE, "", "Open Sea", REGION_LARTON, false, false, BG_SEAPORT)
-	_set_cell(-3, -11, Biome.COAST, LocationType.NONE, "", "Open Sea", REGION_LARTON, false, false, BG_SEAPORT)
-
-	# ============================================
-	# ELVEN FOREST (-4,-12) - Boat Required
-	# Accessible only by sea from Larton
-	# ============================================
-	_set_cell(-4, -12, Biome.FOREST, LocationType.VILLAGE, "village_elven_outpost", "Elven Outpost", REGION_ELVEN, true, false, BG_ENCHANTED)
-	_set_cell(-5, -12, Biome.FOREST, LocationType.NONE, "", "Elven Woods", REGION_ELVEN, true, false, BG_ENCHANTED)
-	_set_cell(-4, -13, Biome.FOREST, LocationType.NONE, "", "Deep Forest", REGION_ELVEN, true, false, BG_ENCHANTED)
-	_set_cell(-5, -13, Biome.FOREST, LocationType.NONE, "", "Ancient Grove", REGION_ELVEN, true, false, BG_ENCHANTED)
-
-	# ============================================
-	# ROAD EAST: Aberdeen to Eastern Reaches (1,-9 to 7,-9)
-	# Main trade route to capital
-	# ============================================
-	_set_cell(1, -9, Biome.PLAINS, LocationType.NONE, "", "Eastern Road", REGION_ABERDEEN, true, true, BG_PLAINS)
-
-	# ============================================
-	# FORGOTTEN BATTLEGROUNDS (2,-9) - Landmark
-	# Historic battlefield, east of Aberdeen
-	# ============================================
-	_set_cell(2, -9, Biome.PLAINS, LocationType.LANDMARK, "poi_forgotten_battlegrounds", "Forgotten Battlegrounds", REGION_EASTERN, true, true, BG_BATTLEFIELD)
-	_set_cell(2, -10, Biome.PLAINS, LocationType.NONE, "", "", REGION_EASTERN, true, false, BG_PLAINS)
-	_set_cell(2, -8, Biome.HILLS, LocationType.NONE, "", "", REGION_EASTERN, true, false, BG_ROCKY)
-
-	# Continue road east
-	_set_cell(3, -9, Biome.PLAINS, LocationType.NONE, "", "Trade Road", REGION_EASTERN, true, true, BG_PLAINS)
-
-	# ============================================
-	# WHAELER'S ABYSS (4,-8) - Dungeon
-	# Spooky temple/dungeon north of road
-	# ============================================
-	_set_cell(4, -8, Biome.ROCKY, LocationType.DUNGEON, "dungeon_whaelers_abyss", "Whaeler's Abyss", REGION_EASTERN, true, false, BG_SPOOKY)
-	_set_cell(3, -8, Biome.HILLS, LocationType.NONE, "", "", REGION_EASTERN, true, false, BG_ROCKY)
-
-	# Road continues
-	_set_cell(4, -9, Biome.PLAINS, LocationType.NONE, "", "Eastern Plains", REGION_EASTERN, true, true, BG_PLAINS)
-
-	# ============================================
-	# TENGER DESERT CAMP (5,-10) - Desert Outpost
-	# Nomadic trading post south of main road
-	# ============================================
-	_set_cell(5, -10, Biome.DESERT, LocationType.OUTPOST, "outpost_tenger_camp", "Tenger Camp", REGION_TENGER, true, false, BG_DESERT)
-	_set_cell(5, -11, Biome.DESERT, LocationType.NONE, "", "Tenger Desert", REGION_TENGER, true, false, BG_DESERT)
-	_set_cell(4, -10, Biome.DESERT, LocationType.NONE, "", "", REGION_TENGER, true, false, BG_DESERT)
-	_set_cell(6, -10, Biome.DESERT, LocationType.NONE, "", "", REGION_TENGER, true, false, BG_DESERT)
-	_set_cell(5, -9, Biome.PLAINS, LocationType.NONE, "", "Desert Edge", REGION_TENGER, true, true, BG_PLAINS)
-
-	# Continue road to Falkenhafen
-	_set_cell(6, -9, Biome.PLAINS, LocationType.NONE, "", "Capital Road", REGION_FALKENHAFEN, true, true, BG_PLAINS)
-
-	# ============================================
-	# FALKENHAFEN (7,-9) - Capital City
-	# Largest city in the land
-	# ============================================
-	_set_cell(7, -9, Biome.ROCKY, LocationType.CAPITAL, "capital_falkenhafen", "Falkenhafen", REGION_FALKENHAFEN, true, true, BG_MOUNTAIN)
-
-	# Falkenhafen surroundings
-	_set_cell(7, -8, Biome.ROCKY, LocationType.NONE, "", "Northern Gate", REGION_FALKENHAFEN, true, false, BG_MOUNTAIN)
-	_set_cell(8, -9, Biome.ROCKY, LocationType.NONE, "", "Castle Grounds", REGION_FALKENHAFEN, true, false, BG_MOUNTAIN)
-	_set_cell(7, -10, Biome.PLAINS, LocationType.NONE, "", "Southern Fields", REGION_FALKENHAFEN, true, false, BG_PLAINS)
-	_set_cell(8, -8, Biome.MOUNTAINS, LocationType.NONE, "", "Eastern Peaks", REGION_MOUNTAINS, false, false, BG_MOUNTAIN)
-	_set_cell(8, -10, Biome.PLAINS, LocationType.NONE, "", "", REGION_FALKENHAFEN, true, false, BG_PLAINS)
-
-	# ============================================
-	# PROCEDURAL SETTLEMENTS (Hardcoded Random)
-	# Additional villages/hamlets away from main road
-	# ============================================
-
-	# Hamlet: Thornfield (northeast of Elder Moor, forest clearing)
-	_set_cell(2, 0, Biome.FOREST, LocationType.VILLAGE, "hamlet_thornfield", "Thornfield", REGION_ELDER_MOOR, true, false, BG_SWAMP)
-
-	# Hamlet: Millbrook (between Dalhurst and Kazan-Dun, off the main road)
-	_set_cell(2, -3, Biome.PLAINS, LocationType.VILLAGE, "hamlet_millbrook", "Millbrook", REGION_DALHURST, true, false, BG_PLAINS)
-
-	# Village: Stonehaven (near mountains south of Kazan-Dun)
-	_set_cell(-2, -7, Biome.ROCKY, LocationType.VILLAGE, "village_stonehaven", "Stonehaven", REGION_KAZAN_DUN, true, false, BG_ROCKY)
-
-	# Hamlet: Dusty Hollow (edge of desert, small trading post)
-	_set_cell(6, -11, Biome.DESERT, LocationType.VILLAGE, "hamlet_dusty_hollow", "Dusty Hollow", REGION_TENGER, true, false, BG_DESERT)
-
-	# Village: Riverside (south of Falkenhafen)
-	_set_cell(7, -11, Biome.PLAINS, LocationType.VILLAGE, "village_riverside", "Riverside", REGION_FALKENHAFEN, true, false, BG_PLAINS)
-
-	# Hamlet: Windmere (north wilderness, accessible from eastern road)
-	_set_cell(4, -7, Biome.HILLS, LocationType.VILLAGE, "hamlet_windmere", "Windmere", REGION_EASTERN, true, false, BG_ROCKY)
-
-	# Village: Old Crossing (junction village between regions)
-	_set_cell(3, -10, Biome.PLAINS, LocationType.VILLAGE, "village_old_crossing", "Old Crossing", REGION_EASTERN, true, false, BG_PLAINS)
-
-	# ============================================
-	# ADDITIONAL SETTLEMENTS (Towns/Outposts)
-	# ============================================
-
-	# Town: East Hollow (Tregar-conquered town)
-	_set_cell(5, -6, Biome.PLAINS, LocationType.TOWN, "town_east_hollow", "East Hollow", REGION_EASTERN, true, false, BG_PLAINS)
-
-	# Town: Whalers Abyss (Cliffside vampire cult town)
-	_set_cell(3, -7, Biome.COAST, LocationType.TOWN, "town_whalers_abyss", "Whalers Abyss", REGION_EASTERN, true, false, BG_SEAPORT)
-
-	# Outpost: King's Watch (Mountain fortress)
-	_set_cell(-1, -5, Biome.MOUNTAINS, LocationType.OUTPOST, "outpost_kings_watch", "King's Watch", REGION_KAZAN_DUN, true, false, BG_MOUNTAIN)
-
-	# Village: Pola Perron (Peaceful mountain village)
-	_set_cell(-3, -6, Biome.HILLS, LocationType.VILLAGE, "village_pola_perron", "Pola Perron", REGION_KAZAN_DUN, true, false, BG_ROCKY)
-
-	# Town: Duncaster (Blocked mountain route)
-	_set_cell(-2, -4, Biome.MOUNTAINS, LocationType.TOWN, "town_duncaster", "Duncaster", REGION_KAZAN_DUN, true, false, BG_MOUNTAIN)
-
-	print("[WorldData] Initialized world grid with %d cells" % world_grid.size())
+	print("[WorldData] Initialized demo zone grid with %d cells" % world_grid.size())
 
 
-## Helper to set a cell
-static func _set_cell(x: int, y: int, biome: Biome, loc_type: LocationType,
-					   loc_id: String, loc_name: String, region: String,
-					   passable: bool = true, road: bool = false, bg: String = "",
-					   scene_path: String = "") -> void:
-	var coords := Vector2i(x, y)
-	world_grid[coords] = CellData.new(biome, loc_type, loc_id, loc_name, region, passable, road, bg, scene_path)
+## Get region name for coordinates
+static func _get_region_for_coords(col: int, row: int) -> String:
+	# Western shore (near water)
+	if col <= 3:
+		return REGION_WESTERN_SHORE
+	# Eastern highlands
+	if col >= 9:
+		return REGION_EASTERN_HIGHLANDS
+	# Mountains (row 0-2, blocked areas)
+	if row <= 2 and col >= 10:
+		return REGION_MOUNTAINS
+	# Swamplands (around swamp terrain)
+	if row >= 5 and row <= 8 and col >= 6 and col <= 8:
+		return REGION_SWAMPLANDS
+	# Southern forest
+	if row >= 13:
+		return REGION_SOUTHERN_FOREST
+	# Default to Elder Moor (central area)
+	return REGION_ELDER_MOOR
+
+
+## Get background asset for biome
+static func _get_background_for_biome(biome: Biome) -> String:
+	match biome:
+		Biome.SWAMP: return BG_SWAMP
+		Biome.PLAINS: return BG_PLAINS
+		Biome.ROCKY, Biome.HILLS: return BG_ROCKY
+		Biome.MOUNTAINS: return BG_MOUNTAIN
+		Biome.COAST: return BG_SEAPORT
+		Biome.DESERT: return BG_DESERT
+		Biome.FOREST: return BG_FOREST
+		_: return BG_PLAINS
 
 
 ## Get cell data for coordinates (returns null if not defined)
@@ -337,16 +347,28 @@ static func get_cell(coords: Vector2i) -> CellData:
 	return world_grid.get(coords, null)
 
 
+## Get terrain at coordinates
+static func get_terrain(coords: Vector2i) -> Terrain:
+	var cell := get_cell(coords)
+	if cell:
+		return cell.terrain
+	return Terrain.BLOCKED
+
+
+## Get terrain color for map rendering
+static func get_terrain_color(coords: Vector2i) -> Color:
+	var cell := get_cell(coords)
+	if cell:
+		return TERRAIN_COLORS.get(cell.terrain, Color.BLACK)
+	return Color.BLACK
+
+
 ## Get biome for coordinates (defaults to FOREST for undefined cells)
 static func get_biome(coords: Vector2i) -> Biome:
 	var cell := get_cell(coords)
 	if cell:
 		return cell.biome
-	# Default biome for unexplored areas based on distance from origin
-	var dist := coords.length()
-	if dist > 5:
-		return Biome.PLAINS  # Far areas are plains
-	return Biome.FOREST  # Near areas are forest
+	return Biome.FOREST
 
 
 ## Check if a cell is passable
@@ -354,7 +376,12 @@ static func is_passable(coords: Vector2i) -> bool:
 	var cell := get_cell(coords)
 	if cell:
 		return cell.is_passable
-	return true  # Undefined cells are passable (wilderness)
+	return false  # Out of bounds is not passable
+
+
+## Check if coordinates are within bounds
+static func is_in_bounds(coords: Vector2i) -> bool:
+	return coords.x >= 0 and coords.x < GRID_COLS and coords.y >= 0 and coords.y < GRID_ROWS
 
 
 ## Check if a cell is a road (safer travel)
@@ -379,8 +406,20 @@ static func get_cell_name(coords: Vector2i) -> String:
 	if cell and cell.location_name != "":
 		return cell.location_name
 	if cell:
-		return "%s (%d, %d)" % [Biome.keys()[cell.biome].capitalize(), coords.x, coords.y]
-	return "Wilderness (%d, %d)" % [coords.x, coords.y]
+		# Return terrain-based name
+		var terrain_names: Dictionary = {
+			Terrain.BLOCKED: "Impassable Mountains",
+			Terrain.HIGHLANDS: "Rocky Highlands",
+			Terrain.FOREST: "Forest",
+			Terrain.WATER: "Open Water",
+			Terrain.COAST: "Coastline",
+			Terrain.SWAMP: "Swampland",
+			Terrain.ROAD: "Road",
+			Terrain.POI: "Point of Interest",
+			Terrain.DESERT: "Desert"
+		}
+		return terrain_names.get(cell.terrain, "Wilderness")
+	return "Unknown"
 
 
 ## Get region name for coordinates
@@ -396,26 +435,7 @@ static func get_background_asset(coords: Vector2i) -> String:
 	var cell := get_cell(coords)
 	if cell and cell.background_asset != "":
 		return "res://Sprite folders grab bag/" + cell.background_asset
-	# Default based on biome
-	var biome := get_biome(coords)
-	match biome:
-		Biome.SWAMP: return "res://Sprite folders grab bag/" + BG_SWAMP
-		Biome.PLAINS: return "res://Sprite folders grab bag/" + BG_PLAINS
-		Biome.ROCKY, Biome.HILLS: return "res://Sprite folders grab bag/" + BG_ROCKY
-		Biome.MOUNTAINS: return "res://Sprite folders grab bag/" + BG_MOUNTAIN
-		Biome.COAST: return "res://Sprite folders grab bag/" + BG_SEAPORT
-		Biome.DESERT: return "res://Sprite folders grab bag/" + BG_DESERT
-		Biome.FOREST: return "res://Sprite folders grab bag/" + BG_ENCHANTED
-		_: return "res://Sprite folders grab bag/" + BG_PLAINS
-
-
-## Get cell scene path for hand-placed wilderness cells
-## Returns empty string if no hand-placed scene (use procedural generation)
-static func get_cell_scene(coords: Vector2i) -> String:
-	var cell := get_cell(coords)
-	if cell:
-		return cell.cell_scene_path
-	return ""
+	return "res://Sprite folders grab bag/" + BG_PLAINS
 
 
 ## Mark a cell as discovered
@@ -433,8 +453,40 @@ static func is_discovered(coords: Vector2i) -> bool:
 	return false
 
 
+## Mark a dungeon as discovered (reveals the dungeon icon on the map)
+static func discover_dungeon(coords: Vector2i) -> void:
+	var cell := get_cell(coords)
+	if cell and cell.location_type == LocationType.DUNGEON:
+		cell.dungeon_discovered = true
+		print("[WorldData] Dungeon discovered at %s: %s" % [coords, cell.location_name])
+
+
+## Check if dungeon at coords has been discovered
+static func is_dungeon_discovered(coords: Vector2i) -> bool:
+	var cell := get_cell(coords)
+	if not cell:
+		return false
+	if cell.location_type != LocationType.DUNGEON:
+		return true
+	return cell.dungeon_discovered
+
+
+## Check if a location should show its full icon vs "?" marker
+static func should_show_location_icon(coords: Vector2i) -> bool:
+	var cell := get_cell(coords)
+	if not cell:
+		return false
+	if SceneManager and not SceneManager.fog_of_war_enabled:
+		return true
+	if cell.location_type != LocationType.DUNGEON:
+		return cell.discovered
+	return cell.discovered and cell.dungeon_discovered
+
+
 ## Get all discovered cells
 static func get_discovered_cells() -> Array[Vector2i]:
+	if world_grid.is_empty():
+		initialize()
 	var discovered: Array[Vector2i] = []
 	for coords: Vector2i in world_grid:
 		var cell: CellData = world_grid[coords]
@@ -480,59 +532,57 @@ static func get_all_settlements() -> Array[Dictionary]:
 	return settlements
 
 
-## Get world bounds (min/max coordinates)
+## Get world bounds
 static func get_world_bounds() -> Dictionary:
-	if world_grid.is_empty():
-		initialize()
-
-	var min_x := 0
-	var max_x := 0
-	var min_y := 0
-	var max_y := 0
-
-	for coords: Vector2i in world_grid:
-		min_x = mini(min_x, coords.x)
-		max_x = maxi(max_x, coords.x)
-		min_y = mini(min_y, coords.y)
-		max_y = maxi(max_y, coords.y)
-
 	return {
-		"min": Vector2i(min_x, min_y),
-		"max": Vector2i(max_x, max_y),
-		"width": max_x - min_x + 1,
-		"height": max_y - min_y + 1
+		"min": Vector2i(0, 0),
+		"max": Vector2i(GRID_COLS - 1, GRID_ROWS - 1),
+		"width": GRID_COLS,
+		"height": GRID_ROWS
 	}
 
 
 ## Convert WildernessRoom.Biome to WorldData.Biome
+## WildernessRoom.Biome values: FOREST=0, PLAINS=1, SWAMP=2, HILLS=3, ROCKY=4, DESERT=5, COAST=6
 static func to_wilderness_biome(biome: Biome) -> int:
 	match biome:
-		Biome.FOREST: return 0  # WildernessRoom.Biome.FOREST
-		Biome.PLAINS: return 1  # WildernessRoom.Biome.PLAINS
-		Biome.SWAMP: return 2   # WildernessRoom.Biome.SWAMP
-		Biome.HILLS: return 3   # WildernessRoom.Biome.HILLS
-		Biome.ROCKY, Biome.MOUNTAINS: return 4  # WildernessRoom.Biome.ROCKY
-		Biome.COAST: return 1   # Use plains visuals for coast
-		Biome.UNDEAD: return 2  # Use swamp visuals for undead (dark, murky)
-		Biome.HORDE: return 1   # Use plains visuals for horde lands
-		Biome.DESERT: return 1  # Use plains visuals for desert (tan/dry)
+		Biome.FOREST: return 0
+		Biome.PLAINS: return 1
+		Biome.SWAMP: return 2
+		Biome.HILLS: return 3
+		Biome.ROCKY, Biome.MOUNTAINS: return 4
+		Biome.DESERT: return 5
+		Biome.COAST: return 6  # Now maps to proper COAST biome instead of PLAINS
 		_: return 0
 
 
-## Find path between two settlements (returns array of coords)
-## Simple pathfinding along roads
-static func find_road_path(from_coords: Vector2i, to_coords: Vector2i) -> Array[Vector2i]:
+## Get location info by ID
+static func get_location_by_id(location_id: String) -> Dictionary:
+	for loc: Dictionary in LOCATIONS:
+		if loc.get("id", "") == location_id:
+			return loc
+	return {}
+
+
+## Get player start coordinates
+static func get_player_start() -> Vector2i:
+	return PLAYER_START
+
+
+## Find path between two points (simple A* pathfinding)
+static func find_path(from_coords: Vector2i, to_coords: Vector2i) -> Array[Vector2i]:
 	if world_grid.is_empty():
 		initialize()
 
-	# Simple BFS pathfinding preferring roads
 	var visited: Dictionary = {}
 	var queue: Array[Dictionary] = [{"coords": from_coords, "path": [from_coords]}]
 	visited[from_coords] = true
 
 	var directions: Array[Vector2i] = [
-		Vector2i(0, 1), Vector2i(0, -1),
-		Vector2i(1, 0), Vector2i(-1, 0)
+		Vector2i(0, -1),  # North (up)
+		Vector2i(0, 1),   # South (down)
+		Vector2i(1, 0),   # East (right)
+		Vector2i(-1, 0)   # West (left)
 	]
 
 	while not queue.is_empty():
@@ -550,7 +600,7 @@ static func find_road_path(from_coords: Vector2i, to_coords: Vector2i) -> Array[
 		var neighbors: Array[Dictionary] = []
 		for dir: Vector2i in directions:
 			var next: Vector2i = coords + dir
-			if not visited.has(next) and is_passable(next):
+			if not visited.has(next) and is_passable(next) and is_in_bounds(next):
 				var priority: int = 1 if is_road(next) else 2
 				neighbors.append({"coords": next, "priority": priority})
 
@@ -566,226 +616,129 @@ static func find_road_path(from_coords: Vector2i, to_coords: Vector2i) -> Array[
 	return []  # No path found
 
 
-# =============================================================================
-# HEX GRID UTILITIES (Daggerfall Unity-inspired world generation)
-# =============================================================================
-
-## Hex direction bitmask constants for road/path connections
-const DIR_NE := 1
-const DIR_E := 2
-const DIR_SE := 4
-const DIR_SW := 8
-const DIR_W := 16
-const DIR_NW := 32
-
-## Chunk size for streaming (world units)
-const CHUNK_SIZE := 100.0
-
-## Axial hex neighbor offsets (flat-top orientation)
-const HEX_NEIGHBORS: Array[Vector2i] = [
-	Vector2i(1, 0),   # East
-	Vector2i(-1, 0),  # West
-	Vector2i(0, 1),   # Southeast
-	Vector2i(0, -1),  # Northwest
-	Vector2i(1, -1),  # Northeast
-	Vector2i(-1, 1)   # Southwest
-]
+## Get adjacent passable cells
+static func get_adjacent_passable(coords: Vector2i) -> Array[Vector2i]:
+	var result: Array[Vector2i] = []
+	var directions: Array[Vector2i] = [
+		Vector2i(0, -1), Vector2i(0, 1),
+		Vector2i(1, 0), Vector2i(-1, 0)
+	]
+	for dir: Vector2i in directions:
+		var next: Vector2i = coords + dir
+		if is_in_bounds(next) and is_passable(next):
+			result.append(next)
+	return result
 
 
-## Extended hex tile data for DFU-style world generation
-class HexTileData:
-	var hex_coords: Vector2i = Vector2i.ZERO  # Axial coordinates (q, r)
-	var terrain: String = "plains"  # Terrain type string
-	var elevation: String = "low"  # "sea", "low", "mid", "high"
-	var biome: Biome = Biome.PLAINS
-	var road_connections: int = 0  # Bitmask of DIR_* constants
-	var location_id: String = ""  # Town/POI ID if present
-	var location_type: LocationType = LocationType.NONE
-	var danger_level: float = 1.0  # Encounter danger multiplier
-	var patrol_faction: String = ""  # Faction that patrols this hex
+## ============================================================================
+## COORDINATE CONVERSION (3D World <-> Grid)
+## ============================================================================
+## Grid cell size in world units (matches WildernessRoom size)
+const CELL_WORLD_SIZE := 100.0
 
-	func _init(q: int = 0, r: int = 0) -> void:
-		hex_coords = Vector2i(q, r)
-
-	## Check if this hex has a road connection in a direction
-	func has_road(direction: int) -> bool:
-		return (road_connections & direction) != 0
-
-	## Add a road connection
-	func add_road(direction: int) -> void:
-		road_connections = road_connections | direction
-
-	## Check if this hex is on any road
-	func is_on_road() -> bool:
-		return road_connections != 0
+## Convert 3D world position to grid coordinates
+static func world_to_axial(world_pos: Vector3) -> Vector2i:
+	# Grid origin (0,0) is at world origin
+	# Each cell is CELL_WORLD_SIZE x CELL_WORLD_SIZE
+	var col := int(floor(world_pos.x / CELL_WORLD_SIZE)) + PLAYER_START.x
+	var row := int(floor(-world_pos.z / CELL_WORLD_SIZE)) + PLAYER_START.y
+	return Vector2i(col, row)
 
 
-## Convert axial hex coordinates to world position (3D)
-## Uses flat-top hex orientation with CHUNK_SIZE spacing
-static func axial_to_world(hex: Vector2i) -> Vector3:
-	var x: float = CHUNK_SIZE * (1.5 * hex.x)
-	var z: float = CHUNK_SIZE * (sqrt(3.0) / 2.0 * hex.x + sqrt(3.0) * hex.y)
+## Convert grid coordinates to 3D world position (center of cell)
+static func axial_to_world(coords: Vector2i) -> Vector3:
+	# Inverse of world_to_axial
+	var x := (coords.x - PLAYER_START.x) * CELL_WORLD_SIZE + CELL_WORLD_SIZE / 2.0
+	var z := -(coords.y - PLAYER_START.y) * CELL_WORLD_SIZE - CELL_WORLD_SIZE / 2.0
 	return Vector3(x, 0.0, z)
 
 
-## Convert world position to axial hex coordinates
-## Rounds to nearest hex center
-static func world_to_axial(pos: Vector3) -> Vector2i:
-	var q: float = pos.x / (CHUNK_SIZE * 1.5)
-	var r: float = (pos.z / CHUNK_SIZE - sqrt(3.0) / 2.0 * q) / sqrt(3.0)
-	# Round to nearest hex using cube coordinate rounding
-	return _axial_round(q, r)
+## Calculate grid distance between two coordinates (Manhattan distance)
+static func hex_distance(from_coords: Vector2i, to_coords: Vector2i) -> int:
+	return abs(from_coords.x - to_coords.x) + abs(from_coords.y - to_coords.y)
 
 
-## Round fractional axial coordinates to nearest hex
-static func _axial_round(q: float, r: float) -> Vector2i:
-	# Convert to cube coordinates
-	var x: float = q
-	var z: float = r
-	var y: float = -x - z
+## ============================================================================
+## NPC & ENEMY REGISTRY (for quest tracking)
+## ============================================================================
+## Registered NPCs: npc_id -> { "coords": Vector2i, "name": String }
+static var registered_npcs: Dictionary = {}
 
-	# Round cube coordinates
-	var rx: int = roundi(x)
-	var ry: int = roundi(y)
-	var rz: int = roundi(z)
-
-	# Fix rounding errors by resetting the component with largest diff
-	var x_diff: float = abs(rx - x)
-	var y_diff: float = abs(ry - y)
-	var z_diff: float = abs(rz - z)
-
-	if x_diff > y_diff and x_diff > z_diff:
-		rx = -ry - rz
-	elif y_diff > z_diff:
-		ry = -rx - rz
-	else:
-		rz = -rx - ry
-
-	# Convert back to axial (q = x, r = z)
-	return Vector2i(rx, rz)
+## Registered enemy spawn locations: coords -> Array of enemy_ids
+static var enemy_spawn_locations: Dictionary = {}
 
 
-## Get all 6 neighboring hex coordinates
-static func get_hex_neighbors(hex: Vector2i) -> Array[Vector2i]:
-	var neighbors: Array[Vector2i] = []
-	for offset: Vector2i in HEX_NEIGHBORS:
-		neighbors.append(hex + offset)
-	return neighbors
-
-
-## Calculate hex distance (number of hexes between two points)
-static func hex_distance(a: Vector2i, b: Vector2i) -> int:
-	# Convert to cube coordinates and use cube distance
-	var a_cube: Vector3i = Vector3i(a.x, -a.x - a.y, a.y)
-	var b_cube: Vector3i = Vector3i(b.x, -b.x - b.y, b.y)
-	return (abs(a_cube.x - b_cube.x) + abs(a_cube.y - b_cube.y) + abs(a_cube.z - b_cube.z)) / 2
-
-
-## Get direction bitmask from one hex to adjacent hex
-static func get_direction_to(from_hex: Vector2i, to_hex: Vector2i) -> int:
-	var diff: Vector2i = to_hex - from_hex
-	match diff:
-		Vector2i(1, -1): return DIR_NE
-		Vector2i(1, 0): return DIR_E
-		Vector2i(0, 1): return DIR_SE
-		Vector2i(-1, 1): return DIR_SW
-		Vector2i(-1, 0): return DIR_W
-		Vector2i(0, -1): return DIR_NW
-	return 0  # Not adjacent
-
-
-## Get opposite direction
-static func get_opposite_direction(direction: int) -> int:
-	match direction:
-		DIR_NE: return DIR_SW
-		DIR_E: return DIR_W
-		DIR_SE: return DIR_NW
-		DIR_SW: return DIR_NE
-		DIR_W: return DIR_E
-		DIR_NW: return DIR_SE
-	return 0
-
-
-# =============================================================================
-# NPC AND ENEMY REGISTRY (for quest/encounter systems)
-# =============================================================================
-
-## NPC location registry: npc_id -> {hex: Vector2i, zone_id: String, npc_type: String}
-static var npc_locations: Dictionary = {}
-
-## Enemy spawn registry: enemy_type -> Array[{hex: Vector2i, zone_id: String, spawn_weight: float}]
-static var enemy_spawns: Dictionary = {}
-
-
-## Register an NPC location (called when NPCs are placed in zones)
-static func register_npc(npc_id: String, hex: Vector2i, zone_id: String, npc_type: String = "") -> void:
-	npc_locations[npc_id] = {
-		"hex": hex,
+## Register an NPC at a location
+## Parameters: npc_id, coords, zone_id, npc_type (matching caller order)
+static func register_npc(npc_id: String, coords: Vector2i, zone_id: String = "", npc_type: String = "") -> void:
+	registered_npcs[npc_id] = {
+		"hex": coords,
 		"zone_id": zone_id,
-		"npc_type": npc_type
+		"type": npc_type
 	}
 
 
-## Unregister an NPC (called when NPC is removed/killed)
+## Unregister an NPC
 static func unregister_npc(npc_id: String) -> void:
-	npc_locations.erase(npc_id)
+	registered_npcs.erase(npc_id)
 
 
-## Get NPC location data
+## Get NPC location - returns Dictionary with hex, zone_id, name
 static func get_npc_location(npc_id: String) -> Dictionary:
-	return npc_locations.get(npc_id, {})
+	if registered_npcs.has(npc_id):
+		return registered_npcs[npc_id]
+	return {}
 
 
-## Get all NPCs in a specific hex
-static func get_npcs_in_hex(hex: Vector2i) -> Array[String]:
-	var npcs: Array[String] = []
-	for npc_id: String in npc_locations:
-		var data: Dictionary = npc_locations[npc_id]
-		if data.get("hex", Vector2i.ZERO) == hex:
-			npcs.append(npc_id)
-	return npcs
+## Register an enemy spawn at a location
+static func register_enemy_spawn(enemy_id: String, coords: Vector2i, zone_id: String = "") -> void:
+	if not enemy_spawn_locations.has(coords):
+		enemy_spawn_locations[coords] = []
+	var entry: Dictionary = {"enemy_id": enemy_id, "zone_id": zone_id}
+	# Check if already registered
+	var found := false
+	for existing: Dictionary in enemy_spawn_locations[coords]:
+		if existing.get("enemy_id", "") == enemy_id:
+			found = true
+			break
+	if not found:
+		enemy_spawn_locations[coords].append(entry)
 
 
-## Get all NPCs of a specific type
-static func get_npcs_by_type(npc_type: String) -> Array[String]:
-	var npcs: Array[String] = []
-	for npc_id: String in npc_locations:
-		var data: Dictionary = npc_locations[npc_id]
-		if data.get("npc_type", "") == npc_type:
-			npcs.append(npc_id)
-	return npcs
+## Get enemy spawn locations, optionally filtered by enemy_type
+## Returns Array of { "hex": Vector2i, "zone_id": String, "enemy_id": String }
+static func get_enemy_spawn_locations(enemy_type: String = "") -> Array:
+	var results: Array = []
+	for coords: Vector2i in enemy_spawn_locations:
+		for entry: Dictionary in enemy_spawn_locations[coords]:
+			var entry_id: String = entry.get("enemy_id", "")
+			# If no filter, return all; otherwise filter by enemy_type
+			if enemy_type.is_empty() or entry_id == enemy_type or entry_id.begins_with(enemy_type):
+				results.append({
+					"hex": coords,
+					"zone_id": entry.get("zone_id", ""),
+					"enemy_id": entry_id
+				})
+	return results
 
 
-## Register an enemy spawn location
-static func register_enemy_spawn(enemy_type: String, hex: Vector2i, zone_id: String, spawn_weight: float = 1.0) -> void:
-	if not enemy_spawns.has(enemy_type):
-		enemy_spawns[enemy_type] = []
-	enemy_spawns[enemy_type].append({
-		"hex": hex,
-		"zone_id": zone_id,
-		"spawn_weight": spawn_weight
-	})
+## ============================================================================
+## ROAD PATHFINDING
+## ============================================================================
+
+## Find path that prefers roads between two coordinates
+static func find_road_path(from_coords: Vector2i, to_coords: Vector2i) -> Array[Vector2i]:
+	# Use the existing find_path which already prefers roads
+	return find_path(from_coords, to_coords)
 
 
-## Get spawn locations for an enemy type
-static func get_enemy_spawn_locations(enemy_type: String) -> Array:
-	return enemy_spawns.get(enemy_type, [])
+## ============================================================================
+## CELL SCENE PATH
+## ============================================================================
 
-
-## Get all enemy types that can spawn in a hex
-static func get_spawnable_enemies_in_hex(hex: Vector2i) -> Array[String]:
-	var enemies: Array[String] = []
-	for enemy_type: String in enemy_spawns:
-		var spawns: Array = enemy_spawns[enemy_type]
-		for spawn: Dictionary in spawns:
-			if spawn.get("hex", Vector2i.ZERO) == hex:
-				if not enemy_type in enemies:
-					enemies.append(enemy_type)
-				break
-	return enemies
-
-
-## Clear all registries (called on new game)
-static func clear_registries() -> void:
-	npc_locations.clear()
-	enemy_spawns.clear()
+## Get custom scene path for a cell (if hand-crafted)
+static func get_cell_scene(coords: Vector2i) -> String:
+	var cell := get_cell(coords)
+	if cell and cell.cell_scene_path != "":
+		return cell.cell_scene_path
+	return ""

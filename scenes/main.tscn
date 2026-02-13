@@ -56,8 +56,8 @@ func _dev_quick_start() -> void:
 
 	print(\"[DEV] Quick start: %s the %s\" % [char_data.character_name, Enums.Race.keys()[char_data.race]])
 
-	# Load game
-	get_tree().change_scene_to_file(\"res://scenes/levels/dalhurst.tscn\")
+	# Load game - start at Elder Moor
+	get_tree().change_scene_to_file(\"res://scenes/levels/elder_moor.tscn\")
 "
 
 [node name="Main" type="Node"]
