@@ -16,6 +16,10 @@ var edge_triggers: Dictionary = {}
 
 
 func _ready() -> void:
+	# Set current region for world map tracking
+	if SceneManager:
+		SceneManager.set_current_region(ZONE_ID)
+
 	SaveManager.set_current_zone(ZONE_ID, "Mill Brook")
 
 	_setup_spawn_points()
@@ -184,7 +188,7 @@ func _on_edge_entered(direction: RoomEdge.Direction) -> void:
 	var target_coords: Vector2i = GRID_COORDS + offset
 
 	SceneManager.current_room_coords = GRID_COORDS
-	SceneManager.enter_wilderness(direction, target_coords)
+	SceneManager.enter_wilderness(target_coords, direction)
 
 
 ## Create invisible collision walls at borders

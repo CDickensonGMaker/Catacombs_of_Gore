@@ -20,6 +20,10 @@ var edge_triggers: Dictionary = {}
 
 
 func _ready() -> void:
+	# Set current region for world map tracking
+	if SceneManager:
+		SceneManager.set_current_region(ZONE_ID)
+
 	_setup_environment()
 	_spawn_npcs()
 	_spawn_interactables()
@@ -253,7 +257,7 @@ func _on_edge_entered(direction: RoomEdge.Direction) -> void:
 	SceneManager.current_room_coords = GRID_COORDS
 
 	# Enter wilderness at the adjacent cell
-	SceneManager.enter_wilderness(direction, target_coords)
+	SceneManager.enter_wilderness(target_coords, direction)
 
 
 ## Setup metadata on spawn points from the scene

@@ -57,4 +57,4 @@ func _enter_wilderness() -> void:
 
 	# Enter wilderness room system
 	print("[WildernessExitHandler] Entering wilderness at %s, direction %d" % [start_coords, direction])
-	SceneManager.enter_wilderness(direction, start_coords)
+	SceneManager.enter_wilderness(start_coords, direction)
