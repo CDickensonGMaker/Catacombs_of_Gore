@@ -17,12 +17,31 @@ var seamless_mode: bool = false
 @export var room_size: float = 100.0
 @export var room_seed: int = 0  # 0 = random
 
-## Biome types (must match WorldData.to_wilderness_biome() output)
-enum Biome { FOREST, PLAINS, SWAMP, HILLS, ROCKY, DESERT, COAST }
+## Biome types
+enum Biome { FOREST, PLAINS, SWAMP, HILLS, ROCKY }
 @export var biome: Biome = Biome.FOREST
 
-## Terrain type from WorldData (for terrain-specific visuals like roads, POIs, coast)
-var terrain_type: int = 0  # WorldData.Terrain enum value
+## Tile template scenes for biome-based tile selection
+## Maps Biome enum to array of scene paths for hand-crafted tile variations
+const TILE_TEMPLATES: Dictionary = {
+	Biome.FOREST: [
+		"res://scenes/wilderness/tile_forest_01.tscn",
+		"res://scenes/wilderness/tile_forest_02.tscn"
+	],
+	Biome.PLAINS: [
+		"res://scenes/wilderness/tile_plains_01.tscn",
+		"res://scenes/wilderness/tile_plains_02.tscn"
+	],
+	Biome.SWAMP: [
+		"res://scenes/wilderness/tile_swamp_01.tscn"
+	],
+	Biome.HILLS: [
+		"res://scenes/wilderness/tile_plains_01.tscn"  # Fallback to plains
+	],
+	Biome.ROCKY: [
+		"res://scenes/wilderness/tile_plains_02.tscn"  # Fallback to plains
+	]
+}
 
 ## Content settings (from plan: 1-3 ruins, 0-1 dungeons at 30%)
 @export var min_ruins: int = 1
@@ -33,33 +52,6 @@ var terrain_type: int = 0  # WorldData.Terrain enum value
 @export var enemy_count_min: int = 2
 @export var enemy_count_max: int = 5
 @export var cursed_totem_chance: float = 0.25  # 25% chance for cursed totem near ruins
-
-## 3D Terrain prop settings
-@export var terrain_prop_chance: float = 0.4  # 40% chance to spawn 3D terrain props
-@export var terrain_prop_count_min: int = 1
-@export var terrain_prop_count_max: int = 3
-
-## 3D terrain model paths by prop type
-const TERRAIN_MODELS: Dictionary = {
-	"hill": [
-		"res://assets/models/terrain/low_hills.glb"
-	],
-	"rock": [],  # Add rock GLB models here
-	"boulder": [],  # Add boulder GLB models here
-	"cliff": [],  # Add cliff GLB models here
-	"stump": [],  # Add stump GLB models here
-	"log": []  # Add log GLB models here
-}
-
-## 3D statue model paths
-const STATUE_MODELS: Array[String] = [
-	"res://assets/models/statues/sword_statue.glb"
-]
-
-## Statue spawn settings
-@export var statue_near_ruins_chance: float = 0.8  # 80% chance per ruin
-@export var statue_standalone_chance: float = 0.5  # 50% chance for standalone statue
-@export var statue_near_dungeon_chance: float = 0.9  # 90% chance near dungeon entrance
 
 ## Road visualization settings
 @export var road_width: float = 8.0  # Width of dirt road
@@ -109,10 +101,6 @@ func _process(_delta: float) -> void:
 	pass
 
 
-## Reference to loaded hand-placed cell scene (if any)
-var hand_placed_cell: Node3D = null
-
-
 ## Generate the room with given seed
 func generate(seed_value: int = 0, coords: Vector2i = Vector2i.ZERO) -> void:
 	grid_coords = coords
@@ -124,21 +112,13 @@ func generate(seed_value: int = 0, coords: Vector2i = Vector2i.ZERO) -> void:
 	# Check if this is a road cell
 	is_road_cell = WorldData.is_road(coords)
 
-	# Check for hand-placed cell scene
-	var cell_scene_path: String = WorldData.get_cell_scene(coords)
-	if not cell_scene_path.is_empty() and ResourceLoader.exists(cell_scene_path):
-		print("[WildernessRoom] Loading hand-placed cell at %s: %s" % [coords, cell_scene_path])
-		_load_hand_placed_cell(cell_scene_path)
-		return
-
-	print("[WildernessRoom] Generating procedural room at %s with seed %d, biome: %s, is_road: %s" % [
+	print("[WildernessRoom] Generating room at %s with seed %d, biome: %s, is_road: %s" % [
 		coords, room_seed, Biome.keys()[biome], is_road_cell
 	])
 
 	_setup_materials()
 	_create_ground()
 	_create_road_if_needed()  # Add dirt road on road cells
-	_create_terrain_specific_features()  # POI landmarks, coastal edges based on terrain_type
 	_create_sky_environment()
 	_create_edges()
 	_create_spawn_points()  # Directional spawn points for cell transitions
@@ -146,111 +126,13 @@ func generate(seed_value: int = 0, coords: Vector2i = Vector2i.ZERO) -> void:
 	_spawn_ruins()
 	_spawn_cursed_totems()  # Skeleton spawners near ruins
 	_spawn_dungeon_entrance()
-	_spawn_statues()  # Decorative statues near ruins and dungeons
 	_spawn_environment()
 	_spawn_enemies()
 	_spawn_fireplace()
 	_spawn_traveling_merchant()
 	_spawn_signposts_if_road()  # Add signposts pointing to destinations
 	_create_boundary_props()
-
-	room_generated.emit(self)
-
-
-## Load and instantiate a hand-placed cell scene
-func _load_hand_placed_cell(scene_path: String) -> void:
-	var cell_scene: PackedScene = load(scene_path)
-	if not cell_scene:
-		push_error("[WildernessRoom] Failed to load hand-placed cell: %s" % scene_path)
-		# Fall back to procedural generation
-		_generate_procedural()
-		return
-
-	hand_placed_cell = cell_scene.instantiate()
-	hand_placed_cell.name = "HandPlacedCell"
-	add_child(hand_placed_cell)
-
-	# Check if it's a WildernessTile with proper structure
-	if hand_placed_cell is WildernessTile:
-		var tile: WildernessTile = hand_placed_cell as WildernessTile
-		tile.apply_biome_effects()
-		print("[WildernessRoom] Loaded hand-placed tile: %s" % tile.get_tile_info())
-
-		# Spawn enemies at designated points
-		_spawn_enemies_at_tile_markers(tile)
-
-	# Still need basic infrastructure (edges, spawn points, walls, environment)
-	_setup_materials()
-	_create_sky_environment()
-	_create_edges()
-	_create_spawn_points()
-	_set_background_for_biome()
-	_create_invisible_walls()
-
-	room_generated.emit(self)
-
-
-## Spawn enemies at hand-placed tile's enemy spawn markers
-func _spawn_enemies_at_tile_markers(tile: WildernessTile) -> void:
-	var spawn_points: Array[Node3D] = tile.get_enemy_spawn_points()
-	if spawn_points.is_empty():
-		return
-
-	for spawn_point in spawn_points:
-		# Get enemy config for this biome
-		var enemy_config: Dictionary = _get_enemy_config_for_biome()
-
-		var enemy: Node = null
-		var pos: Vector3 = spawn_point.global_position
-
-		# Check if this is a skeleton enemy
-		if enemy_config.get("is_skeleton", false):
-			enemy = EnemyBase.spawn_skeleton_enemy(
-				self,
-				pos,
-				enemy_config.data_path
-			)
-		else:
-			# Load sprite texture for regular enemies
-			var sprite_tex: Texture2D = load(enemy_config.sprite_path)
-			if not sprite_tex:
-				push_warning("[WildernessRoom] Failed to load sprite: %s" % enemy_config.sprite_path)
-				continue
-
-			# Spawn regular billboard enemy
-			enemy = EnemyBase.spawn_billboard_enemy(
-				self,
-				pos,
-				enemy_config.data_path,
-				sprite_tex,
-				enemy_config.h_frames,
-				enemy_config.v_frames
-			)
-
-		if enemy:
-			enemies.append(enemy)
-			print("[WildernessRoom] Spawned %s at marker %s" % [enemy_config.display_name, pos])
-
-
-## Generate procedural room (extracted for fallback use)
-func _generate_procedural() -> void:
-	_setup_materials()
-	_create_ground()
-	_create_road_if_needed()
-	_create_sky_environment()
-	_create_edges()
-	_create_spawn_points()
-	_set_background_for_biome()
-	_spawn_ruins()
-	_spawn_cursed_totems()
-	_spawn_dungeon_entrance()
-	_spawn_statues()  # Decorative statues near ruins and dungeons
-	_spawn_environment()
-	_spawn_enemies()
-	_spawn_fireplace()
-	_spawn_traveling_merchant()
-	_spawn_signposts_if_road()
-	_create_boundary_props()
+	_create_edge_transitions()  # Blend terrain at edges with adjacent biomes
 
 	room_generated.emit(self)
 
@@ -290,12 +172,6 @@ func _setup_materials() -> void:
 		Biome.ROCKY:
 			ground_material.albedo_color = Color(0.3, 0.28, 0.25)  # Rocky ground
 			rock_material.albedo_color = Color(0.35, 0.32, 0.3)
-		Biome.DESERT:
-			ground_material.albedo_color = Color(0.6, 0.5, 0.35)  # Sandy tan
-			rock_material.albedo_color = Color(0.55, 0.48, 0.38)  # Desert rock
-		Biome.COAST:
-			ground_material.albedo_color = Color(0.55, 0.52, 0.42)  # Sandy beach
-			rock_material.albedo_color = Color(0.45, 0.43, 0.38)   # Wet rocks
 
 
 ## Create ground plane with simple solid color (PS1 style - no complex textures)
@@ -314,101 +190,8 @@ func _create_ground() -> void:
 	ground.material = simple_mat
 	add_child(ground)
 
-	# Spawn biome-specific floor detail textures
-	_spawn_floor_details()
-
 	# Spawn environmental props on the ground
 	_spawn_ground_props()
-
-	# Spawn 3D terrain props (hills, rocks, etc.)
-	_spawn_terrain_props()
-
-
-## Spawn biome-specific floor detail textures as flat decals
-func _spawn_floor_details() -> void:
-	var floor_container := Node3D.new()
-	floor_container.name = "FloorDetails"
-	add_child(floor_container)
-
-	# Get floor textures based on biome
-	var floor_textures: Array[String] = _get_floor_textures_for_biome()
-	if floor_textures.is_empty():
-		return
-
-	# Number of floor detail patches - large random patterns
-	var num_patches: int = rng.randi_range(12, 20)
-	var half_size: float = room_size / 2.0 - 8.0  # Keep away from edges
-
-	for i in range(num_patches):
-		var tex_path: String = floor_textures[rng.randi() % floor_textures.size()]
-		if not ResourceLoader.exists(tex_path):
-			continue
-
-		var detail := Sprite3D.new()
-		detail.name = "FloorDetail_%d" % i
-		detail.texture = load(tex_path)
-		detail.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
-
-		# Lay flat on ground (rotate -90 on X axis)
-		detail.rotation_degrees.x = -90
-
-		# Random Y rotation for variety
-		detail.rotation_degrees.y = rng.randf_range(0, 360)
-
-		# Large pixel size for big floor patterns
-		detail.pixel_size = rng.randf_range(0.08, 0.15)
-
-		# Position on ground (slightly above to prevent z-fighting)
-		detail.position = Vector3(
-			rng.randf_range(-half_size, half_size),
-			0.02,
-			rng.randf_range(-half_size, half_size)
-		)
-
-		# Apply subtle biome tint
-		detail.modulate = _get_biome_prop_tint()
-
-		floor_container.add_child(detail)
-
-
-## Get floor detail textures based on current biome
-func _get_floor_textures_for_biome() -> Array[String]:
-	match biome:
-		Biome.FOREST:
-			# Mix of full leaves and half leaves for forest floor
-			return [
-				"res://Sprite folders grab bag/fullelaves.png",
-				"res://Sprite folders grab bag/half leaves.png",
-				"res://Sprite folders grab bag/fullelaves.png",  # Weight full leaves more
-			]
-		Biome.PLAINS:
-			# Plains floor textures
-			return [
-				"res://Sprite folders grab bag/plains_floor1.png",
-				"res://Sprite folders grab bag/plains_floor2.png",
-				"res://Sprite folders grab bag/plains_floor3.png",
-			]
-		Biome.SWAMP:
-			# Swamp flood textures
-			return [
-				"res://Sprite folders grab bag/swamp_flood1.png",
-				"res://Sprite folders grab bag/swamp_flood2.png",
-			]
-		Biome.HILLS, Biome.ROCKY, Biome.DESERT:
-			# Rock/hill floor textures for hills, rocky, and desert biomes
-			return [
-				"res://Sprite folders grab bag/rockhill_floor1.png",
-				"res://Sprite folders grab bag/rockhill_floor2.png",
-				"res://Sprite folders grab bag/rockhill_floor3.png",
-			]
-		Biome.COAST:
-			# Coastal floor textures (sandy beach with rocks)
-			return [
-				"res://Sprite folders grab bag/rockhill_floor1.png",
-				"res://Sprite folders grab bag/plains_floor1.png",
-			]
-		_:
-			return []
 
 
 ## Create dirt road mesh if this is a road cell
@@ -508,295 +291,6 @@ func _create_road_if_needed() -> void:
 	print("[WildernessRoom] Created dirt road (N:%s S:%s E:%s W:%s)" % [
 		north_road, south_road, east_road, west_road
 	])
-
-
-## Create terrain-specific visual features based on terrain_type from WorldData
-## This adds visual distinctiveness for Roads, POIs, Coast cells, etc.
-func _create_terrain_specific_features() -> void:
-	# terrain_type comes from WorldData.Terrain enum:
-	# BLOCKED=0, HIGHLANDS=1, FOREST=2, WATER=3, COAST=4, SWAMP=5, ROAD=6, POI=7, DESERT=8
-	match terrain_type:
-		6:  # ROAD - already handled by _create_road_if_needed(), but add road markers
-			pass  # Road visuals handled elsewhere
-		7:  # POI - Add landmark (standing stones, old ruins, signpost)
-			_create_poi_landmark()
-		4:  # COAST - Add water edge and sandy shore
-			_create_coastal_edge()
-		1:  # HIGHLANDS - Add rocky outcrops
-			_create_highland_features()
-		_:
-			pass  # Other terrains use standard biome generation
-
-
-## Create POI landmark - standing stones, old ruins, or waymarker
-func _create_poi_landmark() -> void:
-	var poi_container := Node3D.new()
-	poi_container.name = "POILandmark"
-	add_child(poi_container)
-
-	# Choose a random landmark type
-	var landmark_type: int = rng.randi() % 3
-
-	match landmark_type:
-		0:  # Standing stones (stone circle)
-			_create_standing_stones(poi_container)
-		1:  # Old waymarker/signpost
-			_create_waymarker(poi_container)
-		2:  # Ancient shrine
-			_create_ancient_shrine(poi_container)
-
-	print("[WildernessRoom] Created POI landmark type %d" % landmark_type)
-
-
-## Create a circle of standing stones
-func _create_standing_stones(parent: Node3D) -> void:
-	var num_stones: int = rng.randi_range(4, 7)
-	var radius: float = rng.randf_range(8.0, 12.0)
-
-	var stone_mat := StandardMaterial3D.new()
-	stone_mat.albedo_color = Color(0.35, 0.33, 0.3)
-	stone_mat.roughness = 0.95
-
-	for i in range(num_stones):
-		var angle: float = (TAU / num_stones) * i + rng.randf_range(-0.2, 0.2)
-		var stone := CSGBox3D.new()
-		stone.name = "StandingStone_%d" % i
-		var height: float = rng.randf_range(2.5, 4.5)
-		var width: float = rng.randf_range(0.6, 1.2)
-		stone.size = Vector3(width, height, width * 0.6)
-		stone.position = Vector3(
-			cos(angle) * radius,
-			height / 2.0,
-			sin(angle) * radius
-		)
-		stone.rotation.y = angle + rng.randf_range(-0.3, 0.3)
-		# Slight tilt for weathered look
-		stone.rotation.x = rng.randf_range(-0.1, 0.1)
-		stone.rotation.z = rng.randf_range(-0.1, 0.1)
-		stone.material = stone_mat
-		parent.add_child(stone)
-
-
-## Create a waymarker post
-func _create_waymarker(parent: Node3D) -> void:
-	var post_mat := StandardMaterial3D.new()
-	post_mat.albedo_color = Color(0.4, 0.32, 0.25)
-	post_mat.roughness = 0.9
-
-	# Main post
-	var post := CSGBox3D.new()
-	post.name = "WaymarkerPost"
-	post.size = Vector3(0.3, 3.0, 0.3)
-	post.position = Vector3(0, 1.5, 0)
-	post.material = post_mat
-	parent.add_child(post)
-
-	# Directional signs (2-3 pointing different ways)
-	var num_signs: int = rng.randi_range(2, 3)
-	for i in range(num_signs):
-		var sign_board := CSGBox3D.new()
-		sign_board.name = "Sign_%d" % i
-		sign_board.size = Vector3(1.5, 0.4, 0.1)
-		var sign_height: float = 2.0 + i * 0.5
-		var sign_angle: float = rng.randf_range(0, TAU)
-		sign_board.position = Vector3(cos(sign_angle) * 0.8, sign_height, sin(sign_angle) * 0.8)
-		sign_board.rotation.y = sign_angle
-		sign_board.material = post_mat
-		parent.add_child(sign_board)
-
-
-## Create an ancient shrine structure
-func _create_ancient_shrine(parent: Node3D) -> void:
-	var stone_mat := StandardMaterial3D.new()
-	stone_mat.albedo_color = Color(0.4, 0.38, 0.35)
-	stone_mat.roughness = 0.9
-
-	# Base platform
-	var base := CSGBox3D.new()
-	base.name = "ShrineBase"
-	base.size = Vector3(4.0, 0.4, 4.0)
-	base.position = Vector3(0, 0.2, 0)
-	base.material = stone_mat
-	parent.add_child(base)
-
-	# Central altar
-	var altar := CSGBox3D.new()
-	altar.name = "Altar"
-	altar.size = Vector3(1.5, 1.0, 1.0)
-	altar.position = Vector3(0, 0.9, 0)
-	altar.material = stone_mat
-	parent.add_child(altar)
-
-	# Corner pillars
-	var pillar_positions: Array[Vector3] = [
-		Vector3(-1.5, 1.2, -1.5),
-		Vector3(1.5, 1.2, -1.5),
-		Vector3(-1.5, 1.2, 1.5),
-		Vector3(1.5, 1.2, 1.5)
-	]
-	for i in range(pillar_positions.size()):
-		var pillar := CSGCylinder3D.new()
-		pillar.name = "Pillar_%d" % i
-		pillar.radius = 0.25
-		pillar.height = 2.4
-		pillar.position = pillar_positions[i]
-		pillar.material = stone_mat
-		parent.add_child(pillar)
-
-
-## Create coastal edge - water on one side
-func _create_coastal_edge() -> void:
-	var coast_container := Node3D.new()
-	coast_container.name = "CoastalEdge"
-	add_child(coast_container)
-
-	# Determine which edge has water (based on adjacent cells)
-	var water_direction: int = _get_water_direction()
-	if water_direction == -1:
-		# No adjacent water, just add some shore features
-		_create_beach_features(coast_container)
-		return
-
-	# Create water plane on the water side
-	var water_mat := StandardMaterial3D.new()
-	water_mat.albedo_color = Color(0.2, 0.35, 0.5, 0.8)
-	water_mat.roughness = 0.2
-	water_mat.metallic = 0.1
-	water_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-
-	var water := CSGBox3D.new()
-	water.name = "WaterPlane"
-	water.size = Vector3(room_size + 20, 0.5, 25.0)
-	water.material = water_mat
-
-	var half_size: float = room_size / 2.0
-
-	# Position water based on direction
-	match water_direction:
-		0:  # NORTH - water at -Z
-			water.position = Vector3(0, -0.3, -half_size - 10)
-		1:  # SOUTH - water at +Z
-			water.position = Vector3(0, -0.3, half_size + 10)
-		2:  # EAST - water at +X
-			water.rotation.y = PI / 2.0
-			water.position = Vector3(half_size + 10, -0.3, 0)
-		3:  # WEST - water at -X
-			water.rotation.y = PI / 2.0
-			water.position = Vector3(-half_size - 10, -0.3, 0)
-
-	coast_container.add_child(water)
-
-	# Add sandy shore transition
-	_create_beach_features(coast_container)
-
-	print("[WildernessRoom] Created coastal edge with water at direction %d" % water_direction)
-
-
-## Determine which direction has water (returns -1 if none)
-func _get_water_direction() -> int:
-	var directions: Array[Vector2i] = [
-		Vector2i(0, -1),  # North
-		Vector2i(0, 1),   # South
-		Vector2i(1, 0),   # East
-		Vector2i(-1, 0)   # West
-	]
-
-	for i in range(directions.size()):
-		var adj_coords: Vector2i = grid_coords + directions[i]
-		var adj_terrain: int = WorldData.get_terrain(adj_coords)
-		# WorldData.Terrain.WATER = 3
-		if adj_terrain == 3:
-			return i
-
-	return -1
-
-
-## Create beach features (driftwood, rocks, shells)
-func _create_beach_features(parent: Node3D) -> void:
-	var half_size: float = room_size / 2.0 - 10.0
-	var num_features: int = rng.randi_range(5, 10)
-
-	var rock_mat := StandardMaterial3D.new()
-	rock_mat.albedo_color = Color(0.45, 0.43, 0.4)
-	rock_mat.roughness = 0.85
-
-	var drift_mat := StandardMaterial3D.new()
-	drift_mat.albedo_color = Color(0.5, 0.42, 0.32)
-	drift_mat.roughness = 0.9
-
-	for i in range(num_features):
-		var pos := Vector3(
-			rng.randf_range(-half_size, half_size),
-			0.1,
-			rng.randf_range(-half_size, half_size)
-		)
-
-		if rng.randf() < 0.6:
-			# Beach rock
-			var rock := CSGSphere3D.new()
-			rock.name = "BeachRock_%d" % i
-			rock.radius = rng.randf_range(0.3, 0.8)
-			rock.position = pos
-			rock.scale = Vector3(1.0, rng.randf_range(0.4, 0.7), rng.randf_range(0.8, 1.2))
-			rock.material = rock_mat
-			parent.add_child(rock)
-		else:
-			# Driftwood log
-			var log := CSGCylinder3D.new()
-			log.name = "Driftwood_%d" % i
-			log.radius = rng.randf_range(0.1, 0.2)
-			log.height = rng.randf_range(1.0, 2.5)
-			log.rotation.z = PI / 2.0
-			log.rotation.y = rng.randf_range(0, TAU)
-			log.position = pos
-			log.material = drift_mat
-			parent.add_child(log)
-
-
-## Create highland rocky features
-func _create_highland_features() -> void:
-	var highland_container := Node3D.new()
-	highland_container.name = "HighlandFeatures"
-	add_child(highland_container)
-
-	var half_size: float = room_size / 2.0 - 10.0
-	var num_outcrops: int = rng.randi_range(3, 6)
-
-	var rock_mat := StandardMaterial3D.new()
-	rock_mat.albedo_color = Color(0.42, 0.4, 0.38)
-	rock_mat.roughness = 0.95
-
-	for i in range(num_outcrops):
-		var outcrop := Node3D.new()
-		outcrop.name = "RockOutcrop_%d" % i
-		outcrop.position = Vector3(
-			rng.randf_range(-half_size, half_size),
-			0,
-			rng.randf_range(-half_size, half_size)
-		)
-		highland_container.add_child(outcrop)
-
-		# Create cluster of rocks
-		var cluster_size: int = rng.randi_range(2, 5)
-		for j in range(cluster_size):
-			var rock := CSGBox3D.new()
-			rock.name = "Rock_%d" % j
-			var rock_size: float = rng.randf_range(0.8, 2.0)
-			rock.size = Vector3(rock_size, rock_size * rng.randf_range(0.5, 1.5), rock_size * rng.randf_range(0.6, 1.0))
-			rock.position = Vector3(
-				rng.randf_range(-2, 2),
-				rock.size.y / 2.0,
-				rng.randf_range(-2, 2)
-			)
-			rock.rotation = Vector3(
-				rng.randf_range(-0.2, 0.2),
-				rng.randf_range(0, TAU),
-				rng.randf_range(-0.2, 0.2)
-			)
-			rock.material = rock_mat
-			outcrop.add_child(rock)
-
-	print("[WildernessRoom] Created %d highland rock outcrops" % num_outcrops)
 
 
 ## Spawn environmental props (trees, grass, gravestones) based on biome
@@ -952,101 +446,8 @@ func _get_biome_prop_tint() -> Color:
 			return Color(1.0, 0.95, 0.85)  # Warm yellow
 		Biome.ROCKY:
 			return Color(0.85, 0.85, 0.9)  # Cool gray
-		Biome.DESERT:
-			return Color(1.0, 0.9, 0.7)  # Warm sandy tint
 		_:
 			return Color.WHITE
-
-
-## Spawn 3D terrain props (hills, rocks, boulders) using GLB models
-func _spawn_terrain_props() -> void:
-	# Check if we should spawn terrain props at all
-	if rng.randf() > terrain_prop_chance:
-		return
-
-	# On road cells, reduce terrain prop spawning
-	if is_road_cell:
-		return  # Skip terrain props on roads
-
-	var terrain_container := Node3D.new()
-	terrain_container.name = "TerrainProps"
-	add_child(terrain_container)
-
-	# Determine which prop types to spawn based on biome
-	var prop_types: Array[String] = _get_terrain_prop_types_for_biome()
-	if prop_types.is_empty():
-		return
-
-	var num_props: int = rng.randi_range(terrain_prop_count_min, terrain_prop_count_max)
-	var half_size: float = room_size / 2.0 - 10.0  # Keep away from edges
-
-	for i in range(num_props):
-		var prop_type: String = prop_types[rng.randi() % prop_types.size()]
-		var models: Array = TERRAIN_MODELS.get(prop_type, [])
-		if models.is_empty():
-			continue
-
-		var model_path: String = models[rng.randi() % models.size()]
-		if not ResourceLoader.exists(model_path):
-			continue
-
-		var pos := Vector3(
-			rng.randf_range(-half_size, half_size),
-			0.0,
-			rng.randf_range(-half_size, half_size)
-		)
-
-		# Use TerrainProp class to spawn and texture the model
-		var biome_name: String = _get_biome_name_string()
-		var scale_val: float = rng.randf_range(0.8, 1.5)
-
-		var prop: TerrainProp = TerrainProp.spawn_prop(
-			terrain_container,
-			pos,
-			model_path,
-			prop_type,
-			biome_name,
-			scale_val
-		)
-
-		if prop:
-			props.append(prop)
-
-
-## Get terrain prop types appropriate for current biome
-func _get_terrain_prop_types_for_biome() -> Array[String]:
-	match biome:
-		Biome.HILLS, Biome.ROCKY:
-			return ["hill", "rock", "boulder", "cliff"]
-		Biome.DESERT:
-			return ["rock", "boulder"]  # Desert has scattered rocks
-		Biome.FOREST:
-			return ["hill", "stump", "log", "rock"]
-		Biome.PLAINS:
-			return ["hill", "rock"]
-		Biome.SWAMP:
-			return ["log", "stump"]
-		_:
-			return ["hill", "rock"]
-
-
-## Convert biome enum to string for TerrainProp
-func _get_biome_name_string() -> String:
-	match biome:
-		Biome.FOREST:
-			return "forest"
-		Biome.PLAINS:
-			return "plains"
-		Biome.SWAMP:
-			return "swamp"
-		Biome.HILLS:
-			return "hills"
-		Biome.ROCKY:
-			return "rocky"
-		Biome.DESERT:
-			return "desert"
-		_:
-			return "plains"
 
 
 ## PS1-style distance fog settings (tight visibility for retro feel)
@@ -1089,11 +490,6 @@ func _create_sky_environment() -> void:
 			sky_mat.sky_horizon_color = Color(0.6, 0.65, 0.7)
 			sky_mat.ground_horizon_color = Color(0.4, 0.42, 0.35)
 			fog_color = Color(0.5, 0.5, 0.55)  # Light gray fog
-		Biome.DESERT:
-			sky_mat.sky_top_color = Color(0.5, 0.55, 0.7)  # Bright blue desert sky
-			sky_mat.sky_horizon_color = Color(0.8, 0.75, 0.65)  # Warm sandy horizon
-			sky_mat.ground_horizon_color = Color(0.6, 0.5, 0.4)  # Sandy ground
-			fog_color = Color(0.7, 0.6, 0.5)  # Dusty tan fog
 		_:  # PLAINS and default
 			sky_mat.sky_top_color = Color(0.35, 0.55, 0.75)
 			sky_mat.sky_horizon_color = Color(0.65, 0.75, 0.85)
@@ -1114,8 +510,14 @@ func _create_sky_environment() -> void:
 	env.fog_aerial_perspective = 0.0  # No aerial perspective
 	env.fog_sky_affect = 1.0  # Fog affects sky too
 	env.fog_depth_curve = 1.0  # Linear falloff
-	env.fog_depth_begin = FOG_START  # Fog starts at 20 units
-	env.fog_depth_end = FOG_END  # Fully opaque at 40 units
+
+	# Road cells have better visibility - push fog back
+	if is_road_cell:
+		env.fog_depth_begin = FOG_START * 2.5  # 20 units on roads
+		env.fog_depth_end = FOG_END * 2.0      # 30 units on roads
+	else:
+		env.fog_depth_begin = FOG_START
+		env.fog_depth_end = FOG_END
 
 	world_env.environment = env
 	add_child(world_env)
@@ -1290,88 +692,6 @@ func _spawn_cursed_totems() -> void:
 		if totem:
 			cursed_totems.append(totem)
 			print("[WildernessRoom] Spawned Cursed Totem near ruin at %s" % totem_pos)
-
-
-## Spawn decorative statues near ruins, dungeons, and standalone
-func _spawn_statues() -> void:
-	if STATUE_MODELS.is_empty():
-		push_warning("[WildernessRoom] No statue models defined")
-		return
-
-	var statues_container := Node3D.new()
-	statues_container.name = "Statues"
-	add_child(statues_container)
-
-	var biome_name: String = _get_biome_name_string()
-	var statues_spawned: int = 0
-
-	# Spawn statues near ruins
-	for ruin in ruins:
-		if rng.randf() > statue_near_ruins_chance:
-			continue
-
-		var angle := rng.randf() * TAU
-		var distance := rng.randf_range(5.0, 10.0)
-		var offset := Vector3(cos(angle) * distance, 0, sin(angle) * distance)
-		var statue_pos: Vector3 = ruin.position + offset
-
-		var model_path: String = STATUE_MODELS[rng.randi() % STATUE_MODELS.size()]
-		var scale_val: float = rng.randf_range(1.0, 1.5)
-
-		var statue: TerrainProp = TerrainProp.spawn_prop(
-			statues_container,
-			statue_pos,
-			model_path,
-			"statue",
-			biome_name,
-			scale_val
-		)
-		if statue:
-			props.append(statue)
-			statues_spawned += 1
-
-	# Spawn statue near dungeon entrance
-	if dungeon_entrance and rng.randf() <= statue_near_dungeon_chance:
-		var angle := rng.randf() * TAU
-		var distance := rng.randf_range(4.0, 8.0)
-		var offset := Vector3(cos(angle) * distance, 0, sin(angle) * distance)
-		var statue_pos: Vector3 = dungeon_entrance.position + offset
-
-		var model_path: String = STATUE_MODELS[rng.randi() % STATUE_MODELS.size()]
-		var scale_val: float = rng.randf_range(1.2, 1.8)  # Slightly larger near dungeons
-
-		var statue: TerrainProp = TerrainProp.spawn_prop(
-			statues_container,
-			statue_pos,
-			model_path,
-			"statue",
-			biome_name,
-			scale_val
-		)
-		if statue:
-			props.append(statue)
-			statues_spawned += 1
-
-	# Chance for standalone statue in the wilderness
-	if rng.randf() <= statue_standalone_chance:
-		var pos := _get_random_content_position()
-		var model_path: String = STATUE_MODELS[rng.randi() % STATUE_MODELS.size()]
-		var scale_val: float = rng.randf_range(0.8, 1.3)
-
-		var statue: TerrainProp = TerrainProp.spawn_prop(
-			statues_container,
-			pos,
-			model_path,
-			"statue",
-			biome_name,
-			scale_val
-		)
-		if statue:
-			props.append(statue)
-			statues_spawned += 1
-
-	if statues_spawned > 0:
-		print("[WildernessRoom] Spawned %d statue(s)" % statues_spawned)
 
 
 ## Create a ruin structure
@@ -1636,11 +956,6 @@ func _spawn_environment() -> void:
 			bush_count = rng.randi_range(5, 10)   # Few bushes
 			rock_count = rng.randi_range(20, 35)  # Lots of rocks
 			grass_count = rng.randi_range(5, 10)  # Very sparse grass
-		Biome.DESERT:
-			tree_count = rng.randi_range(0, 2)    # Almost no trees
-			bush_count = rng.randi_range(2, 5)    # Very few bushes
-			rock_count = rng.randi_range(15, 25)  # Scattered rocks
-			grass_count = rng.randi_range(3, 8)   # Minimal scrub grass
 
 	# Reduce prop density on road cells
 	if is_road_cell:
@@ -2648,10 +1963,15 @@ func contains_point(world_pos: Vector3) -> bool:
 # SEAMLESS STREAMING SUPPORT
 # =============================================================================
 
-## Get the world position for this room based on hex coordinates
+## Get the world position for this room based on grid coordinates
 ## Used by WorldManager to position chunks correctly
+static func position_for_cell(cell_coords: Vector2i) -> Vector3:
+	return WorldData.cell_to_world(cell_coords)
+
+
+## Legacy alias for backwards compatibility
 static func position_for_hex(hex_coords: Vector2i) -> Vector3:
-	return WorldData.axial_to_world(hex_coords)
+	return position_for_cell(hex_coords)
 
 
 ## Enable seamless mode (disables edge triggers, WorldManager handles transitions)
@@ -2687,11 +2007,6 @@ func _reset_for_reuse() -> void:
 
 ## Clear all generated content (for chunk recycling)
 func _clear_content() -> void:
-	# Clear hand-placed cell if present
-	if hand_placed_cell and is_instance_valid(hand_placed_cell):
-		hand_placed_cell.queue_free()
-	hand_placed_cell = null
-
 	# Clear ruins
 	for ruin: Node3D in ruins:
 		if is_instance_valid(ruin):
@@ -2789,3 +2104,141 @@ func get_location_type() -> WorldData.LocationType:
 	if cell:
 		return cell.location_type
 	return WorldData.LocationType.NONE
+
+
+## ============================================================================
+## EDGE TERRAIN BLENDING
+## ============================================================================
+## Creates visual transition elements at room edges where adjacent cells have
+## different biomes. This helps make biome transitions feel more natural.
+
+## Create edge transition effects based on adjacent cell biomes
+func _create_edge_transitions() -> void:
+	var half_size: float = room_size / 2.0
+	var transition_depth: float = 15.0  # How far into the room the transition extends
+
+	# Direction offsets for checking adjacent cells
+	var directions: Array[Dictionary] = [
+		{"offset": Vector2i(0, 1), "edge_z": -half_size, "axis": "x", "name": "North"},
+		{"offset": Vector2i(0, -1), "edge_z": half_size, "axis": "x", "name": "South"},
+		{"offset": Vector2i(1, 0), "edge_x": half_size, "axis": "z", "name": "East"},
+		{"offset": Vector2i(-1, 0), "edge_x": -half_size, "axis": "z", "name": "West"}
+	]
+
+	for dir_data: Dictionary in directions:
+		var adjacent_coords: Vector2i = grid_coords + dir_data["offset"]
+		var adjacent_cell: WorldData.CellData = WorldData.get_cell(adjacent_coords)
+
+		if not adjacent_cell:
+			continue
+
+		# Get adjacent biome
+		var adjacent_biome: WorldData.Biome = adjacent_cell.biome
+
+		# Convert to our local Biome enum for comparison
+		var local_adjacent_biome: int = _world_biome_to_local(adjacent_biome)
+
+		# If biomes are different, create transition props
+		if local_adjacent_biome != biome:
+			_spawn_transition_props(dir_data, local_adjacent_biome, transition_depth)
+
+
+## Convert WorldData.Biome to local Biome enum
+func _world_biome_to_local(world_biome: WorldData.Biome) -> int:
+	match world_biome:
+		WorldData.Biome.FOREST: return Biome.FOREST
+		WorldData.Biome.PLAINS: return Biome.PLAINS
+		WorldData.Biome.SWAMP: return Biome.SWAMP
+		WorldData.Biome.HILLS: return Biome.HILLS
+		WorldData.Biome.ROCKY, WorldData.Biome.MOUNTAINS: return Biome.ROCKY
+		_: return Biome.PLAINS
+
+
+## Spawn transition props along an edge based on adjacent biome
+func _spawn_transition_props(dir_data: Dictionary, adjacent_biome: int, depth: float) -> void:
+	var half_size: float = room_size / 2.0
+	var num_props: int = rng.randi_range(5, 10)
+
+	var transition_container := Node3D.new()
+	transition_container.name = "EdgeTransition_%s" % dir_data["name"]
+	add_child(transition_container)
+
+	for i in range(num_props):
+		var pos: Vector3
+
+		if dir_data["axis"] == "x":
+			# North or South edge
+			var edge_z: float = dir_data["edge_z"]
+			var inward: float = sign(edge_z) * -1  # Direction toward center
+			pos = Vector3(
+				rng.randf_range(-half_size + 10, half_size - 10),
+				0,
+				edge_z + inward * rng.randf_range(2, depth)
+			)
+		else:
+			# East or West edge
+			var edge_x: float = dir_data["edge_x"]
+			var inward: float = sign(edge_x) * -1
+			pos = Vector3(
+				edge_x + inward * rng.randf_range(2, depth),
+				0,
+				rng.randf_range(-half_size + 10, half_size - 10)
+			)
+
+		# Spawn appropriate transition prop based on adjacent biome
+		var prop: Node3D = _create_transition_prop(adjacent_biome)
+		if prop:
+			prop.position = pos
+			transition_container.add_child(prop)
+
+
+## Create a prop appropriate for transitioning to a specific biome
+func _create_transition_prop(target_biome: int) -> Node3D:
+	match target_biome:
+		Biome.SWAMP:
+			# Spawn murky puddle or dead vegetation
+			return _create_swamp_transition_prop()
+		Biome.FOREST:
+			# Spawn extra trees or bushes
+			return _create_tree()
+		Biome.ROCKY:
+			# Spawn rocks or boulders
+			return _create_rock()
+		Biome.PLAINS:
+			# Spawn grass clumps
+			return _create_grass_clump()
+		_:
+			return null
+
+
+## Create a swamp transition prop (murky puddle or dead plant)
+func _create_swamp_transition_prop() -> Node3D:
+	var prop := Node3D.new()
+	prop.name = "SwampTransition"
+
+	# Create a small murky puddle
+	var puddle := CSGCylinder3D.new()
+	puddle.radius = rng.randf_range(1.0, 2.5)
+	puddle.height = 0.1
+	puddle.position = Vector3(0, 0.02, 0)
+
+	var puddle_mat := StandardMaterial3D.new()
+	puddle_mat.albedo_color = Color(0.15, 0.2, 0.12, 0.8)  # Murky green
+	puddle_mat.roughness = 0.3
+	puddle_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	puddle.material = puddle_mat
+
+	prop.add_child(puddle)
+
+	# Maybe add some dead grass
+	if rng.randf() > 0.5:
+		var dead_grass := _create_grass_clump()
+		if dead_grass:
+			dead_grass.position = Vector3(rng.randf_range(-1, 1), 0, rng.randf_range(-1, 1))
+			# Tint it brownish for dead appearance
+			for child in dead_grass.get_children():
+				if child is Sprite3D:
+					child.modulate = Color(0.6, 0.5, 0.3)
+			prop.add_child(dead_grass)
+
+	return prop

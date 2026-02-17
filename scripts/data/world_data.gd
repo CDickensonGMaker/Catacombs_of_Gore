@@ -1,15 +1,68 @@
 ## world_data.gd - World grid data defining biomes and locations per cell
 ## Each cell is a wilderness room in the grid-based world system
-## DEMO ZONE MAP - 17x17 grid based on canonical JSON data
+## DEMO ZONE MAP - 20x20 grid based on canonical JSON data
 class_name WorldData
 extends RefCounted
 
 ## Grid dimensions
-const GRID_COLS := 17
-const GRID_ROWS := 17
+const GRID_COLS := 20
+const GRID_ROWS := 20
+
+## Region coordinates with Elder Moor as origin (0,0)
+## X: West negative, East positive
+## Y: North negative, South positive
+const REGION_COORDS: Dictionary = {
+	# Elder Moor - Origin (0, 0)
+	"village_elder_moor": Vector2i(0, 0),
+	"elder_moor": Vector2i(0, 0),
+	"region_elder_moor": Vector2i(0, 0),
+	# Crossroads - West of Elder Moor (-1, 0)
+	"crossroads": Vector2i(-1, 0),
+	"region_crossroads": Vector2i(-1, 0),
+	# Dalhurst - West of Crossroads (-2, 0)
+	"dalhurst": Vector2i(-2, 0),
+	"city_dalhurst": Vector2i(-2, 0),
+	"region_dalhurst": Vector2i(-2, 0),
+	# Thornfield - East of Elder Moor (1, 0)
+	"thornfield": Vector2i(1, 0),
+	"village_thornfield": Vector2i(1, 0),
+	"hamlet_thornfield": Vector2i(1, 0),
+	# Willow Dale - Northwest of Elder Moor (-1, -1)
+	"willow_dale": Vector2i(-1, -1),
+	"village_willow_dale": Vector2i(-1, -1),
+	"dungeon_willow_dale": Vector2i(-1, -1),
+	# Millbrook - Southwest of Elder Moor (-1, 1)
+	"millbrook": Vector2i(-1, 1),
+	"region_millbrook": Vector2i(-1, 1),
+	"hamlet_millbrook": Vector2i(-1, 1),
+	# Bandit's Hideout - Northeast of Elder Moor (1, -1)
+	"bandits_hideout": Vector2i(1, -1),
+	"bandit_hideout": Vector2i(1, -1),
+	"bandit_hideout_exterior": Vector2i(1, -1),
+}
+
+
+## Get region coordinates for a zone ID (Elder Moor-relative)
+static func get_region_coords(zone_id: String) -> Vector2i:
+	var normalized: String = zone_id.to_lower().replace(" ", "_")
+	if REGION_COORDS.has(normalized):
+		return REGION_COORDS[normalized]
+	# Check partial matches
+	for key: String in REGION_COORDS.keys():
+		if normalized.contains(key) or key.contains(normalized):
+			return REGION_COORDS[key]
+	return Vector2i(0, 0)  # Default to Elder Moor
+
+
+## Get zone ID at given region coordinates
+static func get_zone_at_region_coords(coords: Vector2i) -> String:
+	for zone_id: String in REGION_COORDS.keys():
+		if REGION_COORDS[zone_id] == coords:
+			return zone_id
+	return ""
 
 ## Player start position
-const PLAYER_START := Vector2i(7, 4)  # Elder Moor
+const PLAYER_START := Vector2i(12, 8)  # Elder Moor
 
 ## Terrain types from JSON map
 enum Terrain { BLOCKED, HIGHLANDS, FOREST, WATER, COAST, SWAMP, ROAD, POI, DESERT }
@@ -56,9 +109,9 @@ class CellData:
 
 
 ## World grid - Dictionary of Vector2i -> CellData
-## Coordinates: col = x (0-16), row = y (0-16)
-## Row 0 is NORTH, Row 16 is SOUTH
-## Elder Moor is at (7, 4)
+## Coordinates: col = x (0-19), row = y (0-19)
+## Row 0 is NORTH, Row 19 is SOUTH
+## Elder Moor is at (11, 8)
 static var world_grid: Dictionary = {}
 
 ## Terrain character to enum mapping
@@ -110,26 +163,29 @@ const BG_DESERT := "desertcity_background.png"
 const BG_FOREST := "enchantedforest_background.png"
 const BG_GRAVEYARD := "spookygraveyard_background.png"
 
-## The canonical 17x17 terrain grid from JSON
-## Row 0 = North edge, Row 16 = South edge
+## The canonical 20x20 terrain grid from JSON
+## Row 0 = North edge, Row 19 = South edge
 const GRID_DATA: Array = [
-	["B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B"],
-	["W","W","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B"],
-	["W","W","W","B","B","P","F","F","F","H","B","B","B","B","B","B","B"],
-	["W","W","W","C","F","R","F","F","F","P","B","B","B","B","B","B","B"],
-	["W","W","W","P","R","R","R","P","R","P","B","B","B","B","B","B","B"],
-	["W","W","C","F","F","R","P","S","S","H","H","B","B","B","B","B","B"],
-	["W","W","C","F","F","R","S","F","F","F","H","H","B","B","B","B","B"],
-	["W","W","C","F","F","R","F","F","F","F","F","H","B","B","B","B","B"],
-	["W","W","C","F","F","R","F","F","F","F","F","H","H","B","B","B","B"],
-	["W","W","C","P","R","R","F","F","F","F","F","F","H","B","B","B","B"],
-	["W","C","F","F","F","R","F","F","F","F","H","H","H","B","B","B","B"],
-	["W","C","F","F","H","R","F","F","H","H","B","B","B","B","B","B","B"],
-	["W","C","F","H","H","P","H","H","B","B","B","B","B","B","B","B","B"],
-	["W","B","B","B","B","B","B","B","B","F","F","H","F","F","F","F","F"],
-	["W","C","F","F","S","F","F","F","F","S","F","F","F","F","H","F","F"],
-	["W","F","F","F","F","F","H","F","F","F","F","F","F","H","H","F","F"],
-	["W","F","F","F","F","F","F","F","F","F","F","F","F","F","F","F","F"]
+	["B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B"],
+	["B","B","B","B","F","F","F","F","F","F","F","F","F","F","B","B","B","B","B","P"],
+	["B","B","B","F","F","F","F","F","F","F","F","F","F","F","F","B","B","B","B","B"],
+	["W","W","F","F","F","F","F","P","F","F","F","F","F","F","F","H","B","B","B","B"],
+	["W","W","F","F","F","F","F","R","F","F","F","F","F","P","F","H","P","B","B","B"],
+	["W","W","C","F","F","F","F","R","F","F","F","F","F","F","F","H","B","B","B","B"],
+	["W","W","C","F","P","F","F","R","R","R","R","R","R","R","R","P","H","B","B","B"],
+	["W","W","C","F","F","F","F","R","F","F","F","F","F","F","F","H","B","B","B","B"],
+	["W","W","C","F","F","F","F","R","F","F","F","F","P","F","F","H","H","B","B","B"],
+	["W","W","C","F","F","F","F","R","F","F","F","F","F","F","F","F","H","B","B","B"],
+	["W","W","C","F","F","F","F","R","F","F","F","F","F","F","F","H","H","B","B","B"],
+	["W","W","C","F","F","F","F","R","F","F","F","F","F","F","H","H","B","B","B","B"],
+	["W","W","C","F","F","P","F","R","F","F","F","F","F","F","H","H","B","B","B","B"],
+	["W","W","C","F","F","F","F","R","F","F","F","F","F","H","H","B","B","B","B","B"],
+	["W","W","C","F","F","F","F","R","F","F","F","F","H","H","B","B","B","B","B","B"],
+	["W","C","F","F","F","F","F","R","F","F","F","F","H","H","B","B","B","B","B","B"],
+	["W","C","F","F","F","F","F","R","F","F","F","H","H","B","B","B","B","B","B","B"],
+	["W","C","F","F","F","F","F","P","F","F","H","H","B","B","B","B","B","B","B","B"],
+	["W","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B"],
+	["W","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B"]
 ]
 
 ## Location definitions from JSON
@@ -137,93 +193,99 @@ const LOCATIONS: Array = [
 	{
 		"id": "willow_dale",
 		"name": "Willow Dale Ruins",
-		"col": 5, "row": 2,
+		"col": 7, "row": 3,
 		"type": "dungeon",
 		"dungeon_levels": 0,
-		"description": "Crumbling stone ruins deep in the foothills. Ancient carvings cover the walls."
-	},
-	{
-		"id": "dalhurst",
-		"name": "Dalhurst",
-		"col": 3, "row": 4,
-		"type": "town",
-		"description": "A quiet settlement on the western road, close to the lakeshore. Has a tavern and general store."
-	},
-	{
-		"id": "crossroads",
-		"name": "Crossroads",
-		"col": 5, "row": 4,
-		"type": "landmark",
-		"description": "A weathered signpost marks where the roads meet."
-	},
-	{
-		"id": "elder_moor",
-		"name": "Elder Moor",
-		"col": 7, "row": 4,
-		"type": "landmark",
-		"is_start": true,
-		"description": "Rolling moorland dotted with standing stones. Your journey begins here."
-	},
-	{
-		"id": "thornfield",
-		"name": "Thornfield",
-		"col": 9, "row": 4,
-		"type": "town",
-		"description": "The easternmost town in the valley. The pass beyond has collapsed."
-	},
-	{
-		"id": "collapsed_pass",
-		"name": "Collapsed Pass",
-		"col": 10, "row": 4,
-		"type": "blocked",
-		"unlock_quest": "clear_the_pass",
-		"description": "A massive rockslide has sealed the mountain pass. A future quest may clear the way."
-	},
-	{
-		"id": "sunken_crypts",
-		"name": "Sunken Crypts",
-		"col": 6, "row": 5,
-		"type": "dungeon",
-		"dungeon_levels": 3,
-		"description": "A sunken entrance half-hidden by swamp growth leads down into a sprawling three-level crypt."
+		"description": "Crumbling stone ruins deep in the foothills. Ancient carvings cover the walls — whatever lived here predates even the dwarves."
 	},
 	{
 		"id": "bandit_hideout",
 		"name": "Bandit Hideout",
-		"col": 9, "row": 3,
+		"col": 13, "row": 4,
 		"type": "dungeon",
 		"dungeon_levels": 2,
-		"description": "A fortified cave entrance north of Thornfield, crawling with bandits."
+		"description": "A fortified cave entrance crawling with bandits. Two levels of tunnels and stolen goods."
+	},
+	{
+		"id": "mountain_pass",
+		"name": "Mountain Pass",
+		"col": 16, "row": 4,
+		"type": "blocked",
+		"unlock_quest": "clear_the_pass",
+		"description": "A massive rockslide has sealed the mountain pass. Kings Watch, Pola Perron, and Falkenhaften lie beyond — inaccessible for now."
+	},
+	{
+		"id": "dalhurst",
+		"name": "Dalhurst",
+		"col": 4, "row": 6,
+		"type": "town",
+		"description": "A quiet settlement on the western road, close to the lakeshore. Has a tavern, a general store, and folk who don't ask too many questions."
+	},
+	{
+		"id": "crossroads",
+		"name": "Crossroads",
+		"col": 7, "row": 6,
+		"type": "landmark",
+		"description": "A weathered signpost marks where the roads meet. West to Dalhurst, north to Willow Dale, east to Thornfield, south toward Millbrook."
+	},
+	{
+		"id": "thornfield",
+		"name": "Thornfield",
+		"col": 15, "row": 6,
+		"type": "town",
+		"description": "The easternmost town in the valley, nestled against the mountains. The pass beyond has collapsed — no way through until the rubble is cleared."
+	},
+	{
+		"id": "elder_moor",
+		"name": "Elder Moor",
+		"col": 12, "row": 8,
+		"type": "landmark",
+		"is_start": true,
+		"description": "Rolling moorland dotted with standing stones. Strange lights flicker here at night. Your journey begins here."
 	},
 	{
 		"id": "millbrook",
 		"name": "Millbrook",
-		"col": 3, "row": 9,
+		"col": 5, "row": 12,
 		"type": "town",
-		"description": "A rickety little town clinging to the lakeshore. Last stop before Kazer-Dun."
+		"description": "A rickety little town clinging to the lakeshore. The waterwheel creaks day and night. Last stop for supplies before Kazer-Dun."
 	},
 	{
 		"id": "kazer_dun_entrance",
 		"name": "Kazer-Dun Entrance",
-		"col": 5, "row": 12,
+		"col": 7, "row": 17,
 		"type": "dungeon",
 		"is_demo_wall": true,
-		"description": "The great northern gate of Kazer-Dun Dwarf Hold. The doors remain sealed. For now."
+		"description": "The great northern gate of Kazer-Dun Dwarf Hold. Massive stone doors flanked by ancient dwarven statues. The doors remain sealed. For now."
+	},
+	{
+		"id": "falkenhaften",
+		"name": "Falkenhaften",
+		"col": 19, "row": 1,
+		"type": "blocked",
+		"description": "A distant settlement beyond the mountain pass. Inaccessible in the demo."
 	}
 ]
 
 ## Road connections from JSON [[from_col, from_row], [to_col, to_row]]
 const ROADS: Array = [
-	[[3,4],[4,4]], [[4,4],[5,4]],
-	[[5,4],[6,4]], [[6,4],[7,4]],
-	[[7,4],[8,4]], [[8,4],[9,4]],
-	[[9,4],[10,4]],
-	[[9,4],[9,3]],
-	[[5,4],[5,3]], [[5,3],[5,2]],
-	[[5,4],[5,5]], [[5,5],[5,6]], [[5,6],[5,7]], [[5,7],[5,8]], [[5,8],[5,9]],
-	[[5,9],[4,9]], [[4,9],[3,9]],
-	[[3,9],[4,9]], [[4,9],[5,9]],
-	[[5,9],[5,10]], [[5,10],[5,11]], [[5,11],[5,12]]
+	# North road: Crossroads (7,6) to Willow Dale (7,3)
+	[[7,6],[7,5]], [[7,5],[7,4]], [[7,4],[7,3]],
+	# West road: Crossroads (7,6) to Dalhurst (4,6)
+	[[7,6],[6,6]], [[6,6],[5,6]], [[5,6],[4,6]],
+	# East road: Crossroads (7,6) to Thornfield (15,6)
+	[[7,6],[8,6]], [[8,6],[9,6]], [[9,6],[10,6]], [[10,6],[11,6]],
+	[[11,6],[12,6]], [[12,6],[13,6]], [[13,6],[14,6]], [[14,6],[15,6]],
+	# South road: Crossroads (7,6) to Kazer-Dun (7,17)
+	[[7,6],[7,7]], [[7,7],[7,8]], [[7,8],[7,9]], [[7,9],[7,10]],
+	[[7,10],[7,11]], [[7,11],[7,12]], [[7,12],[7,13]], [[7,13],[7,14]],
+	[[7,14],[7,15]], [[7,15],[7,16]], [[7,16],[7,17]],
+	# Spur: Main road to Millbrook (5,12)
+	[[7,12],[6,12]], [[6,12],[5,12]],
+	# Spur: East road to Bandit Hideout (13,4)
+	[[13,6],[13,5]], [[13,5],[13,4]],
+	# Spur: East road to Elder Moor (12,8)
+	[[12,6],[12,7]], [[12,7],[12,8]]
 ]
 
 ## Region definitions (for grouping cells)
@@ -308,23 +370,23 @@ static func initialize() -> void:
 
 ## Get region name for coordinates
 static func _get_region_for_coords(col: int, row: int) -> String:
-	# Western shore (near water)
-	if col <= 3:
+	# Western shore (near water, columns 0-2)
+	if col <= 2:
 		return REGION_WESTERN_SHORE
-	# Eastern highlands
-	if col >= 9:
+	# Eastern highlands (high terrain near mountains)
+	if col >= 14:
 		return REGION_EASTERN_HIGHLANDS
-	# Mountains (row 0-2, blocked areas)
-	if row <= 2 and col >= 10:
+	# Mountains (blocked mountain cells)
+	if row <= 1 or col >= 16:
 		return REGION_MOUNTAINS
-	# Swamplands (around swamp terrain)
-	if row >= 5 and row <= 8 and col >= 6 and col <= 8:
-		return REGION_SWAMPLANDS
-	# Southern forest
-	if row >= 13:
+	# Southern forest (lower rows)
+	if row >= 14:
 		return REGION_SOUTHERN_FOREST
-	# Default to Elder Moor (central area)
-	return REGION_ELDER_MOOR
+	# Elder Moor area (central-east region around 12,8)
+	if col >= 10 and col <= 14 and row >= 6 and row <= 10:
+		return REGION_ELDER_MOOR
+	# Default to general forest region
+	return "The Greenwood"
 
 
 ## Get background asset for biome
@@ -631,31 +693,42 @@ static func get_adjacent_passable(coords: Vector2i) -> Array[Vector2i]:
 
 
 ## ============================================================================
-## COORDINATE CONVERSION (3D World <-> Grid)
+## COORDINATE CONVERSION (3D World <-> Grid) - Square Grid System
 ## ============================================================================
 ## Grid cell size in world units (matches WildernessRoom size)
 const CELL_WORLD_SIZE := 100.0
 
-## Convert 3D world position to grid coordinates
-static func world_to_axial(world_pos: Vector3) -> Vector2i:
-	# Grid origin (0,0) is at world origin
-	# Each cell is CELL_WORLD_SIZE x CELL_WORLD_SIZE
-	var col := int(floor(world_pos.x / CELL_WORLD_SIZE)) + PLAYER_START.x
-	var row := int(floor(-world_pos.z / CELL_WORLD_SIZE)) + PLAYER_START.y
-	return Vector2i(col, row)
-
-
 ## Convert grid coordinates to 3D world position (center of cell)
+## X increases East, Z decreases North (Godot's coordinate system)
+static func cell_to_world(coords: Vector2i) -> Vector3:
+	return Vector3(coords.x * CELL_WORLD_SIZE, 0, -coords.y * CELL_WORLD_SIZE)
+
+
+## Convert 3D world position to grid coordinates
+static func world_to_cell(world_pos: Vector3) -> Vector2i:
+	return Vector2i(
+		roundi(world_pos.x / CELL_WORLD_SIZE),
+		roundi(-world_pos.z / CELL_WORLD_SIZE)
+	)
+
+
+## Legacy aliases for backwards compatibility
 static func axial_to_world(coords: Vector2i) -> Vector3:
-	# Inverse of world_to_axial
-	var x := (coords.x - PLAYER_START.x) * CELL_WORLD_SIZE + CELL_WORLD_SIZE / 2.0
-	var z := -(coords.y - PLAYER_START.y) * CELL_WORLD_SIZE - CELL_WORLD_SIZE / 2.0
-	return Vector3(x, 0.0, z)
+	return cell_to_world(coords)
+
+
+static func world_to_axial(world_pos: Vector3) -> Vector2i:
+	return world_to_cell(world_pos)
 
 
 ## Calculate grid distance between two coordinates (Manhattan distance)
-static func hex_distance(from_coords: Vector2i, to_coords: Vector2i) -> int:
+static func grid_distance(from_coords: Vector2i, to_coords: Vector2i) -> int:
 	return abs(from_coords.x - to_coords.x) + abs(from_coords.y - to_coords.y)
+
+
+## Legacy alias
+static func hex_distance(from_coords: Vector2i, to_coords: Vector2i) -> int:
+	return grid_distance(from_coords, to_coords)
 
 
 ## ============================================================================
