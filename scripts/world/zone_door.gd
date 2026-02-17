@@ -145,14 +145,15 @@ func interact(_interactor: Node) -> void:
 		print("[ZoneDoor] No target scene configured for: " + door_name)
 		return
 
-	# Special case: Return to wilderness grid system
+	# Special case: Return to wilderness (for dungeon exits that lead back to open world)
 	if target_scene == SceneManager.RETURN_TO_WILDERNESS:
 		SceneManager.return_to_wilderness()
 		return
 
-	# Save wilderness coords before leaving (for dungeons)
-	if SceneManager.is_in_wilderness():
-		SceneManager.save_wilderness_coords_for_return()
+	# Special case: Return to previous scene (for interiors like inns)
+	if target_scene == "RETURN_TO_PREVIOUS":
+		SceneManager.return_to_previous_scene()
+		return
 
 	# Transition to target scene
 	SceneManager.change_scene(target_scene, spawn_point_id)

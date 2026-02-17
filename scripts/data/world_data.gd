@@ -127,6 +127,51 @@ const TERRAIN_MAP: Dictionary = {
 	"D": Terrain.DESERT
 }
 
+## Location ID to scene path mapping for hand-crafted scenes
+## Towns, dungeons, and landmarks that have dedicated .tscn files
+const LOCATION_SCENES: Dictionary = {
+	# === DEMO ZONE LOCATIONS ===
+	# Towns
+	"dalhurst": "res://scenes/levels/dalhurst.tscn",
+	"thornfield": "res://scenes/levels/thornfield.tscn",
+	"millbrook": "res://scenes/levels/millbrook.tscn",
+	# Landmarks
+	"elder_moor": "res://scenes/levels/elder_moor.tscn",
+	"crossroads": "",  # No dedicated scene - use procedural wilderness
+	# Dungeons
+	"willow_dale": "res://scenes/levels/willow_dale.tscn",
+	"bandit_hideout": "res://scenes/levels/bandit_hideout_exterior.tscn",
+	"kazer_dun_entrance": "res://scenes/levels/kazan_dun_entrance.tscn",
+	"sunken_crypts": "res://scenes/levels/sunken_crypt.tscn",
+
+	# === EXTENDED LOCATIONS ===
+	# Major cities
+	"falkenhaften": "res://scenes/levels/falkenhaften.tscn",
+	"kazan_dun": "res://scenes/levels/kazan_dun.tscn",
+	# Towns
+	"aberdeen": "res://scenes/levels/aberdeen.tscn",
+	"larton": "res://scenes/levels/larton.tscn",
+	"duncaster": "res://scenes/levels/duncaster.tscn",
+	"east_hollow": "res://scenes/levels/east_hollow.tscn",
+	"whalers_abyss": "res://scenes/levels/whalers_abyss.tscn",
+	# Villages
+	"riverside_village": "res://scenes/levels/riverside_village.tscn",
+	"elven_outpost": "res://scenes/levels/elven_outpost.tscn",
+	"stonehaven": "res://scenes/levels/stonehaven.tscn",
+	"old_crossing": "res://scenes/levels/old_crossing.tscn",
+	"pola_perron": "res://scenes/levels/pola_perron.tscn",
+	# Hamlets
+	"dusty_hollow": "res://scenes/levels/dusty_hollow.tscn",
+	"windmere": "res://scenes/levels/windmere.tscn",
+	# Outposts
+	"tenger_camp": "res://scenes/levels/tenger_camp.tscn",
+	"kings_watch": "res://scenes/levels/kings_watch.tscn",
+	# Dungeons
+	"vampire_crypt": "res://scenes/levels/vampire_crypt.tscn",
+	"mosshall_tombs": "res://scenes/levels/mosshall_tombs.tscn",
+	"pola_perron_crypt": "res://scenes/levels/pola_perron_crypt.tscn",
+}
+
 ## Terrain to biome mapping
 const TERRAIN_TO_BIOME: Dictionary = {
 	Terrain.BLOCKED: Biome.MOUNTAINS,

@@ -1,11 +1,9 @@
 ## scene_manager.gd - Handles scene transitions and loading
+## Hybrid system: hand-crafted scenes for towns/dungeons, procedural wilderness rooms
 extends Node
 
 ## Procedural dungeons regenerate each time, so saved positions are invalid
 const PROCEDURAL_DUNGEON_ZONES := ["random_cave", "test_dungeon"]
-
-## Wilderness room scene path
-const WILDERNESS_ROOM_SCENE := "res://scenes/levels/wilderness_room.tscn"
 
 ## Dev mode - enables fast travel to any location
 var dev_mode: bool = true  # Set to false for release
@@ -18,7 +16,6 @@ signal scene_load_progress(progress: float)
 signal scene_load_completed(scene_path: String)
 signal transition_started
 signal transition_completed
-signal room_changed(old_coords: Vector2i, new_coords: Vector2i)
 
 ## Loading state
 var is_loading: bool = false
@@ -34,25 +31,13 @@ var previous_spawn_id: String = ""
 var scene_cache: Dictionary = {}
 var max_cached_scenes: int = 3
 
-## Wilderness Room Grid System
-## Current position in the room grid (default to Elder Moor from JSON)
-var current_room_coords: Vector2i = WorldData.PLAYER_START
+## Current region tracking (replaces grid coordinates)
+var current_region_id: String = ""
 
-## Room seeds per character (character_id -> {Vector2i -> seed})
-## Ensures same character always sees same rooms
-var room_seeds: Dictionary = {}
-
-## Whether we're currently in the wilderness room system
-var in_wilderness: bool = false
-
-## Last wilderness coordinates (for returning from dungeons)
-var last_wilderness_coords: Vector2i = WorldData.PLAYER_START
-
-## Direction player is entering from (for spawn placement)
-var entering_from_direction: int = -1  # RoomEdge.Direction enum value
-
-## Special marker for portal scenes that should return to wilderness
-const RETURN_TO_WILDERNESS := "RETURN_TO_WILDERNESS"
+## Wilderness tracking for hybrid system
+var current_wilderness_coords: Vector2i = Vector2i(-1, -1)  # Invalid default
+var last_wilderness_coords: Vector2i = Vector2i(-1, -1)  # For returning from dungeons/towns
+var _current_wilderness_room: Node = null  # Reference to active WildernessRoom instance
 
 ## Transition effect
 var transition_overlay: CanvasLayer
@@ -64,30 +49,10 @@ var pending_player_position: Vector3 = Vector3.ZERO
 var pending_player_rotation: float = 0.0
 var has_pending_position: bool = false
 
+
 func _ready() -> void:
 	_create_transition_overlay()
-	# Deferred signal connections to ensure other autoloads are ready
-	call_deferred("_connect_world_signals")
 
-
-## Connect to WorldManager signals for seamless streaming
-func _connect_world_signals() -> void:
-	if WorldManager and WorldManager.has_signal("entering_location"):
-		if not WorldManager.entering_location.is_connected(_on_entering_location):
-			WorldManager.entering_location.connect(_on_entering_location)
-			print("[SceneManager] Connected to WorldManager.entering_location")
-
-
-## Called when WorldManager detects player entering a location hex
-func _on_entering_location(location_id: String, _location_type: int) -> void:
-	# Transition to the location scene
-	var scene_path := _get_scene_for_location(location_id)
-	if scene_path.is_empty():
-		print("[SceneManager] No scene mapping for location: %s" % location_id)
-		return
-
-	print("[SceneManager] WorldManager triggered location entry: %s -> %s" % [location_id, scene_path])
-	change_scene(scene_path, "from_wilderness")
 
 func _create_transition_overlay() -> void:
 	transition_overlay = CanvasLayer.new()
@@ -101,6 +66,7 @@ func _create_transition_overlay() -> void:
 	transition_rect.modulate.a = 0.0
 	transition_overlay.add_child(transition_rect)
 
+
 ## Load a scene with transition
 func change_scene(scene_path: String, spawn_id: String = "", fade: bool = true) -> void:
 	if is_loading:
@@ -111,7 +77,7 @@ func change_scene(scene_path: String, spawn_id: String = "", fade: bool = true) 
 	var current_scene := get_current_scene_path()
 	if not current_scene.is_empty() and current_scene != scene_path:
 		# Don't overwrite previous if going into another interior
-		# Only track "exterior" scenes (towns, wilderness, etc.)
+		# Only track "exterior" scenes (towns, regions, etc.)
 		if not _is_interior_scene(current_scene):
 			previous_scene_path = current_scene
 			previous_spawn_id = "from_" + _get_scene_name(scene_path)
@@ -132,6 +98,7 @@ func change_scene(scene_path: String, spawn_id: String = "", fade: bool = true) 
 
 	is_loading = false
 	scene_load_completed.emit(scene_path)
+
 
 ## Load scene asynchronously
 func _load_scene_async(scene_path: String) -> void:
@@ -175,7 +142,6 @@ func _load_scene_async(scene_path: String) -> void:
 	get_tree().change_scene_to_packed(packed_scene)
 
 	# Wait for scene to fully initialize (multiple frames for procedural content)
-	# Procedural dungeons need more time to generate rooms and spawn points
 	await get_tree().process_frame
 	await get_tree().process_frame
 	await get_tree().process_frame
@@ -184,6 +150,7 @@ func _load_scene_async(scene_path: String) -> void:
 
 	# Handle player spawn
 	_handle_player_spawn()
+
 
 ## Handle player spawning at correct position and rotation
 func _handle_player_spawn() -> void:
@@ -265,15 +232,18 @@ func _handle_player_spawn() -> void:
 	player_3d.global_position = Vector3(0, 5, 0)
 	push_warning("[SceneManager] No spawn point found! Player placed at fallback position (0, 5, 0)")
 
+
 ## Set pending player position and rotation (from save)
 func set_player_position(pos: Vector3, rotation_y: float = 0.0) -> void:
 	pending_player_position = pos
 	pending_player_rotation = rotation_y
 	has_pending_position = true
 
+
 ## Check if a zone is a procedural dungeon (regenerates each time)
 func is_procedural_dungeon(zone_id: String) -> bool:
 	return zone_id in PROCEDURAL_DUNGEON_ZONES
+
 
 ## Cache a scene
 func _cache_scene(scene_path: String, packed_scene: PackedScene) -> void:
@@ -284,9 +254,11 @@ func _cache_scene(scene_path: String, packed_scene: PackedScene) -> void:
 
 	scene_cache[scene_path] = packed_scene
 
+
 ## Clear scene cache
 func clear_cache() -> void:
 	scene_cache.clear()
+
 
 ## Fade out transition
 func _fade_out() -> void:
@@ -295,6 +267,7 @@ func _fade_out() -> void:
 	tween.tween_property(transition_rect, "modulate:a", 1.0, transition_duration)
 	await tween.finished
 
+
 ## Fade in transition
 func _fade_in() -> void:
 	var tween := create_tween()
@@ -302,16 +275,19 @@ func _fade_in() -> void:
 	await tween.finished
 	transition_completed.emit()
 
+
 ## Reload current scene
 func reload_current_scene() -> void:
 	var current := get_tree().current_scene.scene_file_path
 	await change_scene(current, "", true)
+
 
 ## Get current scene path
 func get_current_scene_path() -> String:
 	if get_tree().current_scene:
 		return get_tree().current_scene.scene_file_path
 	return ""
+
 
 ## Preload a scene (for faster transitions)
 func preload_scene(scene_path: String) -> void:
@@ -324,6 +300,7 @@ func preload_scene(scene_path: String) -> void:
 	# Start background loading
 	ResourceLoader.load_threaded_request(scene_path)
 
+
 ## Check if scene is preloaded
 func is_scene_preloaded(scene_path: String) -> bool:
 	if scene_cache.has(scene_path):
@@ -332,11 +309,9 @@ func is_scene_preloaded(scene_path: String) -> bool:
 	var status := ResourceLoader.load_threaded_get_status(scene_path)
 	return status == ResourceLoader.THREAD_LOAD_LOADED
 
+
 ## Area transition trigger (called by trigger zones)
 func trigger_area_transition(target_scene: String, target_spawn: String) -> void:
-	# Save player state before transition
-	# Could trigger autosave here
-
 	await change_scene(target_scene, target_spawn, true)
 
 
@@ -372,113 +347,11 @@ func get_previous_scene() -> String:
 	return previous_scene_path
 
 
-## ============================================================================
-## WILDERNESS ROOM GRID SYSTEM
-## ============================================================================
-
-## Enter the wilderness room system from a town
-## travel_direction: The direction the player is TRAVELING (0=NORTH, 1=SOUTH, 2=EAST, 3=WEST)
-## starting_coords: Grid position to enter. Use Vector2i(-1,-1) for default (Elder Moor)
-## NOTE: Player should spawn at the OPPOSITE edge of the cell they're entering
-## (e.g., traveling EAST means entering from WEST, so spawn at west edge)
-func enter_wilderness(travel_direction: int, starting_coords: Vector2i = Vector2i(-1, -1)) -> void:
-	# Default to player start (Elder Moor) if sentinel value passed
-	if starting_coords == Vector2i(-1, -1):
-		starting_coords = WorldData.PLAYER_START
-	current_room_coords = starting_coords
-	in_wilderness = true
-
-	# Convert travel direction to entry direction (opposite)
-	# Traveling EAST means entering from WEST
-	var entry_direction := _opposite_direction(travel_direction)
-	entering_from_direction = entry_direction
-
-	# Store previous scene for returning
-	var current := get_current_scene_path()
-	if not current.is_empty() and not _is_interior_scene(current):
-		previous_scene_path = current
-		previous_spawn_id = _get_spawn_id_from_direction(travel_direction)
-
-	print("[SceneManager] Entering wilderness at %s, traveled %s, entering from %s" % [
-		starting_coords,
-		["NORTH", "SOUTH", "EAST", "WEST"][travel_direction],
-		["NORTH", "SOUTH", "EAST", "WEST"][entry_direction]
-	])
-	await _transition_to_wilderness_room(starting_coords, entry_direction)
-
-
-## Transition to an adjacent wilderness room
-func transition_to_adjacent_room(direction: int) -> void:
-	if is_loading:
-		return
-
-	var old_coords := current_room_coords
-	var new_coords := _get_adjacent_coords(current_room_coords, direction)
-
-	print("[SceneManager] Room transition: %s -> %s (direction %d)" % [old_coords, new_coords, direction])
-
-	# Check if target cell is passable
-	if not WorldData.is_passable(new_coords):
-		print("[SceneManager] Cannot enter cell %s - impassable terrain" % new_coords)
-		_handle_impassable_terrain(direction)
-		return
-
-	# Check if transitioning to a special location (town/dungeon)
-	var location_id := WorldData.get_location_id(new_coords)
-	if location_id != "":
-		print("[SceneManager] Entering location: %s from direction %d" % [location_id, direction])
-		# Mark cell as discovered before leaving wilderness
-		WorldData.discover_cell(new_coords)
-		# If this is a dungeon, also mark it as discovered (reveals icon on map)
-		WorldData.discover_dungeon(new_coords)
-
-		# Calculate directional spawn ID based on which direction player came from
-		# Player enters from direction X, so they should spawn at the opposite edge
-		var spawn_id := "from_wilderness"
-		match direction:
-			0:  # NORTH - player traveled north, enters from south edge
-				spawn_id = "from_wilderness_south"
-			1:  # SOUTH - player traveled south, enters from north edge
-				spawn_id = "from_wilderness_north"
-			2:  # EAST - player traveled east, enters from west edge
-				spawn_id = "from_wilderness_west"
-			3:  # WEST - player traveled west, enters from east edge
-				spawn_id = "from_wilderness_east"
-
-		# Check if this is a procedural town or hand-crafted scene
-		if _should_use_procedural_town(location_id):
-			# Use procedural town generator
-			in_wilderness = false
-			current_room_coords = new_coords
-			await _transition_to_procedural_town(new_coords, _opposite_direction(direction))
-			room_changed.emit(old_coords, new_coords)
-			return
-		else:
-			# Load hand-crafted scene
-			var location_scene := _get_scene_for_location(location_id)
-			if location_scene != "":
-				in_wilderness = false
-				current_room_coords = new_coords
-				await change_scene(location_scene, spawn_id)
-				room_changed.emit(old_coords, new_coords)
-				return
-
-	# Mark cell as discovered
-	WorldData.discover_cell(new_coords)
-
-	entering_from_direction = _opposite_direction(direction)
-	await _transition_to_wilderness_room(new_coords, entering_from_direction)
-
-	room_changed.emit(old_coords, new_coords)
-
-
-## Get scene path for a location ID (only for hand-crafted scenes)
-func _get_scene_for_location(location_id: String) -> String:
+## Get scene path for a location ID (for region-based navigation)
+func get_scene_for_location(location_id: String) -> String:
 	# Map location IDs to hand-crafted scene paths
-	# IDs MUST match WorldData.LOCATIONS from the JSON "bible"
-	# Locations not listed here will use procedural generation
 	match location_id:
-		# === DEMO ZONE LOCATIONS (from JSON) ===
+		# === DEMO ZONE LOCATIONS ===
 		# Towns
 		"dalhurst":
 			return "res://scenes/levels/dalhurst.tscn"
@@ -490,7 +363,7 @@ func _get_scene_for_location(location_id: String) -> String:
 		"elder_moor":
 			return "res://scenes/levels/elder_moor.tscn"
 		"crossroads":
-			return ""  # Procedural wilderness
+			return ""  # Use region scene
 		# Dungeons
 		"willow_dale":
 			return "res://scenes/levels/willow_dale.tscn"
@@ -500,11 +373,8 @@ func _get_scene_for_location(location_id: String) -> String:
 			return "res://scenes/levels/bandit_hideout_exterior.tscn"
 		"kazer_dun_entrance":
 			return "res://scenes/levels/kazan_dun_entrance.tscn"
-		# Blocked (no scene - impassable)
-		"collapsed_pass":
-			return ""
 
-		# === LEGACY LOCATIONS (outside demo zone, may be added later) ===
+		# === LEGACY LOCATIONS ===
 		"city_kazan_dun":
 			return "res://scenes/levels/kazan_dun.tscn"
 		"town_aberdeen":
@@ -542,212 +412,63 @@ func _get_scene_for_location(location_id: String) -> String:
 		"dungeon_mosshall_tombs":
 			return "res://scenes/levels/mosshall_tombs.tscn"
 		_:
-			return ""  # Use procedural generation
+			return ""
 
 
-## Check if a location should use procedural generation
-func _should_use_procedural_town(location_id: String) -> bool:
-	# If we have a hand-crafted scene, don't use procedural generation
-	var scene_path := _get_scene_for_location(location_id)
-	if scene_path != "":
-		return false
-	# Everything else uses procedural generation
-	return true
+## Apply rotation to player based on spawn point ID
+func _apply_spawn_rotation(player: Node3D, spawn_id: String) -> void:
+	var target_rotation: float = 0.0
+	var should_rotate: bool = true
 
+	match spawn_id:
+		"from_north", "from_region_north":
+			# Entered from NORTH, face south
+			target_rotation = PI
+		"from_south", "from_region_south":
+			# Entered from SOUTH, face north
+			target_rotation = 0.0
+		"from_east", "from_region_east":
+			# Entered from EAST, face west
+			target_rotation = -PI / 2.0
+		"from_west", "from_region_west":
+			# Entered from WEST, face east
+			target_rotation = PI / 2.0
+		_:
+			should_rotate = false  # Unknown spawn ID, don't change rotation
 
-## Internal: Load and generate a wilderness room
-func _transition_to_wilderness_room(coords: Vector2i, from_direction: int) -> void:
-	if is_loading:
-		push_warning("[SceneManager] Already loading!")
+	if not should_rotate:
 		return
 
-	# Preserve known spells before wilderness transition
-	var player := get_tree().get_first_node_in_group("player")
-	if player:
-		var spell_caster: SpellCaster = player.get_node_or_null("SpellCaster")
-		if spell_caster:
-			SaveManager.pending_known_spells.clear()
-			for spell in spell_caster.known_spells:
-				if spell:
-					SaveManager.pending_known_spells.append(spell.id)
+	# Apply rotation to MeshRoot if it exists (common pattern for player controller)
+	if player.has_node("MeshRoot"):
+		player.get_node("MeshRoot").rotation.y = target_rotation
+		print("[SceneManager] Applied spawn rotation: %.2f radians (%.1f degrees)" % [target_rotation, rad_to_deg(target_rotation)])
+	elif "rotation" in player:
+		# Fallback to direct rotation on player node
+		player.rotation.y = target_rotation
+		print("[SceneManager] Applied spawn rotation to player: %.2f radians" % target_rotation)
 
-	is_loading = true
-	current_room_coords = coords
-
-	scene_load_started.emit(WILDERNESS_ROOM_SCENE)
-	await _fade_out()
-
-	# Load the wilderness room scene
-	var packed_scene: PackedScene
-	if scene_cache.has(WILDERNESS_ROOM_SCENE):
-		packed_scene = scene_cache[WILDERNESS_ROOM_SCENE]
-	else:
-		packed_scene = load(WILDERNESS_ROOM_SCENE)
-		if packed_scene:
-			_cache_scene(WILDERNESS_ROOM_SCENE, packed_scene)
-
-	if not packed_scene:
-		push_error("[SceneManager] Failed to load wilderness room scene!")
-		is_loading = false
-		await _fade_in()
-		return
-
-	# Instance the scene
-	get_tree().change_scene_to_packed(packed_scene)
-
-	# Wait for scene to be ready
-	await get_tree().process_frame
-	await get_tree().process_frame
-
-	# Get the wilderness room and configure it
-	var room := get_tree().get_first_node_in_group("wilderness_room")
-	if room and room is WildernessRoom:
-		var wilderness_room := room as WildernessRoom
-
-		# Get or generate seed for this room
-		var room_seed := _get_room_seed(coords)
-
-		# Determine biome based on distance from origin
-		var biome := _get_biome_for_coords(coords)
-		wilderness_room.biome = biome
-
-		# Pass terrain type from WorldData for terrain-specific visuals
-		var cell := WorldData.get_cell(coords)
-		if cell:
-			wilderness_room.terrain_type = cell.terrain
-
-		# Set entry direction so barriers don't block return path
-		wilderness_room.entry_direction = from_direction
-
-		# Connect edge signals
-		wilderness_room.edge_triggered.connect(_on_room_edge_triggered)
-
-		# Generate the room
-		wilderness_room.generate(room_seed, coords)
-
-	# Wait for generation to complete
-	await get_tree().process_frame
-	await get_tree().process_frame
-
-	# Spawn player at correct position
-	spawn_point_id = _get_spawn_id_from_direction(from_direction)
-	_handle_player_spawn()
-
-	# Ensure MapTracker knows we're in wilderness (belt + suspenders with wilderness_room._ready())
-	if MapTracker:
-		MapTracker.init_zone("open_world")
-
-	await _fade_in()
-
-	is_loading = false
-	in_wilderness = true
-	scene_load_completed.emit(WILDERNESS_ROOM_SCENE)
+	# Also sync the camera pivot yaw so camera faces same direction as player
+	if player.has_node("CameraPivot"):
+		var camera_pivot := player.get_node("CameraPivot")
+		if camera_pivot.has_method("set_yaw"):
+			camera_pivot.set_yaw(target_rotation)
+			print("[SceneManager] Synced camera yaw: %.2f radians" % target_rotation)
 
 
-## Handle room edge being triggered
-func _on_room_edge_triggered(direction: int) -> void:
-	print("[SceneManager] Room edge triggered: direction %d" % direction)
-	transition_to_adjacent_room(direction)
+## Set current region (called by region scripts)
+func set_current_region(region_id: String) -> void:
+	current_region_id = region_id
+	current_room_coords = WorldData.get_region_coords(region_id)
+	print("[SceneManager] Current region: %s (coords: %s)" % [region_id, current_room_coords])
 
 
-## Handle player trying to enter impassable terrain
-func _handle_impassable_terrain(direction: int) -> void:
-	var player := get_tree().get_first_node_in_group("player")
-	if player and player is CharacterBody3D:
-		var player_body := player as CharacterBody3D
-		# Push player back from edge
-		var push_distance := 5.0
-		var push_dir := Vector3.ZERO
-		match direction:
-			0:  # Tried to go NORTH, push back south (+Z)
-				push_dir = Vector3(0, 0, push_distance)
-			1:  # Tried to go SOUTH, push back north (-Z)
-				push_dir = Vector3(0, 0, -push_distance)
-			2:  # Tried to go EAST, push back west (-X)
-				push_dir = Vector3(-push_distance, 0, 0)
-			3:  # Tried to go WEST, push back east (+X)
-				push_dir = Vector3(push_distance, 0, 0)
-
-		player_body.global_position += push_dir
-		print("[SceneManager] Pushed player back from impassable terrain")
-
-	# Show message to player via HUD
-	var hud := get_tree().get_first_node_in_group("hud")
-	if hud and hud.has_method("show_notification"):
-		var cell := WorldData.get_cell(_get_adjacent_coords(current_room_coords, direction))
-		var terrain_name := "Mountains"
-		if cell and cell.location_name != "":
-			terrain_name = cell.location_name
-		hud.show_notification("Impassable terrain: %s" % terrain_name)
+## Get current region ID
+func get_current_region_id() -> String:
+	return current_region_id
 
 
-## Transition to a procedurally generated town
-func _transition_to_procedural_town(coords: Vector2i, from_direction: int) -> void:
-	if is_loading:
-		push_warning("[SceneManager] Already loading!")
-		return
-
-	is_loading = true
-	current_room_coords = coords
-
-	var cell: WorldData.CellData = WorldData.get_cell(coords)
-	if not cell:
-		push_error("[SceneManager] No cell data for coords %s" % coords)
-		is_loading = false
-		return
-
-	print("[SceneManager] Generating procedural town: %s" % cell.location_name)
-	scene_load_started.emit("procedural_town")
-	await _fade_out()
-
-	# Preserve the player before clearing the scene
-	var player := get_tree().get_first_node_in_group("player")
-	var player_saved: Node = null
-	if player:
-		player_saved = player
-		player.get_parent().remove_child(player)
-
-	# Clear current scene
-	var current := get_tree().current_scene
-	if current:
-		current.queue_free()
-		await get_tree().process_frame
-
-	# Create new root node
-	var town_root := Node3D.new()
-	town_root.name = cell.location_name.replace(" ", "_")
-	get_tree().root.add_child(town_root)
-	get_tree().current_scene = town_root
-
-	# Re-add the player to the new scene
-	if player_saved:
-		town_root.add_child(player_saved)
-
-	# Create town generator
-	var town: TownGenerator = TownGenerator.new()
-	town.name = "TownGenerator"
-	town_root.add_child(town)
-
-	# Generate town from cell data
-	var town_seed := _get_room_seed(coords)
-	town.generate_from_cell(cell, coords, town_seed)
-
-	# Wait for generation
-	await get_tree().process_frame
-	await get_tree().process_frame
-
-	# Position player at spawn point
-	spawn_point_id = _get_spawn_id_from_direction(from_direction)
-	_handle_player_spawn()
-
-	await _fade_in()
-
-	is_loading = false
-	in_wilderness = false
-	scene_load_completed.emit("procedural_town")
-
-
-## Dev mode: Fast travel to any location with a shrine
+## Dev mode: Fast travel to any location
 func dev_fast_travel_to(location_id: String) -> void:
 	if not dev_mode:
 		print("[SceneManager] Dev mode disabled")
@@ -755,45 +476,13 @@ func dev_fast_travel_to(location_id: String) -> void:
 
 	print("[SceneManager] dev_fast_travel_to called with: %s" % location_id)
 
-	# Ensure world grid is initialized
-	if WorldData.world_grid.is_empty():
-		WorldData.initialize()
-		print("[SceneManager] Initialized world grid with %d cells" % WorldData.world_grid.size())
-
-	# Find the coordinates for this location
-	var target_coords: Vector2i = Vector2i(999, 999)
-	for coords: Vector2i in WorldData.world_grid:
-		var cell: WorldData.CellData = WorldData.world_grid[coords]
-		if cell.location_id == location_id:
-			target_coords = coords
-			break
-
-	if target_coords == Vector2i(999, 999):
-		print("[SceneManager] Location not found: %s" % location_id)
+	var scene_path := get_scene_for_location(location_id)
+	if scene_path.is_empty():
+		print("[SceneManager] No scene found for location: %s" % location_id)
 		return
 
-	var cell: WorldData.CellData = WorldData.get_cell(target_coords)
-	if not cell:
-		return
-
-	print("[SceneManager] Dev fast travel to: %s at %s" % [cell.location_name, target_coords])
-
-	# Mark as discovered
-	WorldData.discover_cell(target_coords)
-	current_room_coords = target_coords
-
-	# Transition based on location type
-	if _should_use_procedural_town(location_id):
-		print("[SceneManager] Using procedural town for %s" % location_id)
-		await _transition_to_procedural_town(target_coords, 1)  # From south
-	else:
-		var scene_path := _get_scene_for_location(location_id)
-		print("[SceneManager] Scene path for %s: %s" % [location_id, scene_path])
-		if scene_path:
-			print("[SceneManager] Changing to scene: %s" % scene_path)
-			await change_scene(scene_path, "from_fast_travel")
-		else:
-			print("[SceneManager] ERROR: No scene path found for %s" % location_id)
+	print("[SceneManager] Dev fast travel to: %s" % location_id)
+	await change_scene(scene_path, "from_fast_travel")
 
 
 ## Get all locations available for fast travel (dev mode shows all)
@@ -827,191 +516,294 @@ func get_fast_travel_locations() -> Array[Dictionary]:
 	return locations
 
 
-## Get or create a seed for a room at given coordinates
-## Same character + same coordinates = same seed (persistent)
-func _get_room_seed(coords: Vector2i) -> int:
-	var char_id := "default"
-	if GameManager and GameManager.player_data:
-		# Use character name as unique identifier for seed generation
-		char_id = GameManager.player_data.character_name if GameManager.player_data.character_name else "default"
+## ============================================================================
+## HYBRID WILDERNESS SYSTEM
+## Combines hand-crafted scenes for towns/dungeons with procedural wilderness
+## ============================================================================
 
-	if not room_seeds.has(char_id):
-		room_seeds[char_id] = {}
+## Constant for returning to wilderness from dungeons/towns
+const RETURN_TO_WILDERNESS := "RETURN_TO_WILDERNESS"
 
-	var char_rooms: Dictionary = room_seeds[char_id]
-	if not char_rooms.has(coords):
-		# Generate deterministic seed from character + coords
-		var base_seed := char_id.hash()
-		var coord_hash := coords.x * 73856093 ^ coords.y * 19349663  # Prime numbers for good distribution
-		char_rooms[coords] = base_seed ^ coord_hash
-
-	return char_rooms[coords]
+## Current room coordinates (grid-based system)
+var current_room_coords: Vector2i = Vector2i(12, 8)  # Default to Elder Moor
 
 
-## Get biome type based on coordinates using WorldData
-func _get_biome_for_coords(coords: Vector2i) -> int:
-	# Use WorldData to get biome for this cell
-	var world_biome: int = WorldData.get_biome(coords)
-	return WorldData.to_wilderness_biome(world_biome)
-
-## Get adjacent room coordinates based on direction
-## JSON Grid: col = X (0-16, West to East), row = Y (0-16, North to South)
-## 3D Space: NORTH is -Z, SOUTH is +Z, EAST is +X, WEST is -X
-func _get_adjacent_coords(coords: Vector2i, direction: int) -> Vector2i:
-	# Grid system: Row 0 = NORTH, Row 16 = SOUTH (per JSON)
-	# So NORTH decreases row (Y), SOUTH increases row (Y)
-	match direction:
-		0:  # NORTH (-Z in 3D) = -Y in grid (toward row 0)
-			return coords + Vector2i(0, -1)
-		1:  # SOUTH (+Z in 3D) = +Y in grid (toward row 16)
-			return coords + Vector2i(0, 1)
-		2:  # EAST (+X) = +X in grid (toward col 16)
-			return coords + Vector2i(1, 0)
-		3:  # WEST (-X) = -X in grid (toward col 0)
-			return coords + Vector2i(-1, 0)
-	return coords
+## Check if player is currently in a procedural wilderness room
+func is_in_wilderness() -> bool:
+	# Check by group membership (WildernessRoom adds itself to "wilderness_room" group)
+	var current_scene := get_tree().current_scene
+	if current_scene and current_scene.is_in_group("wilderness_room"):
+		return true
+	# Fallback: check our tracked reference
+	return _current_wilderness_room != null and is_instance_valid(_current_wilderness_room)
 
 
-## Get opposite direction
-func _opposite_direction(direction: int) -> int:
-	match direction:
-		0: return 1  # NORTH -> SOUTH
-		1: return 0  # SOUTH -> NORTH
-		2: return 3  # EAST -> WEST
-		3: return 2  # WEST -> EAST
-	return 0
-
-
-## Get spawn point ID from direction
-func _get_spawn_id_from_direction(direction: int) -> String:
-	match direction:
-		0: return "from_north"
-		1: return "from_south"
-		2: return "from_east"
-		3: return "from_west"
-	return "default"
-
-
-## Apply rotation to player based on spawn point ID
-## Player should continue facing the direction they were traveling (preserve momentum)
-## NOTE: We do NOT change player rotation on cell transitions - player maintains their heading
-func _apply_spawn_rotation(player: Node3D, spawn_id: String) -> void:
-	# For wilderness cell transitions, preserve player's current rotation
-	# Only apply rotation when entering a town/location from wilderness
-	if spawn_id.begins_with("from_north") or spawn_id.begins_with("from_south") or \
-	   spawn_id.begins_with("from_east") or spawn_id.begins_with("from_west"):
-		# These are wilderness cell-to-cell transitions - don't change rotation
-		# Player should keep facing their travel direction
-		return
-
-	# For entering towns/locations from wilderness, face inward
-	var target_rotation: float = 0.0
-	var should_rotate: bool = true
-
-	match spawn_id:
-		"from_wilderness_north", "from_open_world_north":
-			# Entered town from NORTH, so player was traveling SOUTH, face south
-			target_rotation = PI
-		"from_wilderness_south", "from_open_world_south":
-			# Entered town from SOUTH, so player was traveling NORTH, face north
-			target_rotation = 0.0
-		"from_wilderness_east", "from_open_world_east":
-			# Entered town from EAST, so player was traveling WEST, face west
-			target_rotation = -PI / 2.0
-		"from_wilderness_west", "from_open_world_west", "from_wilderness", "from_open_world":
-			# Entered town from WEST, so player was traveling EAST, face east
-			target_rotation = PI / 2.0
-		_:
-			should_rotate = false  # Unknown spawn ID, don't change rotation
-
-	if not should_rotate:
-		return
-
-	# Apply rotation to MeshRoot if it exists (common pattern for player controller)
-	if player.has_node("MeshRoot"):
-		player.get_node("MeshRoot").rotation.y = target_rotation
-		print("[SceneManager] Applied spawn rotation: %.2f radians (%.1f degrees)" % [target_rotation, rad_to_deg(target_rotation)])
-	elif "rotation" in player:
-		# Fallback to direct rotation on player node
-		player.rotation.y = target_rotation
-		print("[SceneManager] Applied spawn rotation to player: %.2f radians" % target_rotation)
-
-	# Also sync the camera pivot yaw so camera faces same direction as player
-	if player.has_node("CameraPivot"):
-		var camera_pivot := player.get_node("CameraPivot")
-		if camera_pivot.has_method("set_yaw"):
-			camera_pivot.set_yaw(target_rotation)
-			print("[SceneManager] Synced camera yaw: %.2f radians" % target_rotation)
-
-
-## Exit wilderness and return to town
-func exit_wilderness_to_town(town_scene: String, spawn_id: String) -> void:
-	in_wilderness = false
-	current_room_coords = WorldData.PLAYER_START
-	entering_from_direction = -1
-	await change_scene(town_scene, spawn_id)
-
-
-## Return to wilderness from a dungeon
-## Uses last_wilderness_coords to return player to where they entered the dungeon
-func return_to_wilderness() -> void:
-	var return_coords := last_wilderness_coords
-	# Check if we have valid saved coords (not the sentinel value)
-	if return_coords == Vector2i(-1, -1) or not WorldData.is_in_bounds(return_coords):
-		# Fallback to Elder Moor starting area
-		return_coords = WorldData.PLAYER_START
-
-	print("[SceneManager] Returning to wilderness at %s" % return_coords)
-
-	# Re-enter wilderness at the saved coordinates
-	# Use direction -1 (unknown) to spawn at center
-	await enter_wilderness(-1, return_coords)
-
-
-## Store current wilderness coords before entering a dungeon
-func save_wilderness_coords_for_return() -> void:
-	if in_wilderness:
-		last_wilderness_coords = current_room_coords
-		print("[SceneManager] Saved wilderness coords for return: %s" % last_wilderness_coords)
-
-
-## Get current room coordinates (for HUD display)
+## Get current room coordinates for world map
 func get_current_room_coords() -> Vector2i:
 	return current_room_coords
 
 
-## Get current biome name (for HUD display)
-func get_current_biome_name() -> String:
-	if not in_wilderness:
+## Save wilderness coords before entering a dungeon/interior
+func save_wilderness_coords_for_return() -> void:
+	if current_wilderness_coords.x >= 0 and current_wilderness_coords.y >= 0:
+		last_wilderness_coords = current_wilderness_coords
+		print("[SceneManager] Saved wilderness coords for return: %s" % last_wilderness_coords)
+
+
+## Enter wilderness at specified coordinates (HYBRID SYSTEM)
+## Checks if target cell has a hand-crafted scene, otherwise generates procedural room
+func enter_wilderness(target_coords: Vector2i, from_direction: int = -1) -> void:
+	print("[SceneManager] enter_wilderness called: coords=%s, from_direction=%d" % [target_coords, from_direction])
+
+	# Check if target is valid and passable
+	var cell := WorldData.get_cell(target_coords)
+	if cell == null:
+		print("[SceneManager] Target cell is null, cannot travel")
+		_show_travel_blocked("Cannot travel there")
+		return
+
+	if not WorldData.is_passable(target_coords):
+		print("[SceneManager] Target cell is not passable")
+		_show_travel_blocked("The way is blocked")
+		return
+
+	# Check if this cell has a hand-crafted scene (town/dungeon/landmark)
+	var scene_path := _get_scene_for_cell(cell)
+	if scene_path != "":
+		# Save current wilderness coords for return
+		if current_wilderness_coords.x >= 0:
+			last_wilderness_coords = current_wilderness_coords
+		# Load hand-crafted scene
+		print("[SceneManager] Loading hand-crafted scene: %s" % scene_path)
+		var spawn_id := _get_spawn_id_for_direction(from_direction)
+		await _load_location_scene(scene_path, spawn_id, target_coords)
+	else:
+		# Generate procedural wilderness room
+		print("[SceneManager] Generating procedural wilderness for coords: %s" % target_coords)
+		await _load_wilderness_room(target_coords, from_direction)
+
+	# Mark cell as discovered
+	WorldData.discover_cell(target_coords)
+
+
+## Return to wilderness from a dungeon/interior
+func return_to_wilderness() -> void:
+	print("[SceneManager] return_to_wilderness called, last coords: %s" % last_wilderness_coords)
+
+	if last_wilderness_coords.x >= 0 and last_wilderness_coords.y >= 0:
+		# Return to the saved wilderness coordinates
+		await enter_wilderness(last_wilderness_coords, -1)
+	else:
+		# Fallback to Elder Moor if no saved coords
+		print("[SceneManager] No saved wilderness coords, falling back to Elder Moor")
+		await enter_wilderness(WorldData.PLAYER_START, -1)
+
+
+## Load a hand-crafted location scene
+func _load_location_scene(scene_path: String, spawn_id: String, coords: Vector2i) -> void:
+	current_room_coords = coords
+	current_wilderness_coords = Vector2i(-1, -1)  # Not in wilderness
+	_current_wilderness_room = null
+
+	await change_scene(scene_path, spawn_id)
+
+
+## Player scene for instantiation in procedural rooms
+const PLAYER_SCENE_PATH := "res://scenes/player/player.tscn"
+var _player_scene: PackedScene = null
+
+
+## Load a procedural wilderness room
+func _load_wilderness_room(coords: Vector2i, from_direction: int) -> void:
+	if is_loading:
+		push_warning("[SceneManager] Already loading, ignoring wilderness request")
+		return
+
+	is_loading = true
+	transition_started.emit()
+
+	await _fade_out()
+
+	# Clear current scene
+	var current_scene := get_tree().current_scene
+	if current_scene:
+		current_scene.queue_free()
+		await get_tree().process_frame
+
+	# Create WildernessRoom instance
+	var wilderness_room := WildernessRoom.new()
+	wilderness_room.name = "WildernessRoom_%d_%d" % [coords.x, coords.y]
+
+	# Set entry direction BEFORE generating (affects mountain barrier placement)
+	wilderness_room.entry_direction = from_direction
+
+	# Get biome from WorldData and convert to WildernessRoom.Biome
+	var world_biome: int = WorldData.get_biome(coords)
+	var wilderness_biome: int = WorldData.to_wilderness_biome(world_biome)
+	# WildernessRoom.Biome only has 5 values (0-4), clamp to valid range
+	wilderness_room.biome = clampi(wilderness_biome, 0, 4) as WildernessRoom.Biome
+
+	# Generate with deterministic seed from coordinates
+	var seed_value: int = coords.x * 10000 + coords.y + 12345
+
+	# Add to scene tree
+	get_tree().root.add_child(wilderness_room)
+	get_tree().current_scene = wilderness_room
+
+	# Generate the room content
+	wilderness_room.generate(seed_value, coords)
+
+	# Instantiate player if not present
+	_ensure_player_exists(wilderness_room)
+
+	# Connect edge signals for room transitions
+	wilderness_room.edge_triggered.connect(_on_wilderness_edge_triggered)
+
+	# Update tracking
+	current_room_coords = coords
+	current_wilderness_coords = coords
+	_current_wilderness_room = wilderness_room
+
+	# Wait for scene to initialize
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+	# Position player based on entry direction
+	_position_player_for_wilderness(from_direction, wilderness_room.room_size)
+
+	await _fade_in()
+
+	is_loading = false
+	scene_load_completed.emit("wilderness://%d,%d" % [coords.x, coords.y])
+
+	print("[SceneManager] Wilderness room loaded at %s" % coords)
+
+
+## Ensure a player exists in the scene (instantiate if needed)
+func _ensure_player_exists(parent: Node) -> void:
+	var existing_player := get_tree().get_first_node_in_group("player")
+	if existing_player:
+		print("[SceneManager] Player already exists in scene")
+		return
+
+	# Load and cache player scene
+	if _player_scene == null:
+		if ResourceLoader.exists(PLAYER_SCENE_PATH):
+			_player_scene = load(PLAYER_SCENE_PATH) as PackedScene
+		else:
+			push_error("[SceneManager] Player scene not found: %s" % PLAYER_SCENE_PATH)
+			return
+
+	# Instantiate player
+	var player := _player_scene.instantiate()
+	if player:
+		parent.add_child(player)
+		print("[SceneManager] Player instantiated in wilderness room")
+
+
+## Position player based on entry direction in wilderness
+func _position_player_for_wilderness(from_direction: int, room_size: float) -> void:
+	var player := get_tree().get_first_node_in_group("player")
+	if not player or not player is Node3D:
+		push_warning("[SceneManager] No player found for positioning")
+		return
+
+	var player_3d := player as Node3D
+	var spawn_offset := Vector3(0, 0.5, 0)  # Default center
+
+	if from_direction >= 0:
+		# Use RoomEdge to get spawn offset (player enters from opposite side)
+		var opposite_dir: int = RoomEdge.get_opposite(from_direction as RoomEdge.Direction)
+		spawn_offset = RoomEdge.get_spawn_offset(opposite_dir as RoomEdge.Direction, room_size)
+
+	player_3d.global_position = spawn_offset
+
+	# Apply rotation to face into the room
+	_apply_spawn_rotation(player_3d, _get_spawn_id_for_direction(from_direction))
+
+	print("[SceneManager] Player positioned at %s (from_direction=%d)" % [spawn_offset, from_direction])
+
+
+## Handle wilderness edge trigger - transition to adjacent cell
+func _on_wilderness_edge_triggered(direction: RoomEdge.Direction) -> void:
+	print("[SceneManager] Wilderness edge triggered: %s" % RoomEdge.Direction.keys()[direction])
+
+	# Calculate target coordinates based on direction
+	var offset: Vector2i
+	match direction:
+		RoomEdge.Direction.NORTH:
+			offset = Vector2i(0, -1)  # North is -Y in grid
+		RoomEdge.Direction.SOUTH:
+			offset = Vector2i(0, 1)   # South is +Y in grid
+		RoomEdge.Direction.EAST:
+			offset = Vector2i(1, 0)
+		RoomEdge.Direction.WEST:
+			offset = Vector2i(-1, 0)
+		_:
+			offset = Vector2i.ZERO
+
+	var target_coords: Vector2i = current_wilderness_coords + offset
+
+	# Enter the new cell (passing direction so player spawns on opposite side)
+	await enter_wilderness(target_coords, direction)
+
+
+## Get scene path for a cell with a location
+func _get_scene_for_cell(cell: WorldData.CellData) -> String:
+	if cell.location_id.is_empty():
 		return ""
 
-	# Use WorldData for location/region info
-	var cell_name := WorldData.get_cell_name(current_room_coords)
-	return cell_name
+	# Check WorldData's LOCATION_SCENES dictionary first
+	if WorldData.LOCATION_SCENES.has(cell.location_id):
+		return WorldData.LOCATION_SCENES[cell.location_id]
+
+	# Fallback to get_scene_for_location
+	return get_scene_for_location(cell.location_id)
 
 
-## Get current region name (for HUD display)
-func get_current_region_name() -> String:
-	if not in_wilderness:
-		return ""
-	return WorldData.get_region_name(current_room_coords)
+## Get spawn ID string for a direction
+func _get_spawn_id_for_direction(direction: int) -> String:
+	match direction:
+		0: return "from_north"  # RoomEdge.Direction.NORTH
+		1: return "from_south"  # RoomEdge.Direction.SOUTH
+		2: return "from_east"   # RoomEdge.Direction.EAST
+		3: return "from_west"   # RoomEdge.Direction.WEST
+		_: return "default"
 
 
-## Check if current cell has a location (town/dungeon)
-func get_current_location_id() -> String:
-	return WorldData.get_location_id(current_room_coords)
+## Show travel blocked notification
+func _show_travel_blocked(message: String) -> void:
+	var hud := get_tree().get_first_node_in_group("hud")
+	if hud and hud.has_method("show_notification"):
+		hud.show_notification(message)
+	print("[SceneManager] Travel blocked: %s" % message)
 
 
-## Check if currently in wilderness room system
-func is_in_wilderness() -> bool:
-	return in_wilderness
+## Legacy alias for get_scene_for_location (underscore prefix version)
+func _get_scene_for_location(location_id: String) -> String:
+	return get_scene_for_location(location_id)
 
 
-## Save room seeds for a character (called by save system)
-func get_room_seeds_for_save() -> Dictionary:
-	return room_seeds
+## Helper: Convert direction int to string
+func _direction_to_string(direction: int) -> String:
+	match direction:
+		0: return "north"  # RoomEdge.Direction.NORTH
+		1: return "south"  # RoomEdge.Direction.SOUTH
+		2: return "east"   # RoomEdge.Direction.EAST
+		3: return "west"   # RoomEdge.Direction.WEST
+	return "center"
 
 
-## Load room seeds from save
-func load_room_seeds(data: Dictionary) -> void:
-	room_seeds = data
+## Legacy: Transition to adjacent room in a direction
+## Calculates target coords and calls enter_wilderness
+func transition_to_adjacent_room(direction: int) -> void:
+	var offset: Vector2i
+	match direction:
+		0: offset = Vector2i(0, -1)  # NORTH
+		1: offset = Vector2i(0, 1)   # SOUTH
+		2: offset = Vector2i(1, 0)   # EAST
+		3: offset = Vector2i(-1, 0)  # WEST
+		_: offset = Vector2i.ZERO
+
+	var target_coords: Vector2i = current_room_coords + offset
+	await enter_wilderness(target_coords, direction)
