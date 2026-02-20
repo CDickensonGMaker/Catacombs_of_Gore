@@ -6,8 +6,8 @@ extends Node3D
 const ZONE_ID := "hamlet_millbrook"
 const ZONE_SIZE := 40.0  # Millbrook is 40x40 units
 
-## Millbrook grid coordinates (from WorldData GRID_DATA)
-const GRID_COORDS := Vector2i(3, 9)
+## Millbrook grid coordinates (from WorldData LOCATIONS: col=5, row=12)
+const GRID_COORDS := Vector2i(5, 12)
 
 @onready var nav_region: NavigationRegion3D = $NavigationRegion3D
 

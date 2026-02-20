@@ -457,9 +457,23 @@ func _apply_spawn_rotation(player: Node3D, spawn_id: String) -> void:
 
 
 ## Set current region (called by region scripts)
+## Note: This sets current_room_coords to the GRID coords (20x20 system), not region-relative coords
 func set_current_region(region_id: String) -> void:
 	current_region_id = region_id
-	current_room_coords = WorldData.get_region_coords(region_id)
+	# Look up the grid coords for this location from WorldData LOCATIONS
+	var loc_info: Dictionary = WorldData.get_location_by_id(region_id)
+	if not loc_info.is_empty():
+		current_room_coords = Vector2i(loc_info.get("col", 12), loc_info.get("row", 8))
+	else:
+		# Fallback: try to find in world_grid by location_id
+		for coords: Vector2i in WorldData.world_grid:
+			var cell: WorldData.CellData = WorldData.world_grid[coords]
+			if cell.location_id == region_id:
+				current_room_coords = coords
+				break
+	# Notify WorldManager of cell entry
+	if WorldManager:
+		WorldManager.on_cell_entered(current_room_coords)
 	print("[SceneManager] Current region: %s (coords: %s)" % [region_id, current_room_coords])
 
 

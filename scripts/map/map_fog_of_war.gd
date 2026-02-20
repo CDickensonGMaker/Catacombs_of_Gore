@@ -1,20 +1,27 @@
-## map_fog_of_war.gd - OpenMW-inspired fog of war system for painted world map
-## Reveals areas as the player explores, with circular reveal around visited hexes
+## map_fog_of_war.gd - Fog of war system for painted world map (Square Grid)
+## Reveals areas as the player explores, with circular reveal around visited cells
 ## Uses grayscale image for fog opacity - white = visible, black = hidden
 class_name MapFogOfWar
 extends RefCounted
 
 ## Reveal settings
-const REVEAL_RADIUS_HEXES := 2  ## Number of hexes around player to reveal
+const REVEAL_RADIUS_CELLS := 2  ## Number of cells around player to reveal
 const REVEAL_FEATHER := 0.3  ## Edge softness (0-1)
+
+## Grid dimensions (must match WorldData)
+const GRID_COLS := 20
+const GRID_ROWS := 20
 
 ## Fog image (grayscale, R channel = opacity where 255 = visible, 0 = hidden)
 var fog_image: Image
 var fog_texture: ImageTexture
 var image_size: Vector2i
 
-## Explored hex cells (set for fast lookup)
-var explored_hexes: Dictionary = {}  ## "q,r" -> true
+## Cell size in pixels (calculated from image size / grid size)
+var cell_size: float = 54.0
+
+## Explored cells (set for fast lookup)
+var explored_hexes: Dictionary = {}  ## "x,y" -> true (kept as "hexes" for save compatibility)
 
 ## Whether fog is dirty and needs texture update
 var _fog_dirty: bool = true
@@ -22,6 +29,7 @@ var _fog_dirty: bool = true
 
 func _init(p_image_size: Vector2i) -> void:
 	image_size = p_image_size
+	cell_size = float(image_size.x) / float(GRID_COLS)
 	_create_fog_image()
 
 
@@ -34,27 +42,31 @@ func _create_fog_image() -> void:
 	print("[MapFogOfWar] Created fog image: %dx%d" % [image_size.x, image_size.y])
 
 
-## Reveal area around a hex coordinate
-func reveal_hex(hex: Vector2i) -> void:
-	var key: String = "%d,%d" % [hex.x, hex.y]
+## Reveal area around a cell coordinate
+func reveal_hex(cell: Vector2i) -> void:
+	var key: String = "%d,%d" % [cell.x, cell.y]
 	if explored_hexes.has(key):
 		return  # Already explored
 
 	explored_hexes[key] = true
-	_paint_revealed_area(hex)
+	_paint_revealed_area(cell)
 	_fog_dirty = true
 
 
-## Paint revealed area on fog image around a hex
-func _paint_revealed_area(center_hex: Vector2i) -> void:
-	if not MapCoordinateSystem or not MapCoordinateSystem.is_initialized:
-		return
+## Convert grid coords to pixel position (center of cell)
+func _grid_to_pixel(coords: Vector2i) -> Vector2:
+	var pixel_x: float = float(coords.x) * cell_size + cell_size / 2.0
+	var pixel_y: float = float(coords.y) * cell_size + cell_size / 2.0
+	return Vector2(pixel_x, pixel_y)
 
-	# Get pixel position of hex center
-	var center_pixel: Vector2 = MapCoordinateSystem.hex_to_pixel_v(center_hex)
 
-	# Calculate reveal radius in pixels
-	var pixel_radius: float = MapCoordinateSystem.hex_distance_to_pixels(float(REVEAL_RADIUS_HEXES))
+## Paint revealed area on fog image around a cell
+func _paint_revealed_area(center_cell: Vector2i) -> void:
+	# Get pixel position of cell center
+	var center_pixel: Vector2 = _grid_to_pixel(center_cell)
+
+	# Calculate reveal radius in pixels (cells * cell_size)
+	var pixel_radius: float = float(REVEAL_RADIUS_CELLS) * cell_size
 
 	# Calculate bounding box for painting
 	var min_x: int = maxi(0, int(center_pixel.x - pixel_radius) - 1)

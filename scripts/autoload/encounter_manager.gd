@@ -215,16 +215,17 @@ func _ready() -> void:
 
 ## Connect to other autoloads (deferred to ensure they're ready)
 func _connect_signals() -> void:
-	# Connect to WorldManager.hex_changed for forced encounter checks
-	if WorldManager and WorldManager.has_signal("hex_changed"):
-		if not WorldManager.hex_changed.is_connected(_on_hex_changed):
-			WorldManager.hex_changed.connect(_on_hex_changed)
-			print("[EncounterManager] Connected to WorldManager.hex_changed")
+	# Connect to WorldManager.cell_entered for forced encounter checks when entering new cells
+	if WorldManager and WorldManager.has_signal("cell_entered"):
+		if not WorldManager.cell_entered.is_connected(_on_cell_entered):
+			WorldManager.cell_entered.connect(_on_cell_entered)
+			print("[EncounterManager] Connected to WorldManager.cell_entered")
 
 
-## Called when player enters a new hex - force encounter check
-func _on_hex_changed(_old_hex: Vector2i, _new_hex: Vector2i) -> void:
-	# Force an encounter check when entering a new hex
+## Called when player enters a new cell - force encounter check
+func _on_cell_entered(coords: Vector2i, _cell_data: WorldData.CellData) -> void:
+	# Update last check coords and force an encounter check when entering a new cell
+	_last_check_hex = coords
 	force_check()
 
 

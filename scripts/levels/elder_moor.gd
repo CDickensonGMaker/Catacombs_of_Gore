@@ -9,7 +9,9 @@ const ZONE_SIZE := 300.0  # 300x300 unit region (expanded from 60x60)
 ## Town center radius - buildings are kept within this area
 const TOWN_RADIUS := 35.0
 
-## Elder Moor grid coordinates (from WorldData GRID_DATA)
+## Elder Moor grid coordinates (from WorldData LOCATIONS: col=12, row=8)
+## This is the position in the 20x20 GRID_DATA array
+## In region-relative coordinates, Elder Moor is at (0, 0) as the origin
 const GRID_COORDS := Vector2i(12, 8)
 
 @onready var nav_region: NavigationRegion3D = $NavigationRegion3D
@@ -76,7 +78,7 @@ func _setup_spawn_point_metadata() -> void:
 
 
 ## Setup edge exits for transitioning to adjacent wilderness cells
-## Elder Moor at (11, 8) - creates exits for all passable adjacent cells
+## Elder Moor at grid (12, 8) - creates exits for all passable adjacent cells
 func _setup_edge_exits() -> void:
 	var edges_container := Node3D.new()
 	edges_container.name = "EdgeExits"

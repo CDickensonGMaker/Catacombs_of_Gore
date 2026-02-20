@@ -10,8 +10,8 @@ extends Node3D
 const ZONE_ID := "hamlet_thornfield"
 const ZONE_SIZE := 50.0  # Thornfield is 50x50 units
 
-## Thornfield grid coordinates (from WorldData GRID_DATA)
-const GRID_COORDS := Vector2i(9, 4)
+## Thornfield grid coordinates (from WorldData LOCATIONS: col=15, row=6)
+const GRID_COORDS := Vector2i(15, 6)
 
 @onready var nav_region: NavigationRegion3D = $NavigationRegion3D
 

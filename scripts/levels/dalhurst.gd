@@ -11,8 +11,8 @@ extends Node3D
 const ZONE_ID := "city_dalhurst"
 const ZONE_SIZE := 60.0  # Dalhurst is 60x60 units
 
-## Dalhurst grid coordinates (from WorldData GRID_DATA)
-const GRID_COORDS := Vector2i(3, 4)
+## Dalhurst grid coordinates (from WorldData LOCATIONS: col=4, row=6)
+const GRID_COORDS := Vector2i(4, 6)
 
 @onready var nav_region: NavigationRegion3D = $NavigationRegion3D
 

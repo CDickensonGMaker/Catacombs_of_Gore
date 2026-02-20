@@ -260,8 +260,19 @@ func _setup_travel_dialog() -> void:
 
 
 ## ============================================================================
-## COORDINATE CONVERSION
+## COORDINATE CONVERSION (Square Grid System)
 ## ============================================================================
+
+## Grid dimensions (must match WorldData and map image)
+const GRID_COLS := 20
+const GRID_ROWS := 20
+
+## Get cell size in pixels based on map texture size
+func _get_cell_size() -> float:
+	if map_size.x > 0:
+		return map_size.x / float(GRID_COLS)
+	return 54.0  # Default: 1080 / 20 = 54
+
 
 ## Convert map pixel position to canvas position (with zoom and offset)
 func map_to_canvas(map_pixel: Vector2) -> Vector2:
@@ -275,20 +286,35 @@ func canvas_to_map(canvas_pos: Vector2) -> Vector2:
 	return (canvas_pos - canvas_center - map_offset) / zoom_level + map_size / 2.0
 
 
+## Convert grid coords to map pixel position (center of cell)
+func grid_to_pixel(coords: Vector2i) -> Vector2:
+	var cell_size: float = _get_cell_size()
+	var pixel_x: float = float(coords.x) * cell_size + cell_size / 2.0
+	var pixel_y: float = float(coords.y) * cell_size + cell_size / 2.0
+	return Vector2(pixel_x, pixel_y)
+
+
 ## Convert grid coords to canvas position
 func grid_to_canvas(coords: Vector2i) -> Vector2:
-	if not MapCoordinateSystem or not MapCoordinateSystem.is_initialized:
-		return Vector2.ZERO
-	var map_pixel: Vector2 = MapCoordinateSystem.grid_to_pixel_v(coords)
+	var map_pixel: Vector2 = grid_to_pixel(coords)
 	return map_to_canvas(map_pixel)
+
+
+## Convert map pixel position to grid coords
+func pixel_to_grid(pixel: Vector2) -> Vector2i:
+	var cell_size: float = _get_cell_size()
+	var col: int = int(pixel.x / cell_size)
+	var row: int = int(pixel.y / cell_size)
+	# Clamp to valid grid range
+	col = clampi(col, 0, GRID_COLS - 1)
+	row = clampi(row, 0, GRID_ROWS - 1)
+	return Vector2i(col, row)
 
 
 ## Convert canvas position to grid coords
 func canvas_to_grid(canvas_pos: Vector2) -> Vector2i:
-	if not MapCoordinateSystem or not MapCoordinateSystem.is_initialized:
-		return Vector2i(-999, -999)
 	var map_pixel: Vector2 = canvas_to_map(canvas_pos)
-	return MapCoordinateSystem.pixel_to_grid(map_pixel)
+	return pixel_to_grid(map_pixel)
 
 
 ## ============================================================================
@@ -524,12 +550,8 @@ func _clamp_offset() -> void:
 
 
 func _center_on_player() -> void:
-	if not MapCoordinateSystem or not MapCoordinateSystem.is_initialized:
-		map_offset = Vector2.ZERO
-		return
-
-	# Get player position on map
-	var player_map_pos: Vector2 = MapCoordinateSystem.grid_to_pixel_v(player_cell)
+	# Get player position on map using local grid_to_pixel
+	var player_map_pos: Vector2 = grid_to_pixel(player_cell)
 
 	# Calculate offset to center player
 	map_offset = (map_size / 2.0 - player_map_pos) * zoom_level

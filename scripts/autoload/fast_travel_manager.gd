@@ -257,16 +257,18 @@ func get_valid_destinations() -> Array[Dictionary]:
 	var destinations: Array[Dictionary] = []
 
 	for loc: Dictionary in WorldManager.get_discovered_locations():
-		var loc_id: String = loc.id
+		var loc_id: String = loc.get("id", "")
+		if loc_id.is_empty():
+			continue
 		if can_fast_travel_to(loc_id).allowed:
 			var estimate: Dictionary = get_travel_estimate(loc_id)
 			destinations.append({
 				"id": loc_id,
-				"name": loc.name,
-				"type": loc.type,
-				"coords": loc.coords,
-				"distance": estimate.distance,
-				"travel_time": estimate.formatted
+				"name": loc.get("name", "Unknown"),
+				"type": loc.get("type", 0),
+				"coords": loc.get("coords", Vector2i.ZERO),
+				"distance": estimate.get("distance", 0),
+				"travel_time": estimate.get("formatted", "Unknown")
 			})
 
 	# Sort by distance

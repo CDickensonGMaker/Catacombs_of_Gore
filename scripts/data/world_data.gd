@@ -61,8 +61,22 @@ static func get_zone_at_region_coords(coords: Vector2i) -> String:
 			return zone_id
 	return ""
 
-## Player start position
-const PLAYER_START := Vector2i(12, 8)  # Elder Moor
+
+## Convert grid coordinates (20x20 grid) to region coordinates (Elder Moor-relative)
+## Elder Moor is at grid (12, 8) which is region (0, 0)
+static func grid_to_region(grid_coords: Vector2i) -> Vector2i:
+	return grid_coords - PLAYER_START
+
+
+## Convert region coordinates (Elder Moor-relative) to grid coordinates (20x20 grid)
+static func region_to_grid(region_coords: Vector2i) -> Vector2i:
+	return region_coords + PLAYER_START
+
+## Player start position (Elder Moor is at grid coords 12,8 in the 20x20 GRID_DATA)
+const PLAYER_START := Vector2i(12, 8)  # Elder Moor location in GRID_DATA
+
+## Region-relative start position (Elder Moor is origin in region coords)
+const REGION_START := Vector2i(0, 0)  # Elder Moor as origin
 
 ## Terrain types from JSON map
 enum Terrain { BLOCKED, HIGHLANDS, FOREST, WATER, COAST, SWAMP, ROAD, POI, DESERT }
@@ -111,7 +125,7 @@ class CellData:
 ## World grid - Dictionary of Vector2i -> CellData
 ## Coordinates: col = x (0-19), row = y (0-19)
 ## Row 0 is NORTH, Row 19 is SOUTH
-## Elder Moor is at (11, 8)
+## Elder Moor is at grid (12, 8) - see LOCATIONS and PLAYER_START
 static var world_grid: Dictionary = {}
 
 ## Terrain character to enum mapping
