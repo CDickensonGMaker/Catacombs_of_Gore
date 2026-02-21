@@ -26,7 +26,21 @@ func _ready() -> void:
 	# Register with CellStreamer and start streaming
 	_setup_cell_streaming()
 
+	# Start the Road to Thornfield quest automatically for new players
+	_start_starter_quest()
+
 	print("[Elder Moor] Logging camp initialized")
+
+
+## Start the introductory quest to guide players east to Thornfield
+func _start_starter_quest() -> void:
+	if not QuestManager:
+		return
+
+	# Only start if not already active or completed
+	if not QuestManager.quests.has("road_to_thornfield"):
+		if QuestManager.start_quest("road_to_thornfield"):
+			print("[Elder Moor] Started starter quest: Road to Thornfield")
 
 
 ## Register this scene with CellStreamer and start streaming

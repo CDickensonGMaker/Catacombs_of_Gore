@@ -8,7 +8,7 @@ signal fast_travel_requested(zone_id: String, spawn_id: String)
 signal location_selected(zone_id: String)
 
 ## Map settings
-const CELL_SIZE := 28  ## Pixels per grid cell
+const CELL_SIZE := 18  ## Pixels per grid cell (smaller = more zoomed out)
 const MAP_PADDING := 10
 const PLAYER_ICON_SIZE := 12.0
 
@@ -55,9 +55,10 @@ var grid_offset: Vector2
 
 
 func _ready() -> void:
-	# Calculate sizes
+	# Calculate sizes - use full rect to fill container, don't force overflow
 	grid_size = Vector2(WorldData.GRID_COLS * CELL_SIZE, WorldData.GRID_ROWS * CELL_SIZE)
-	custom_minimum_size = grid_size + Vector2(MAP_PADDING * 2, MAP_PADDING * 2 + 60)
+	# Don't set custom_minimum_size larger than typical panel - let it fit the container
+	set_anchors_preset(PRESET_FULL_RECT)
 
 	# Initialize WorldData
 	if WorldData.world_grid.is_empty():
@@ -121,7 +122,7 @@ func _setup_ui() -> void:
 	coords_label.offset_left = -80
 	add_child(coords_label)
 
-	# Map canvas for drawing
+	# Map canvas for drawing - centered within available space
 	map_canvas = Control.new()
 	map_canvas.name = "MapCanvas"
 	map_canvas.position = Vector2(MAP_PADDING, 46)
@@ -602,10 +603,13 @@ func _on_travel_cancelled() -> void:
 
 
 func _update_player_position() -> void:
-	# Get player's current grid position from SceneManager
-	# In region-based system, current_room_coords tracks world map position
+	# Get player's current grid position
+	# CellStreamer/SceneManager uses WorldGrid coords (Elder Moor = 0,0)
+	# WorldData uses grid coords (Elder Moor = 12,8)
+	# Convert from region coords to grid coords for WorldData compatibility
 	if SceneManager:
-		player_coords = SceneManager.current_room_coords
+		# Convert from WorldGrid/region coords to WorldData grid coords
+		player_coords = WorldData.region_to_grid(SceneManager.current_room_coords)
 	else:
 		# Default to Elder Moor
 		player_coords = WorldData.PLAYER_START

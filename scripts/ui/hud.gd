@@ -2192,9 +2192,10 @@ func _update_compass_quest_marker(player: Node3D, yaw_degrees: float, ppd: float
 	var marker_visible: bool = abs(rel_angle) < 50.0
 	compass_quest_marker.visible = marker_visible
 
+	# Debug: Log once per second when debug is enabled
 	if should_log:
-		print("[Compass] Marker for '%s' at angle %.1f deg, visible: %s, position: %.1f" % [
-			target_name, rel_angle, marker_visible, compass_quest_marker.position.x
+		print("[Compass] Marker '%s': rel_angle=%.1f, visible=%s, x_pos=%.1f, player_pos=%s, target_pos=%s" % [
+			target_name, rel_angle, marker_visible, x_pos, player.global_position, target_pos
 		])
 
 
@@ -2499,7 +2500,18 @@ func _find_objective_in_current_zone(objective: QuestManager.Objective, quest: Q
 						return result
 
 		"reach":
-			# Look for location markers or spawn points
+			# First, check QuestManager's cached location for the destination
+			if quest and QuestManager:
+				var cached_pos: Vector3 = QuestManager.get_objective_world_pos(quest.id, objective.id)
+				if cached_pos != Vector3.ZERO:
+					result.found = true
+					result.position = cached_pos
+					# Get location name from WorldGrid
+					var location_name: String = WorldGrid.get_location_name(objective.target)
+					result.name = location_name if location_name != "Unknown Location" else objective.target
+					return result
+
+			# Fallback: Look for location markers or spawn points
 			var spawn_points := get_tree().get_nodes_in_group("spawn_points")
 			for point in spawn_points:
 				if point is Node3D:
@@ -2602,10 +2614,15 @@ func _get_objective_target_zone(objective: QuestManager.Objective) -> String:
 					return "elder_moor"
 				"dalhurst", "city_dalhurst":
 					return "dalhurst"
+				"thornfield", "hamlet_thornfield":
+					return "thornfield"
+				"millbrook":
+					return "millbrook"
 				"open_world":
 					return "open_world"
 				_:
-					return ""
+					# For unknown locations, return the target itself as it might be a valid zone
+					return objective.target
 
 		"collect":
 			match objective.target:

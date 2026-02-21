@@ -1880,14 +1880,14 @@ func _refresh_journal() -> void:
 			quest_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 			vbox.add_child(quest_btn)
 
-			vbox.add_child(_make_label("  " + quest.description, COL_DIM))
+			vbox.add_child(_make_wrapping_label("  " + quest.description, COL_DIM))
 			for obj in quest.objectives:
 				var check := "[X]" if obj.is_completed else "[ ]"
 				var progress := ""
 				if obj.required_count > 1:
 					progress = " (%d/%d)" % [obj.current_count, obj.required_count]
 				var col := COL_GREEN if obj.is_completed else COL_TEXT
-				vbox.add_child(_make_label("  %s %s%s" % [check, obj.description, progress], col))
+				vbox.add_child(_make_wrapping_label("  %s %s%s" % [check, obj.description, progress], col))
 			vbox.add_child(HSeparator.new())
 
 	vbox.add_child(_make_label("COMPLETED QUESTS", COL_GOLD))
@@ -1911,6 +1911,15 @@ func _make_label(text: String, color: Color) -> Label:
 	var lbl = Label.new()
 	lbl.text = text
 	lbl.add_theme_color_override("font_color", color)
+	return lbl
+
+
+func _make_wrapping_label(text: String, color: Color) -> Label:
+	var lbl = Label.new()
+	lbl.text = text
+	lbl.add_theme_color_override("font_color", color)
+	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	return lbl
 
 func _style_item_list(list: ItemList) -> void:

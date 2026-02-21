@@ -1,0 +1,28 @@
+{
+	"id": "road_to_thornfield",
+	"title": "Road to Thornfield",
+	"description": "A traveler in Elder Moor mentioned that Thornfield, a small logging hamlet to the east, has been having trouble with wolves in the forest. Perhaps they could use some help.",
+	"is_main_quest": true,
+	"quest_source": "story",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "elder_moor",
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "thornfield",
+	"objectives": [
+		{
+			"id": "travel_to_thornfield",
+			"description": "Travel east to Thornfield",
+			"type": "reach",
+			"target": "thornfield",
+			"required_count": 1,
+			"is_optional": false
+		}
+	],
+	"rewards": {
+		"gold": 50,
+		"xp": 500
+	},
+	"prerequisites": []
+}

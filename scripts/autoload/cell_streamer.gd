@@ -112,6 +112,9 @@ func _check_cell_boundary() -> void:
 			# Update location ID if entering a named location
 			if not cell_info.location_id.is_empty():
 				SceneManager.current_region_id = cell_info.location_id
+				# Notify QuestManager that we reached this location
+				if QuestManager:
+					QuestManager.on_location_reached(cell_info.location_id)
 			else:
 				# In wilderness - use region name as fallback
 				SceneManager.current_region_id = cell_info.region_name.to_snake_case()
@@ -269,9 +272,11 @@ func _create_simple_cell(coords: Vector2i, cell_info: WorldGrid.CellInfo) -> Nod
 	plane_mesh.size = Vector2(CELL_SIZE + 2.0, CELL_SIZE + 2.0)  # Overlap by 1 unit on each side
 	ground.mesh = plane_mesh
 
-	# Set material based on biome
+	# Set material to grass green to match wilderness rooms
 	var material: StandardMaterial3D = StandardMaterial3D.new()
-	material.albedo_color = WorldGrid.TERRAIN_COLORS.get(cell_info.terrain, Color.DARK_GREEN)
+	# Use consistent grass green color to prevent flashing with wilderness cells
+	material.albedo_color = Color(0.2, 0.35, 0.15)  # Forest grass green
+	material.roughness = 0.9
 	ground.material_override = material
 
 	cell.add_child(ground)

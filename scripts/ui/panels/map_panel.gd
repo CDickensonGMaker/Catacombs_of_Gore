@@ -116,12 +116,8 @@ func _determine_map_mode() -> void:
 	var is_outdoor: bool = _is_outdoor_region(zone_id)
 
 	if is_outdoor:
-		# In outdoor region - show painted world map (OpenMW-style)
-		# Fall back to grid map if painted map texture not available
-		if painted_world_map:
-			_set_mode(MapMode.WORLD_PAINTED)
-		else:
-			_set_mode(MapMode.WORLD_GRID)
+		# In outdoor region - show grid world map (procedural, no uploaded image)
+		_set_mode(MapMode.WORLD_GRID)
 	else:
 		# In dungeon/town/interior - show local map
 		_set_mode(MapMode.LOCAL_AREA)
@@ -176,11 +172,8 @@ func _set_mode(mode: MapMode) -> void:
 func _on_mode_toggle_pressed() -> void:
 	# Toggle between local and world map
 	if current_mode == MapMode.LOCAL_AREA:
-		# Switch to world map - prefer painted map
-		if painted_world_map:
-			_set_mode(MapMode.WORLD_PAINTED)
-		else:
-			_set_mode(MapMode.WORLD_GRID)
+		# Switch to grid world map
+		_set_mode(MapMode.WORLD_GRID)
 	else:
 		# Switch to local map
 		_set_mode(MapMode.LOCAL_AREA)

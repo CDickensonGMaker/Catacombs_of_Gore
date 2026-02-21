@@ -5,8 +5,8 @@ extends Control
 
 ## Minimap settings
 const MAP_SIZE := Vector2(120, 120)
-const CELL_PIXEL_SIZE := 4  # Pixels per cell
-const VIEW_RADIUS := 15  # Cells to show from player center
+const CELL_PIXEL_SIZE := 30  # Pixels per cell (750% zoom - very zoomed in for visibility)
+const VIEW_RADIUS := 2  # Cells to show from player center (smaller = more zoomed in)
 
 ## Colors
 const COLOR_REVEALED := Color(0.15, 0.13, 0.18, 0.9)

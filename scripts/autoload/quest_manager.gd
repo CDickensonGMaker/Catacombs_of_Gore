@@ -360,14 +360,23 @@ func _resolve_npc_location(npc_id: String) -> Dictionary:
 
 ## Resolve zone/location ID to coordinates
 func _resolve_zone_location(zone_id: String) -> Dictionary:
-	# Check WorldData world_grid for location IDs
-	for coords: Vector2i in WorldData.world_grid:
-		var cell: WorldData.CellData = WorldData.world_grid[coords]
+	# First check WorldGrid (new system) for location IDs
+	var coords: Vector2i = WorldGrid.get_location_coords(zone_id)
+	if coords != Vector2i.ZERO or zone_id == "elder_moor":
+		return {
+			"hex": coords,
+			"zone_id": zone_id,
+			"world_pos": WorldGrid.cell_to_world(coords)
+		}
+
+	# Fallback to WorldData world_grid for legacy location IDs
+	for legacy_coords: Vector2i in WorldData.world_grid:
+		var cell: WorldData.CellData = WorldData.world_grid[legacy_coords]
 		if cell.location_id == zone_id:
 			return {
-				"hex": coords,
+				"hex": legacy_coords,
 				"zone_id": zone_id,
-				"world_pos": WorldData.axial_to_world(coords)
+				"world_pos": WorldData.axial_to_world(legacy_coords)
 			}
 
 	return {}

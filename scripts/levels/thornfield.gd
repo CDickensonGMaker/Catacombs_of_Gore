@@ -19,6 +19,10 @@ func _ready() -> void:
 		var coords := WorldGrid.get_location_coords(ZONE_ID)
 		PlayerGPS.set_position(coords)
 
+	# Track location for quest objectives
+	if QuestManager:
+		QuestManager.on_location_reached(ZONE_ID)
+
 	_setup_environment()
 	_spawn_npcs()
 	_spawn_interactables()
