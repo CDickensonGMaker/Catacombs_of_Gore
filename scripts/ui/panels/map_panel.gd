@@ -109,8 +109,8 @@ func _determine_map_mode() -> void:
 	var zone_id: String = ""
 	if SceneManager:
 		zone_id = SceneManager.get_current_region_id()
-	if zone_id.is_empty() and MapTracker:
-		zone_id = MapTracker.get_current_zone()
+	if zone_id.is_empty() and PlayerGPS:
+		zone_id = PlayerGPS.current_location_id
 
 	# Check if this is a dungeon/interior (local map) or outdoor region (world map)
 	var is_outdoor: bool = _is_outdoor_region(zone_id)

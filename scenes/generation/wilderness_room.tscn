@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bwildroom001"]
+
+[ext_resource type="Script" path="res://scripts/generation/wilderness_room.gd" id="1_wilderness"]
+
+[node name="WildernessRoom" type="Node3D"]
+script = ExtResource("1_wilderness")

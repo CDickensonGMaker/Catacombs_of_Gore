@@ -477,9 +477,9 @@ func _connect_signals() -> void:
 		QuestManager.objective_completed.connect(_on_objective_completed)
 
 	# World/cell change signals - for immediate location name updates
-	if WorldManager and WorldManager.has_signal("cell_entered"):
-		if not WorldManager.cell_entered.is_connected(_on_cell_entered):
-			WorldManager.cell_entered.connect(_on_cell_entered)
+	if PlayerGPS and PlayerGPS.has_signal("cell_changed"):
+		if not PlayerGPS.cell_changed.is_connected(_on_cell_changed_hud):
+			PlayerGPS.cell_changed.connect(_on_cell_changed_hud)
 
 ## Disconnect signals from old player_data to prevent "signal connected to freed object" errors
 func _disconnect_player_data_signals() -> void:
@@ -1572,10 +1572,10 @@ func _update_minimap_coordinates() -> void:
 	if not minimap_coord_label or not _cached_player:
 		return
 
-	# Show zone name from MapTracker or SceneManager
+	# Show zone name from PlayerGPS or SceneManager
 	var zone_id: String = ""
-	if MapTracker:
-		zone_id = MapTracker.get_current_zone()
+	if PlayerGPS:
+		zone_id = PlayerGPS.current_location_id
 
 	if zone_id.is_empty() and SceneManager:
 		zone_id = SceneManager.get_current_region_id()
@@ -1676,17 +1676,24 @@ func _get_friendly_region_name(zone_id: String) -> String:
 	return clean_name.replace("_", " ").capitalize()
 
 
-## Handle cell entered signal from WorldManager for immediate location updates
-func _on_cell_entered(coords: Vector2i, cell: WorldData.CellData) -> void:
+## Handle cell changed signal from PlayerGPS for immediate location updates
+func _on_cell_changed_hud(old_cell: Vector2i, new_cell: Vector2i) -> void:
 	if not minimap_coord_label:
 		return
 
+	# Get cell info from WorldGrid
+	var cell_info: WorldGrid.CellInfo = WorldGrid.get_cell(new_cell)
+	if not cell_info:
+		minimap_coord_label.text = "Unknown"
+		minimap_coord_label.visible = true
+		return
+
 	# Immediately update location display - prioritize cell.location_name
-	if cell.location_name and not cell.location_name.is_empty():
-		minimap_coord_label.text = cell.location_name
+	if not cell_info.location_name.is_empty():
+		minimap_coord_label.text = cell_info.location_name
 	else:
 		# Show "Biome Wilderness" for unnamed cells
-		var biome_name: String = WorldData.Biome.keys()[cell.biome].capitalize()
+		var biome_name: String = WorldGrid.Biome.keys()[cell_info.biome].capitalize()
 		minimap_coord_label.text = "%s Wilderness" % biome_name
 
 	minimap_coord_label.visible = true
@@ -2126,7 +2133,7 @@ func _update_compass_quest_marker(player: Node3D, yaw_degrees: float, ppd: float
 
 			# Fallback: if target_zone is empty and we're in town, point to outdoor region
 			if target_zone.is_empty():
-				var current_zone := MapTracker.get_current_zone() if MapTracker else ""
+				var current_zone: String = PlayerGPS.current_location_id if PlayerGPS else ""
 				if current_zone in ["town", "riverside_village", "elder_moor", "village_elder_moor"]:
 					target_zone = "open_world"
 					if should_log:
@@ -2607,7 +2614,7 @@ func _get_objective_target_zone(objective: QuestManager.Objective) -> String:
 					return "goblin_cave"
 				# Purchasable in town (use current zone if in town, else elder_moor)
 				"health_potion", "mana_potion", "stamina_potion", "antidote":
-					var current: String = MapTracker.get_current_zone() if MapTracker else ""
+					var current: String = PlayerGPS.current_location_id if PlayerGPS else ""
 					return current if _is_town_zone(current) else "elder_moor"
 				# Crafting materials - wilderness
 				"wolf_pelt", "wolf_fang", "spider_silk", "raw_meat":
@@ -2626,7 +2633,7 @@ func _get_objective_target_zone(objective: QuestManager.Objective) -> String:
 					return "elder_moor"  # Knight is in starting town
 				"innkeeper", "blacksmith", "merchant", "alchemist":
 					# Use current zone if in town, else return elder_moor
-					var current: String = MapTracker.get_current_zone() if MapTracker else ""
+					var current: String = PlayerGPS.current_location_id if PlayerGPS else ""
 					return current if _is_town_zone(current) else "elder_moor"
 				_:
 					# For bounty turn-ins and other NPCs, default to starting town
@@ -2662,7 +2669,7 @@ func _find_exit_door_to_zone(target_zone: String) -> ZoneDoor:
 	var nearest_dist: float = INF
 
 	# Get current zone to determine appropriate routing
-	var current_zone := MapTracker.get_current_zone() if MapTracker else ""
+	var current_zone: String = PlayerGPS.current_location_id if PlayerGPS else ""
 
 	# Look for doors leading to the target zone
 	if target_zone == "open_world" or _is_town_zone(target_zone):

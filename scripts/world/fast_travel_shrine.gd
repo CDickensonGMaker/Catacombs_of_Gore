@@ -1,5 +1,5 @@
 ## fast_travel_shrine.gd - Interactable shrine for fast travel discovery
-## When interacted with, discovers the current location via MapTracker
+## When interacted with, discovers the current location via PlayerGPS
 ## Registers as a compass POI for easy navigation
 class_name FastTravelShrine
 extends StaticBody3D
@@ -44,7 +44,7 @@ func _ready() -> void:
 
 	# Check if already discovered
 	var zone_id := _get_current_zone_id()
-	if MapTracker.is_location_discovered(zone_id):
+	if PlayerGPS and PlayerGPS.is_location_discovered(zone_id):
 		is_discovered = true
 		_set_discovered_visual()
 
@@ -228,7 +228,8 @@ func interact(_interactor: Node) -> void:
 	if not is_discovered:
 		# First time discovering this shrine
 		is_discovered = true
-		MapTracker.discover_location(zone_id)
+		if PlayerGPS:
+			PlayerGPS.discover_location(zone_id)
 		_set_discovered_visual()
 		_show_discovery_message()
 		AudioManager.play_ui_confirm()
@@ -252,8 +253,8 @@ func _get_current_zone_id() -> String:
 			return parent.get("ZONE_ID")
 		parent = parent.get_parent()
 
-	# Fallback to MapTracker's current zone
-	return MapTracker.get_current_zone()
+	# Fallback to PlayerGPS's current zone
+	return PlayerGPS.current_location_id if PlayerGPS else ""
 
 
 ## Update visual to discovered state (brighter glow)

@@ -208,24 +208,24 @@ func _ready() -> void:
 	_rng = RandomNumberGenerator.new()
 	_rng.randomize()
 
-	# Connect to WorldManager for hex change notifications
-	# Deferred to ensure WorldManager is ready
+	# Connect to PlayerGPS for cell change notifications
+	# Deferred to ensure PlayerGPS is ready
 	call_deferred("_connect_signals")
 
 
 ## Connect to other autoloads (deferred to ensure they're ready)
 func _connect_signals() -> void:
-	# Connect to WorldManager.cell_entered for forced encounter checks when entering new cells
-	if WorldManager and WorldManager.has_signal("cell_entered"):
-		if not WorldManager.cell_entered.is_connected(_on_cell_entered):
-			WorldManager.cell_entered.connect(_on_cell_entered)
-			print("[EncounterManager] Connected to WorldManager.cell_entered")
+	# Connect to PlayerGPS.cell_changed for forced encounter checks when entering new cells
+	if PlayerGPS and PlayerGPS.has_signal("cell_changed"):
+		if not PlayerGPS.cell_changed.is_connected(_on_cell_changed):
+			PlayerGPS.cell_changed.connect(_on_cell_changed)
+			print("[EncounterManager] Connected to PlayerGPS.cell_changed")
 
 
 ## Called when player enters a new cell - force encounter check
-func _on_cell_entered(coords: Vector2i, _cell_data: WorldData.CellData) -> void:
+func _on_cell_changed(old_cell: Vector2i, new_cell: Vector2i) -> void:
 	# Update last check coords and force an encounter check when entering a new cell
-	_last_check_hex = coords
+	_last_check_hex = new_cell
 	force_check()
 
 

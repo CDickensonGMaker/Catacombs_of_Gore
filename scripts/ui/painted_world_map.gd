@@ -58,7 +58,7 @@ var drag_offset_start: Vector2 = Vector2.ZERO
 ## Selection state
 var selected_cell: Vector2i = Vector2i(-999, -999)
 var hovered_cell: Vector2i = Vector2i(-999, -999)
-var player_cell: Vector2i = WorldData.PLAYER_START  # Default to Elder Moor (7, 4)
+var player_cell: Vector2i = Vector2i.ZERO  # Default to Elder Moor (0, 0)
 
 ## Cached values
 var map_size: Vector2 = Vector2.ZERO
@@ -89,7 +89,7 @@ func _setup_fog_of_war() -> void:
 		fog_of_war = MapFogOfWar.new(Vector2i(int(map_size.x), int(map_size.y)))
 
 		# Reveal starting area (Elder Moor)
-		fog_of_war.reveal_hex(WorldData.PLAYER_START)
+		fog_of_war.reveal_hex(Vector2i.ZERO)
 
 		# Reveal player's current position
 		_reveal_current_cell()
@@ -391,19 +391,15 @@ func _draw_fog_overlay(map_rect: Rect2) -> void:
 
 
 func _draw_town_markers() -> void:
-	# Ensure WorldData is initialized
-	if WorldData.world_grid.is_empty():
-		WorldData.initialize()
-
 	var is_dev: bool = SceneManager and SceneManager.dev_mode
 	var fog_disabled: bool = SceneManager and not SceneManager.fog_of_war_enabled
 
 	# Iterate through all cells to find towns
-	for coords: Vector2i in WorldData.world_grid:
-		var cell: WorldData.CellData = WorldData.world_grid[coords]
+	for coords: Vector2i in WorldGrid.cells:
+		var cell: WorldGrid.CellInfo = WorldGrid.cells[coords]
 
 		# Only draw towns
-		if cell.location_type != WorldData.LocationType.TOWN:
+		if cell.location_type != WorldGrid.LocationType.TOWN:
 			continue
 
 		# Check visibility
@@ -561,11 +557,7 @@ func _center_on_player() -> void:
 
 
 func _update_tooltip(coords: Vector2i, mouse_pos: Vector2) -> void:
-	# Ensure WorldData is initialized
-	if WorldData.world_grid.is_empty():
-		WorldData.initialize()
-
-	var cell: WorldData.CellData = WorldData.get_cell(coords)
+	var cell: WorldGrid.CellInfo = WorldGrid.get_cell(coords)
 
 	if not cell:
 		tooltip_panel.visible = false
@@ -582,17 +574,18 @@ func _update_tooltip(coords: Vector2i, mouse_pos: Vector2) -> void:
 			text = cell.location_name + "\n"
 		if not cell.region_name.is_empty():
 			text += cell.region_name + "\n"
-		text += WorldData.get_cell_name(coords)
+		# Show biome type
+		var biome_name: String = WorldGrid.Biome.keys()[cell.biome].capitalize()
+		text += biome_name
 		if coords == player_cell:
 			text += "\n[Current Location]"
-	elif not cell.is_passable:
+	elif not cell.passable:
 		text = "Impassable"
 	else:
 		text = "Undiscovered"
 
 	# Show Elder Moor-relative coordinates
-	var region_coords: Vector2i = WorldData.get_region_coords(cell.location_id) if not cell.location_id.is_empty() else Vector2i(0, 0)
-	text += "\nRegion: (%d, %d)" % [region_coords.x, region_coords.y]
+	text += "\nCoords: (%d, %d)" % [coords.x, coords.y]
 
 	tooltip_label.text = text
 	tooltip_panel.reset_size()
@@ -613,11 +606,7 @@ func _update_tooltip(coords: Vector2i, mouse_pos: Vector2) -> void:
 
 
 func _on_cell_clicked(coords: Vector2i) -> void:
-	# Ensure WorldData is initialized
-	if WorldData.world_grid.is_empty():
-		WorldData.initialize()
-
-	var cell: WorldData.CellData = WorldData.get_cell(coords)
+	var cell: WorldGrid.CellInfo = WorldGrid.get_cell(coords)
 
 	if not cell:
 		return
@@ -635,7 +624,7 @@ func _on_cell_clicked(coords: Vector2i) -> void:
 		return
 
 	# Can only fast travel to towns
-	if cell.location_type != WorldData.LocationType.TOWN:
+	if cell.location_type != WorldGrid.LocationType.TOWN:
 		return
 
 	if cell.location_id.is_empty():
@@ -656,7 +645,7 @@ func _on_travel_confirmed() -> void:
 		travel_dialog.visible = false
 		return
 
-	var cell: WorldData.CellData = WorldData.get_cell(selected_cell)
+	var cell: WorldGrid.CellInfo = WorldGrid.get_cell(selected_cell)
 	if not cell or cell.location_id.is_empty():
 		travel_dialog.visible = false
 		return
@@ -665,7 +654,7 @@ func _on_travel_confirmed() -> void:
 
 	# Use SceneManager's fast travel
 	if SceneManager:
-		SceneManager.dev_fast_travel_to(cell.location_id)
+		SceneManager.fast_travel_to(cell.location_id)
 
 	fast_travel_requested.emit(cell.location_id, "from_fast_travel")
 
@@ -689,21 +678,19 @@ func _reveal_current_cell() -> void:
 
 
 func _update_player_position() -> void:
-	# Get player's current grid position from SceneManager
-	if SceneManager:
+	# Get player's current grid position from PlayerGPS (primary) or SceneManager (fallback)
+	if PlayerGPS:
+		player_cell = PlayerGPS.current_cell
+	elif SceneManager:
 		player_cell = SceneManager.current_room_coords
 	else:
-		player_cell = WorldData.PLAYER_START  # Default to Elder Moor
+		player_cell = Vector2i.ZERO  # Default to Elder Moor (0,0)
 
 	# Reveal fog at player position
 	_reveal_current_cell()
 
-	# Ensure WorldData is initialized
-	if WorldData.world_grid.is_empty():
-		WorldData.initialize()
-
-	# Update info labels
-	var cell: WorldData.CellData = WorldData.get_cell(player_cell)
+	# Update info labels using WorldGrid
+	var cell: WorldGrid.CellInfo = WorldGrid.get_cell(player_cell)
 
 	if cell:
 		if not cell.location_name.is_empty():
@@ -711,12 +698,16 @@ func _update_player_position() -> void:
 		elif not cell.region_name.is_empty():
 			location_label.text = cell.region_name
 		else:
-			location_label.text = WorldData.get_cell_name(player_cell)
+			# Show biome type for wilderness
+			var biome_name: String = WorldGrid.Biome.keys()[cell.biome].capitalize()
+			location_label.text = "%s Wilderness" % biome_name
 	else:
 		location_label.text = "Wilderness"
 
-	# Show Elder Moor-relative region coordinates
-	var region_coords: Vector2i = SceneManager.current_room_coords if SceneManager else Vector2i(0, 0)
+	# Show Elder Moor-relative coordinates
+	var region_coords: Vector2i = player_cell
+	if PlayerGPS:
+		region_coords = PlayerGPS.current_cell
 	coords_label.text = "Region: (%d, %d)" % [region_coords.x, region_coords.y]
 
 

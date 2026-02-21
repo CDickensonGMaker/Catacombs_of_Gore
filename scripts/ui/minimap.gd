@@ -66,10 +66,12 @@ func _ready() -> void:
 
 	_setup_ui()
 
-	# Connect to MapTracker signals
-	if MapTracker:
-		MapTracker.map_updated.connect(_on_map_updated)
-		MapTracker.cell_revealed.connect(_on_cell_revealed)
+	# Connect to PlayerGPS signals for map updates
+	if PlayerGPS:
+		if PlayerGPS.has_signal("cell_changed"):
+			PlayerGPS.cell_changed.connect(_on_cell_changed_minimap)
+		if PlayerGPS.has_signal("location_discovered"):
+			PlayerGPS.location_discovered.connect(_on_location_discovered)
 
 
 func _setup_ui() -> void:
@@ -141,9 +143,9 @@ func _process(_delta: float) -> void:
 	if not player:
 		return
 
-	# Update player cell
-	if MapTracker:
-		player_cell = MapTracker.world_to_cell(player.global_position)
+	# Update player cell using WorldGrid conversion
+	var player_world_pos := player.global_position
+	player_cell = WorldGrid.world_to_cell(player_world_pos)
 
 	# Request redraw
 	queue_redraw()
@@ -153,15 +155,26 @@ func _process(_delta: float) -> void:
 	_update_poi_markers()
 
 
+## Signal handlers for PlayerGPS
+func _on_cell_changed_minimap(_old_cell: Vector2i, _new_cell: Vector2i) -> void:
+	queue_redraw()
+
+func _on_location_discovered(_location_id: String) -> void:
+	queue_redraw()
+
+
 func _draw() -> void:
-	if not MapTracker:
+	# Simplified drawing until full PlayerGPS integration
+	var center := MAP_SIZE / 2.0
+	var _offset := Vector2(2, 2)  # Border offset
+
+	# Draw revealed cells from PlayerGPS
+	if not PlayerGPS:
 		return
 
-	var center := MAP_SIZE / 2.0
-	var offset := Vector2(2, 2)  # Border offset
-
-	# Draw revealed cells
-	for cell in MapTracker.get_revealed_cells():
+	var revealed_cells: Array = PlayerGPS.discovered_cells.keys() if PlayerGPS.discovered_cells else []
+	for cell_variant in revealed_cells:
+		var cell: Vector2i = cell_variant as Vector2i
 		var rel_cell := cell - player_cell
 		if abs(rel_cell.x) > VIEW_RADIUS or abs(rel_cell.y) > VIEW_RADIUS:
 			continue
@@ -183,6 +196,8 @@ func _draw() -> void:
 
 ## Check if a cell is on the edge of revealed area (wall)
 func _is_edge_cell(cell: Vector2i) -> bool:
+	if not PlayerGPS:
+		return false
 	# Check adjacent cells
 	var neighbors := [
 		Vector2i(cell.x - 1, cell.y),
@@ -192,70 +207,58 @@ func _is_edge_cell(cell: Vector2i) -> bool:
 	]
 
 	for neighbor in neighbors:
-		if not MapTracker.is_cell_revealed(neighbor):
+		if not PlayerGPS.is_discovered(neighbor):
 			return true
 
 	return false
 
 
-## Draw room outlines from dungeon data
-func _draw_room_outlines(center: Vector2) -> void:
-	if MapTracker.current_map.rooms.is_empty():
-		return
-
-	# Check if fog of war is disabled (reveal all rooms)
-	var fog_disabled: bool = SceneManager and not SceneManager.fog_of_war_enabled
-
-	for room_data in MapTracker.current_map.rooms:
-		if not room_data.get("explored", false) and not fog_disabled:
-			continue
-
-		var bounds: Dictionary = room_data.get("bounds", {})
-		if bounds.is_empty():
-			continue
-
-		# Convert room bounds to minimap coords
-		var room_rect := Rect2(bounds.x, bounds.y, bounds.w, bounds.h)
-		var room_center := room_rect.get_center()
-		var player_world := Vector2(player_cell.x * MapTracker.CELL_SIZE, player_cell.y * MapTracker.CELL_SIZE)
-
-		var rel_pos := (room_center - player_world) / MapTracker.CELL_SIZE * CELL_PIXEL_SIZE
-		var map_pos := center + rel_pos
-		var map_size := room_rect.size / MapTracker.CELL_SIZE * CELL_PIXEL_SIZE
-
-		var draw_rect := Rect2(map_pos - map_size / 2.0, map_size)
-
-		# Only draw if on screen
-		if draw_rect.intersects(Rect2(Vector2.ZERO, MAP_SIZE)):
-			draw_rect(draw_rect, COLOR_ROOM_OUTLINE, false, 1.0)
+## Draw room outlines from dungeon data (for interior dungeons)
+func _draw_room_outlines(_center: Vector2) -> void:
+	# Room outlines are only relevant for interior dungeon areas
+	# In the cell streaming system, room data comes from the current dungeon scene
+	# For now, this is a no-op until dungeon interior support is added
+	pass
 
 
-## Draw map markers
+## Draw map markers (chests, portals, etc. from scene)
 func _draw_markers(center: Vector2) -> void:
-	for marker in MapTracker.get_markers():
-		var marker_pos := Vector3(marker.position.x, marker.position.y, marker.position.z)
-		var marker_cell := MapTracker.world_to_cell(marker_pos)
-		var rel_cell := marker_cell - player_cell
+	# Get markers from scene groups instead of MapTracker
+	var marker_groups: Array[Dictionary] = [
+		{"group": "chests", "type": "chest"},
+		{"group": "portals", "type": "portal"},
+		{"group": "zone_doors", "type": "portal"},
+	]
 
-		if abs(rel_cell.x) > VIEW_RADIUS or abs(rel_cell.y) > VIEW_RADIUS:
-			continue
+	for group_info: Dictionary in marker_groups:
+		var group_name: String = group_info["group"]
+		var marker_type: String = group_info["type"]
+		var nodes := get_tree().get_nodes_in_group(group_name)
 
-		var pixel_pos := center + Vector2(rel_cell.x, rel_cell.y) * CELL_PIXEL_SIZE
-		var color: Color
+		for node in nodes:
+			if not node is Node3D:
+				continue
 
-		match marker.type:
-			"chest":
-				color = COLOR_CHEST
-				draw_rect(Rect2(pixel_pos - Vector2(2, 2), Vector2(4, 4)), color)
-			"portal":
-				color = COLOR_PORTAL
-				draw_circle(pixel_pos, 3, color)
-			"npc":
-				color = COLOR_NPC
-				draw_circle(pixel_pos, 2, color)
-			_:
-				color = Color.WHITE
-				draw_circle(pixel_pos, 2, color)
+			var marker_pos: Vector3 = (node as Node3D).global_position
+			var marker_cell := WorldGrid.world_to_cell(marker_pos)
+			var rel_cell := marker_cell - player_cell
+
+			if abs(rel_cell.x) > VIEW_RADIUS or abs(rel_cell.y) > VIEW_RADIUS:
+				continue
+
+			var pixel_pos := center + Vector2(rel_cell.x, rel_cell.y) * CELL_PIXEL_SIZE
+			var color: Color
+
+			match marker_type:
+				"chest":
+					color = COLOR_CHEST
+					draw_rect(Rect2(pixel_pos - Vector2(2, 2), Vector2(4, 4)), color)
+				"portal":
+					color = COLOR_PORTAL
+					draw_circle(pixel_pos, 3, color)
+				_:
+					color = Color.WHITE
+					draw_circle(pixel_pos, 2, color)
 
 
 ## Update player marker position and rotation
@@ -294,7 +297,7 @@ func _update_entity_markers() -> void:
 		if enemy.has_method("is_dead") and enemy.is_dead():
 			continue
 
-		var enemy_cell := MapTracker.world_to_cell((enemy as Node3D).global_position)
+		var enemy_cell := WorldGrid.world_to_cell((enemy as Node3D).global_position)
 		var rel_cell := enemy_cell - player_cell
 
 		# Only show nearby enemies
@@ -302,7 +305,7 @@ func _update_entity_markers() -> void:
 			continue
 
 		# Only show in revealed cells
-		if not MapTracker.is_cell_revealed(enemy_cell):
+		if PlayerGPS and not PlayerGPS.is_discovered(enemy_cell):
 			continue
 
 		var pixel_pos := center + Vector2(rel_cell.x, rel_cell.y) * CELL_PIXEL_SIZE
@@ -320,13 +323,13 @@ func _update_entity_markers() -> void:
 		if not item is Node3D:
 			continue
 
-		var item_cell := MapTracker.world_to_cell((item as Node3D).global_position)
+		var item_cell := WorldGrid.world_to_cell((item as Node3D).global_position)
 		var rel_cell := item_cell - player_cell
 
 		if abs(rel_cell.x) > VIEW_RADIUS or abs(rel_cell.y) > VIEW_RADIUS:
 			continue
 
-		if not MapTracker.is_cell_revealed(item_cell):
+		if PlayerGPS and not PlayerGPS.is_discovered(item_cell):
 			continue
 
 		var pixel_pos := center + Vector2(rel_cell.x, rel_cell.y) * CELL_PIXEL_SIZE
@@ -412,10 +415,7 @@ func _get_turnin_world_position(quest) -> Vector3:
 
 ## Add a quest marker at a world position with distance-based rendering
 func _add_quest_marker_with_distance(world_pos: Vector3, color: Color, icon: String, center: Vector2, distance: float) -> void:
-	if not MapTracker:
-		return
-
-	var target_cell := MapTracker.world_to_cell(world_pos)
+	var target_cell := WorldGrid.world_to_cell(world_pos)
 	var rel_cell := target_cell - player_cell
 
 	# Calculate pixel position
@@ -593,7 +593,7 @@ func _update_poi_markers() -> void:
 			marker.queue_free()
 	poi_markers.clear()
 
-	if not player or not MapTracker:
+	if not player:
 		return
 
 	var center := MAP_SIZE / 2.0
@@ -628,7 +628,7 @@ func _update_poi_markers() -> void:
 				continue
 
 			var poi_node := poi as Node3D
-			var poi_cell := MapTracker.world_to_cell(poi_node.global_position)
+			var poi_cell := WorldGrid.world_to_cell(poi_node.global_position)
 			var rel_cell := poi_cell - player_cell
 
 			# Only show nearby POIs

@@ -159,11 +159,8 @@ func _create_ground() -> void:
 
 
 func _create_sky_environment() -> void:
-	# Use BackgroundManager for static background image
-	if BackgroundManager:
-		BackgroundManager.set_background_for_world_biome(biome)
-		BackgroundManager.show_background()
-		print("[TownGenerator] Set background for biome: %s" % WorldData.Biome.keys()[biome])
+	# NOTE: Background manager removed - biome backgrounds handled by environment settings
+	# TODO: Add biome-specific environment settings if needed
 
 	# Create WorldEnvironment for lighting/fog only (no procedural sky)
 	var world_env := WorldEnvironment.new()

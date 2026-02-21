@@ -770,29 +770,27 @@ func _apply_errand_data(errand_data) -> void:
 	})
 
 
-## Collect world manager (location discovery) data
+## Collect world manager (location discovery) data - now uses PlayerGPS
 func _collect_world_manager_data(world_manager_data) -> void:
-	if not has_node("/root/WorldManager"):
+	if not PlayerGPS:
 		return
 
-	var wm := get_node("/root/WorldManager")
-	var wm_dict: Dictionary = wm.to_dict()
-	world_manager_data.discovered_locations = wm_dict.get("discovered_locations", {})
-	world_manager_data.discovered_cells = wm_dict.get("discovered_cells", [])
-	world_manager_data.current_cell = wm_dict.get("current_cell", {"x": 0, "y": 0})
-	world_manager_data.current_region = wm_dict.get("current_region", "")
-	world_manager_data.current_location_id = wm_dict.get("current_location_id", "")
-	world_manager_data.cells_traveled = wm_dict.get("cells_traveled", 0)
-	world_manager_data.locations_visited = wm_dict.get("locations_visited", 0)
+	var gps_dict: Dictionary = PlayerGPS.to_dict()
+	world_manager_data.discovered_locations = gps_dict.get("discovered_locations", {})
+	world_manager_data.discovered_cells = gps_dict.get("discovered_cells", [])
+	world_manager_data.current_cell = gps_dict.get("current_cell", {"x": 0, "y": 0})
+	world_manager_data.current_region = gps_dict.get("current_region", "")
+	world_manager_data.current_location_id = gps_dict.get("current_location_id", "")
+	world_manager_data.cells_traveled = gps_dict.get("cells_traveled", 0)
+	world_manager_data.locations_visited = gps_dict.get("locations_visited", 0)
 
 
-## Apply world manager (location discovery) data
+## Apply world manager (location discovery) data - now uses PlayerGPS
 func _apply_world_manager_data(world_manager_data) -> void:
-	if not has_node("/root/WorldManager"):
+	if not PlayerGPS:
 		return
 
-	var wm := get_node("/root/WorldManager")
-	wm.from_dict({
+	PlayerGPS.from_dict({
 		"discovered_locations": world_manager_data.discovered_locations,
 		"discovered_cells": world_manager_data.discovered_cells,
 		"current_cell": world_manager_data.current_cell,
@@ -1208,7 +1206,6 @@ func reset_world_state() -> void:
 		var bounty_manager := get_node("/root/BountyManager")
 		bounty_manager.reset_for_new_game()
 
-	# Reset world manager (location discovery)
-	if has_node("/root/WorldManager"):
-		var wm := get_node("/root/WorldManager")
-		wm.reset_for_new_game()
+	# Reset player GPS (location discovery)
+	if PlayerGPS:
+		PlayerGPS.reset()

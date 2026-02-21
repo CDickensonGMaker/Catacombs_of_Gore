@@ -68,10 +68,12 @@ func _ready() -> void:
 
 	_setup_ui()
 
-	# Connect to MapTracker signals
-	if MapTracker:
-		MapTracker.map_updated.connect(_on_map_updated)
-		MapTracker.cell_revealed.connect(_on_cell_revealed)
+	# Connect to PlayerGPS signals
+	if PlayerGPS:
+		if PlayerGPS.has_signal("cell_changed"):
+			PlayerGPS.cell_changed.connect(_on_cell_changed)
+		if PlayerGPS.has_signal("location_discovered"):
+			PlayerGPS.location_discovered.connect(_on_location_discovered)
 
 
 func _setup_ui() -> void:
@@ -232,8 +234,8 @@ func _process(delta: float) -> void:
 	if not player or not is_instance_valid(player):
 		player = get_tree().get_first_node_in_group("player") as Node3D
 
-	if player and MapTracker:
-		player_cell = MapTracker.world_to_cell(player.global_position)
+	if player:
+		player_cell = WorldGrid.world_to_cell(player.global_position)
 
 	# Handle keyboard panning
 	_handle_keyboard_pan(delta)
@@ -242,10 +244,10 @@ func _process(delta: float) -> void:
 	if center_on_player:
 		pan_offset = Vector2.ZERO
 
-	# Update zone name
-	if MapTracker and zone_name_label:
-		var zone_id := MapTracker.get_current_zone()
-		zone_name_label.text = zone_id.capitalize().replace("_", " ") if not zone_id.is_empty() else "Zone Map"
+	# Update zone name from PlayerGPS current location
+	if PlayerGPS and zone_name_label:
+		var location_id: String = PlayerGPS.current_location_id if "current_location_id" in PlayerGPS else ""
+		zone_name_label.text = location_id.capitalize().replace("_", " ") if not location_id.is_empty() else "Zone Map"
 
 	# Request redraw
 	map_canvas.queue_redraw()
@@ -347,16 +349,23 @@ func _on_center_toggle(enabled: bool) -> void:
 
 
 func _clamp_pan_offset() -> void:
-	if not MapTracker:
+	if not PlayerGPS:
 		return
 
-	var bounds := MapTracker.get_map_bounds()
-	if bounds.size == Vector2.ZERO:
+	# Get bounds from discovered cells
+	var discovered: Dictionary = PlayerGPS.discovered_cells
+	if discovered.is_empty():
 		return
 
-	# Convert bounds to cells
-	var min_cell := Vector2(bounds.position.x / MapTracker.CELL_SIZE, bounds.position.y / MapTracker.CELL_SIZE)
-	var max_cell := Vector2(bounds.end.x / MapTracker.CELL_SIZE, bounds.end.y / MapTracker.CELL_SIZE)
+	# Find min/max from discovered cells
+	var min_cell := Vector2(INF, INF)
+	var max_cell := Vector2(-INF, -INF)
+	for cell_variant in discovered.keys():
+		var cell: Vector2i = cell_variant as Vector2i
+		min_cell.x = minf(min_cell.x, cell.x)
+		min_cell.y = minf(min_cell.y, cell.y)
+		max_cell.x = maxf(max_cell.x, cell.x)
+		max_cell.y = maxf(max_cell.y, cell.y)
 
 	# Clamp pan to keep map visible
 	pan_offset.x = clampf(pan_offset.x, min_cell.x - 10, max_cell.x + 10)
@@ -364,7 +373,7 @@ func _clamp_pan_offset() -> void:
 
 
 func _draw_map() -> void:
-	if not MapTracker:
+	if not PlayerGPS:
 		return
 
 	var container_size := map_container.size
@@ -377,8 +386,10 @@ func _draw_map() -> void:
 	# Draw zone edge/border first (background)
 	_draw_zone_edges(center, view_center_cell, pixel_size, container_size)
 
-	# Draw revealed cells
-	for cell in MapTracker.get_revealed_cells():
+	# Draw revealed cells from PlayerGPS
+	var discovered: Dictionary = PlayerGPS.discovered_cells
+	for cell_variant in discovered.keys():
+		var cell: Vector2i = cell_variant as Vector2i
 		var rel_cell := Vector2(cell) - view_center_cell
 		var pixel_pos := center + rel_cell * pixel_size
 		var rect := Rect2(pixel_pos - Vector2(pixel_size / 2.0, pixel_size / 2.0), Vector2(pixel_size, pixel_size))
@@ -403,14 +414,19 @@ func _draw_map() -> void:
 
 
 func _draw_zone_edges(center: Vector2, view_center: Vector2, pixel_size: float, container_size: Vector2) -> void:
-	# Get map bounds and draw zone boundary
-	var bounds := MapTracker.get_map_bounds()
-	if bounds.size == Vector2.ZERO:
+	# Get zone boundary from discovered cells
+	if not PlayerGPS or PlayerGPS.discovered_cells.is_empty():
 		return
 
-	# Convert bounds to cell coordinates
-	var min_cell := Vector2(bounds.position.x / MapTracker.CELL_SIZE, bounds.position.y / MapTracker.CELL_SIZE)
-	var max_cell := Vector2(bounds.end.x / MapTracker.CELL_SIZE, bounds.end.y / MapTracker.CELL_SIZE)
+	# Find min/max from discovered cells
+	var min_cell := Vector2(INF, INF)
+	var max_cell := Vector2(-INF, -INF)
+	for cell_variant in PlayerGPS.discovered_cells.keys():
+		var cell: Vector2i = cell_variant as Vector2i
+		min_cell.x = minf(min_cell.x, cell.x)
+		min_cell.y = minf(min_cell.y, cell.y)
+		max_cell.x = maxf(max_cell.x, cell.x)
+		max_cell.y = maxf(max_cell.y, cell.y)
 
 	# Calculate screen positions
 	var min_rel := min_cell - view_center
@@ -425,6 +441,8 @@ func _draw_zone_edges(center: Vector2, view_center: Vector2, pixel_size: float, 
 
 
 func _is_edge_cell(cell: Vector2i) -> bool:
+	if not PlayerGPS:
+		return false
 	var neighbors := [
 		Vector2i(cell.x - 1, cell.y),
 		Vector2i(cell.x + 1, cell.y),
@@ -433,89 +451,89 @@ func _is_edge_cell(cell: Vector2i) -> bool:
 	]
 
 	for neighbor in neighbors:
-		if not MapTracker.is_cell_revealed(neighbor):
+		if not PlayerGPS.is_discovered(neighbor):
 			return true
 
 	return false
 
 
-func _draw_room_outlines(center: Vector2, view_center: Vector2, pixel_size: float) -> void:
-	if MapTracker.current_map.rooms.is_empty():
-		return
-
-	# Check if fog of war is disabled (reveal all rooms)
-	var fog_disabled: bool = SceneManager and not SceneManager.fog_of_war_enabled
-
-	for room_data in MapTracker.current_map.rooms:
-		if not room_data.get("explored", false) and not fog_disabled:
-			continue
-
-		var bounds: Dictionary = room_data.get("bounds", {})
-		if bounds.is_empty():
-			continue
-
-		# Convert room bounds to cell coords
-		var room_min := Vector2(bounds.x / MapTracker.CELL_SIZE, bounds.y / MapTracker.CELL_SIZE)
-		var room_max := Vector2((bounds.x + bounds.w) / MapTracker.CELL_SIZE, (bounds.y + bounds.h) / MapTracker.CELL_SIZE)
-		var room_center := (room_min + room_max) / 2.0
-
-		var rel_pos := room_center - view_center
-		var map_pos := center + rel_pos * pixel_size
-		var map_size := (room_max - room_min) * pixel_size
-
-		var draw_rect := Rect2(map_pos - map_size / 2.0, map_size)
-
-		if draw_rect.intersects(Rect2(Vector2.ZERO, map_container.size)):
-			map_canvas.draw_rect(draw_rect, COLOR_ROOM_OUTLINE, false, 1.0)
+func _draw_room_outlines(_center: Vector2, _view_center: Vector2, _pixel_size: float) -> void:
+	# Room outlines are only relevant for interior dungeon areas
+	# In the cell streaming system, room data comes from the current dungeon scene
+	# For now, this is a no-op until dungeon interior support is added
+	pass
 
 
 func _draw_markers(center: Vector2, view_center: Vector2, pixel_size: float) -> void:
-	for marker in MapTracker.get_markers():
-		var marker_pos := Vector3(marker.position.x, marker.position.y, marker.position.z)
-		var marker_cell := MapTracker.world_to_cell(marker_pos)
-		var rel_cell := Vector2(marker_cell) - view_center
-		var pixel_pos := center + rel_cell * pixel_size
+	# Draw markers from scene groups
+	var marker_groups: Array[Dictionary] = [
+		{"group": "chests", "type": "chest"},
+		{"group": "portals", "type": "portal"},
+		{"group": "zone_doors", "type": "door"},
+		{"group": "npcs", "type": "npc"},
+		{"group": "merchants", "type": "merchant"},
+		{"group": "shops", "type": "shop"},
+		{"group": "inns", "type": "inn"},
+		{"group": "taverns", "type": "tavern"},
+		{"group": "dungeon_entrances", "type": "dungeon"},
+		{"group": "shrines", "type": "shrine"},
+		{"group": "fast_travel_shrines", "type": "fast_travel"},
+		{"group": "fireplaces", "type": "shrine"},
+	]
 
-		# Skip if off-screen
-		if pixel_pos.x < -10 or pixel_pos.x > map_container.size.x + 10:
-			continue
-		if pixel_pos.y < -10 or pixel_pos.y > map_container.size.y + 10:
-			continue
+	for group_info: Dictionary in marker_groups:
+		var group_name: String = group_info["group"]
+		var marker_type: String = group_info["type"]
+		var nodes := get_tree().get_nodes_in_group(group_name)
 
-		var marker_size := 3.0 * current_zoom
-		var marker_type: String = marker.get("type", "")
+		for node in nodes:
+			if not node is Node3D:
+				continue
 
-		match marker_type:
-			"chest":
-				# Square icon for chests
-				map_canvas.draw_rect(Rect2(pixel_pos - Vector2(marker_size, marker_size), Vector2(marker_size * 2, marker_size * 2)), COLOR_CHEST)
-			"portal", "door", "exit":
-				# Archway/door icon (rectangle with gap)
-				_draw_door_icon(pixel_pos, marker_size)
-			"npc", "quest_giver":
-				# Circle with dot for NPCs
-				map_canvas.draw_circle(pixel_pos, marker_size + 1, COLOR_NPC)
-				map_canvas.draw_circle(pixel_pos, marker_size * 0.4, Color.WHITE)
-			"merchant", "shop":
-				# Diamond icon for shops
-				_draw_diamond_icon(pixel_pos, marker_size, COLOR_SHOP)
-			"inn", "tavern":
-				# Bed-like icon (rectangle)
-				map_canvas.draw_rect(Rect2(pixel_pos - Vector2(marker_size * 1.2, marker_size * 0.6), Vector2(marker_size * 2.4, marker_size * 1.2)), COLOR_INN)
-			"dungeon", "dungeon_entrance":
-				# Skull-like icon (triangle pointing down)
-				_draw_dungeon_icon(pixel_pos, marker_size)
-			"shrine", "rest_spot", "fireplace":
-				# Star-like icon
-				_draw_shrine_icon(pixel_pos, marker_size)
-			"fast_travel":
-				# Double circle for fast travel shrines
-				map_canvas.draw_circle(pixel_pos, marker_size + 2, COLOR_SHRINE)
-				map_canvas.draw_circle(pixel_pos, marker_size, COLOR_BG)
-				map_canvas.draw_circle(pixel_pos, marker_size - 1, COLOR_SHRINE)
-			_:
-				# Default: simple circle
-				map_canvas.draw_circle(pixel_pos, marker_size, Color.WHITE)
+			var marker_pos: Vector3 = (node as Node3D).global_position
+			var marker_cell := WorldGrid.world_to_cell(marker_pos)
+			var rel_cell := Vector2(marker_cell) - view_center
+			var pixel_pos := center + rel_cell * pixel_size
+
+			# Skip if off-screen
+			if pixel_pos.x < -10 or pixel_pos.x > map_container.size.x + 10:
+				continue
+			if pixel_pos.y < -10 or pixel_pos.y > map_container.size.y + 10:
+				continue
+
+			var marker_size := 3.0 * current_zoom
+
+			match marker_type:
+				"chest":
+					# Square icon for chests
+					map_canvas.draw_rect(Rect2(pixel_pos - Vector2(marker_size, marker_size), Vector2(marker_size * 2, marker_size * 2)), COLOR_CHEST)
+				"portal", "door", "exit":
+					# Archway/door icon (rectangle with gap)
+					_draw_door_icon(pixel_pos, marker_size)
+				"npc", "quest_giver":
+					# Circle with dot for NPCs
+					map_canvas.draw_circle(pixel_pos, marker_size + 1, COLOR_NPC)
+					map_canvas.draw_circle(pixel_pos, marker_size * 0.4, Color.WHITE)
+				"merchant", "shop":
+					# Diamond icon for shops
+					_draw_diamond_icon(pixel_pos, marker_size, COLOR_SHOP)
+				"inn", "tavern":
+					# Bed-like icon (rectangle)
+					map_canvas.draw_rect(Rect2(pixel_pos - Vector2(marker_size * 1.2, marker_size * 0.6), Vector2(marker_size * 2.4, marker_size * 1.2)), COLOR_INN)
+				"dungeon", "dungeon_entrance":
+					# Skull-like icon (triangle pointing down)
+					_draw_dungeon_icon(pixel_pos, marker_size)
+				"shrine", "rest_spot", "fireplace":
+					# Star-like icon
+					_draw_shrine_icon(pixel_pos, marker_size)
+				"fast_travel":
+					# Double circle for fast travel shrines
+					map_canvas.draw_circle(pixel_pos, marker_size + 2, COLOR_SHRINE)
+					map_canvas.draw_circle(pixel_pos, marker_size, COLOR_BG)
+					map_canvas.draw_circle(pixel_pos, marker_size - 1, COLOR_SHRINE)
+				_:
+					# Default: simple circle
+					map_canvas.draw_circle(pixel_pos, marker_size, Color.WHITE)
 
 
 func _draw_door_icon(pos: Vector2, size: float) -> void:
@@ -574,10 +592,10 @@ func _draw_entities(center: Vector2, view_center: Vector2, pixel_size: float) ->
 		if enemy.has_method("is_dead") and enemy.is_dead():
 			continue
 
-		var enemy_cell := MapTracker.world_to_cell((enemy as Node3D).global_position)
+		var enemy_cell := WorldGrid.world_to_cell((enemy as Node3D).global_position)
 
 		# Only show in revealed cells
-		if not MapTracker.is_cell_revealed(enemy_cell):
+		if PlayerGPS and not PlayerGPS.is_discovered(enemy_cell):
 			continue
 
 		var rel_cell := Vector2(enemy_cell) - view_center
@@ -621,9 +639,6 @@ func _update_player_marker() -> void:
 
 
 func _check_marker_click(pos: Vector2) -> void:
-	if not MapTracker:
-		return
-
 	var container_size := map_container.size
 	var center := container_size / 2.0
 	var pixel_size := CELL_PIXEL_SIZE * current_zoom
@@ -632,23 +647,29 @@ func _check_marker_click(pos: Vector2) -> void:
 	# Adjust position for header offset
 	var adjusted_pos := pos - Vector2(0, 24)
 
-	for marker in MapTracker.get_markers():
-		var marker_pos := Vector3(marker.position.x, marker.position.y, marker.position.z)
-		var marker_cell := MapTracker.world_to_cell(marker_pos)
-		var rel_cell := Vector2(marker_cell) - view_center
-		var pixel_pos := center + rel_cell * pixel_size
+	# Check clickable groups
+	var clickable_groups: Array[String] = ["npcs", "merchants", "zone_doors", "chests", "fast_travel_shrines"]
+	for group_name: String in clickable_groups:
+		var nodes := get_tree().get_nodes_in_group(group_name)
+		for node in nodes:
+			if not node is Node3D:
+				continue
 
-		if adjusted_pos.distance_to(pixel_pos) < 10 * current_zoom:
-			marker_clicked.emit(marker)
-			_show_marker_tooltip(marker, pos)
-			return
+			var marker_pos: Vector3 = (node as Node3D).global_position
+			var marker_cell := WorldGrid.world_to_cell(marker_pos)
+			var rel_cell := Vector2(marker_cell) - view_center
+			var pixel_pos := center + rel_cell * pixel_size
+
+			if adjusted_pos.distance_to(pixel_pos) < 10 * current_zoom:
+				var marker_data := {"position": marker_pos, "type": group_name, "node": node}
+				if "display_name" in node:
+					marker_data["label"] = node.display_name
+				marker_clicked.emit(marker_data)
+				_show_marker_tooltip(marker_data, pos)
+				return
 
 
 func _update_tooltip_at_position(pos: Vector2) -> void:
-	if not MapTracker:
-		tooltip_panel.visible = false
-		return
-
 	var container_size := map_container.size
 	var center := container_size / 2.0
 	var pixel_size := CELL_PIXEL_SIZE * current_zoom
@@ -657,15 +678,27 @@ func _update_tooltip_at_position(pos: Vector2) -> void:
 	# Adjust position for header offset
 	var adjusted_pos := pos - Vector2(0, 24)
 
-	for marker in MapTracker.get_markers():
-		var marker_pos := Vector3(marker.position.x, marker.position.y, marker.position.z)
-		var marker_cell := MapTracker.world_to_cell(marker_pos)
-		var rel_cell := Vector2(marker_cell) - view_center
-		var pixel_pos := center + rel_cell * pixel_size
+	# Check tooltip-able groups
+	var tooltip_groups: Array[String] = ["npcs", "merchants", "zone_doors", "chests", "fast_travel_shrines", "inns", "shops"]
+	for group_name: String in tooltip_groups:
+		var nodes := get_tree().get_nodes_in_group(group_name)
+		for node in nodes:
+			if not node is Node3D:
+				continue
 
-		if adjusted_pos.distance_to(pixel_pos) < 8 * current_zoom:
-			_show_marker_tooltip(marker, pos)
-			return
+			var marker_pos: Vector3 = (node as Node3D).global_position
+			var marker_cell := WorldGrid.world_to_cell(marker_pos)
+			var rel_cell := Vector2(marker_cell) - view_center
+			var pixel_pos := center + rel_cell * pixel_size
+
+			if adjusted_pos.distance_to(pixel_pos) < 8 * current_zoom:
+				var marker_data := {"position": marker_pos, "type": group_name}
+				if "display_name" in node:
+					marker_data["label"] = node.display_name
+				elif "npc_name" in node:
+					marker_data["label"] = node.npc_name
+				_show_marker_tooltip(marker_data, pos)
+				return
 
 	tooltip_panel.visible = false
 
@@ -689,11 +722,11 @@ func _show_marker_tooltip(marker: Dictionary, pos: Vector2) -> void:
 	tooltip_panel.position = tooltip_pos
 
 
-func _on_map_updated() -> void:
+func _on_cell_changed(_old_cell: Vector2i, _new_cell: Vector2i) -> void:
 	map_canvas.queue_redraw()
 
 
-func _on_cell_revealed(_cell: Vector2i) -> void:
+func _on_location_discovered(_location_id: String) -> void:
 	map_canvas.queue_redraw()
 
 

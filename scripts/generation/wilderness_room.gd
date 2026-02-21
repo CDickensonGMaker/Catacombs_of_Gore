@@ -4,13 +4,13 @@
 class_name WildernessRoom
 extends Node3D
 
-## Zone ID for quest tracking - tells MapTracker the player is in wilderness
+## Zone ID for quest tracking
 const ZONE_ID := "open_world"
 
 signal room_generated(room: WildernessRoom)
-signal edge_triggered(direction: RoomEdge.Direction)
+signal edge_triggered(direction: int)  # CellEdge.Direction
 
-## Seamless streaming mode - when true, edge triggers are disabled (WorldManager handles transitions)
+## Seamless streaming mode - when true, edge triggers are disabled (CellStreamer handles transitions)
 var seamless_mode: bool = false
 
 ## Room configuration
@@ -65,7 +65,7 @@ var grid_coords: Vector2i = Vector2i.ZERO
 var entry_direction: int = -1
 
 ## Generated content references
-var edges: Dictionary = {}  # Direction -> RoomEdge
+var edges: Dictionary = {}  # Direction -> boundary info
 var ruins: Array[Node3D] = []
 var cursed_totems: Array[CursedTotem] = []  # Skeleton spawners near ruins
 var dungeon_entrance: Node3D = null
@@ -91,13 +91,9 @@ var ruin_material: StandardMaterial3D
 
 func _ready() -> void:
 	add_to_group("wilderness_room")
-	# Initialize zone tracking for quest markers
-	if MapTracker:
-		MapTracker.init_zone(ZONE_ID)
 
 
 func _process(_delta: float) -> void:
-	# Background is now handled by BackgroundManager autoload
 	pass
 
 
@@ -110,19 +106,23 @@ func generate(seed_value: int = 0, coords: Vector2i = Vector2i.ZERO) -> void:
 	rng.seed = room_seed
 
 	# Check if this is a road cell
-	is_road_cell = WorldData.is_road(coords)
+	is_road_cell = WorldGrid.is_road(coords)
 
-	print("[WildernessRoom] Generating room at %s with seed %d, biome: %s, is_road: %s" % [
-		coords, room_seed, Biome.keys()[biome], is_road_cell
+	print("[WildernessRoom] Generating room at %s with seed %d, biome: %s, is_road: %s, seamless: %s" % [
+		coords, room_seed, Biome.keys()[biome], is_road_cell, seamless_mode
 	])
 
 	_setup_materials()
 	_create_ground()
 	_create_road_if_needed()  # Add dirt road on road cells
-	_create_sky_environment()
-	_create_edges()
+
+	# Only create environment and edges when NOT in seamless mode
+	# In seamless mode, the main scene provides lighting and CellStreamer handles boundaries
+	if not seamless_mode:
+		_create_sky_environment()
+		_create_edges()
+
 	_create_spawn_points()  # Directional spawn points for cell transitions
-	_set_background_for_biome()  # Set static background via BackgroundManager
 	_spawn_ruins()
 	_spawn_cursed_totems()  # Skeleton spawners near ruins
 	_spawn_dungeon_entrance()
@@ -204,10 +204,10 @@ func _create_road_if_needed() -> void:
 	add_child(road_container)
 
 	# Determine road direction based on neighboring road cells
-	var north_road := WorldData.is_road(grid_coords + Vector2i(0, 1))
-	var south_road := WorldData.is_road(grid_coords + Vector2i(0, -1))
-	var east_road := WorldData.is_road(grid_coords + Vector2i(1, 0))
-	var west_road := WorldData.is_road(grid_coords + Vector2i(-1, 0))
+	var north_road := WorldGrid.is_road(grid_coords + Vector2i(0, 1))
+	var south_road := WorldGrid.is_road(grid_coords + Vector2i(0, -1))
+	var east_road := WorldGrid.is_road(grid_coords + Vector2i(1, 0))
+	var west_road := WorldGrid.is_road(grid_coords + Vector2i(-1, 0))
 
 	# Create road segments based on connections
 	var half_size: float = room_size / 2.0
@@ -532,14 +532,11 @@ func _create_sky_environment() -> void:
 	add_child(sun)
 
 
-## Create full-wall edge triggers
+## Create boundary walls for impassable edges using CellEdge
 func _create_edges() -> void:
-	edges = RoomEdge.create_room_edges(self, room_size)
-
-	# Connect edge signals
-	for dir: int in edges:
-		var edge: RoomEdge = edges[dir]
-		edge.edge_entered.connect(_on_edge_entered)
+	# In the new cell streaming system, edge transitions are handled by CellStreamer
+	# We only create boundary walls for impassable adjacent cells
+	CellEdge.create_boundary_walls(self, grid_coords, room_size)
 
 	# Add invisible walls at all 4 edges to prevent falling off
 	_create_invisible_walls()
@@ -585,13 +582,13 @@ func _create_invisible_walls() -> void:
 	print("[WildernessRoom] Created invisible boundary walls")
 
 
-## Handle player entering an edge
-func _on_edge_entered(direction: RoomEdge.Direction) -> void:
-	# In seamless mode, WorldManager handles transitions - don't emit edge signals
+## Handle player entering an edge (legacy - kept for compatibility)
+func _on_edge_entered(direction: int) -> void:
+	# In seamless mode, CellStreamer handles transitions - don't emit edge signals
 	if seamless_mode:
 		return
 
-	print("[WildernessRoom] Edge triggered: %s" % RoomEdge.Direction.keys()[direction])
+	print("[WildernessRoom] Edge triggered: %s" % CellEdge.Direction.keys()[direction])
 	edge_triggered.emit(direction)
 
 
@@ -628,12 +625,10 @@ func _create_spawn_points() -> void:
 	print("[WildernessRoom] Created 4 directional spawn points with metadata")
 
 
-## Set the static background image via BackgroundManager autoload
+## Set the background - BackgroundManager removed, handled by environment
 func _set_background_for_biome() -> void:
-	if BackgroundManager:
-		BackgroundManager.set_background_for_biome(biome)
-		BackgroundManager.show_background()
-		print("[WildernessRoom] Set background for biome: %s" % Biome.keys()[biome])
+	# Background now handled by WorldEnvironment settings
+	pass
 
 
 ## Spawn 1-3 ruins (small explorable structures)
@@ -1657,7 +1652,7 @@ func _create_mountain_barriers() -> void:
 		var adjacent_coords: Vector2i = grid_coords + dir_data["offset"]
 
 		# Check if adjacent cell is impassable
-		if not WorldData.is_passable(adjacent_coords):
+		if not WorldGrid.is_passable(adjacent_coords):
 			_spawn_mountain_wall(dir_data)
 			print("[WildernessRoom] Added mountain barrier on %s edge (adjacent cell %s is impassable)" % [
 				["North", "South", "East", "West"][dir_data["dir"]],
@@ -1795,10 +1790,10 @@ func _get_random_prop_position() -> Vector3:
 		var on_road := false
 
 		# Check road directions
-		var north_road := WorldData.is_road(grid_coords + Vector2i(0, 1))
-		var south_road := WorldData.is_road(grid_coords + Vector2i(0, -1))
-		var east_road := WorldData.is_road(grid_coords + Vector2i(1, 0))
-		var west_road := WorldData.is_road(grid_coords + Vector2i(-1, 0))
+		var north_road := WorldGrid.is_road(grid_coords + Vector2i(0, 1))
+		var south_road := WorldGrid.is_road(grid_coords + Vector2i(0, -1))
+		var east_road := WorldGrid.is_road(grid_coords + Vector2i(1, 0))
+		var west_road := WorldGrid.is_road(grid_coords + Vector2i(-1, 0))
 
 		# North-South road
 		if (north_road or south_road) and abs(pos.x) < road_half_width:
@@ -1844,7 +1839,7 @@ func _spawn_signposts_if_road() -> void:
 		var adjacent: Vector2i = grid_coords + dir_data["dir"]
 
 		# Only add signpost if there's a road in that direction
-		if not WorldData.is_road(adjacent):
+		if not WorldGrid.is_road(adjacent):
 			continue
 
 		# Find the destination in that direction (nearest named location)
@@ -1871,12 +1866,12 @@ func _find_destination_in_direction(direction: Vector2i) -> String:
 		check_coords = check_coords + direction
 
 		# Get cell data
-		var cell: WorldData.CellData = WorldData.get_cell(check_coords)
+		var cell: WorldGrid.CellInfo = WorldGrid.get_cell(check_coords)
 		if not cell:
 			break
 
 		# If not passable, stop searching
-		if not cell.is_passable:
+		if not cell.passable:
 			break
 
 		# If has a location name, return it
@@ -1964,9 +1959,9 @@ func contains_point(world_pos: Vector3) -> bool:
 # =============================================================================
 
 ## Get the world position for this room based on grid coordinates
-## Used by WorldManager to position chunks correctly
+## Used by CellStreamer to position chunks correctly
 static func position_for_cell(cell_coords: Vector2i) -> Vector3:
-	return WorldData.cell_to_world(cell_coords)
+	return WorldGrid.cell_to_world(cell_coords)
 
 
 ## Legacy alias for backwards compatibility
@@ -1974,26 +1969,16 @@ static func position_for_hex(hex_coords: Vector2i) -> Vector3:
 	return position_for_cell(hex_coords)
 
 
-## Enable seamless mode (disables edge triggers, WorldManager handles transitions)
+## Enable seamless mode (disables edge triggers, CellStreamer handles transitions)
 func set_seamless_mode(enabled: bool) -> void:
 	seamless_mode = enabled
 
-	# In seamless mode, we might want to hide/show edge triggers visually
-	if enabled:
-		# Disable edge trigger collision
-		for dir: int in edges:
-			var edge: RoomEdge = edges[dir]
-			if edge:
-				edge.set_deferred("monitoring", false)
-	else:
-		# Re-enable edge trigger collision
-		for dir: int in edges:
-			var edge: RoomEdge = edges[dir]
-			if edge:
-				edge.set_deferred("monitoring", true)
+	# In cell streaming system, edge transitions are handled by CellStreamer
+	# No need to toggle edge triggers - boundary walls are always present for impassable edges
+	pass
 
 
-## Reset the room for reuse (called by WorldManager when recycling chunks)
+## Reset the room for reuse (called by CellStreamer when recycling chunks)
 func _reset_for_reuse() -> void:
 	# Clear generated content
 	_clear_content()
@@ -2047,11 +2032,12 @@ func _clear_content() -> void:
 			signpost.queue_free()
 	signposts.clear()
 
-	# Clear edges
-	for dir: int in edges:
-		var edge: RoomEdge = edges[dir]
-		if edge and is_instance_valid(edge):
-			edge.queue_free()
+	# Clear boundary walls (created by CellEdge)
+	var boundary_walls := find_child("BoundaryWall*", true, false)
+	if boundary_walls:
+		for wall in get_children():
+			if wall.name.begins_with("BoundaryWall"):
+				wall.queue_free()
 	edges.clear()
 
 	# Remove all children except persistent ones
@@ -2084,26 +2070,26 @@ func get_danger_level() -> float:
 
 ## Check if this chunk has a location (town, dungeon, etc.)
 func has_location() -> bool:
-	var cell: WorldData.CellData = WorldData.get_cell(grid_coords)
+	var cell: WorldGrid.CellInfo = WorldGrid.get_cell(grid_coords)
 	if cell:
-		return cell.location_type != WorldData.LocationType.NONE
+		return cell.location_type != WorldGrid.LocationType.NONE
 	return false
 
 
 ## Get the location ID if this chunk has one
 func get_location_id() -> String:
-	var cell: WorldData.CellData = WorldData.get_cell(grid_coords)
+	var cell: WorldGrid.CellInfo = WorldGrid.get_cell(grid_coords)
 	if cell:
 		return cell.location_id
 	return ""
 
 
 ## Get the location type if this chunk has one
-func get_location_type() -> WorldData.LocationType:
-	var cell: WorldData.CellData = WorldData.get_cell(grid_coords)
+func get_location_type() -> WorldGrid.LocationType:
+	var cell: WorldGrid.CellInfo = WorldGrid.get_cell(grid_coords)
 	if cell:
 		return cell.location_type
-	return WorldData.LocationType.NONE
+	return WorldGrid.LocationType.NONE
 
 
 ## ============================================================================
@@ -2127,13 +2113,13 @@ func _create_edge_transitions() -> void:
 
 	for dir_data: Dictionary in directions:
 		var adjacent_coords: Vector2i = grid_coords + dir_data["offset"]
-		var adjacent_cell: WorldData.CellData = WorldData.get_cell(adjacent_coords)
+		var adjacent_cell: WorldGrid.CellInfo = WorldGrid.get_cell(adjacent_coords)
 
 		if not adjacent_cell:
 			continue
 
 		# Get adjacent biome
-		var adjacent_biome: WorldData.Biome = adjacent_cell.biome
+		var adjacent_biome: WorldGrid.Biome = adjacent_cell.biome
 
 		# Convert to our local Biome enum for comparison
 		var local_adjacent_biome: int = _world_biome_to_local(adjacent_biome)
@@ -2143,14 +2129,14 @@ func _create_edge_transitions() -> void:
 			_spawn_transition_props(dir_data, local_adjacent_biome, transition_depth)
 
 
-## Convert WorldData.Biome to local Biome enum
-func _world_biome_to_local(world_biome: WorldData.Biome) -> int:
+## Convert WorldGrid.Biome to local Biome enum
+func _world_biome_to_local(world_biome: WorldGrid.Biome) -> int:
 	match world_biome:
-		WorldData.Biome.FOREST: return Biome.FOREST
-		WorldData.Biome.PLAINS: return Biome.PLAINS
-		WorldData.Biome.SWAMP: return Biome.SWAMP
-		WorldData.Biome.HILLS: return Biome.HILLS
-		WorldData.Biome.ROCKY, WorldData.Biome.MOUNTAINS: return Biome.ROCKY
+		WorldGrid.Biome.FOREST: return Biome.FOREST
+		WorldGrid.Biome.PLAINS: return Biome.PLAINS
+		WorldGrid.Biome.SWAMP: return Biome.SWAMP
+		WorldGrid.Biome.HILLS: return Biome.HILLS
+		WorldGrid.Biome.ROCKY, WorldGrid.Biome.MOUNTAINS: return Biome.ROCKY
 		_: return Biome.PLAINS
 
 

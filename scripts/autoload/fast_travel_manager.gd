@@ -68,11 +68,11 @@ func can_fast_travel_to(destination_id: String) -> Dictionary:
 	var is_dev_mode: bool = SceneManager.dev_mode if SceneManager else false
 
 	# Must be discovered (unless in dev mode)
-	if not is_dev_mode and not WorldManager.is_location_discovered(destination_id):
+	if not is_dev_mode and PlayerGPS and not PlayerGPS.is_location_discovered(destination_id):
 		return {"allowed": false, "reason": "Location not discovered"}
 
 	# Can't travel to current location
-	if destination_id == WorldManager.current_location_id:
+	if PlayerGPS and destination_id == PlayerGPS.current_location_id:
 		return {"allowed": false, "reason": "Already at this location"}
 
 	# Check if player is in combat
@@ -87,8 +87,8 @@ func can_fast_travel_to(destination_id: String) -> Dictionary:
 
 ## Calculate travel time between two locations
 func calculate_travel_time(from_id: String, to_id: String, speed: TravelSpeed = TravelSpeed.NORMAL, mode: TravelMode = TravelMode.ROAD) -> float:
-	var from_coords := WorldManager.get_location_coords(from_id)
-	var to_coords := WorldManager.get_location_coords(to_id)
+	var from_coords := WorldGrid.get_location_coords(from_id)
+	var to_coords := WorldGrid.get_location_coords(to_id)
 
 	var hours: float = 0.0
 
@@ -128,13 +128,13 @@ func _calculate_direct_time(from_coords: Vector2i, to_coords: Vector2i) -> float
 
 ## Get estimated travel time to a destination from current location
 func get_travel_estimate(destination_id: String, speed: TravelSpeed = TravelSpeed.NORMAL) -> Dictionary:
-	var from_id := WorldManager.current_location_id
+	var from_id: String = PlayerGPS.current_location_id if PlayerGPS else ""
 	if from_id.is_empty():
 		# Use cell coords as fallback
 		from_id = "current_cell"
 
 	var hours := calculate_travel_time(from_id, destination_id, speed)
-	var distance := WorldManager.get_distance_from_current(destination_id)
+	var distance: int = PlayerGPS.get_distance_from_current(destination_id) if PlayerGPS else 0
 
 	return {
 		"hours": hours,
@@ -171,7 +171,7 @@ func travel_to(destination_id: String, speed: TravelSpeed = TravelSpeed.NORMAL, 
 		push_warning("[FastTravel] Cannot travel: " + check.reason)
 		return false
 
-	var from_id := WorldManager.current_location_id
+	var from_id: String = PlayerGPS.current_location_id if PlayerGPS else ""
 	var hours := calculate_travel_time(from_id, destination_id, speed, mode)
 
 	is_traveling = true
@@ -256,7 +256,8 @@ func _complete_travel(destination_id: String) -> void:
 func get_valid_destinations() -> Array[Dictionary]:
 	var destinations: Array[Dictionary] = []
 
-	for loc: Dictionary in WorldManager.get_discovered_locations():
+	var discovered_locations: Array = PlayerGPS.get_discovered_locations() if PlayerGPS else []
+	for loc: Dictionary in discovered_locations:
 		var loc_id: String = loc.get("id", "")
 		if loc_id.is_empty():
 			continue
