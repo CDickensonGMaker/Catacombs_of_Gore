@@ -2023,6 +2023,10 @@ func _create_plant_marker() -> Label:
 
 ## Update compass quest marker (points to objective or exit door)
 ## This is separate from the HUD quest tracker display
+## TODO: BUG - Compass quest marker not displaying for "reach" objectives
+## The minimap shows the golden marker correctly, but the compass dial does not.
+## Debug confirmed cached_pos is correct (300, 0, 200 for Thornfield).
+## Issue is likely in marker positioning or visibility logic below.
 var _compass_debug_timer: float = 0.0
 const COMPASS_DEBUG_ENABLED := false  # Set to true to enable compass debug logging
 func _update_compass_quest_marker(player: Node3D, yaw_degrees: float, ppd: float) -> void:
