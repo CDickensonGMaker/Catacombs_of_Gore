@@ -62,6 +62,11 @@ func _ready() -> void:
 	# Add to player group
 	add_to_group("player")
 
+	# Configure floor snapping for terrain traversal
+	# Without this, player hops over small terrain bumps
+	floor_snap_length = 1.0  # Snap to ground up to 1 unit below
+	floor_max_angle = deg_to_rad(50)  # Allow walking up steeper slopes
+
 	# Make sure the hitbox starts off.
 	melee_hitbox.monitoring = false
 

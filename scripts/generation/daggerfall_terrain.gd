@@ -10,8 +10,8 @@ const GRID_SIZE: int = 17          # 17x17 vertices per cell (289 total)
 const CELL_SIZE: float = 100.0     # World units per cell
 
 ## Height settings
-const MAX_HEIGHT: float = 4.0      # Maximum terrain height in units
-const MIN_HEIGHT: float = 0.0      # Minimum terrain height
+const MAX_HEIGHT: float = 3.0      # Maximum terrain height (hills)
+const MIN_HEIGHT: float = -1.0     # Minimum terrain height (shallow valleys)
 
 ## Noise settings - world-space continuous noise
 const NOISE_FREQUENCY: float = 0.012  # Controls hill size (lower = larger hills)
@@ -119,9 +119,14 @@ static func _generate_height_grid(cell_x: int, cell_z: int) -> PackedFloat32Arra
 			# Sample noise at world coordinates (returns -1 to 1)
 			var noise_value: float = noise.get_noise_2d(world_x, world_z)
 
-			# Map noise to height range (no quantization - smooth continuous values)
-			# noise_value is -1 to 1, map to MIN_HEIGHT to MAX_HEIGHT
-			var height: float = lerpf(MIN_HEIGHT, MAX_HEIGHT, (noise_value + 1.0) * 0.5)
+			# Map noise directly to height: 0 noise = 0 height (ground level)
+			# Positive noise = hills, negative noise = shallow valleys
+			# This ensures road cells (y=0) connect seamlessly with average terrain
+			var height: float
+			if noise_value >= 0.0:
+				height = noise_value * MAX_HEIGHT  # 0 to MAX_HEIGHT
+			else:
+				height = noise_value * absf(MIN_HEIGHT)  # MIN_HEIGHT to 0
 
 			heights[z * GRID_SIZE + x] = height
 
