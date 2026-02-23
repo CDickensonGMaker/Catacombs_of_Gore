@@ -17,17 +17,22 @@ const MIN_HEIGHT: float = -1.0     # Minimum terrain height (shallow valleys)
 const NOISE_FREQUENCY: float = 0.012  # Controls hill size (lower = larger hills)
 const NOISE_SEED: int = 42069         # Fixed seed for deterministic generation
 
+## Edge blending settings
+const BLEND_DISTANCE: int = 4         # How many vertices from edge to blend over
+
 
 ## Generate complete terrain for a cell
+## blend_edges: Dictionary with "north", "south", "east", "west" bools
 ## Returns: Dictionary with "node" (Node3D), "heights" (PackedFloat32Array)
 static func generate(
 	cell_x: int,
 	cell_z: int,
 	biome: int,
-	material: Material = null
+	material: Material = null,
+	blend_edges: Dictionary = {}
 ) -> Dictionary:
-	# Generate height grid
-	var heights: PackedFloat32Array = _generate_height_grid(cell_x, cell_z)
+	# Generate height grid with edge blending
+	var heights: PackedFloat32Array = _generate_height_grid(cell_x, cell_z, blend_edges)
 
 	# Create root node
 	var root := Node3D.new()
@@ -95,7 +100,8 @@ static func get_height_at(
 ## Generate height grid using world-space noise coordinates
 ## This ensures seamless terrain across cell boundaries - edge vertices
 ## at adjacent cells sample the exact same world position and get identical heights
-static func _generate_height_grid(cell_x: int, cell_z: int) -> PackedFloat32Array:
+## blend_edges: Dictionary with "north", "south", "east", "west" bools for flat neighbors
+static func _generate_height_grid(cell_x: int, cell_z: int, blend_edges: Dictionary = {}) -> PackedFloat32Array:
 	var noise := FastNoiseLite.new()
 	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
 	noise.frequency = NOISE_FREQUENCY
@@ -109,6 +115,12 @@ static func _generate_height_grid(cell_x: int, cell_z: int) -> PackedFloat32Arra
 
 	var step: float = CELL_SIZE / (GRID_SIZE - 1)
 
+	# Get blend flags (default to false if not specified)
+	var blend_north: bool = blend_edges.get("north", false)
+	var blend_south: bool = blend_edges.get("south", false)
+	var blend_east: bool = blend_edges.get("east", false)
+	var blend_west: bool = blend_edges.get("west", false)
+
 	for z in range(GRID_SIZE):
 		for x in range(GRID_SIZE):
 			# Calculate world-space coordinates for this vertex
@@ -121,14 +133,33 @@ static func _generate_height_grid(cell_x: int, cell_z: int) -> PackedFloat32Arra
 
 			# Map noise directly to height: 0 noise = 0 height (ground level)
 			# Positive noise = hills, negative noise = shallow valleys
-			# This ensures road cells (y=0) connect seamlessly with average terrain
 			var height: float
 			if noise_value >= 0.0:
 				height = noise_value * MAX_HEIGHT  # 0 to MAX_HEIGHT
 			else:
 				height = noise_value * absf(MIN_HEIGHT)  # MIN_HEIGHT to 0
 
-			heights[z * GRID_SIZE + x] = height
+			# Apply edge blending - fade to 0 near edges that border flat cells
+			# blend factor: 1.0 = full terrain height, 0.0 = flat ground
+			var blend: float = 1.0
+
+			# North edge (z = 0 is north)
+			if blend_north and z < BLEND_DISTANCE:
+				blend = minf(blend, float(z) / float(BLEND_DISTANCE))
+
+			# South edge (z = GRID_SIZE-1 is south)
+			if blend_south and z >= GRID_SIZE - BLEND_DISTANCE:
+				blend = minf(blend, float(GRID_SIZE - 1 - z) / float(BLEND_DISTANCE))
+
+			# West edge (x = 0 is west)
+			if blend_west and x < BLEND_DISTANCE:
+				blend = minf(blend, float(x) / float(BLEND_DISTANCE))
+
+			# East edge (x = GRID_SIZE-1 is east)
+			if blend_east and x >= GRID_SIZE - BLEND_DISTANCE:
+				blend = minf(blend, float(GRID_SIZE - 1 - x) / float(BLEND_DISTANCE))
+
+			heights[z * GRID_SIZE + x] = height * blend
 
 	return heights
 

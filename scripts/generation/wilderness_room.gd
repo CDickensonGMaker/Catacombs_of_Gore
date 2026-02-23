@@ -217,12 +217,22 @@ func _create_heightmap_terrain() -> void:
 	terrain_mat.albedo_color = ground_material.albedo_color
 	terrain_mat.cull_mode = BaseMaterial3D.CULL_BACK
 
-	# Generate Daggerfall-style terrain
+	# Calculate which edges need to blend to flat ground (y=0)
+	# This creates smooth transitions to roads, hand-crafted scenes, and boundaries
+	var blend_edges: Dictionary = {
+		"north": _neighbor_is_flat(grid_coords + Vector2i(0, -1)),
+		"south": _neighbor_is_flat(grid_coords + Vector2i(0, 1)),
+		"east": _neighbor_is_flat(grid_coords + Vector2i(1, 0)),
+		"west": _neighbor_is_flat(grid_coords + Vector2i(-1, 0)),
+	}
+
+	# Generate Daggerfall-style terrain with edge blending
 	var result: Dictionary = DaggerfallTerrain.generate(
 		grid_coords.x,
 		grid_coords.y,
 		biome,
-		terrain_mat
+		terrain_mat,
+		blend_edges
 	)
 
 	# Store heights for prop placement
@@ -231,6 +241,27 @@ func _create_heightmap_terrain() -> void:
 	# Add terrain node to scene
 	var terrain_node: Node3D = result.node
 	add_child(terrain_node)
+
+
+## Check if a neighboring cell uses flat ground (roads, hand-crafted scenes, blocked)
+func _neighbor_is_flat(coords: Vector2i) -> bool:
+	var cell_info: WorldGrid.CellInfo = WorldGrid.get_cell(coords)
+	if not cell_info:
+		return true  # Out of bounds = treat as flat/blocked
+
+	# Roads use flat ground
+	if cell_info.is_road:
+		return true
+
+	# Hand-crafted scenes (towns, dungeons, etc.) use their own flat ground
+	if cell_info.scene_path != "":
+		return true
+
+	# Blocked/impassable cells should blend to flat
+	if not cell_info.passable:
+		return true
+
+	return false
 
 
 ## Get terrain height at a world position (relative to room center)
