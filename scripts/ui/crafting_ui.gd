@@ -42,8 +42,8 @@ var category_buttons: Dictionary = {}  # category -> Button
 var station_type: String = ""
 
 const STATION_CATEGORIES := {
-	"blacksmith": ["Weapon", "Armor", "Tool", "Material"],
-	"alchemy": ["Consumable"],
+	"blacksmith": ["Weapon", "Armor", "Tool", "Material", "Ammo"],
+	"alchemy": ["Alchemy"],
 	"cooking": ["Food"],
 }
 
@@ -57,7 +57,8 @@ func _input(event: InputEvent) -> void:
 	if not visible:
 		return
 
-	if event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause"):
+	# Close on escape, pause, or tab menu key
+	if event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause") or event.is_action_pressed("menu"):
 		close()
 		get_viewport().set_input_as_handled()
 
@@ -65,15 +66,26 @@ func _input(event: InputEvent) -> void:
 func _build_ui() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 
-	# Dark overlay
+	# Click-outside overlay - clicking this closes the UI
+	var click_outside = Button.new()
+	click_outside.set_anchors_preset(Control.PRESET_FULL_RECT)
+	click_outside.flat = true
+	click_outside.focus_mode = Control.FOCUS_NONE
+	click_outside.mouse_filter = Control.MOUSE_FILTER_STOP
+	click_outside.pressed.connect(close)
+	add_child(click_outside)
+
+	# Dark overlay (visual only)
 	var overlay = ColorRect.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	overlay.color = Color(0, 0, 0, 0.75)
+	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(overlay)
 
 	# Main panel
 	var main = PanelContainer.new()
 	main.set_anchors_preset(Control.PRESET_FULL_RECT)
+	main.mouse_filter = Control.MOUSE_FILTER_STOP  # Block clicks from reaching overlay
 	main.offset_left = 40
 	main.offset_top = 30
 	main.offset_right = -40

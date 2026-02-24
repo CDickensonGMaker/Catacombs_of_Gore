@@ -300,6 +300,29 @@ func _spawn_npcs() -> void:
 		marek.region_id = ZONE_ID
 		marek.faction_id = "human_empire"
 
+	# Elder Vorn - Town Leader (talk target for Tharin's quest chain)
+	var elder_vorn := QuestGiver.spawn_quest_giver(
+		npcs,
+		Vector3(0, 0, 5),  # Near town center
+		"Elder Vorn",
+		"elder_vorn_thornfield",
+		null,  # use default sprite
+		8, 2,
+		[],  # No quests to give, just receives messages
+		true  # is_talk_target
+	)
+	elder_vorn.region_id = ZONE_ID
+	elder_vorn.faction_id = "human_empire"
+	elder_vorn.no_quest_dialogue = "Ah, greetings traveler. I am Vorn, elder of this humble settlement. What brings you to Thornfield?"
+	var elder_profile := NPCKnowledgeProfile.new()
+	elder_profile.archetype = NPCKnowledgeProfile.Archetype.GENERIC_VILLAGER
+	elder_profile.personality_traits = ["wise", "cautious", "hospitable"]
+	elder_profile.knowledge_tags = ["thornfield", "local_area", "logging", "trade", "authority"]
+	elder_profile.base_disposition = 60
+	elder_profile.speech_style = "formal"
+	elder_vorn.npc_profile = elder_profile
+	print("[Thornfield] Spawned Elder Vorn (town leader)")
+
 	# Woodcutter 1 (green vest guy - fits woodcutter theme)
 	var woodcutter1_pos: Marker3D = npc_spawn_points.get_node_or_null("Civilian_Woodcutter1")
 	if woodcutter1_pos:
@@ -339,7 +362,7 @@ func _spawn_npcs() -> void:
 		Vector3(6, 0, -2),  # Near blacksmith
 	]
 	for spawn_pos: Vector3 in random_positions:
-		var civilian := CivilianNPC.spawn_any_random(npcs, spawn_pos, ZONE_ID)
+		var civilian := CivilianNPC.spawn_gendered_random(npcs, spawn_pos, ZONE_ID)
 		if civilian.wander:
 			civilian.wander.wander_radius = 5.0
 

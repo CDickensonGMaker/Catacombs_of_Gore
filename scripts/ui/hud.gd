@@ -177,6 +177,7 @@ func _ready() -> void:
 	if not equipped_label:
 		equipped_label = get_node_or_null("BottomLeft/EquippedLabel") as Label
 
+	_setup_health_frame()
 	_setup_spell_slots()
 	_setup_quick_slots()
 	_setup_interaction_prompt()
@@ -427,6 +428,55 @@ func _process(delta: float) -> void:
 	_update_bounty_indicator(delta)
 	_update_quest_tracker()
 	_update_debug_overlay()
+
+## Skull frame texture for health/stamina bars
+var skull_frame_texture: Texture2D = null
+var skull_frame_container: Control = null
+
+func _setup_health_frame() -> void:
+	# Try to load the skull frame HUD scene (editable in Godot editor)
+	var scene_path := "res://scenes/ui/skull_frame_hud.tscn"
+	if not ResourceLoader.exists(scene_path):
+		print("[HUD] Skull frame scene not found, using default health bars")
+		return
+
+	var skull_scene: PackedScene = load(scene_path)
+	if not skull_scene:
+		print("[HUD] Failed to load skull frame scene, using default health bars")
+		return
+
+	# Get the TopLeft VBoxContainer (parent of health bars)
+	var top_left: VBoxContainer = null
+	if health_bar:
+		top_left = health_bar.get_parent() as VBoxContainer
+
+	if not top_left:
+		print("[HUD] Could not find TopLeft container, using default health bars")
+		return
+
+	# Hide the original TopLeft container - we use the scene instead
+	top_left.visible = false
+
+	# Instance the skull frame scene
+	skull_frame_container = skull_scene.instantiate()
+	add_child(skull_frame_container)
+
+	# Get references to the bars from the scene
+	var new_health_bar := skull_frame_container.get_node_or_null("HealthBar") as ProgressBar
+	var new_stamina_bar := skull_frame_container.get_node_or_null("StaminaBar") as ProgressBar
+	var new_mana_bar := skull_frame_container.get_node_or_null("ManaBar") as ProgressBar
+
+	# Update references to use new bars
+	if new_health_bar:
+		health_bar = new_health_bar
+	if new_stamina_bar:
+		stamina_bar = new_stamina_bar
+	if new_mana_bar:
+		mana_bar = new_mana_bar
+	health_label = null  # No more text label
+
+	print("[HUD] Skull frame HUD loaded from scene")
+
 
 func _setup_spell_slots() -> void:
 	# Spell slots deprecated - mana bar is used instead

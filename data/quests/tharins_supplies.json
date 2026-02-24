@@ -1,0 +1,44 @@
+{
+	"id": "tharins_supplies",
+	"title": "Supply Run to Dalhurst",
+	"description": "Tharin needs someone to pick up a shipment of specialized tools and supplies from Halvard the Supplier in Dalhurst. The port city is further west, past the Crossroads. Retrieve the supplies and bring them back to Tharin.",
+	"is_main_quest": true,
+	"quest_source": "story",
+	"giver_npc_id": "tharin_ironbeard",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "elder_moor",
+	"objectives": [
+		{
+			"id": "travel_dalhurst",
+			"description": "Travel to Dalhurst",
+			"type": "reach",
+			"target": "dalhurst",
+			"required_count": 1
+		},
+		{
+			"id": "get_supplies",
+			"description": "Collect supplies from Halvard",
+			"type": "talk",
+			"target": "halvard_supplier_dalhurst",
+			"required_count": 1
+		},
+		{
+			"id": "return_supplies",
+			"description": "Return the supplies to Tharin",
+			"type": "talk",
+			"target": "tharin_ironbeard",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "tharin_ironbeard",
+	"turn_in_zone": "elder_moor",
+	"rewards": {
+		"gold": 40,
+		"xp": 75,
+		"items": []
+	},
+	"prerequisites": ["tharins_message"],
+	"next_quest": "tharins_wolf_problem",
+	"unlocks_quests": ["tharins_wolf_problem"]
+}

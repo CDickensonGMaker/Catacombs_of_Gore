@@ -1,0 +1,30 @@
+{
+	"id": "tharins_wolf_problem",
+	"title": "The Wolf Problem",
+	"description": "Wolves have been attacking the logging teams and making the roads around Elder Moor dangerous. Tharin wants you to thin out the wolf population by killing several of them. This will prove you can handle yourself in a fight before he trusts you with more sensitive work.",
+	"is_main_quest": true,
+	"quest_source": "story",
+	"giver_npc_id": "tharin_ironbeard",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "elder_moor",
+	"objectives": [
+		{
+			"id": "kill_wolves",
+			"description": "Kill wolves near Elder Moor (0/5)",
+			"type": "kill",
+			"target": "wolf",
+			"required_count": 5
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "tharin_ironbeard",
+	"turn_in_zone": "elder_moor",
+	"rewards": {
+		"gold": 50,
+		"xp": 100,
+		"items": ["health_potion", "health_potion"]
+	},
+	"prerequisites": ["tharins_supplies"],
+	"next_quest": "keepers_letter_delivery",
+	"unlocks_quests": ["keepers_letter_delivery"]
+}

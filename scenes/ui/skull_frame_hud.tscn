@@ -1,0 +1,73 @@
+[gd_scene load_steps=8 format=3 uid="uid://c8xk7m2qv1h3p"]
+
+[ext_resource type="Texture2D" uid="uid://b36ih6kpxxmqu" path="res://assets/ui/skull_frame.png" id="1_skull"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_health_bg"]
+bg_color = Color(0.2, 0.05, 0.05, 0.9)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_health_fill"]
+bg_color = Color(0.7, 0.1, 0.1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stamina_bg"]
+bg_color = Color(0.05, 0.15, 0.05, 0.9)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stamina_fill"]
+bg_color = Color(0.15, 0.6, 0.2, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mana_bg"]
+bg_color = Color(0.05, 0.08, 0.2, 0.9)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mana_fill"]
+bg_color = Color(0.15, 0.3, 0.7, 1)
+
+[node name="SkullFrameHUD" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -17.0
+offset_top = 9.0
+offset_right = 433.0
+offset_bottom = 61.0
+scale = Vector2(0.6011499, 0.7495961)
+
+[node name="SkullFrame" type="TextureRect" parent="."]
+layout_mode = 0
+offset_top = -18.0
+offset_right = 738.0
+offset_bottom = 170.0
+scale = Vector2(0.6068862, 0.536771)
+texture = ExtResource("1_skull")
+stretch_mode = 5
+
+[node name="HealthBar" type="ProgressBar" parent="."]
+layout_mode = 0
+offset_left = 52.0
+offset_top = 12.0
+offset_right = 398.0
+offset_bottom = 22.0
+theme_override_styles/background = SubResource("StyleBoxFlat_health_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_health_fill")
+value = 100.0
+show_percentage = false
+
+[node name="StaminaBar" type="ProgressBar" parent="."]
+layout_mode = 0
+offset_left = 52.0
+offset_top = 25.0
+offset_right = 398.0
+offset_bottom = 35.0
+theme_override_styles/background = SubResource("StyleBoxFlat_stamina_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_stamina_fill")
+value = 100.0
+show_percentage = false
+
+[node name="ManaBar" type="ProgressBar" parent="."]
+layout_mode = 0
+offset_left = 52.0
+offset_top = 38.0
+offset_right = 398.0
+offset_bottom = 48.0
+theme_override_styles/background = SubResource("StyleBoxFlat_mana_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_mana_fill")
+max_value = 50.0
+value = 50.0
+show_percentage = false

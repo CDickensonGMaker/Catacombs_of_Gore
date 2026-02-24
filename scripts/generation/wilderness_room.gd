@@ -551,27 +551,41 @@ func _spawn_tree_prop(parent: Node3D, pos: Vector3) -> void:
 	parent.add_child(tree)
 
 
-## Spawn special props (gravestones for swamp/undead, flood patches, etc.)
+## Spawn special props (gravestones for swamp/undead, flood patches, statues, etc.)
 func _spawn_special_prop(parent: Node3D, pos: Vector3) -> void:
 	var special_textures: Array[String] = []
+	var is_statue: bool = false
 
-	match biome:
-		Biome.SWAMP:
-			# Swamp gets gravestones, flood patches, and dead things
-			special_textures = [
-				"res://Sprite folders grab bag/gravehead_1.png",
-				"res://Sprite folders grab bag/gravehead_2.png",
-				"res://Sprite folders grab bag/gravehead_3.png",
-				"res://Sprite folders grab bag/swamp_flood1.png",
-				"res://Sprite folders grab bag/swamp_flood2.png"
-			]
-		Biome.ROCKY, Biome.HILLS:
-			# Rocky areas might have some fallen trees or rocks
-			special_textures = [
-				"res://Sprite folders grab bag/swamp_downtree1.png"
-			]
-		_:
-			return  # No special props for other biomes
+	# Ancient statues can appear in any biome (rare landmark)
+	const STATUE_TEXTURE := "res://assets/sprites/decorations/ancient_statue.png"
+	var statue_chance: float = 0.15  # 15% of special props are statues
+
+	if rng.randf() < statue_chance and ResourceLoader.exists(STATUE_TEXTURE):
+		special_textures = [STATUE_TEXTURE]
+		is_statue = true
+	else:
+		match biome:
+			Biome.SWAMP:
+				# Swamp gets gravestones, flood patches, and dead things
+				special_textures = [
+					"res://Sprite folders grab bag/gravehead_1.png",
+					"res://Sprite folders grab bag/gravehead_2.png",
+					"res://Sprite folders grab bag/gravehead_3.png",
+					"res://Sprite folders grab bag/swamp_flood1.png",
+					"res://Sprite folders grab bag/swamp_flood2.png"
+				]
+			Biome.ROCKY, Biome.HILLS:
+				# Rocky areas might have some fallen trees or rocks
+				special_textures = [
+					"res://Sprite folders grab bag/swamp_downtree1.png"
+				]
+			Biome.FOREST, Biome.PLAINS:
+				# Forest and plains can have ancient statues as landmarks
+				if ResourceLoader.exists(STATUE_TEXTURE):
+					special_textures = [STATUE_TEXTURE]
+					is_statue = true
+			_:
+				return  # No special props for other biomes
 
 	if special_textures.is_empty():
 		return
@@ -581,13 +595,20 @@ func _spawn_special_prop(parent: Node3D, pos: Vector3) -> void:
 		return
 
 	var prop := Sprite3D.new()
-	prop.name = "SpecialProp"
+	prop.name = "AncientStatue" if is_statue else "SpecialProp"
 	prop.texture = load(tex_path)
 	prop.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	prop.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
-	prop.pixel_size = rng.randf_range(0.02, 0.035)
+
+	# Statues are larger and have stone coloring
+	if is_statue:
+		prop.pixel_size = rng.randf_range(0.025, 0.04)  # Taller statues
+		prop.modulate = Color(0.85, 0.82, 0.78)  # Stone gray tint
+	else:
+		prop.pixel_size = rng.randf_range(0.02, 0.035)
+		prop.modulate = _get_biome_prop_tint()
+
 	prop.position = pos + Vector3(0, prop.texture.get_height() * prop.pixel_size * 0.5, 0)
-	prop.modulate = _get_biome_prop_tint()
 	parent.add_child(prop)
 
 
@@ -1682,12 +1703,19 @@ func _spawn_enemies() -> void:
 
 		var enemy: Node = null
 
+		# Get zone danger level for stat scaling
+		var cell_info: WorldGrid.CellInfo = WorldGrid.get_cell(grid_coords)
+		var current_zone_danger: int = 1
+		if cell_info:
+			current_zone_danger = cell_info.danger_level
+
 		# Check if this is a skeleton enemy - use specialized spawner with walk/attack sprites
 		if enemy_config.get("is_skeleton", false):
 			enemy = EnemyBase.spawn_skeleton_enemy(
 				self,
 				spawn_pos,
-				enemy_config.data_path
+				enemy_config.data_path,
+				current_zone_danger
 			)
 		else:
 			# Load sprite texture for regular enemies
@@ -1696,20 +1724,21 @@ func _spawn_enemies() -> void:
 				push_warning("[WildernessRoom] Failed to load sprite: %s" % enemy_config.sprite_path)
 				continue
 
-			# Spawn regular billboard enemy
+			# Spawn regular billboard enemy with zone danger for stat scaling
 			enemy = EnemyBase.spawn_billboard_enemy(
 				self,
 				spawn_pos,
 				enemy_config.data_path,
 				sprite_tex,
 				enemy_config.h_frames,
-				enemy_config.v_frames
+				enemy_config.v_frames,
+				current_zone_danger
 			)
 
 		if enemy:
 			enemies.append(enemy)
 			placed_positions.append(pos)
-			print("[WildernessRoom] Spawned %s at %s" % [enemy_config.display_name, pos])
+			print("[WildernessRoom] Spawned %s at %s (zone_danger: %d)" % [enemy_config.display_name, pos, current_zone_danger])
 
 	print("[WildernessRoom] Spawned %d enemies" % enemies.size())
 

@@ -276,6 +276,86 @@ var color: Color = COL_GOLD if is_main else COL_TEXT
 
 ---
 
+## AUTOLOAD API FUNCTION REFERENCE
+
+**CRITICAL:** Always verify function names exist before using them. These are the CORRECT function names for common operations.
+
+### InventoryManager Functions
+```gdscript
+# Item queries
+InventoryManager.get_item_name(item_id: String) -> String      # Get display name
+InventoryManager.get_item_description(item_id: String) -> String
+InventoryManager.get_item_data(item_id: String) -> Resource    # Get ItemData resource
+InventoryManager.get_item_count(item_id: String) -> int        # Count in inventory
+InventoryManager.get_item_value(item_id: String, quality) -> int
+
+# Inventory operations
+InventoryManager.add_item(item_id: String, quantity: int = 1) -> bool
+InventoryManager.remove_item(item_id: String, quantity: int = 1) -> bool
+InventoryManager.has_item(item_id: String, quantity: int = 1) -> bool
+InventoryManager.add_gold(amount: int) -> void
+InventoryManager.remove_gold(amount: int) -> bool
+```
+
+### Common Mistakes
+```gdscript
+# WRONG - These functions DO NOT exist:
+InventoryManager.get_item_display_name(item_id)  # Use get_item_name()
+InventoryManager.give_item(item_id)              # Use add_item()
+InventoryManager.take_item(item_id)              # Use remove_item()
+
+# CORRECT versions:
+var name: String = InventoryManager.get_item_name(item_id)
+var success: bool = InventoryManager.add_item(item_id, quantity)
+var removed: bool = InventoryManager.remove_item(item_id, quantity)
+```
+
+### GameManager Functions
+```gdscript
+# Player data access
+GameManager.player_data.level          # Player level (int)
+GameManager.player_data.gold           # Player gold (int)
+GameManager.player_data.add_ip(amount) # Add improvement points (XP)
+GameManager.player_data.take_damage(amount)
+GameManager.player_data.get_effective_stat(Enums.Stat.STAT_NAME) -> int
+GameManager.player_data.get_skill(Enums.Skill.SKILL_NAME) -> int
+```
+
+### CraftingRecipe Properties
+**CRITICAL:** CraftingRecipe uses `materials`, NOT `ingredients`!
+
+```gdscript
+# CraftingRecipe resource properties (scripts/data/crafting_recipe.gd)
+recipe.recipe_id: String              # Unique ID
+recipe.display_name: String           # Display name
+recipe.description: String            # Description text
+recipe.category: String               # "Weapon", "Armor", "Consumable", "Tool", "Material", "Food"
+recipe.materials: Dictionary          # {item_id: quantity} - NOT "ingredients"!
+recipe.gold_cost: int                 # Gold required
+recipe.required_engineering: int      # Engineering skill required
+recipe.required_arcana: int           # Arcana skill required
+recipe.output_item_id: String         # Item produced
+recipe.output_quantity: int           # How many items produced
+recipe.base_quality: Enums.ItemQuality
+recipe.can_crit: bool                 # Can get quality bonus on crit
+
+# Methods
+recipe.can_craft() -> bool            # Has materials and gold?
+recipe.meets_requirements() -> bool   # Has required skills?
+recipe.craft() -> Dictionary          # Execute craft, returns {success, item_id, quantity, quality}
+```
+
+**Common Mistakes:**
+```gdscript
+# WRONG - "ingredients" does NOT exist!
+recipe.ingredients.size()  # ERROR!
+
+# CORRECT - use "materials"
+recipe.materials.size()
+```
+
+---
+
 ## BILLBOARDSPRITE API
 
 When creating NPCs using BillboardSprite, follow these rules to avoid common errors:

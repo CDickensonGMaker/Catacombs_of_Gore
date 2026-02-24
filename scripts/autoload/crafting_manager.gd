@@ -8,7 +8,7 @@ signal recipe_crafted(recipe_id: String, result: Dictionary)
 var recipes: Dictionary = {}  # recipe_id -> CraftingRecipe
 
 ## Recipe categories for UI filtering
-var categories: Array[String] = ["Weapon", "Armor", "Consumable", "Tool", "Material", "Food"]
+var categories: Array[String] = ["Weapon", "Armor", "Alchemy", "Consumable", "Tool", "Material", "Food", "Ammo"]
 
 
 func _ready() -> void:
@@ -107,14 +107,14 @@ func _register_recipes() -> void:
 		"base_quality": Enums.ItemQuality.AVERAGE
 	})
 
-	# === CONSUMABLES ===
+	# === ALCHEMY (Potions) ===
 
 	# Health Potion
 	_add_recipe({
 		"recipe_id": "craft_health_potion",
 		"display_name": "Health Potion",
-		"description": "Brew a basic healing potion",
-		"category": "Consumable",
+		"description": "Brew a basic healing potion from red herbs",
+		"category": "Alchemy",
 		"materials": {"red_herb": 2, "empty_vial": 1},
 		"gold_cost": 5,
 		"required_engineering": 0,
@@ -123,12 +123,98 @@ func _register_recipes() -> void:
 		"can_crit": false
 	})
 
+	# Stamina Potion
+	_add_recipe({
+		"recipe_id": "craft_stamina_potion",
+		"display_name": "Stamina Potion",
+		"description": "An energizing draught brewed from forest mushrooms",
+		"category": "Alchemy",
+		"materials": {"mushroom": 2, "empty_vial": 1},
+		"gold_cost": 10,
+		"required_engineering": 0,
+		"output_item_id": "stamina_potion",
+		"base_quality": Enums.ItemQuality.AVERAGE,
+		"can_crit": false
+	})
+
+	# Mana Potion
+	_add_recipe({
+		"recipe_id": "craft_mana_potion",
+		"display_name": "Mana Potion",
+		"description": "A shimmering blue elixir that restores magical energy",
+		"category": "Alchemy",
+		"materials": {"blue_flower": 2, "empty_vial": 1},
+		"gold_cost": 15,
+		"required_arcana": 1,
+		"output_item_id": "mana_potion",
+		"base_quality": Enums.ItemQuality.AVERAGE,
+		"can_crit": false
+	})
+
+	# Antidote
+	_add_recipe({
+		"recipe_id": "craft_antidote",
+		"display_name": "Antidote",
+		"description": "A bitter herbal remedy that cures poison - made from venom itself",
+		"category": "Alchemy",
+		"materials": {"spider_venom": 1, "healing_herb": 1, "empty_vial": 1},
+		"gold_cost": 10,
+		"required_engineering": 0,
+		"output_item_id": "antidote",
+		"base_quality": Enums.ItemQuality.AVERAGE,
+		"can_crit": false
+	})
+
+	# Regeneration Potion (advanced)
+	_add_recipe({
+		"recipe_id": "craft_regeneration_potion",
+		"display_name": "Regeneration Potion",
+		"description": "A powerful healing draught that regenerates wounds over time",
+		"category": "Alchemy",
+		"materials": {"healing_herb": 2, "red_herb": 1, "mushroom": 1, "empty_vial": 1},
+		"gold_cost": 30,
+		"required_arcana": 2,
+		"output_item_id": "regeneration_potion",
+		"base_quality": Enums.ItemQuality.AVERAGE,
+		"can_crit": false
+	})
+
+	# Agility Elixir (advanced - uses bat wings per item description)
+	_add_recipe({
+		"recipe_id": "craft_agility_elixir",
+		"display_name": "Agility Elixir",
+		"description": "A dark, fizzing elixir brewed from bat wings that enhances reflexes",
+		"category": "Alchemy",
+		"materials": {"bat_wing": 2, "blue_flower": 1, "empty_vial": 1},
+		"gold_cost": 25,
+		"required_arcana": 2,
+		"output_item_id": "agility_elixir",
+		"base_quality": Enums.ItemQuality.AVERAGE,
+		"can_crit": false
+	})
+
+	# Strength Tonic (advanced - uses beast heart per item description)
+	_add_recipe({
+		"recipe_id": "craft_strength_tonic",
+		"display_name": "Strength Tonic",
+		"description": "A potent brew made from beast heart essence that grants raw strength",
+		"category": "Alchemy",
+		"materials": {"beast_heart": 1, "red_herb": 1, "empty_vial": 1},
+		"gold_cost": 35,
+		"required_arcana": 2,
+		"output_item_id": "strength_tonic",
+		"base_quality": Enums.ItemQuality.AVERAGE,
+		"can_crit": false
+	})
+
+	# === AMMO ===
+
 	# Arrows (10)
 	_add_recipe({
 		"recipe_id": "craft_arrows",
 		"display_name": "Arrows (10)",
 		"description": "Craft a bundle of arrows",
-		"category": "Consumable",
+		"category": "Ammo",
 		"materials": {"wood_plank": 1, "iron_ingot": 1},
 		"gold_cost": 5,
 		"required_engineering": 0,
@@ -299,6 +385,10 @@ func get_craftable_recipes() -> Array[CraftingRecipe]:
 	return result
 
 
+## XP rewards for crafting (varies by category/difficulty)
+const CRAFTING_XP_MIN := 5
+const CRAFTING_XP_MAX := 15
+
 ## Craft a recipe by ID
 func craft_recipe(recipe_id: String) -> Dictionary:
 	if not recipes.has(recipe_id):
@@ -310,7 +400,34 @@ func craft_recipe(recipe_id: String) -> Dictionary:
 	if result.success:
 		recipe_crafted.emit(recipe_id, result)
 
+		# Award XP for crafting (5-15 based on recipe complexity)
+		var xp_reward: int = _calculate_crafting_xp(recipe)
+		if GameManager and GameManager.player_data:
+			GameManager.player_data.add_ip(xp_reward)
+			print("[CraftingManager] Awarded %d XP for crafting %s" % [xp_reward, recipe.display_name])
+
 	return result
+
+
+## Calculate XP reward based on recipe complexity
+func _calculate_crafting_xp(recipe: CraftingRecipe) -> int:
+	# Base XP varies by number of materials and category
+	var base_xp: int = CRAFTING_XP_MIN
+
+	# More materials = more XP
+	var material_count: int = recipe.materials.size()
+	base_xp += material_count * 2
+
+	# Category bonus
+	match recipe.category:
+		"Weapon", "Armor":
+			base_xp += 5  # Smithing is harder
+		"Consumable", "Tool":
+			base_xp += 3
+		"Food":
+			base_xp += 1  # Cooking is simpler
+
+	return clampi(base_xp, CRAFTING_XP_MIN, CRAFTING_XP_MAX)
 
 
 ## Get a specific recipe

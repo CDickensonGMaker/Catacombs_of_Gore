@@ -24,6 +24,7 @@ var shop_ui_script = preload("res://scripts/ui/shop_ui.gd")
 ## Merchant configuration
 @export var merchant_name: String = "Merchant"
 @export var merchant_id: String = ""  # Unique ID for dialogue flag matching (uses merchant_name if empty)
+@export var is_female: bool = false  # Whether this merchant is female (affects default sprite)
 @export var buy_price_multiplier: float = 1.0  # Price markup when player buys
 
 ## NPC properties for central turn-in system
@@ -140,12 +141,20 @@ func _create_merchant_mesh() -> void:
 	var v_frames_to_use: int = sprite_v_frames
 
 	if not texture_to_use:
-		# Try multiple fallback paths in order of preference
-		var fallback_paths: Array[Dictionary] = [
-			{"path": "res://assets/sprites/npcs/generalmerchant.png", "h": 3, "v": 3},
-			{"path": "res://Sprite folders grab bag/man_civilian.png", "h": 8, "v": 2},
-			{"path": "res://Sprite folders grab bag/3x3barmaid_civilian.png", "h": 3, "v": 3},
-		]
+		# Try fallback paths based on gender
+		var fallback_paths: Array[Dictionary]
+		if is_female:
+			fallback_paths = [
+				{"path": "res://Sprite folders grab bag/new lady in red.png", "h": 8, "v": 1, "size": 0.0182},
+				{"path": "res://Sprite folders grab bag/3x3barmaid_civilian.png", "h": 3, "v": 1, "size": 0.0234},
+				{"path": "res://Sprite folders grab bag/merchant_civilian.png", "h": 1, "v": 1, "size": 0.0115},
+			]
+		else:
+			fallback_paths = [
+				{"path": "res://assets/sprites/npcs/generalmerchant.png", "h": 3, "v": 3, "size": 0.0384},
+				{"path": "res://Sprite folders grab bag/merchantman.png", "h": 1, "v": 1, "size": 0.0115},
+				{"path": "res://Sprite folders grab bag/man_civilian.png", "h": 8, "v": 2, "size": 0.0384},
+			]
 
 		for fallback: Dictionary in fallback_paths:
 			var tex: Texture2D = load(fallback["path"]) as Texture2D
@@ -153,6 +162,7 @@ func _create_merchant_mesh() -> void:
 				texture_to_use = tex
 				h_frames_to_use = fallback["h"]
 				v_frames_to_use = fallback["v"]
+				sprite_pixel_size = fallback.get("size", sprite_pixel_size)
 				if DEBUG:
 					print("[Merchant] Using fallback sprite %s for %s" % [fallback["path"], merchant_name])
 				break
@@ -205,6 +215,7 @@ func _setup_default_inventory() -> void:
 		_add_shop_item("pickaxe", 80, -1, Enums.ItemQuality.AVERAGE)  # Mining tool
 		_add_shop_item("axe", 150, -1, Enums.ItemQuality.AVERAGE)  # Woodcutting/combat
 		_add_shop_item("torch", 15, -1, Enums.ItemQuality.AVERAGE)  # Light source
+		_add_shop_item("empty_vial", 10, -1, Enums.ItemQuality.AVERAGE)  # Alchemy supplies
 
 		# Optional inventory - small chance to have potions (marked up vs magic shops)
 		# Use RNG seeded by merchant position for consistent stock per merchant
@@ -292,35 +303,13 @@ func interact(_interactor: Node) -> void:
 var _pending_quest_turnin: String = ""
 
 
-## Show dialogue for quest turn-in
+## Show dialogue for quest turn-in using ConversationSystem scripted dialogue
 func _show_quest_turnin_dialogue(quest_id: String) -> void:
 	var quest := QuestManager.get_quest(quest_id)
 	if not quest:
 		return
 
-	# Create turn-in dialogue
-	var dialogue := DialogueData.new()
-	dialogue.title = "Quest Complete"
-
-	var root_node := DialogueNode.new()
-	root_node.id = "turnin_root"
-	root_node.speaker = merchant_name
-	root_node.text = "Ah, you've completed '%s'. Well done! Here's your reward." % quest.title
-
-	# Create accept choice
-	var choice_accept := DialogueChoice.new()
-	choice_accept.text = "Accept reward"
-	choice_accept.next_node_id = "turnin_accept"
-
-	root_node.choices = [choice_accept]
-
-	# Create accept node
-	var accept_node := DialogueNode.new()
-	accept_node.id = "turnin_accept"
-	accept_node.speaker = merchant_name
-
 	# Format reward text
-	var reward_text := "You received: "
 	var rewards: Array[String] = []
 	if quest.rewards.has("gold") and quest.rewards["gold"] > 0:
 		rewards.append("%d gold" % quest.rewards["gold"])
@@ -332,27 +321,35 @@ func _show_quest_turnin_dialogue(quest_id: String) -> void:
 			var quantity: int = item.get("quantity", 1)
 			rewards.append("%dx %s" % [quantity, item_name])
 
-	accept_node.text = reward_text + ", ".join(rewards) if not rewards.is_empty() else "Thank you for your help!"
-	accept_node.is_end_node = true
+	var reward_text: String = "You received: " + ", ".join(rewards) if not rewards.is_empty() else "Thank you for your help!"
 
-	dialogue.nodes = [root_node, accept_node]
-	dialogue.start_node_id = "turnin_root"
+	# Build scripted dialogue lines
+	var lines: Array = []
+
+	# Line 0: Quest complete acknowledgment
+	lines.append(ConversationSystem.create_scripted_line(
+		merchant_name,
+		"Ah, you've completed '%s'. Well done! Here's your reward." % quest.title,
+		[ConversationSystem.create_scripted_choice("Accept reward", 1)]
+	))
+
+	# Line 1: Reward given
+	lines.append(ConversationSystem.create_scripted_line(
+		merchant_name,
+		reward_text,
+		[],
+		true  # is_end
+	))
 
 	# Store quest ID to complete when dialogue ends
 	_pending_quest_turnin = quest_id
 
-	# Connect to dialogue ended signal
-	if not DialogueManager.dialogue_ended.is_connected(_on_quest_turnin_ended):
-		DialogueManager.dialogue_ended.connect(_on_quest_turnin_ended)
-
-	DialogueManager.start_dialogue(dialogue, merchant_name)
+	# Start scripted dialogue with callback
+	ConversationSystem.start_scripted_dialogue(lines, _on_quest_turnin_ended)
 
 
 ## Handle quest turn-in dialogue completion
-func _on_quest_turnin_ended(_dialogue_data: DialogueData) -> void:
-	if DialogueManager.dialogue_ended.is_connected(_on_quest_turnin_ended):
-		DialogueManager.dialogue_ended.disconnect(_on_quest_turnin_ended)
-
+func _on_quest_turnin_ended() -> void:
 	if not _pending_quest_turnin.is_empty():
 		var result: Dictionary = QuestManager.try_turnin(self, _pending_quest_turnin)
 
@@ -542,29 +539,29 @@ func get_effective_merchant_id() -> String:
 		return merchant_name.to_lower().replace(" ", "_")
 	return merchant_id
 
-## Get dialogue-based price modifier from DialogueManager flags
+## Get dialogue-based price modifier from ConversationSystem flags
 ## Returns a multiplier: <1.0 = discount, >1.0 = markup
-## Flag format: "{merchant_id}:{flag_name}" (e.g., "grimwald_haggle_success")
+## Flag format: "{merchant_id}_{flag_name}" (e.g., "grimwald_haggle_success")
 func get_dialogue_price_modifier() -> float:
 	var mid := get_effective_merchant_id()
 	var modifier := 1.0
 
 	# Check for temporary discounts (from successful dialogue checks)
 	# haggle_success = 10% discount
-	if DialogueManager.has_flag(mid + "_haggle_success"):
+	if ConversationSystem.has_flag(mid + "_haggle_success"):
 		modifier -= 0.10
 
 	# intimidate_success = 15% discount
-	if DialogueManager.has_flag(mid + "_intimidate_success"):
+	if ConversationSystem.has_flag(mid + "_intimidate_success"):
 		modifier -= 0.15
 
 	# Check for permanent relationship modifiers
 	# merchant_befriend = 5% permanent discount
-	if DialogueManager.has_flag(mid + "_befriend"):
+	if ConversationSystem.has_flag(mid + "_befriend"):
 		modifier -= 0.05
 
 	# merchant_angered = 20% markup (penalty)
-	if DialogueManager.has_flag(mid + "_angered"):
+	if ConversationSystem.has_flag(mid + "_angered"):
 		modifier += 0.20
 
 	# Ensure modifier doesn't go below a minimum (can't get free items)
@@ -630,13 +627,14 @@ func get_buy_price_with_speech(shop_index: int) -> int:
 ## sprite_path: Optional path to sprite sheet texture (e.g., "res://assets/sprites/npcs/merchant.png")
 ## h_frames/v_frames: Sprite sheet grid dimensions (default 3x3)
 ## pixel_size: Size of each pixel in world units (default 0.0384)
-static func spawn_merchant(parent: Node, pos: Vector3, name: String = "Merchant", tier: LootTables.LootTier = LootTables.LootTier.UNCOMMON, type: String = "general", sprite_path: String = "", h_frames: int = 3, v_frames: int = 3, pixel_size: float = 0.0384) -> Merchant:
+static func spawn_merchant(parent: Node, pos: Vector3, name: String = "Merchant", tier: LootTables.LootTier = LootTables.LootTier.UNCOMMON, type: String = "general", sprite_path: String = "", h_frames: int = 3, v_frames: int = 3, pixel_size: float = 0.0384, female: bool = false) -> Merchant:
 	var instance := Merchant.new()
 	instance.position = pos
 	instance.merchant_name = name
 	instance.shop_tier = tier
 	instance.shop_type = type
 	instance.sprite_pixel_size = pixel_size
+	instance.is_female = female
 
 	# Load sprite texture if path provided
 	if sprite_path != "":

@@ -31,7 +31,7 @@
 		"xp": 100,
 		"items": []
 	},
-	"prerequisites": [],
+	"prerequisites": ["tharins_wolf_problem"],
 	"next_quest": "",
 	"unlocks_quests": ["keepers_initiation"]
 }

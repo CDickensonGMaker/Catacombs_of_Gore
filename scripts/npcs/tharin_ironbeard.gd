@@ -32,7 +32,11 @@ var has_given_quest: bool = false
 var quest_id: String = "keepers_letter_delivery"
 
 ## Quest IDs this NPC can offer (for ConversationSystem QUESTS topic)
-var quest_ids: Array[String] = ["keepers_letter_delivery"]
+## Quests are offered in order - player must complete each before the next unlocks
+var quest_ids: Array[String] = ["tharins_message", "tharins_supplies", "tharins_wolf_problem", "keepers_letter_delivery"]
+
+## Current quest in the chain (tracks progression)
+var current_chain_quest: String = "tharins_message"
 
 ## NPC knowledge profile (created on demand)
 var knowledge_profile: NPCKnowledgeProfile
@@ -47,10 +51,10 @@ var wander_timer: float = 0.0
 var wander_wait_time: float = 3.0
 var is_waiting: bool = true
 
-## Dialogue content for scripted sequences
-var dialogue_quest_offer := "Listen close now. I need ye to deliver this sealed letter to my contact in Dalhurst. A man named Aldric Vane - he runs a curiosities shop. Don't open it, don't lose it. This is important business, if ye catch my meaning. There'll be coin in it for ye when it's done."
-var dialogue_quest_active := "Ye still have the letter? Get it to Aldric Vane in Dalhurst! He runs a curiosities shop in the merchant district. Don't dawdle!"
-var dialogue_quest_complete := "Good work. Ye've proven yerself reliable. There may be more work for ye yet."
+## Dialogue content for scripted sequences (first quest in chain)
+var dialogue_quest_offer := "Hold up there! Before ye go wanderin' off into the wilds, I've got a task for ye. I need a message delivered to Elder Vorn in Thornfield - it's about our timber shipments. Simple enough work, but it'll let me see if ye can be trusted. What do ye say?"
+var dialogue_quest_active := "Have ye delivered that message to Elder Vorn in Thornfield yet? It's northeast of here, follow the road."
+var dialogue_quest_complete := "Good work. Ye've proven yerself reliable. Come talk to me - I've got more work for ye."
 
 ## Exit interception
 var _player_near_exit: bool = false
@@ -73,9 +77,11 @@ func _ready() -> void:
 	# Connect to wilderness exit signals
 	_setup_exit_detection()
 
-	# Check if quest already given (from save)
-	if QuestManager.is_quest_active(quest_id) or QuestManager.is_quest_completed(quest_id):
-		has_given_quest = true
+	# Check if any quest in chain already started (from save)
+	for q_id: String in quest_ids:
+		if QuestManager.is_quest_active(q_id) or QuestManager.is_quest_completed(q_id):
+			has_given_quest = true
+			break
 
 	# Connect to ConversationSystem signals for quest handling
 	if not ConversationSystem.conversation_ended.is_connected(_on_conversation_ended):
@@ -336,15 +342,16 @@ func _on_quest_scripted_ended() -> void:
 func _accept_quest() -> void:
 	has_given_quest = true
 
-	# Start the quest
-	if QuestManager.start_quest(quest_id):
+	# Start the first quest in the chain
+	var first_quest := "tharins_message"
+	if QuestManager.start_quest(first_quest):
 		var hud := get_tree().get_first_node_in_group("hud")
 		if hud and hud.has_method("show_notification"):
-			hud.show_notification("Quest Started: The Letter")
+			hud.show_notification("Quest Started: A Message for Thornfield")
 		AudioManager.play_ui_confirm()
 
-	# Give player the letter item
-	InventoryManager.add_item("tharins_letter", 1)
+	# Give player the trade message item
+	InventoryManager.add_item("tharins_trade_message", 1)
 
 	# Resume wandering
 	wander_enabled = true
