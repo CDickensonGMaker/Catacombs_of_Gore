@@ -140,6 +140,7 @@ func _check_level_up() -> void:
 		if total_ip_earned >= IP_PER_LEVEL[i]:
 			new_level = i + 1
 	if new_level > level:
+		print("[DEBUG LEVEL] Level up! %d -> %d (total_ip=%d, threshold=%d)" % [level, new_level, total_ip_earned, IP_PER_LEVEL[new_level - 1] if new_level - 1 < IP_PER_LEVEL.size() else 0])
 		level = new_level
 		level_up.emit(level)
 

@@ -7,6 +7,8 @@ extends Resource
 @export var display_name: String = ""
 @export_multiline var description: String = ""
 @export var level: int = 1  ## Enemy level (1-100) - determines loot tier and XP scaling
+@export var min_level: int = 1  ## Minimum effective level (floor for scaling)
+@export var max_level: int = 10  ## Maximum effective level (ceiling for scaling)
 
 @export_group("Stats")
 @export var max_hp: int = 25
@@ -74,6 +76,9 @@ extends Resource
 @export var sprite_vframes: int = 1  ## Vertical frames in sprite sheet
 @export var attack_hframes: int = 1  ## Horizontal frames in attack sprite
 @export var attack_vframes: int = 1  ## Vertical frames in attack sprite
+@export var death_sprite_path: String = ""  ## Path to death sprite sheet (optional)
+@export var death_hframes: int = 4  ## Horizontal frames in death sprite
+@export var death_vframes: int = 1  ## Vertical frames in death sprite
 @export var sprite_pixel_size: float = 0.01  ## Pixel size for billboard sprite
 
 @export_group("Audio")
@@ -108,6 +113,13 @@ func get_damage_multiplier(damage_type: Enums.DamageType) -> float:
 
 	# Resistance reduces damage, weakness increases it
 	return (1.0 - resistance) * (1.0 + weakness)
+
+## Calculate effective level based on player level and zone danger
+## Scales with player level but bounded by min_level and max_level
+func get_effective_level(player_level: int, zone_danger: int) -> int:
+	var scaled: int = player_level + (zone_danger - 1)
+	return clampi(scaled, min_level, max_level)
+
 
 ## Roll gold drop
 func roll_gold() -> int:

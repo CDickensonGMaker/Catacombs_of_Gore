@@ -133,9 +133,9 @@ drop_table = {
 }
 xp_reward = 80
 scene_path = ""
-icon_path = "res://Sprite folders grab bag/wolf_moving.png"
-scale = 1.3
-sprite_path = "res://Sprite folders grab bag/wolf_moving.png"
+icon_path = "res://assets/sprites/enemies/wolf.png"
+scale = 1.0
+sprite_path = "res://assets/sprites/enemies/wolf.png"
 attack_sprite_path = ""
 sprite_hframes = 6
 sprite_vframes = 1

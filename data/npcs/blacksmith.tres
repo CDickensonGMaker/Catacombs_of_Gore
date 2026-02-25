@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="NPCData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/npc_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+npc_id = "blacksmith"
+display_name = "Blacksmith"
+race = "Human"
+archetype = "merchant"
+location = ""
+zone_id = ""
+faction_id = "neutral"
+secondary_factions = []
+base_disposition = 55
+alignment = 40
+description = "A burly man with soot-stained arms and a leather apron, constantly working his anvil with practiced strikes. The ring of hammer on metal echoes around him."
+portrait_path = ""
+sprite_path = "res://assets/sprites/npcs/blacksmith.png"
+sprite_h_frames = 5
+sprite_v_frames = 1
+dialogue_topics = ["trade", "weapons", "armor", "repairs", "local_news"]
+has_unique_dialogue = false
+dialogue_data_path = ""
+knowledge_profile_path = ""
+shop_type = "blacksmith"
+flags = {"is_merchant": true, "can_repair": true}
+can_wander = false
+wander_radius = 0.0

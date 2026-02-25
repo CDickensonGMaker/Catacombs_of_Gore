@@ -35,8 +35,11 @@ var npc_type: String = "quest_giver"  # Can be overridden for specific NPC types
 @export var use_legacy_dialogue: bool = false
 
 ## Sprite texture for billboard display (PS1-style)
-## If not set, defaults to man_civilian sprite
+## If not set, defaults based on is_female setting
 @export var sprite_texture: Texture2D
+
+## Whether this NPC is female (affects default sprite if no texture set)
+@export var is_female: bool = false
 
 ## Current quest being discussed (determined dynamically)
 var current_quest_id: String = ""
@@ -59,6 +62,9 @@ var dialogue_ui: Control = null
 
 ## Track if intro dialogue has been shown (for optional pre-quest dialogue)
 var _intro_dialogue_shown: bool = false
+
+## Guard against multiple interact() calls on same frame
+var _is_interacting: bool = false
 
 ## Dialogue content per quest (keyed by quest_id)
 ## Falls back to generic dialogue if quest not found
@@ -108,10 +114,25 @@ func _ready() -> void:
 
 ## Create the visual representation (billboard sprite - PS1 style)
 func _create_visual() -> void:
-	# Load fallback texture if none assigned
+	# Load fallback texture if none assigned - pick based on gender
 	var tex: Texture2D = sprite_texture
+	var h_frames: int = sprite_h_frames
+	var v_frames: int = sprite_v_frames
+	var pixel_size: float = sprite_pixel_size
+
 	if not tex:
-		tex = load("res://Sprite folders grab bag/man_civilian.png") as Texture2D
+		if is_female:
+			# Use lady in red sprite for female NPCs
+			tex = load("res://Sprite folders grab bag/new lady in red.png") as Texture2D
+			h_frames = 8
+			v_frames = 1
+			pixel_size = 0.0182  # PIXEL_SIZE_LADY_RED
+		else:
+			# Use man_civilian sprite for male NPCs
+			tex = load("res://Sprite folders grab bag/man_civilian.png") as Texture2D
+			h_frames = 8
+			v_frames = 2
+			pixel_size = 0.0384  # PIXEL_SIZE_MAN
 
 	if not tex:
 		push_warning("QuestGiver: No sprite texture available for " + display_name)
@@ -119,11 +140,11 @@ func _create_visual() -> void:
 
 	billboard = BillboardSprite.new()
 	billboard.sprite_sheet = tex
-	billboard.h_frames = sprite_h_frames
-	billboard.v_frames = sprite_v_frames
-	billboard.pixel_size = sprite_pixel_size
-	billboard.idle_frames = sprite_h_frames
-	billboard.walk_frames = sprite_h_frames
+	billboard.h_frames = h_frames
+	billboard.v_frames = v_frames
+	billboard.pixel_size = pixel_size
+	billboard.idle_frames = h_frames
+	billboard.walk_frames = h_frames
 	billboard.idle_fps = 3.0
 	billboard.walk_fps = 6.0
 	billboard.name = "Billboard"
@@ -183,12 +204,35 @@ func _update_quest_state() -> void:
 
 ## Interaction interface
 func interact(_interactor: Node) -> void:
+	# Guard against multiple calls - set immediately before any other checks
+	if _is_interacting:
+		return
+	_is_interacting = true
+
+	# Block interaction if already in a conversation or scripted dialogue
+	if ConversationSystem.is_active or ConversationSystem.is_scripted_mode:
+		_is_interacting = false
+		return
+
 	_update_quest_state()
 	# Notify quest system that player talked to this NPC (for "talk" objectives)
 	QuestManager.on_npc_talked(npc_id)
 
-	# Always use ConversationSystem for all NPC interactions
+	# Priority 0: Check for quest turn-ins using central turn-in system
+	var turnin_quests := QuestManager.get_turnin_quests_for_entity(self)
+	if not turnin_quests.is_empty():
+		# If we have custom dialogue_data, use DialogueManager for richer turn-in experience
+		if dialogue_data:
+			DialogueManager.start_dialogue(dialogue_data, display_name)
+		else:
+			# Use generic scripted turn-in dialogue
+			_show_quest_turnin_dialogue(turnin_quests[0])
+		_is_interacting = false
+		return
+
+	# Use ConversationSystem for all other NPC interactions
 	_open_conversation()
+	_is_interacting = false
 
 
 ## Open ConversationSystem topic-based dialogue
@@ -490,7 +534,8 @@ const BEACON_HEIGHT := 4.0  # Height of beacon effect above NPC
 ## Static factory method
 ## quest_list: Optional array of quest IDs this NPC can give.
 ## is_talk_target: If true, this NPC gives no quests (just a "talk to" objective target).
-static func spawn_quest_giver(parent: Node, pos: Vector3, npc_name: String = "Mysterious Stranger", id: String = "", custom_sprite: Texture2D = null, h_frames: int = 8, v_frames: int = 2, quest_list: Array[String] = [], is_talk_target: bool = false) -> QuestGiver:
+## pixel_size: Size of sprite in world units (0.0 = use default 0.0384)
+static func spawn_quest_giver(parent: Node, pos: Vector3, npc_name: String = "Mysterious Stranger", id: String = "", custom_sprite: Texture2D = null, h_frames: int = 8, v_frames: int = 2, quest_list: Array[String] = [], is_talk_target: bool = false, pixel_size: float = 0.0) -> QuestGiver:
 	var npc := QuestGiver.new()
 	npc.display_name = npc_name
 	# Set npc_id - use provided id, or convert name to snake_case
@@ -508,6 +553,8 @@ static func spawn_quest_giver(parent: Node, pos: Vector3, npc_name: String = "My
 		npc.sprite_texture = custom_sprite
 		npc.sprite_h_frames = h_frames
 		npc.sprite_v_frames = v_frames
+		if pixel_size > 0.0:
+			npc.sprite_pixel_size = pixel_size
 
 	# Find clear ground position to avoid spawning inside trees/obstacles
 	var clear_pos := _find_clear_spawn_position(parent, pos)
@@ -621,3 +668,67 @@ func _add_beacon_effect() -> void:
 	beam.scale = Vector3(0.5, BEACON_HEIGHT * 2.0, 1.0)
 	beam.modulate = Color(0.4, 0.8, 1.0, 0.4)
 	beacon.add_child(beam)
+
+
+## Pending quest to complete after dialogue
+var _pending_quest_turnin: String = ""
+
+
+## Show generic dialogue for quest turn-in using ConversationSystem scripted dialogue
+func _show_quest_turnin_dialogue(quest_id: String) -> void:
+	var quest := QuestManager.get_quest(quest_id)
+	if not quest:
+		return
+
+	# Format reward text
+	var rewards: Array[String] = []
+	if quest.rewards.has("gold") and quest.rewards["gold"] > 0:
+		rewards.append("%d gold" % quest.rewards["gold"])
+	if quest.rewards.has("xp") and quest.rewards["xp"] > 0:
+		rewards.append("%d XP" % quest.rewards["xp"])
+	if quest.rewards.has("items"):
+		for item in quest.rewards["items"]:
+			var item_name: String = item.get("id", "item")
+			var quantity: int = item.get("quantity", 1)
+			rewards.append("%dx %s" % [quantity, item_name])
+
+	var reward_text: String = "You received: " + ", ".join(rewards) if not rewards.is_empty() else "Thank you for your help!"
+
+	# Build scripted dialogue lines
+	var lines: Array = []
+
+	# Line 0: Quest complete acknowledgment
+	lines.append(ConversationSystem.create_scripted_line(
+		display_name,
+		"Ah, you've completed '%s'. Well done! Here's your reward." % quest.title,
+		[ConversationSystem.create_scripted_choice("Accept reward", 1)]
+	))
+
+	# Line 1: Reward given
+	lines.append(ConversationSystem.create_scripted_line(
+		display_name,
+		reward_text,
+		[],
+		true  # is_end
+	))
+
+	# Store quest ID to complete when dialogue ends
+	_pending_quest_turnin = quest_id
+
+	# Start scripted dialogue with callback
+	ConversationSystem.start_scripted_dialogue(lines, _on_quest_turnin_ended)
+
+
+## Handle quest turn-in dialogue completion
+func _on_quest_turnin_ended() -> void:
+	if not _pending_quest_turnin.is_empty():
+		var result: Dictionary = QuestManager.try_turnin(self, _pending_quest_turnin)
+		if result.get("success", false):
+			var hud := get_tree().get_first_node_in_group("hud")
+			if hud and hud.has_method("show_notification"):
+				hud.show_notification("Quest completed!")
+			AudioManager.play_ui_confirm()
+		_pending_quest_turnin = ""
+
+		# Update state to check for next quest
+		_update_quest_state()

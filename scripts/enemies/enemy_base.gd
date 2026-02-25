@@ -110,6 +110,10 @@ var totem_position: Vector3 = Vector3.ZERO
 var current_hp: int = 25
 var max_hp: int = 25
 var armor_value: int = 8
+var base_damage: int = 0  ## Base damage for scaling (from first attack)
+
+## Zone danger level for stat scaling (set by spawner)
+var zone_danger: int = 1
 
 ## AI State
 enum AIState {
@@ -319,9 +323,33 @@ func _exit_tree() -> void:
 	CombatManager.unregister_enemy(self)
 
 func _initialize_from_data() -> void:
-	max_hp = enemy_data.max_hp
+	# Get player level for scaling (default to 1 if not available)
+	var player_level: int = 1
+	if GameManager and GameManager.player_data:
+		player_level = GameManager.player_data.level
+
+	# Calculate effective level based on zone danger
+	var effective_level: int = enemy_data.get_effective_level(player_level, zone_danger)
+	var level_ratio: float = float(effective_level) / float(maxi(enemy_data.level, 1))
+
+	# Scale HP linearly with level ratio
+	var scaled_hp: int = int(enemy_data.max_hp * level_ratio)
+	max_hp = maxi(scaled_hp, 1)  # Ensure at least 1 HP
 	current_hp = max_hp
 	armor_value = enemy_data.armor_value
+
+	# Calculate base damage from first attack for damage scaling
+	if not enemy_data.attacks.is_empty():
+		var first_attack: EnemyAttackData = enemy_data.attacks[0]
+		if first_attack:
+			# Store base damage for reference (average of dice roll)
+			var dice_count: int = first_attack.damage[0] if first_attack.damage.size() > 0 else 1
+			var dice_sides: int = first_attack.damage[1] if first_attack.damage.size() > 1 else 4
+			var flat_bonus: int = first_attack.damage[2] if first_attack.damage.size() > 2 else 0
+			base_damage = int(dice_count * (dice_sides + 1) / 2.0 + flat_bonus)
+
+	# Scale damage using sqrt for smoother curve (applied via attack damage modifier)
+	# Damage scaling is handled at attack time, not here
 
 	if aggro_area:
 		# Adjust aggro range from data
@@ -1047,7 +1075,8 @@ func _pick_random_wander_point() -> void:
 var _chase_debug_timer: float = 0.0
 
 func _state_chase(delta: float) -> void:
-	if not current_target:
+	if not current_target or not is_instance_valid(current_target):
+		current_target = null
 		_change_state(AIState.IDLE)
 		return
 
@@ -1123,7 +1152,8 @@ func _state_attack(_delta: float) -> void:
 		_perform_basic_attack()
 
 func _state_retreat(_delta: float) -> void:
-	if not current_target:
+	if not current_target or not is_instance_valid(current_target):
+		current_target = null
 		_change_state(AIState.IDLE)
 		return
 
@@ -1160,7 +1190,8 @@ func _state_disengage(_delta: float) -> void:
 			print("[Enemy] Returned to spawn, fully healed, cooldown started")
 
 func _state_ranged_attack(delta: float) -> void:
-	if not current_target:
+	if not current_target or not is_instance_valid(current_target):
+		current_target = null
 		_change_state(AIState.IDLE)
 		return
 
@@ -1186,7 +1217,8 @@ func _state_ranged_attack(delta: float) -> void:
 			_change_state(AIState.CHASE)
 
 func _state_strafe(_delta: float) -> void:
-	if not current_target:
+	if not current_target or not is_instance_valid(current_target):
+		current_target = null
 		_change_state(AIState.IDLE)
 		return
 
@@ -1218,7 +1250,7 @@ func _is_beyond_leash() -> bool:
 
 ## Move away from target (for ranged enemies too close)
 func _move_away_from_target() -> void:
-	if not current_target:
+	if not current_target or not is_instance_valid(current_target):
 		return
 
 	var away_dir := (global_position - current_target.global_position).normalized()
@@ -1236,7 +1268,7 @@ func _start_strafe() -> void:
 
 ## Fire the ranged attack projectile
 func _fire_ranged_attack() -> void:
-	if not ranged_attack_projectile or not current_target:
+	if not ranged_attack_projectile or not current_target or not is_instance_valid(current_target):
 		return
 
 	# Calculate spawn position (in front of enemy)
@@ -1750,7 +1782,7 @@ func _update_movement(delta: float) -> void:
 
 	if direction.length() > 0.1:
 		# Slow down when close to target in attack state
-		if current_state == AIState.ATTACK and current_target:
+		if current_state == AIState.ATTACK and current_target and is_instance_valid(current_target):
 			var dist := global_position.distance_to(current_target.global_position)
 			if dist < 3.0:
 				speed *= 0.3
@@ -2006,11 +2038,13 @@ func _animate_projectile(projectile: Node3D, direction: Vector3, speed: float, m
 	projectile.add_child(timer)
 
 	timer.timeout.connect(func():
-		if not is_instance_valid(projectile):
+		if not is_instance_valid(projectile) or projectile.is_queued_for_deletion():
+			timer.stop()
 			return
 
 		elapsed += 0.016
 		if elapsed > max_time:
+			timer.stop()
 			projectile.queue_free()
 			return
 
@@ -2018,8 +2052,8 @@ func _animate_projectile(projectile: Node3D, direction: Vector3, speed: float, m
 		projectile.global_position += direction * speed * 0.016
 
 		# Check for collision with player
-		var target: Node3D = projectile.get_meta("target", null)
-		if target and is_instance_valid(target):
+		var target: Node3D = projectile.get_meta("target", null) as Node3D
+		if is_instance_valid(target):
 			var dist := projectile.global_position.distance_to(target.global_position + Vector3.UP)
 			if dist < 1.0:
 				# Hit!
@@ -2033,6 +2067,7 @@ func _animate_projectile(projectile: Node3D, direction: Vector3, speed: float, m
 				# Spawn impact effect
 				_spawn_projectile_impact(projectile.global_position, dmg_type)
 				AudioManager.play_sfx_3d("projectile_hit", projectile.global_position)
+				timer.stop()
 				projectile.queue_free()
 	)
 
@@ -2202,6 +2237,22 @@ func _on_death() -> void:
 	# Notify QuestManager of enemy death (works regardless of damage source)
 	if enemy_data and enemy_data.id:
 		QuestManager.on_enemy_killed(enemy_data.id)
+
+	# Add to bestiary codex
+	if enemy_data and CodexManager:
+		var bestiary_data: Dictionary = {
+			"name": enemy_data.display_name,
+			"description": enemy_data.description,
+			"level": enemy_data.level,
+			"max_hp": enemy_data.max_hp,
+			"fire_weakness": enemy_data.fire_weakness,
+			"frost_weakness": enemy_data.frost_weakness,
+			"lightning_weakness": enemy_data.lightning_weakness,
+			"holy_weakness": enemy_data.holy_weakness,
+			"drops": enemy_data.drop_table.keys(),
+			"icon_path": enemy_data.icon_path
+		}
+		CodexManager.discover_bestiary_entry(enemy_data.id, bestiary_data)
 
 	# Mark as killed in SaveManager for persistence (procedural dungeon enemies)
 	if not persistent_id.is_empty():
@@ -2475,6 +2526,28 @@ func setup_billboard_sprite(texture: Texture2D, h_frames: int = 4, v_frames: int
 	state_changed.connect(_on_state_changed_for_sprite)
 	damaged.connect(_on_damaged_for_sprite)
 
+	# Setup attack and death textures from enemy_data if available
+	if enemy_data:
+		# Attack texture
+		if enemy_data.attack_sprite_path and not enemy_data.attack_sprite_path.is_empty():
+			var attack_tex: Texture2D = load(enemy_data.attack_sprite_path)
+			if attack_tex:
+				billboard_sprite.attack_texture = attack_tex
+				billboard_sprite.attack_texture_h_frames = enemy_data.attack_hframes
+				billboard_sprite.attack_texture_v_frames = enemy_data.attack_vframes
+				billboard_sprite.attack_frames = enemy_data.attack_hframes
+				billboard_sprite.attack_fps = 10.0
+
+		# Death texture
+		if enemy_data.death_sprite_path and not enemy_data.death_sprite_path.is_empty():
+			var death_tex: Texture2D = load(enemy_data.death_sprite_path)
+			if death_tex:
+				billboard_sprite.death_texture = death_tex
+				billboard_sprite.death_texture_h_frames = enemy_data.death_hframes
+				billboard_sprite.death_texture_v_frames = enemy_data.death_vframes
+				billboard_sprite.death_frames = enemy_data.death_hframes
+				billboard_sprite.death_fps = 6.0
+
 	return billboard_sprite
 
 ## Handle state changes for billboard sprite animation
@@ -2501,7 +2574,8 @@ func _on_damaged_for_sprite(_amount: int, _damage_type: Enums.DamageType, _attac
 
 ## Static helper to spawn a billboard sprite enemy
 ## Returns the enemy instance with billboard sprite configured
-static func spawn_billboard_enemy(parent: Node, pos: Vector3, enemy_data_path: String, sprite_texture: Texture2D, h_frames: int = 4, v_frames: int = 4) -> EnemyBase:
+## zone_danger: Zone danger level for stat scaling (1-10, default 1)
+static func spawn_billboard_enemy(parent: Node, pos: Vector3, enemy_data_path: String, sprite_texture: Texture2D, h_frames: int = 4, v_frames: int = 4, p_zone_danger: int = 1) -> EnemyBase:
 	# Load base enemy scene
 	var enemy_scene: PackedScene = load("res://scenes/enemies/enemy_base.tscn")
 	if not enemy_scene:
@@ -2515,6 +2589,9 @@ static func spawn_billboard_enemy(parent: Node, pos: Vector3, enemy_data_path: S
 	if data:
 		enemy.enemy_data = data
 
+	# Set zone danger before adding to scene (so _initialize_from_data uses it)
+	enemy.zone_danger = p_zone_danger
+
 	# Add to scene first (required for _ready to run)
 	parent.add_child(enemy)
 	enemy.global_position = pos
@@ -2527,7 +2604,8 @@ static func spawn_billboard_enemy(parent: Node, pos: Vector3, enemy_data_path: S
 
 ## Static helper to spawn a mesh-based enemy (uses placeholder capsule mesh)
 ## Returns the enemy instance without billboard sprite
-static func spawn_mesh_enemy(parent: Node, pos: Vector3, enemy_data_path: String) -> EnemyBase:
+## zone_danger: Zone danger level for stat scaling (1-10, default 1)
+static func spawn_mesh_enemy(parent: Node, pos: Vector3, enemy_data_path: String, p_zone_danger: int = 1) -> EnemyBase:
 	# Load base enemy scene
 	var enemy_scene: PackedScene = load("res://scenes/enemies/enemy_base.tscn")
 	if not enemy_scene:
@@ -2544,6 +2622,9 @@ static func spawn_mesh_enemy(parent: Node, pos: Vector3, enemy_data_path: String
 	if data:
 		enemy.enemy_data = data
 
+	# Set zone danger before adding to scene (so _initialize_from_data uses it)
+	enemy.zone_danger = p_zone_danger
+
 	# Add to scene (mesh stays visible - no billboard sprite setup)
 	parent.add_child(enemy)
 	enemy.global_position = pos
@@ -2553,7 +2634,8 @@ static func spawn_mesh_enemy(parent: Node, pos: Vector3, enemy_data_path: String
 
 ## Static helper to spawn a skeleton enemy with separate walk/attack sprite sheets
 ## Uses skeleton_walking.png (8x1) for idle/walk and skeleton_attacking.png (6x1) for attacks
-static func spawn_skeleton_enemy(parent: Node, pos: Vector3, enemy_data_path: String = "res://data/enemies/skeleton_warrior.tres") -> EnemyBase:
+## zone_danger: Zone danger level for stat scaling (1-10, default 1)
+static func spawn_skeleton_enemy(parent: Node, pos: Vector3, enemy_data_path: String = "res://data/enemies/skeleton_warrior.tres", p_zone_danger: int = 1) -> EnemyBase:
 	# Validate parent
 	if not parent:
 		push_error("[EnemyBase] spawn_skeleton_enemy called with null parent")
@@ -2576,6 +2658,9 @@ static func spawn_skeleton_enemy(parent: Node, pos: Vector3, enemy_data_path: St
 		enemy.enemy_data = data
 	else:
 		push_warning("[EnemyBase] Failed to load enemy data: %s" % enemy_data_path)
+
+	# Set zone danger before adding to scene (so _initialize_from_data uses it)
+	enemy.zone_danger = p_zone_danger
 
 	# Add to scene first (required for _ready to run)
 	parent.add_child(enemy)

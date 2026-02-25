@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="NPCData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/npc_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+npc_id = "thornfield_leader"
+display_name = "Lord Aldric"
+race = "Human"
+archetype = "quest_giver"
+location = "Thornfield"
+zone_id = "thornfield"
+faction_id = "human_empire"
+secondary_factions = []
+base_disposition = 50
+alignment = 45
+description = "A stern man draped in a heavy fur cloak, bearing a staff of office. His weathered face speaks of harsh winters endured and difficult decisions made. As leader of Thornfield, he carries the weight of his people's survival."
+portrait_path = ""
+sprite_path = "res://assets/sprites/npcs/thornfield_leader.png"
+sprite_h_frames = 2
+sprite_v_frames = 1
+dialogue_topics = ["local_news", "rumors", "thornfield", "trade", "threats", "quests"]
+has_unique_dialogue = true
+dialogue_data_path = ""
+knowledge_profile_path = ""
+shop_type = "none"
+flags = {"is_quest_giver": true, "is_leader": true}
+can_wander = false
+wander_radius = 0.0

@@ -217,13 +217,27 @@ func _build_quests_content() -> Control:
 	list_panel.custom_minimum_size.x = 200
 	split.add_child(list_panel)
 
+	var list_vbox := VBoxContainer.new()
+	list_vbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	list_panel.add_child(list_vbox)
+
 	var quest_list := ItemList.new()
 	quest_list.name = "QuestList"
 	quest_list.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	quest_list.add_theme_color_override("font_color", COL_TEXT)
 	quest_list.add_theme_color_override("font_selected_color", COL_GOLD)
 	quest_list.item_selected.connect(_on_quest_selected)
-	list_panel.add_child(quest_list)
+	quest_list.item_activated.connect(_on_quest_double_clicked)  # Double-click to track
+	list_vbox.add_child(quest_list)
+
+	# Track button
+	var track_btn := Button.new()
+	track_btn.name = "TrackButton"
+	track_btn.text = "Track Quest"
+	track_btn.custom_minimum_size.y = 28
+	track_btn.add_theme_color_override("font_color", COL_GOLD)
+	track_btn.pressed.connect(_on_track_quest_pressed)
+	list_vbox.add_child(track_btn)
 
 	# Quest details
 	var detail_panel := _create_panel()
@@ -277,7 +291,9 @@ func _populate_quest_list(quest_list: ItemList) -> void:
 	quest_list.clear()
 
 	var quests: Array = []
+	var tracked_id: String = ""
 	if QuestManager:
+		tracked_id = QuestManager.get_tracked_quest_id() if QuestManager.has_method("get_tracked_quest_id") else ""
 		var active: Array = QuestManager.get_active_quests() if QuestManager.has_method("get_active_quests") else []
 		var completed: Array = QuestManager.get_completed_quests() if QuestManager.has_method("get_completed_quests") else []
 
@@ -299,12 +315,23 @@ func _populate_quest_list(quest_list: ItemList) -> void:
 	for quest in quests:
 		displayed_quests.append(quest)
 		var title: String = quest.title if "title" in quest else "Unknown"
+		var quest_id: String = quest.id if "id" in quest else ""
 		var state = quest.state if "state" in quest else Enums.QuestState.ACTIVE
+
+		# Show tracked indicator
+		if quest_id == tracked_id and state == Enums.QuestState.ACTIVE:
+			title = "> " + title  # Arrow indicates tracked quest
+
 		if state == Enums.QuestState.COMPLETED:
 			title = "[DONE] " + title
 		elif state == Enums.QuestState.FAILED:
 			title = "[FAIL] " + title
-		quest_list.add_item(title)
+
+		var idx: int = quest_list.add_item(title)
+
+		# Highlight tracked quest with gold color
+		if quest_id == tracked_id and state == Enums.QuestState.ACTIVE:
+			quest_list.set_item_custom_fg_color(idx, COL_GOLD)
 
 	if displayed_quests.is_empty():
 		quest_list.add_item("No quests in this category")
@@ -319,6 +346,7 @@ func _on_quest_selected(index: int) -> void:
 	var title_label: Label = content_container.find_child("QuestTitle", true, false)
 	var desc_label: RichTextLabel = content_container.find_child("QuestDesc", true, false)
 	var obj_list: ItemList = content_container.find_child("ObjectivesList", true, false)
+	var track_btn: Button = content_container.find_child("TrackButton", true, false)
 
 	if title_label:
 		title_label.text = quest.title if "title" in quest else "Unknown"
@@ -339,6 +367,50 @@ func _on_quest_selected(index: int) -> void:
 				text += " (%d/%d)" % [current, required]
 			text = ("[X] " if done else "[ ] ") + text
 			obj_list.add_item(text)
+
+	# Update track button text based on quest state
+	if track_btn:
+		var state = quest.state if "state" in quest else Enums.QuestState.ACTIVE
+		var quest_id: String = quest.id if "id" in quest else ""
+		var tracked_id: String = QuestManager.get_tracked_quest_id() if QuestManager else ""
+
+		if state != Enums.QuestState.ACTIVE:
+			track_btn.text = "Quest Complete"
+			track_btn.disabled = true
+		elif quest_id == tracked_id:
+			track_btn.text = "Currently Tracking"
+			track_btn.disabled = true
+		else:
+			track_btn.text = "Track Quest"
+			track_btn.disabled = false
+
+
+## Double-click on a quest to track it
+func _on_quest_double_clicked(index: int) -> void:
+	_track_quest_at_index(index)
+
+
+## Track button pressed
+func _on_track_quest_pressed() -> void:
+	_track_quest_at_index(selected_quest_index)
+
+
+## Track the quest at the given index
+func _track_quest_at_index(index: int) -> void:
+	if index < 0 or index >= displayed_quests.size():
+		return
+
+	var quest = displayed_quests[index]
+	var quest_id: String = quest.id if "id" in quest else ""
+	var state = quest.state if "state" in quest else Enums.QuestState.ACTIVE
+
+	# Only track active quests
+	if state != Enums.QuestState.ACTIVE:
+		return
+
+	if QuestManager and not quest_id.is_empty():
+		QuestManager.set_tracked_quest(quest_id)
+		_refresh_current_tab()  # Refresh to show new tracked quest
 
 
 # =============================================================================

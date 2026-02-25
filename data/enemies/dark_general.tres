@@ -1,0 +1,152 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/data/enemy_attack_data.gd" id="2"]
+
+[sub_resource type="Resource" id="1"]
+script = ExtResource("2")
+id = "dark_cleave"
+display_name = "Cleave"
+damage = Array[int]([8, 12, 5])
+damage_type = 0
+windup_time = 0.6
+active_time = 0.3
+recovery_time = 0.5
+cooldown = 2.0
+range_distance = 3.0
+is_ranged = false
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 0.0
+inflicts_condition = 0
+condition_chance = 0.0
+condition_duration = 0.0
+stagger_power = 1.5
+knockback_force = 4.0
+weight = 1.0
+min_range = 0.0
+max_range = 3.0
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[sub_resource type="Resource" id="2"]
+script = ExtResource("2")
+id = "crushing_blow"
+display_name = "Crushing Blow"
+damage = Array[int]([12, 20, 8])
+damage_type = 0
+windup_time = 1.0
+active_time = 0.4
+recovery_time = 0.8
+cooldown = 6.0
+range_distance = 3.5
+is_ranged = false
+is_aoe = true
+aoe_radius = 2.5
+projectile_speed = 0.0
+inflicts_condition = 5
+condition_chance = 0.7
+condition_duration = 2.0
+stagger_power = 2.5
+knockback_force = 6.0
+weight = 0.4
+min_range = 0.0
+max_range = 3.5
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[sub_resource type="Resource" id="3"]
+script = ExtResource("2")
+id = "executioner_strike"
+display_name = "Executioner's Strike"
+damage = Array[int]([15, 25, 10])
+damage_type = 0
+windup_time = 1.5
+active_time = 0.3
+recovery_time = 1.0
+cooldown = 12.0
+range_distance = 4.0
+is_ranged = false
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 0.0
+inflicts_condition = 3
+condition_chance = 0.5
+condition_duration = 5.0
+stagger_power = 3.0
+knockback_force = 8.0
+weight = 0.2
+min_range = 0.0
+max_range = 4.0
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[resource]
+script = ExtResource("1")
+id = "dark_general"
+display_name = "Dark General"
+description = "A fearsome warrior clad in spiked black armor, commanding presence on any battlefield. His massive blade has claimed countless lives, and his red eyes burn with malevolent intent."
+level = 35
+min_level = 30
+max_level = 45
+max_hp = 450
+armor_value = 45
+movement_speed = 3.5
+turn_speed = 4.0
+grit = 14
+agility = 6
+will = 10
+knowledge = 8
+behavior = 0
+faction = 3
+aggro_range = 18.0
+attack_range = 3.0
+preferred_distance = 2.5
+flee_hp_threshold = 0.0
+is_boss = true
+attacks = Array[ExtResource("2")]([SubResource("1"), SubResource("2"), SubResource("3")])
+can_block = true
+block_chance = 0.35
+stagger_resistance = 0.7
+fire_resistance = 0.2
+frost_resistance = 0.3
+lightning_resistance = 0.1
+poison_resistance = 0.5
+necrotic_resistance = 0.6
+physical_resistance = 0.25
+fire_weakness = 0.0
+frost_weakness = 0.0
+lightning_weakness = 0.15
+holy_weakness = 0.3
+causes_horror = true
+horror_difficulty = 14
+loot_table_av = 8
+gold_drop = Array[int]([150, 400])
+guaranteed_drops = Array[String](["dark_general_helm"])
+drop_table = {
+"dark_steel_ingot": 0.8,
+"black_iron_ore": 0.6,
+"blood_gem": 0.25,
+"executioners_blade": 0.15
+}
+xp_reward = 800
+scene_path = ""
+icon_path = "res://assets/sprites/enemies/dark_general_idle.png"
+scale = 1.2
+sprite_path = "res://assets/sprites/enemies/dark_general_idle.png"
+attack_sprite_path = "res://assets/sprites/enemies/dark_general_attack.png"
+sprite_hframes = 4
+sprite_vframes = 1
+attack_hframes = 4
+attack_vframes = 1
+death_sprite_path = "res://assets/sprites/enemies/dark_general_death.png"
+death_hframes = 4
+death_vframes = 1
+sprite_pixel_size = 0.006
+idle_sounds = Array[String]([])
+attack_sounds = Array[String]([])
+hurt_sounds = Array[String]([])
+death_sounds = Array[String]([])

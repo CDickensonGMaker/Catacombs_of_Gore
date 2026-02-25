@@ -82,14 +82,14 @@ func _build_ui() -> void:
 	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(overlay)
 
-	# Main panel
+	# Main panel (matching game_menu.gd size)
 	var main = PanelContainer.new()
 	main.set_anchors_preset(Control.PRESET_FULL_RECT)
 	main.mouse_filter = Control.MOUSE_FILTER_STOP  # Block clicks from reaching overlay
-	main.offset_left = 40
-	main.offset_top = 30
-	main.offset_right = -40
-	main.offset_bottom = -30
+	main.offset_left = 60
+	main.offset_top = 80
+	main.offset_right = -60
+	main.offset_bottom = -40
 	var main_style = StyleBoxFlat.new()
 	main_style.bg_color = COL_BG
 	main_style.border_color = COL_BORDER
@@ -543,6 +543,9 @@ func _get_allowed_categories() -> Array:
 
 func open() -> void:
 	visible = true
+	# Discover all recipes the player can make and add to codex
+	if CraftingManager:
+		CraftingManager.discover_available_recipes()
 	_refresh_display()
 
 

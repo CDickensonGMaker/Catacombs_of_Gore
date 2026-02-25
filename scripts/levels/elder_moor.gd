@@ -4,10 +4,11 @@
 extends Node3D
 
 const ZONE_ID := "elder_moor"
-const ZONE_SIZE := 100.0  # Matches WorldGrid.CELL_SIZE
+const ZONE_SIZE := Vector2(242.0, 219.0)  # Actual scene dimensions (width, depth)
+const ZONE_SIZE_LEGACY := 242.0  # For backwards compatibility (use larger dimension)
 
 ## Town center radius - buildings are kept within this area
-const TOWN_RADIUS := 35.0
+const TOWN_RADIUS := 80.0  # Expanded for larger scene
 
 @onready var nav_region: NavigationRegion3D = $NavigationRegion3D
 
@@ -19,7 +20,7 @@ func _ready() -> void:
 
 	if is_main_scene:
 		if PlayerGPS:
-			PlayerGPS.set_position(Vector2i.ZERO)  # Elder Moor is at (0, 0)
+			PlayerGPS.set_position(Vector2i.ZERO, true)  # Elder Moor is at (0, 0), skip_discovery=true (already handled by reset)
 		# Legacy starter quest disabled - using new quest system
 		#_start_starter_quest()
 
@@ -27,13 +28,12 @@ func _ready() -> void:
 	if is_main_scene:
 		_setup_day_night_cycle()
 	_setup_spawn_point_metadata()
+	_generate_terrain_collision()
 	_spawn_enemy_spawners()
 	_spawn_harvestable_herbs()
-	# NPCs and crafting stations are now placed directly in elder_moor.tscn
-	# for easier editing in the Godot editor
-	#_spawn_npcs()
-	#_spawn_crafting_stations()
-	#_spawn_tutorial_npcs()
+	_spawn_civilian_population()
+	# Spawn tutorial NPCs (Grom, Martha, Brennan) with correct sprites
+	_spawn_tutorial_npcs()
 
 	# Register with CellStreamer and start streaming
 	_setup_cell_streaming()
@@ -108,6 +108,40 @@ func _setup_spawn_point_metadata() -> void:
 	for child in spawn_points.get_children():
 		if child.is_in_group("spawn_points"):
 			child.set_meta("spawn_id", child.name)
+
+
+## Generate collision shapes for terrain and building meshes
+func _generate_terrain_collision() -> void:
+	# Find the terrain node
+	var terrain := get_node_or_null("Terrain/ElderMoorTerrain")
+	if terrain:
+		_add_collision_to_meshes(terrain)
+		print("[Elder Moor] Generated collision for terrain")
+
+	# Also check for any modular house GLB instances
+	var buildings := get_node_or_null("Buildings")
+	if buildings:
+		_add_collision_to_meshes(buildings)
+
+
+## Recursively add collision to all MeshInstance3D nodes
+func _add_collision_to_meshes(node: Node) -> void:
+	if node is MeshInstance3D:
+		var mesh_instance: MeshInstance3D = node
+		# Check if collision already exists
+		var has_collision := false
+		for child in mesh_instance.get_children():
+			if child is StaticBody3D:
+				has_collision = true
+				break
+
+		if not has_collision and mesh_instance.mesh:
+			# Create static body with trimesh collision
+			mesh_instance.create_trimesh_collision()
+
+	# Recurse into children
+	for child in node.get_children():
+		_add_collision_to_meshes(child)
 
 
 ## Spawn enemy spawners at marker positions in the wilderness
@@ -203,6 +237,103 @@ func _spawn_harvestable_herbs() -> void:
 	herbs_container.queue_free()
 
 
+## Spawn ~20 civilian NPCs that wander around from 9am to 9pm
+func _spawn_civilian_population() -> void:
+	var civilians_container := Node3D.new()
+	civilians_container.name = "CivilianPopulation"
+	add_child(civilians_container)
+
+	# Spawn area definitions for Elder Moor logging camp
+	# Each area: center position, spawn radius, number of NPCs
+	var spawn_areas: Array[Dictionary] = [
+		# Central camp area (near general shop and cabins)
+		{"pos": Vector3(-5, 0, 10), "radius": 8.0, "count": 4},
+		# Foreman's cabin area
+		{"pos": Vector3(-12, 0, -28), "radius": 6.0, "count": 2},
+		# Worker cabin area (east side)
+		{"pos": Vector3(15, 0, -5), "radius": 5.0, "count": 3},
+		# Worker cabin area (west/central)
+		{"pos": Vector3(-8, 0, 20), "radius": 6.0, "count": 3},
+		# Sawmill area (south)
+		{"pos": Vector3(5, 0, 50), "radius": 10.0, "count": 5},
+		# Sawmill area (north)
+		{"pos": Vector3(26, 0, -22), "radius": 6.0, "count": 3},
+	]
+
+	var total_spawned: int = 0
+
+	for spawn_def: Dictionary in spawn_areas:
+		var center: Vector3 = spawn_def["pos"]
+		var radius: float = spawn_def["radius"]
+		var count: int = spawn_def["count"]
+
+		for i in range(count):
+			# Random position within radius
+			var angle: float = randf() * TAU
+			var dist: float = randf() * radius
+			var spawn_pos := Vector3(
+				center.x + cos(angle) * dist,
+				0.0,
+				center.z + sin(angle) * dist
+			)
+
+			# Spawn random civilian type (loggers, workers - no nobles/gladiators)
+			var npc: CivilianNPC = CivilianNPC.spawn_worker_random(
+				civilians_container,
+				spawn_pos,
+				ZONE_ID
+			)
+
+			# Configure wander behavior - loggers move around their work area
+			npc.wander_radius = radius * 0.8
+			npc.wander_speed = randf_range(1.2, 2.0)
+
+			total_spawned += 1
+
+	print("[Elder Moor] Spawned %d civilian NPCs (loggers and workers)" % total_spawned)
+
+	# Store reference for day/night management
+	set_meta("civilians_container", civilians_container)
+
+	# Connect to GameManager's time of day changes for visibility management
+	if GameManager:
+		GameManager.time_of_day_changed.connect(_on_time_of_day_changed)
+		# Initial visibility check
+		_update_civilian_visibility()
+
+
+## Called when time of day changes
+func _on_time_of_day_changed(_new_time: Enums.TimeOfDay) -> void:
+	_update_civilian_visibility()
+
+
+## Show/hide civilians based on time of day (active during daytime: DAWN through DUSK)
+func _update_civilian_visibility() -> void:
+	var civilians_container: Node3D = get_meta("civilians_container", null) as Node3D
+	if not civilians_container:
+		return
+
+	var current_time: Enums.TimeOfDay = GameManager.current_time_of_day if GameManager else Enums.TimeOfDay.NOON
+
+	# Civilians active during daytime hours (DAWN through DUSK, not NIGHT or MIDNIGHT)
+	var is_daytime: bool = current_time in [
+		Enums.TimeOfDay.DAWN,
+		Enums.TimeOfDay.MORNING,
+		Enums.TimeOfDay.NOON,
+		Enums.TimeOfDay.AFTERNOON,
+		Enums.TimeOfDay.DUSK
+	]
+
+	for child in civilians_container.get_children():
+		if child is CivilianNPC:
+			child.visible = is_daytime
+			child.set_physics_process(is_daytime)
+			child.set_process(is_daytime)
+			# Enable/disable wandering
+			if child.wander:
+				child.wander.set_physics_process(is_daytime)
+
+
 ## Spawn NPCs (merchants, quest givers, civilians)
 func _spawn_npcs() -> void:
 	# Spawn general merchant inside the GeneralShop building
@@ -248,9 +379,9 @@ func _spawn_crafting_stations() -> void:
 	var anvil := RepairStation.spawn_station(self, anvil_pos)
 	print("[Elder Moor] Spawned blacksmith anvil at %s" % anvil_pos)
 
-	# Cooking fire - near the camp's central campfire area
+	# Cooking fire - south of the elder moor terrain
 	# Position at the gathering area where travelers rest
-	var cooking_pos := Vector3(5.0, 0.0, 8.0)
+	var cooking_pos := Vector3(5.0, 0.0, 30.0)
 	var cooking := CookingStation.spawn_cooking_station(self, cooking_pos)
 	print("[Elder Moor] Spawned cooking station at %s" % cooking_pos)
 
@@ -267,13 +398,14 @@ func _spawn_tutorial_npcs() -> void:
 	# Positioned near the anvil
 	var grom_pos := Vector3(-10.0, 0.0, -12.0)
 	var grom_quests: Array[String] = ["tutorial_crafting"]
+	var grom_sprite: Texture2D = load("res://assets/sprites/npcs/blacksmith.png")
 	var grom := QuestGiver.spawn_quest_giver(
 		self,
 		grom_pos,
 		"Grom the Smith",
 		"grom_the_smith",
-		null,  # Uses default sprite
-		8, 2,
+		grom_sprite,
+		5, 1,  # 5 horizontal frames (hammering animation), 1 row
 		grom_quests
 	)
 	grom.region_id = "elder_moor"
@@ -289,14 +421,17 @@ func _spawn_tutorial_npcs() -> void:
 	# Positioned near the cooking fire
 	var martha_pos := Vector3(3.0, 0.0, 8.0)
 	var martha_quests: Array[String] = ["tutorial_cooking"]
+	var martha_sprite: Texture2D = load("res://assets/sprites/npcs/martha_cook.png")
 	var martha := QuestGiver.spawn_quest_giver(
 		self,
 		martha_pos,
 		"Martha",
 		"martha_cook",
-		null,  # Uses default sprite
-		8, 2,
-		martha_quests
+		martha_sprite,
+		4, 1,  # 4 horizontal frames, 1 row
+		martha_quests,
+		false,  # is_talk_target
+		0.018   # pixel_size - smaller for cook sprite
 	)
 	martha.region_id = "elder_moor"
 	martha.faction_id = "human_empire"
@@ -305,19 +440,20 @@ func _spawn_tutorial_npcs() -> void:
 		"active": "Just use the cooking fire and roast that meat.\nNothing fancy, but it'll keep you alive out there.",
 		"complete": "There you go! Simple but effective.\nTake these stews I made - they'll restore both health and stamina."
 	}
-	print("[Elder Moor] Spawned tutorial NPC: Martha the Cook")
+	print("[Elder Moor] Spawned tutorial NPC: Martha")
 
 	# Old Sage Brennan - alchemy tutorial quest giver
 	# Positioned near the alchemy table
 	var brennan_pos := Vector3(8.0, 0.0, -5.0)
 	var brennan_quests: Array[String] = ["tutorial_alchemy"]
+	var brennan_sprite: Texture2D = load("res://assets/sprites/npcs/old_man_sage.png")
 	var brennan := QuestGiver.spawn_quest_giver(
 		self,
 		brennan_pos,
 		"Old Sage Brennan",
 		"sage_brennan",
-		null,  # Uses default sprite
-		8, 2,
+		brennan_sprite,
+		2, 1,  # 2 horizontal frames, 1 row
 		brennan_quests
 	)
 	brennan.region_id = "elder_moor"

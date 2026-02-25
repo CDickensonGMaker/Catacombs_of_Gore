@@ -63,7 +63,8 @@ func _input(event: InputEvent) -> void:
 	if not visible:
 		return
 
-	if event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause"):
+	# Close on escape, pause, or tab menu key
+	if event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause") or event.is_action_pressed("menu"):
 		close()
 		get_viewport().set_input_as_handled()
 
@@ -71,19 +72,30 @@ func _build_ui() -> void:
 	# Set root control to fill viewport
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 
-	# Dark overlay
+	# Click-outside overlay - clicking this closes the UI
+	var click_outside = Button.new()
+	click_outside.set_anchors_preset(Control.PRESET_FULL_RECT)
+	click_outside.flat = true
+	click_outside.focus_mode = Control.FOCUS_NONE
+	click_outside.mouse_filter = Control.MOUSE_FILTER_STOP
+	click_outside.pressed.connect(close)
+	add_child(click_outside)
+
+	# Dark overlay (visual only)
 	var overlay = ColorRect.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	overlay.color = Color(0, 0, 0, 0.75)
+	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(overlay)
 
-	# Main panel
+	# Main panel (matching game_menu.gd size)
 	var main = PanelContainer.new()
 	main.set_anchors_preset(Control.PRESET_FULL_RECT)
-	main.offset_left = 20
-	main.offset_top = 20
-	main.offset_right = -20
-	main.offset_bottom = -20
+	main.mouse_filter = Control.MOUSE_FILTER_STOP  # Block clicks from reaching overlay
+	main.offset_left = 60
+	main.offset_top = 80
+	main.offset_right = -60
+	main.offset_bottom = -40
 	var main_style = StyleBoxFlat.new()
 	main_style.bg_color = COL_BG
 	main_style.border_color = COL_BORDER
