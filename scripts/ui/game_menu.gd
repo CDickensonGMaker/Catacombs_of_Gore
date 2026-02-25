@@ -15,16 +15,69 @@ const INV_CATEGORY_NAMES = ["All", "Weapons", "Armor", "Magic", "Aid", "Misc", "
 
 const TAB_NAMES = ["Character", "Items", "Magic", "Journal", "Map"]
 
-# Dark gothic colors
-const COL_BG = Color(0.08, 0.08, 0.1)
-const COL_PANEL = Color(0.12, 0.12, 0.15)
-const COL_BORDER = Color(0.3, 0.25, 0.2)
-const COL_TEXT = Color(0.9, 0.85, 0.75)
-const COL_DIM = Color(0.5, 0.5, 0.5)
-const COL_GOLD = Color(0.8, 0.6, 0.2)
-const COL_SELECT = Color(0.25, 0.2, 0.15)
-const COL_GREEN = Color(0.3, 0.8, 0.3)
-const COL_RED = Color(0.8, 0.3, 0.3)
+# Grey drab gothic colors
+const COL_BG = Color(0.1, 0.1, 0.1, 0.85)  # Semi-transparent for texture to show through
+const COL_PANEL = Color(0.15, 0.15, 0.15, 0.9)
+const COL_BORDER = Color(0.3, 0.3, 0.3)
+const COL_TEXT = Color(0.75, 0.75, 0.72)
+const COL_DIM = Color(0.4, 0.4, 0.4)
+const COL_GOLD = Color(0.6, 0.55, 0.4)  # Muted brass/bronze
+const COL_SELECT = Color(0.2, 0.2, 0.2)
+const COL_GREEN = Color(0.4, 0.6, 0.4)  # Muted green
+const COL_RED = Color(0.6, 0.3, 0.3)  # Muted red
+
+# Full-screen menu background texture
+const MENU_BG_TEXTURE = "res://assets/ui/menu_background.png"
+
+# Stat descriptions for tooltips
+const STAT_DESCRIPTIONS := {
+	"Grit": "Raw physical power. Increases melee damage, carry weight, and intimidation.",
+	"Agility": "Speed and reflexes. Improves dodge chance, attack speed, and movement.",
+	"Will": "Mental fortitude. Boosts spell power, mana pool, and resistance to fear.",
+	"Speech": "Social ability. Affects persuasion, bartering prices, and NPC reactions.",
+	"Knowledge": "Learning and lore. Improves crafting, spell learning, and identifying items.",
+	"Vitality": "Physical endurance. Increases health, stamina, and poison resistance."
+}
+
+# Skill descriptions for tooltips (matches Enums.Skill)
+const SKILL_DESCRIPTIONS := {
+	# GRIT-based
+	"Melee": "+5% melee damage per level. +1% crit chance per level.",
+	"Intimidation": "+5% fear chance per level. Can force enemies to flee.",
+	# AGILITY-based
+	"Ranged": "+5% ranged damage per level. +3% accuracy per level.",
+	"Dodge": "+3% dodge chance per level. Reduces incoming damage.",
+	"Stealth": "-5% detection per level. +10% backstab damage per level.",
+	"Endurance": "+2% max stamina per level. +3% stamina regen per level.",
+	"Thievery": "+5% pickpocket success per level. Better theft checks.",
+	"Acrobatics": "-5% fall damage per level. +5% jump height per level.",
+	"Athletics": "+2% movement speed per level. -2% stamina cost per level.",
+	# WILL-based
+	"Concentration": "+3% max mana per level. Reduces spell interrupt chance.",
+	"Resist": "+3% magic resistance per level. Reduces curse duration.",
+	"Bravery": "+5% fear resistance per level. +2% damage vs undead.",
+	# SPEECH-based
+	"Persuasion": "+5% disposition per level. Unlocks dialogue options.",
+	"Deception": "+5% bluff success per level. Better disguise checks.",
+	"Negotiation": "+3% better prices per level. +5% quest rewards.",
+	# KNOWLEDGE-based
+	"Arcana Lore": "+3% spell power per level. Better spell learning.",
+	"History": "+5% artifact identify chance. Unlocks lore dialogue.",
+	"Intuition": "+2% initiative per level. Detects ambushes and secrets.",
+	"Engineering": "+5% crafting success per level. +3% trap disarm.",
+	"Investigation": "+5% hidden item find chance. Better clue detection.",
+	"Perception": "+5% enemy detection range. Spots traps and secrets.",
+	"Religion": "+5% temple blessing duration. +3% vs undead.",
+	"Nature": "+5% animal calm chance. Better foraging yields.",
+	# VITALITY-based
+	"First Aid": "+10% healing item effectiveness per level.",
+	"Herbalism": "+5% potion brewing success. +3% foraging yield.",
+	"Survival": "+3% weather resistance per level. Better camping rest.",
+	# CRAFTING-related
+	"Alchemy": "+5% potion strength per level. +3% crafting success.",
+	"Smithing": "+5% crafted item quality per level. Repair efficiency.",
+	"Lockpicking": "+1 lock difficulty per level. Silent lock attempts."
+}
 
 # UI elements
 var tab_buttons: Array = []
@@ -108,19 +161,28 @@ func _update_tabs() -> void:
 	_refresh_tab()
 
 func _build_menu() -> void:
-	# Dark overlay
-	var overlay = ColorRect.new()
-	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	overlay.color = Color(0, 0, 0, 0.75)
-	add_child(overlay)
+	# Full-screen textured background
+	if ResourceLoader.exists(MENU_BG_TEXTURE):
+		var bg := TextureRect.new()
+		bg.texture = load(MENU_BG_TEXTURE)
+		bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+		bg.stretch_mode = TextureRect.STRETCH_SCALE
+		bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		add_child(bg)
+	else:
+		# Fallback to dark overlay
+		var overlay := ColorRect.new()
+		overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+		overlay.color = Color(0, 0, 0, 0.75)
+		add_child(overlay)
 
 	# Main container
 	var main = PanelContainer.new()
 	main.set_anchors_preset(Control.PRESET_FULL_RECT)
-	main.offset_left = 20
-	main.offset_top = 20
-	main.offset_right = -20
-	main.offset_bottom = -20
+	main.offset_left = 60   # More margin from left edge
+	main.offset_top = 80    # More margin from top (clear skull HP bar)
+	main.offset_right = -60
+	main.offset_bottom = -40
 	var main_style = StyleBoxFlat.new()
 	main_style.bg_color = COL_BG
 	main_style.border_color = COL_BORDER
@@ -135,13 +197,6 @@ func _build_menu() -> void:
 	vbox.offset_right = -10
 	vbox.offset_bottom = -10
 	main.add_child(vbox)
-
-	# Title
-	var title = Label.new()
-	title.text = "CATACOMBS OF GORE"
-	title.add_theme_color_override("font_color", COL_GOLD)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	vbox.add_child(title)
 
 	# Tab buttons
 	var tab_bar = HBoxContainer.new()
@@ -387,13 +442,13 @@ func _refresh_character() -> void:
 
 	# === MAIN STATS AREA (3 columns) ===
 	var main_cols = HBoxContainer.new()
-	main_cols.add_theme_constant_override("separation", 30)
+	main_cols.add_theme_constant_override("separation", 20)
 	vbox.add_child(main_cols)
 
 	# --- Column 1: Vital Resources ---
 	var vitals_vbox = VBoxContainer.new()
 	main_cols.add_child(vitals_vbox)
-	vitals_vbox.add_child(_make_label("VITALS", COL_GOLD))
+	vitals_vbox.add_child(_make_label("VITALS", COL_GOLD, 12))
 
 	# HP with color based on percentage
 	var hp_pct = float(data.current_hp) / max(data.max_hp, 1)
@@ -410,7 +465,7 @@ func _refresh_character() -> void:
 	# vitals_vbox.add_child(_make_label("Spell Slots: %d / %d" % [data.current_spell_slots, data.max_spell_slots], Color(0.6, 0.4, 0.8)))
 
 	vitals_vbox.add_child(_make_label("", COL_TEXT))  # Spacer
-	vitals_vbox.add_child(_make_label("REGENERATION", COL_GOLD))
+	vitals_vbox.add_child(_make_label("REGENERATION", COL_GOLD, 11))
 	vitals_vbox.add_child(_make_label("HP Regen: %.1f/s" % data.get_hp_regen(), COL_DIM))
 	vitals_vbox.add_child(_make_label("Stamina Regen: %.1f/s" % data.get_stamina_regen(), COL_DIM))
 	vitals_vbox.add_child(_make_label("Mana Regen: %.1f/s" % data.get_mana_regen(), COL_DIM))
@@ -418,7 +473,7 @@ func _refresh_character() -> void:
 	# --- Column 2: Combat Stats ---
 	var combat_vbox = VBoxContainer.new()
 	main_cols.add_child(combat_vbox)
-	combat_vbox.add_child(_make_label("OFFENSE", COL_GOLD))
+	combat_vbox.add_child(_make_label("OFFENSE", COL_GOLD, 12))
 
 	# Get equipped weapon info
 	var weapon = InventoryManager.get_equipped_weapon()
@@ -458,16 +513,16 @@ func _refresh_character() -> void:
 	# --- Column 3: Attributes ---
 	var attr_vbox = VBoxContainer.new()
 	main_cols.add_child(attr_vbox)
-	attr_vbox.add_child(_make_label("ATTRIBUTES", COL_GOLD))
-	attr_vbox.add_child(_make_label("Grit: %d" % data.get_effective_stat(Enums.Stat.GRIT), COL_TEXT))
-	attr_vbox.add_child(_make_label("Agility: %d" % data.get_effective_stat(Enums.Stat.AGILITY), COL_TEXT))
-	attr_vbox.add_child(_make_label("Will: %d" % data.get_effective_stat(Enums.Stat.WILL), COL_TEXT))
-	attr_vbox.add_child(_make_label("Speech: %d" % data.get_effective_stat(Enums.Stat.SPEECH), COL_TEXT))
-	attr_vbox.add_child(_make_label("Knowledge: %d" % data.get_effective_stat(Enums.Stat.KNOWLEDGE), COL_TEXT))
-	attr_vbox.add_child(_make_label("Vitality: %d" % data.get_effective_stat(Enums.Stat.VITALITY), COL_TEXT))
+	attr_vbox.add_child(_make_label("ATTRIBUTES", COL_GOLD, 12))
+	attr_vbox.add_child(_make_stat_label("Grit", data.get_effective_stat(Enums.Stat.GRIT)))
+	attr_vbox.add_child(_make_stat_label("Agility", data.get_effective_stat(Enums.Stat.AGILITY)))
+	attr_vbox.add_child(_make_stat_label("Will", data.get_effective_stat(Enums.Stat.WILL)))
+	attr_vbox.add_child(_make_stat_label("Speech", data.get_effective_stat(Enums.Stat.SPEECH)))
+	attr_vbox.add_child(_make_stat_label("Knowledge", data.get_effective_stat(Enums.Stat.KNOWLEDGE)))
+	attr_vbox.add_child(_make_stat_label("Vitality", data.get_effective_stat(Enums.Stat.VITALITY)))
 
 	attr_vbox.add_child(_make_label("", COL_TEXT))  # Spacer
-	attr_vbox.add_child(_make_label("BONUSES", COL_GOLD))
+	attr_vbox.add_child(_make_label("BONUSES", COL_GOLD, 11))
 	attr_vbox.add_child(_make_label("Move Speed: %.0f%%" % (data.get_movement_multiplier() * 100), COL_DIM))
 	attr_vbox.add_child(_make_label("XP Bonus: +%d%%" % int((data.get_xp_multiplier() - 1.0) * 100), COL_DIM))
 
@@ -478,37 +533,45 @@ func _refresh_character() -> void:
 	prog_hbox.add_theme_constant_override("separation", 40)
 	vbox.add_child(prog_hbox)
 
-	prog_hbox.add_child(_make_label("PROGRESSION", COL_GOLD))
+	prog_hbox.add_child(_make_label("PROGRESSION", COL_GOLD, 12))
 	prog_hbox.add_child(_make_label("Level: %d" % data.level, COL_TEXT))
 	prog_hbox.add_child(_make_label("XP Available: %d" % data.improvement_points, COL_GOLD if data.improvement_points > 0 else COL_DIM))
 	prog_hbox.add_child(_make_label("Gold: %d" % InventoryManager.gold, COL_GOLD))
 
 	vbox.add_child(HSeparator.new())
 
-	# === SKILLS (Compact Grid) ===
-	vbox.add_child(_make_label("SKILLS", COL_GOLD))
+	# === SKILLS (Scrollable Section) ===
+	vbox.add_child(_make_label("SKILLS", COL_GOLD, 14))
+
+	var skill_scroll = ScrollContainer.new()
+	skill_scroll.custom_minimum_size.y = 180  # Fixed height, scrollable
+	skill_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	skill_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(skill_scroll)
 
 	var skill_grid = GridContainer.new()
-	skill_grid.columns = 4
-	skill_grid.add_theme_constant_override("h_separation", 15)
-	skill_grid.add_theme_constant_override("v_separation", 2)
-	vbox.add_child(skill_grid)
+	skill_grid.columns = 2  # 2 columns for readability
+	skill_grid.add_theme_constant_override("h_separation", 20)
+	skill_grid.add_theme_constant_override("v_separation", 4)
+	skill_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	skill_scroll.add_child(skill_grid)
 
 	for skill_enum in Enums.Skill.values():
 		var skill_name = Enums.Skill.keys()[skill_enum] as String
 		var skill_level = data.get_skill(skill_enum)
 		var display_name = skill_name.capitalize().replace("_", " ")
-		# Truncate long names
-		if display_name.length() > 12:
-			display_name = display_name.substr(0, 11) + "."
-		var skill_color = COL_DIM
+		# No truncation - full names displayed
+		var skill_color: Color = COL_DIM
 		if skill_level >= 7:
 			skill_color = COL_GOLD  # Master level
 		elif skill_level >= 4:
 			skill_color = COL_TEXT  # Proficient
 		elif skill_level > 0:
 			skill_color = Color(0.7, 0.7, 0.7)  # Some training
-		var lbl = _make_label("%s: %d" % [display_name, skill_level], skill_color)
+		var lbl = _make_label("%s: %d" % [display_name, skill_level], skill_color, 14)
+		lbl.tooltip_text = SKILL_DESCRIPTIONS.get(display_name, "")
+		lbl.mouse_filter = Control.MOUSE_FILTER_STOP
+		lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		skill_grid.add_child(lbl)
 
 	# === CONDITIONS ===
@@ -1986,10 +2049,21 @@ func _refresh_journal() -> void:
 		panel._refresh_current_tab()
 
 # ==================== HELPERS ====================
-func _make_label(text: String, color: Color) -> Label:
+func _make_label(text: String, color: Color, font_size: int = 0) -> Label:
 	var lbl = Label.new()
 	lbl.text = text
 	lbl.add_theme_color_override("font_color", color)
+	if font_size > 0:
+		lbl.add_theme_font_size_override("font_size", font_size)
+	return lbl
+
+
+func _make_stat_label(stat_name: String, value: int) -> Label:
+	var lbl = Label.new()
+	lbl.text = "%s: %d" % [stat_name, value]
+	lbl.add_theme_color_override("font_color", COL_TEXT)
+	lbl.tooltip_text = STAT_DESCRIPTIONS.get(stat_name, "")
+	lbl.mouse_filter = Control.MOUSE_FILTER_STOP
 	return lbl
 
 
@@ -2053,6 +2127,7 @@ func open() -> void:
 	visible = true
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	GameManager.enter_menu()
+	GameManager.set_menu_cursor()  # Use menu cursor
 	get_tree().paused = true
 	_refresh_stats_bar()
 	_refresh_tab()
@@ -2076,5 +2151,6 @@ func close() -> void:
 	context_menu_target = {}
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	GameManager.exit_menu()
+	GameManager.set_default_cursor()  # Restore default cursor
 	get_tree().paused = false
 	menu_closed.emit()

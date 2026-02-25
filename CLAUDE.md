@@ -1486,3 +1486,43 @@ With the cell streaming system working:
 - [x] All NPCs at correct height (not floating)
 - [x] All NPCs at correct size (not too big/small)
 - [x] No frame flicker when NPCs spawn
+
+### Priority 3: Stealth & Crouch System
+
+**Crouch Mechanic:**
+- Add crouch input (Ctrl or C key)
+- Reduce player height/collision when crouching
+- Slower movement while crouched
+- Visual feedback (camera lowered)
+
+**Stealth System:**
+- Detection radius based on Stealth skill
+- Light level affects detection (darker = harder to see)
+- Movement speed affects noise (crouching = quieter)
+- Backstab damage bonus when undetected
+- "Hidden" indicator on HUD when fully concealed
+- Enemy awareness states: Unaware → Suspicious → Alert → Combat
+
+### Priority 4: Killable NPCs & Consequences
+
+**All NPCs Killable:**
+- Every NPC can be attacked and killed (no essential flags)
+- Quest givers dying breaks their quest chains permanently
+- Merchants dying removes their shop from the game
+- Unique items on NPCs can be looted from corpses
+
+**Morality & Faction System Tie-in:**
+- Killing innocents lowers reputation with factions
+- Witnesses report crimes to guards
+- Murder bounty placed on player
+- Faction standing affects NPC disposition and available quests
+
+**Crime & Jail System:**
+- Guards attempt arrest when bounty is active
+- Player can: Surrender, Pay bounty, Resist arrest, Flee
+- Surrender → Jail time (skip time, lose stolen goods)
+- Resist → Guards attack, bounty increases
+- **Dalhurst Jail** - First jail location to implement
+  - Cell with lockable door (escapable with high Lockpicking)
+  - Confiscated items chest (retrievable after release)
+  - Jail time scales with bounty amount
