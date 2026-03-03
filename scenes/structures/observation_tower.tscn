@@ -1,6 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://di2f41gfisv70"]
+[gd_scene load_steps=5 format=3 uid="uid://di2f41gfisv70"]
 
-[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://Sprite folders grab bag/stonewall.png" id="1_stone"]
+[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://assets/textures/environment/walls/stonewall.png" id="1_stone"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tower"]
 albedo_texture = ExtResource("1_stone")
@@ -8,111 +8,205 @@ roughness = 0.85
 uv1_scale = Vector3(0.5, 0.5, 1)
 texture_filter = 0
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall"]
+size = Vector3(3, 12, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_diag"]
+size = Vector3(2.5, 12, 0.5)
+
 [node name="ObservationTower" type="Node3D"]
 
 [node name="TowerBase" type="CSGCylinder3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 0)
-use_collision = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.388973, 0)
 radius = 4.0
 height = 12.0
 material = SubResource("StandardMaterial3D_tower")
 
+[node name="TowerWallCollision" type="StaticBody3D" parent="."]
+transform = Transform3D(0.72304845, 0, 0, 0, 1, 0, 0, 0, 0.8552003, 0, 0, 0)
+
+[node name="Wall_N" type="CollisionShape3D" parent="TowerWallCollision"]
+transform = Transform3D(1, 0, 0, 0, 0.99999994, 0, 0, 0, 1, 0, 5.3889728, -3.9)
+shape = SubResource("BoxShape3D_wall")
+
+[node name="Wall_S" type="CollisionShape3D" parent="TowerWallCollision"]
+transform = Transform3D(1, 0, 0, 0, 0.99999994, 0, 0, 0, 1, 0, 5.3889728, 3.9)
+shape = SubResource("BoxShape3D_wall")
+
+[node name="Wall_E" type="CollisionShape3D" parent="TowerWallCollision"]
+transform = Transform3D(0, 0, 1, 0, 0.99999994, 0, -1, 0, 0, 3.9, 5.3889728, 0)
+shape = SubResource("BoxShape3D_wall")
+
+[node name="Wall_W" type="CollisionShape3D" parent="TowerWallCollision"]
+transform = Transform3D(0, 0, 1, 0, 0.99999994, 0, -1, 0, 0, -3.9, 5.3889728, 0)
+shape = SubResource("BoxShape3D_wall")
+
+[node name="Wall_NE" type="CollisionShape3D" parent="TowerWallCollision"]
+transform = Transform3D(0.70710695, 0, 0.70710695, 0, 0.99999994, 0, -0.707107, 0, 0.707107, 2.76, 5.3889728, -2.76)
+shape = SubResource("BoxShape3D_wall_diag")
+
+[node name="Wall_NW" type="CollisionShape3D" parent="TowerWallCollision"]
+transform = Transform3D(0.70710695, 0, -0.70710695, 0, 0.99999994, 0, 0.707107, 0, 0.707107, -2.76, 5.3889728, -2.76)
+shape = SubResource("BoxShape3D_wall_diag")
+
+[node name="Wall_SE" type="CollisionShape3D" parent="TowerWallCollision"]
+transform = Transform3D(0.70710695, 0, -0.70710695, 0, 0.99999994, 0, 0.707107, 0, 0.707107, 2.76, 5.3889728, 2.76)
+shape = SubResource("BoxShape3D_wall_diag")
+
+[node name="Wall_SW" type="CollisionShape3D" parent="TowerWallCollision"]
+transform = Transform3D(0.70710695, 0, 0.70710695, 0, 0.99999994, 0, -0.707107, 0, 0.707107, -2.76, 5.3889728, 2.76)
+shape = SubResource("BoxShape3D_wall_diag")
+
 [node name="Ramp_0" type="CSGBox3D" parent="."]
-transform = Transform3D(-0.32590017, 0.017520124, -0.94524574, 0.39197505, 0.9128673, -0.11810276, 0.8602419, -0.40804172, -0.30422148, 4.907801, 1.5352348, 0.090761386)
+transform = Transform3D(-0.32590017, 0.017520124, -0.94524574, 0.39197505, 0.9128673, -0.11810276, 0.8602419, -0.40804172, -0.30422148, 4.907801, 0.92420805, 0.090761386)
 use_collision = true
-size = Vector3(6, 0.3, 2.5966797)
+size = Vector3(6, 0.6, 2.5966797)
 material = SubResource("StandardMaterial3D_tower")
 
 [node name="Ramp_1" type="CSGBox3D" parent="."]
-transform = Transform3D(0.8739416, 0.14249939, 0.44544834, -0.29566133, 0.93791777, 0.2502573, -0.38573635, -0.3164423, 0.8595323, 2.0941682, 3.5243673, 3.7680159)
+transform = Transform3D(0.74439514, 0.0027900713, 0.65544415, -0.13852811, 0.98731, 0.14420922, -0.6531986, -0.15919606, 0.74124587, 1.6519357, 2.3801765, 4.0953)
 use_collision = true
-size = Vector3(6.425415, 0.35095826, 2.9906616)
+size = Vector3(5.717102, 0.7, 2.605194)
 material = SubResource("StandardMaterial3D_tower")
 
 [node name="Ramp_2" type="CSGBox3D" parent="."]
-transform = Transform3D(0.75495976, 0.34613505, -0.54424834, -0.29566136, 0.9379179, 0.25025734, 0.5853223, -0.025146142, 0.8006334, -3.3314288, 4.6102767, 2.7612505)
+transform = Transform3D(0.8120591, 0.14289042, -0.56746805, -0.18732864, 0.987386, 0.051104408, 0.55267537, 0.069160804, 0.821716, -3.3314288, 3.3301702, 2.7612505)
 use_collision = true
-size = Vector3(7.346588, 0.35095826, 5.5187683)
+size = Vector3(7.346588, 0.7, 5.5187683)
 material = SubResource("StandardMaterial3D_tower")
 
 [node name="Ramp_6" type="CSGBox3D" parent="."]
-transform = Transform3D(0.75495976, 0.34613505, -0.54424834, -0.29566136, 0.9379179, 0.25025734, 0.5853223, -0.025146142, 0.8006334, -3.3314288, 4.6102767, 2.7612505)
+transform = Transform3D(0.22099388, -0.09108076, -0.9768586, 0.2041539, 0.97151697, -0.016604476, 0.9536589, -0.21906929, 0.21288648, 4.4420276, 7.819598, -0.88135123)
 use_collision = true
-size = Vector3(7.346588, 0.35095826, 5.5187683)
+size = Vector3(7.346588, 0.7, 2.6558151)
+material = SubResource("StandardMaterial3D_tower")
+
+[node name="Ramp_7" type="CSGBox3D" parent="."]
+transform = Transform3D(-0.793094, 0.16653581, -0.57538533, 0.20415388, 0.97151697, -0.016604474, 0.5738514, -0.16897595, -0.8176216, 2.7492607, 8.9691105, 3.4116993)
+use_collision = true
+size = Vector3(6.190384, 0.7, 2.1321068)
+material = SubResource("StandardMaterial3D_tower")
+
+[node name="Ramp_8" type="CSGBox3D" parent="."]
+transform = Transform3D(-0.9712924, 0.25584862, -0.05216367, 0.22921455, 0.96525496, -0.015267678, 0.06351379, -0.054372296, -0.99844617, -1.3451983, 9.921279, 4.4983635)
+use_collision = true
+size = Vector3(6.190384, 0.7, 2.1321068)
 material = SubResource("StandardMaterial3D_tower")
 
 [node name="Ramp_3" type="CSGBox3D" parent="."]
-transform = Transform3D(0.10918134, -0.06516761, 0.9930582, 0.2913823, 0.9158788, 0.020851463, -0.9502877, 0.39629573, 0.11571107, -4.921499, 5.926913, -0.7951129)
+transform = Transform3D(0.10918134, -0.06516761, 0.9930582, 0.18270105, 0.9546252, 0.033727836, -0.9770212, 0.29081768, 0.11263333, -4.921499, 4.3480487, -0.7951129)
 use_collision = true
-size = Vector3(7.739151, 0.3, 2.6833496)
+size = Vector3(7.739151, 0.6, 2.6833496)
 material = SubResource("StandardMaterial3D_tower")
 
 [node name="Ramp_4" type="CSGBox3D" parent="."]
-transform = Transform3D(0.8633017, -0.5527917, 0.2217178, 0.46059304, 0.8273318, 0.030188026, -0.20599799, 0.10037186, 0.9746375, -0.4832425, 8.507555, -4.5563965)
+transform = Transform3D(0.9458792, -0.3484838, 0.22273535, 0.25049564, 0.93199545, -0.021425627, -0.20599799, 0.10037186, 0.9746375, -0.4832425, 5.9261293, -4.5563965)
 use_collision = true
-size = Vector3(9.9087715, 0.3, 2.9506836)
+size = Vector3(9.9087715, 0.6, 2.9506836)
 material = SubResource("StandardMaterial3D_tower")
 
 [node name="Ramp_5" type="CSGBox3D" parent="."]
-transform = Transform3D(-0.69378746, 0.2606517, -0.70006883, 0.44949195, 0.806574, -0.22036305, 0.56257194, -0.53068864, -0.6792142, 1.7575666, 11.341141, -5.124631)
+transform = Transform3D(-0.064358294, 0.11594676, -0.9921287, 0.05585771, 0.97957146, 0.10666114, 0.9962974, -0.16470315, -0.065511785, -1.6803356, 10.081396, 4.172892)
 use_collision = true
-size = Vector3(4.283051, 0.41838685, 0.82250977)
+size = Vector3(2.5580673, 0.8, 0.82250977)
+material = SubResource("StandardMaterial3D_tower")
+
+[node name="Ramp_9" type="CSGBox3D" parent="."]
+transform = Transform3D(-0.064358294, 0.11594676, -0.9921287, 0.05585771, 0.97957146, 0.10666114, 0.9962974, -0.16470315, -0.065511785, -2.2259014, 10.305748, 4.172892)
+use_collision = true
+size = Vector3(2.5580673, 0.8, 0.82250977)
+material = SubResource("StandardMaterial3D_tower")
+
+[node name="Ramp_10" type="CSGBox3D" parent="."]
+transform = Transform3D(-0.064358294, 0.11594676, -0.9921287, 0.05585771, 0.97957146, 0.10666114, 0.9962974, -0.16470315, -0.065511785, -2.849485, 10.459793, 4.172892)
+use_collision = true
+size = Vector3(2.5580673, 0.8, 0.82250977)
+material = SubResource("StandardMaterial3D_tower")
+
+[node name="Ramp_11" type="CSGBox3D" parent="."]
+transform = Transform3D(-0.064358294, 0.11594676, -0.9921287, 0.05585771, 0.97957146, 0.10666114, 0.9962974, -0.16470315, -0.065511785, -3.4601593, 10.712986, 4.172892)
+use_collision = true
+size = Vector3(2.5580673, 0.8, 0.82250977)
+material = SubResource("StandardMaterial3D_tower")
+
+[node name="Ramp_12" type="CSGBox3D" parent="."]
+transform = Transform3D(-0.99455667, 0.16199684, 0.0882803, 0.055857714, 0.9795716, 0.10666115, -0.08722285, 0.11969885, -0.9903625, -2.6526365, 10.848434, 3.8299496)
+use_collision = true
+size = Vector3(2.6491508, 0.8, 0.82250977)
+material = SubResource("StandardMaterial3D_tower")
+
+[node name="Ramp_13" type="CSGBox3D" parent="."]
+transform = Transform3D(-0.99455667, 0.16199684, 0.0882803, 0.055857714, 0.9795716, 0.10666115, -0.08722285, 0.11969885, -0.9903625, -2.6526365, 11.113225, 3.336233)
+use_collision = true
+size = Vector3(2.6491508, 0.8, 0.82250977)
+material = SubResource("StandardMaterial3D_tower")
+
+[node name="Ramp_14" type="CSGBox3D" parent="."]
+transform = Transform3D(-0.99455667, 0.16199684, 0.0882803, 0.055857714, 0.9795716, 0.10666115, -0.08722285, 0.11969885, -0.9903625, -2.6526365, 11.417825, 3.0670927)
+use_collision = true
+size = Vector3(2.6491508, 0.8, 0.82250977)
 material = SubResource("StandardMaterial3D_tower")
 
 [node name="Platform" type="CSGCylinder3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12.25, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 11.298812, 0)
 use_collision = true
 radius = 4.477051
 height = 0.5
 material = SubResource("StandardMaterial3D_tower")
 
 [node name="Merlon_0" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 13, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 12.186278, 0)
 use_collision = true
 size = Vector3(1, 1.5, 0.5)
 material = SubResource("StandardMaterial3D_tower")
 
 [node name="Merlon_1" type="CSGBox3D" parent="."]
-transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, 3.18, 13, 3.18)
+transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, 3.18, 12.186278, 3.18)
 use_collision = true
 size = Vector3(1, 1.5, 0.5)
 material = SubResource("StandardMaterial3D_tower")
 
 [node name="Merlon_2" type="CSGBox3D" parent="."]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0, 13, 4.5)
+transform = Transform3D(-0.83726096, 0, 0.54680353, 0, 1, 0, -0.54680353, 0, -0.83726096, -0.91481227, 11.976073, 3.8001993)
 use_collision = true
-size = Vector3(1, 1.5, 0.5)
+size = Vector3(2.222107, 1.0795898, 0.32861328)
+material = SubResource("StandardMaterial3D_tower")
+
+[node name="Merlon_8" type="CSGBox3D" parent="."]
+transform = Transform3D(-0.9152763, 0, -0.40282664, 0, 1, 0, 0.40282664, 0, -0.9152763, 1.5083835, 11.976073, 3.722988)
+use_collision = true
+size = Vector3(3.5866394, 1.0795898, 0.32861328)
 material = SubResource("StandardMaterial3D_tower")
 
 [node name="Merlon_3" type="CSGBox3D" parent="."]
-transform = Transform3D(-0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, -0.707107, -3.18, 13, 3.18)
+transform = Transform3D(-0.04279983, 0, 0.999084, 0, 1, 0, -0.999084, 0, -0.04279983, -3.7198994, 12.186278, 2.3621747)
 use_collision = true
-size = Vector3(1, 1.5, 0.5)
+size = Vector3(1.7011719, 1.5, 0.5)
 material = SubResource("StandardMaterial3D_tower")
 
 [node name="Merlon_4" type="CSGBox3D" parent="."]
-transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -4.5, 13, 0)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -4.5, 12.186278, 0)
 use_collision = true
 size = Vector3(1, 1.5, 0.5)
 material = SubResource("StandardMaterial3D_tower")
 
 [node name="Merlon_5" type="CSGBox3D" parent="."]
-transform = Transform3D(-0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, -0.707107, -3.18, 13, -3.18)
+transform = Transform3D(-0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, -0.707107, -3.18, 12.186278, -3.18)
 use_collision = true
 size = Vector3(1, 1.5, 0.5)
 material = SubResource("StandardMaterial3D_tower")
 
 [node name="Merlon_6" type="CSGBox3D" parent="."]
-transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 0, 13, -4.5)
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 0, 12.186278, -4.5)
 use_collision = true
 size = Vector3(1, 1.5, 0.5)
 material = SubResource("StandardMaterial3D_tower")
 
 [node name="Merlon_7" type="CSGBox3D" parent="."]
-transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, 3.18, 13, -3.18)
+transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, 3.18, 12.186278, -3.18)
 use_collision = true
 size = Vector3(1, 1.5, 0.5)
 material = SubResource("StandardMaterial3D_tower")
 
 [node name="ChestSpawnPoint" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 11.454854, 0)

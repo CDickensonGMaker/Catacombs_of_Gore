@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="SpellEffectData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/spell_effect_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "apply_slow"
+display_name = "Slow"
+description = "Slows the target's movement and attack speed"
+effect_type = 4
+damage_type = 0
+condition = 11
+stat = 0
+allowed_delivery = [1, 2, 3]
+base_magnitude = 30
+max_magnitude = 70
+base_duration = 5.0
+max_duration = 20.0
+base_cost = 8
+magnitude_cost_mult = 0.2
+duration_cost_mult = 0.8
+aoe_cost_mult = 2.0
+required_arcana = 2
+icon_path = ""
+effect_color = Color(0.6, 0.6, 0.8, 1)

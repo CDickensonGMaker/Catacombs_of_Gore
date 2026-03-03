@@ -3,10 +3,6 @@
 [ext_resource type="Script" path="res://scripts/dialogue/conversation_response_pool.gd" id="1_pool"]
 [ext_resource type="Script" path="res://scripts/dialogue/conversation_response.gd" id="2_resp"]
 
-# =============================================================================
-# STRANGER GREETINGS (Disposition 0-25)
-# =============================================================================
-
 [sub_resource type="Resource" id="greeting_stranger_1"]
 script = ExtResource("2_resp")
 text = "What do you want?"
@@ -58,10 +54,6 @@ weight = 1.0
 actions = []
 conditions = []
 response_id = "greeting_stranger_4"
-
-# =============================================================================
-# ACQUAINTANCE GREETINGS (Disposition 26-50)
-# =============================================================================
 
 [sub_resource type="Resource" id="greeting_acquaint_1"]
 script = ExtResource("2_resp")
@@ -115,10 +107,6 @@ actions = []
 conditions = []
 response_id = "greeting_acquaint_4"
 
-# =============================================================================
-# FRIEND GREETINGS (Disposition 51-75)
-# =============================================================================
-
 [sub_resource type="Resource" id="greeting_friend_1"]
 script = ExtResource("2_resp")
 text = "Well met, friend!"
@@ -170,10 +158,6 @@ weight = 0.9
 actions = []
 conditions = []
 response_id = "greeting_friend_4"
-
-# =============================================================================
-# CLOSE FRIEND GREETINGS (Disposition 76-100)
-# =============================================================================
 
 [sub_resource type="Resource" id="greeting_close_1"]
 script = ExtResource("2_resp")

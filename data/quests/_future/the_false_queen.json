@@ -1,0 +1,50 @@
+{
+	"id": "the_false_queen",
+	"title": "The False Queen",
+	"description": "Your investigation has revealed disturbing inconsistencies in the elven woman's story. Historical records suggest the King's true elven lover died decades ago. The secret society believes this woman is an imposter - possibly a witch using dark magic to advance her claims. You must find proof of her deception before she seizes the throne.",
+	"is_main_quest": true,
+	"quest_source": "story",
+	"giver_npc_id": "secret_society_contact",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "falkenhaften",
+	"objectives": [
+		{
+			"id": "find_records",
+			"description": "Search the Imperial Archives for records of the King's lover",
+			"type": "interact",
+			"target": "imperial_archives",
+			"required_count": 1
+		},
+		{
+			"id": "speak_elven_elder",
+			"description": "Seek out an elven elder who knew the true lover",
+			"type": "talk",
+			"target": "elven_elder_witness",
+			"required_count": 1
+		},
+		{
+			"id": "investigate_magic",
+			"description": "Investigate reports of dark magic near the claimant's quarters",
+			"type": "reach",
+			"target": "claimant_quarters",
+			"required_count": 1
+		},
+		{
+			"id": "find_proof",
+			"description": "Find evidence of the imposter's true nature",
+			"type": "collect",
+			"target": "witch_evidence",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "secret_society_contact",
+	"turn_in_zone": "falkenhaften",
+	"rewards": {
+		"gold": 300,
+		"xp": 750,
+		"items": []
+	},
+	"prerequisites": ["capital_intrigue"],
+	"next_quest": "the_kings_secret"
+}

@@ -1,0 +1,40 @@
+{
+	"id": "cursed_tome_1",
+	"title": "The Cursed Tome",
+	"description": "A dangerous book of dark magic was stolen from Dalhurst's library. The thief was tracked to a cultist temple west of town. Recover the tome before they can use its forbidden knowledge.",
+	"is_main_quest": false,
+	"quest_source": "npc",
+	"giver_npc_id": "dalhurst_scholar",
+	"giver_npc_type": "civilian",
+	"giver_region": "dalhurst",
+	"faction": "scholars_guild",
+	"objectives": [
+		{
+			"id": "find_temple",
+			"description": "Find the cultist temple west of Dalhurst",
+			"type": "reach",
+			"target": "cultist_temple_west",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 0,
+		"xp": 70,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": [],
+	"next_quest": "cursed_tome_2",
+	"spawn_on_accept": [
+		{
+			"type": "chest",
+			"location": "cultist_temple_west",
+			"contains": ["cursed_tome"],
+			"loot_tier": "rare"
+		}
+	],
+	"quest_items": ["cursed_tome"]
+}

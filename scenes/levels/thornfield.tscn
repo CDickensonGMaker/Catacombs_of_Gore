@@ -3,8 +3,8 @@
 [ext_resource type="Script" path="res://scripts/levels/thornfield.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
-[ext_resource type="Texture2D" path="res://Sprite folders grab bag/cat_animiation.png" id="4"]
-[ext_resource type="Texture2D" path="res://Sprite folders grab bag/cow animiation.png" id="5"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/animals/cat_animiation.png" id="4"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/animals/cow_animiation.png" id="5"]
 [ext_resource type="Script" path="res://scripts/world/bounty_board.gd" id="6_bounty_board"]
 
 [node name="Thornfield" type="Node3D"]
@@ -321,7 +321,7 @@ omni_range = 6.5
 [node name="Trees" type="Node3D" parent="Decorations"]
 
 [node name="Tree_0" type="Node3D" parent="Decorations/Trees"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, -18)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, -0.3, -18)
 
 [node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
@@ -338,7 +338,7 @@ height = 2.5
 sides = 6
 
 [node name="Tree_1" type="Node3D" parent="Decorations/Trees"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 0, -12)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, -0.3, -12)
 
 [node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, 0)
@@ -355,7 +355,7 @@ height = 2.75
 sides = 6
 
 [node name="Tree_2" type="Node3D" parent="Decorations/Trees"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 0, -20)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, -0.3, -20)
 
 [node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
@@ -372,7 +372,7 @@ height = 2.25
 sides = 6
 
 [node name="Tree_3" type="Node3D" parent="Decorations/Trees"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 0, -8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, -0.3, -8)
 
 [node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
@@ -389,7 +389,7 @@ height = 3
 sides = 6
 
 [node name="Tree_4" type="Node3D" parent="Decorations/Trees"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21, 0, -5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21, -0.3, -5)
 
 [node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_4"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
@@ -406,7 +406,7 @@ height = 2.5
 sides = 6
 
 [node name="Tree_5" type="Node3D" parent="Decorations/Trees"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, -18)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, -0.3, -18)
 
 [node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_5"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, 0)
@@ -423,7 +423,7 @@ height = 2.75
 sides = 6
 
 [node name="Tree_6" type="Node3D" parent="Decorations/Trees"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 0, -12)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, -0.3, -12)
 
 [node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_6"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
@@ -440,7 +440,7 @@ height = 2.5
 sides = 6
 
 [node name="Tree_7" type="Node3D" parent="Decorations/Trees"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, -20)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, -0.3, -20)
 
 [node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_7"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
@@ -457,7 +457,7 @@ height = 3
 sides = 6
 
 [node name="Tree_8" type="Node3D" parent="Decorations/Trees"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 0, -8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, -0.3, -8)
 
 [node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_8"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
@@ -474,7 +474,7 @@ height = 2.25
 sides = 6
 
 [node name="Tree_9" type="Node3D" parent="Decorations/Trees"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21, 0, -5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21, -0.3, -5)
 
 [node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_9"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, 0)
@@ -491,7 +491,7 @@ height = 2.75
 sides = 6
 
 [node name="Tree_10" type="Node3D" parent="Decorations/Trees"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, 12)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, -0.3, 12)
 
 [node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_10"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
@@ -508,7 +508,7 @@ height = 2.5
 sides = 6
 
 [node name="Tree_11" type="Node3D" parent="Decorations/Trees"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 0, 18)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, -0.3, 18)
 
 [node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_11"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
@@ -525,7 +525,7 @@ height = 3
 sides = 6
 
 [node name="Tree_12" type="Node3D" parent="Decorations/Trees"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 0, 15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, -0.3, 15)
 
 [node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_12"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
@@ -542,7 +542,7 @@ height = 2.25
 sides = 6
 
 [node name="Tree_13" type="Node3D" parent="Decorations/Trees"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 0, 8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, -0.3, 8)
 
 [node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_13"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, 0)
@@ -559,7 +559,7 @@ height = 2.75
 sides = 6
 
 [node name="Tree_14" type="Node3D" parent="Decorations/Trees"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, 12)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, -0.3, 12)
 
 [node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_14"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
@@ -576,7 +576,7 @@ height = 2.5
 sides = 6
 
 [node name="Tree_15" type="Node3D" parent="Decorations/Trees"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 0, 18)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, -0.3, 18)
 
 [node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_15"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
@@ -593,7 +593,7 @@ height = 3
 sides = 6
 
 [node name="Tree_16" type="Node3D" parent="Decorations/Trees"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, -0.3, 15)
 
 [node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_16"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
@@ -610,7 +610,7 @@ height = 2.25
 sides = 6
 
 [node name="Tree_17" type="Node3D" parent="Decorations/Trees"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 0, 8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, -0.3, 8)
 
 [node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_17"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, 0)
@@ -627,7 +627,7 @@ height = 2.75
 sides = 6
 
 [node name="Tree_18" type="Node3D" parent="Decorations/Trees"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, 5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, -0.3, 5)
 
 [node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_18"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
@@ -644,7 +644,7 @@ height = 2.5
 sides = 6
 
 [node name="Tree_19" type="Node3D" parent="Decorations/Trees"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, -8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, -0.3, -8)
 
 [node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_19"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
@@ -661,7 +661,7 @@ height = 3
 sides = 6
 
 [node name="Tree_20" type="Node3D" parent="Decorations/Trees"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, -0.3, 15)
 
 [node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_20"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
@@ -676,6 +676,374 @@ radius_top = 0.1
 radius_bottom = 1.575
 height = 2.25
 sides = 6
+
+[node name="Tree_21" type="Node3D" parent="Decorations/Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26, -0.3, -15)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_21"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+radius = 0.3
+height = 3
+sides = 6
+
+[node name="Foliage" type="CSGCylinder3D" parent="Decorations/Trees/Tree_21"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.75, 0)
+radius_top = 0.1
+radius_bottom = 1.75
+height = 2.5
+sides = 6
+
+[node name="Tree_22" type="Node3D" parent="Decorations/Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28, -0.3, -3)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_22"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+use_collision = true
+radius = 0.35
+height = 3.6
+sides = 6
+
+[node name="Foliage" type="CSGCylinder3D" parent="Decorations/Trees/Tree_22"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+radius_top = 0.1
+radius_bottom = 2.1
+height = 3
+sides = 6
+
+[node name="Tree_23" type="Node3D" parent="Decorations/Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, -0.3, 6)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_23"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
+use_collision = true
+radius = 0.28
+height = 2.7
+sides = 6
+
+[node name="Foliage" type="CSGCylinder3D" parent="Decorations/Trees/Tree_23"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.375, 0)
+radius_top = 0.1
+radius_bottom = 1.575
+height = 2.25
+sides = 6
+
+[node name="Tree_24" type="Node3D" parent="Decorations/Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, -0.3, -15)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_24"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, 0)
+use_collision = true
+radius = 0.32
+height = 3.3
+sides = 6
+
+[node name="Foliage" type="CSGCylinder3D" parent="Decorations/Trees/Tree_24"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.125, 0)
+radius_top = 0.1
+radius_bottom = 1.925
+height = 2.75
+sides = 6
+
+[node name="Tree_25" type="Node3D" parent="Decorations/Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, -0.3, -3)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_25"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+radius = 0.3
+height = 3
+sides = 6
+
+[node name="Foliage" type="CSGCylinder3D" parent="Decorations/Trees/Tree_25"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.75, 0)
+radius_top = 0.1
+radius_bottom = 1.75
+height = 2.5
+sides = 6
+
+[node name="Tree_26" type="Node3D" parent="Decorations/Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, -0.3, 6)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_26"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+use_collision = true
+radius = 0.35
+height = 3.6
+sides = 6
+
+[node name="Foliage" type="CSGCylinder3D" parent="Decorations/Trees/Tree_26"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+radius_top = 0.1
+radius_bottom = 2.1
+height = 3
+sides = 6
+
+[node name="Tree_27" type="Node3D" parent="Decorations/Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, -0.3, 22)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_27"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
+use_collision = true
+radius = 0.28
+height = 2.7
+sides = 6
+
+[node name="Foliage" type="CSGCylinder3D" parent="Decorations/Trees/Tree_27"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.375, 0)
+radius_top = 0.1
+radius_bottom = 1.575
+height = 2.25
+sides = 6
+
+[node name="Tree_28" type="Node3D" parent="Decorations/Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, -0.3, 22)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_28"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, 0)
+use_collision = true
+radius = 0.32
+height = 3.3
+sides = 6
+
+[node name="Foliage" type="CSGCylinder3D" parent="Decorations/Trees/Tree_28"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.125, 0)
+radius_top = 0.1
+radius_bottom = 1.925
+height = 2.75
+sides = 6
+
+[node name="Tree_29" type="Node3D" parent="Decorations/Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, -0.3, -22)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_29"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+use_collision = true
+radius = 0.3
+height = 3
+sides = 6
+
+[node name="Foliage" type="CSGCylinder3D" parent="Decorations/Trees/Tree_29"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.75, 0)
+radius_top = 0.1
+radius_bottom = 1.75
+height = 2.5
+sides = 6
+
+[node name="Tree_30" type="Node3D" parent="Decorations/Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, -0.3, -22)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_30"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+use_collision = true
+radius = 0.35
+height = 3.6
+sides = 6
+
+[node name="Foliage" type="CSGCylinder3D" parent="Decorations/Trees/Tree_30"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+radius_top = 0.1
+radius_bottom = 2.1
+height = 3
+sides = 6
+
+[node name="Tree_31" type="Node3D" parent="Decorations/Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -27, -0.3, 14)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_31"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
+use_collision = true
+radius = 0.28
+height = 2.7
+sides = 6
+
+[node name="Foliage" type="CSGCylinder3D" parent="Decorations/Trees/Tree_31"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.375, 0)
+radius_top = 0.1
+radius_bottom = 1.575
+height = 2.25
+sides = 6
+
+[node name="Tree_32" type="Node3D" parent="Decorations/Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27, -0.3, 14)
+
+[node name="Trunk" type="CSGCylinder3D" parent="Decorations/Trees/Tree_32"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, 0)
+use_collision = true
+radius = 0.32
+height = 3.3
+sides = 6
+
+[node name="Foliage" type="CSGCylinder3D" parent="Decorations/Trees/Tree_32"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.125, 0)
+radius_top = 0.1
+radius_bottom = 1.925
+height = 2.75
+sides = 6
+
+[node name="Bushes" type="Node3D" parent="Decorations"]
+
+[node name="Bush_0" type="Node3D" parent="Decorations/Bushes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, -0.3, -16)
+
+[node name="Foliage" type="CSGSphere3D" parent="Decorations/Bushes/Bush_0"]
+transform = Transform3D(1, 0, 0, 0, 0.7, 0, 0, 0, 1, 0, 0.5, 0)
+radius = 0.6
+radial_segments = 6
+rings = 4
+
+[node name="Bush_1" type="Node3D" parent="Decorations/Bushes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23, -0.3, -10)
+
+[node name="Foliage" type="CSGSphere3D" parent="Decorations/Bushes/Bush_1"]
+transform = Transform3D(1, 0, 0, 0, 0.65, 0, 0, 0, 1.1, 0, 0.45, 0)
+radius = 0.55
+radial_segments = 6
+rings = 4
+
+[node name="Bush_2" type="Node3D" parent="Decorations/Bushes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, -0.3, -6)
+
+[node name="Foliage" type="CSGSphere3D" parent="Decorations/Bushes/Bush_2"]
+transform = Transform3D(1.1, 0, 0, 0, 0.75, 0, 0, 0, 0.9, 0, 0.55, 0)
+radius = 0.65
+radial_segments = 6
+rings = 4
+
+[node name="Bush_3" type="Node3D" parent="Decorations/Bushes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, -0.3, -16)
+
+[node name="Foliage" type="CSGSphere3D" parent="Decorations/Bushes/Bush_3"]
+transform = Transform3D(1, 0, 0, 0, 0.7, 0, 0, 0, 1, 0, 0.5, 0)
+radius = 0.6
+radial_segments = 6
+rings = 4
+
+[node name="Bush_4" type="Node3D" parent="Decorations/Bushes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23, -0.3, -10)
+
+[node name="Foliage" type="CSGSphere3D" parent="Decorations/Bushes/Bush_4"]
+transform = Transform3D(0.9, 0, 0, 0, 0.6, 0, 0, 0, 1.05, 0, 0.4, 0)
+radius = 0.5
+radial_segments = 6
+rings = 4
+
+[node name="Bush_5" type="Node3D" parent="Decorations/Bushes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, -0.3, -6)
+
+[node name="Foliage" type="CSGSphere3D" parent="Decorations/Bushes/Bush_5"]
+transform = Transform3D(1.1, 0, 0, 0, 0.75, 0, 0, 0, 0.9, 0, 0.55, 0)
+radius = 0.65
+radial_segments = 6
+rings = 4
+
+[node name="Bush_6" type="Node3D" parent="Decorations/Bushes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21, -0.3, 10)
+
+[node name="Foliage" type="CSGSphere3D" parent="Decorations/Bushes/Bush_6"]
+transform = Transform3D(1, 0, 0, 0, 0.7, 0, 0, 0, 1, 0, 0.5, 0)
+radius = 0.6
+radial_segments = 6
+rings = 4
+
+[node name="Bush_7" type="Node3D" parent="Decorations/Bushes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, -0.3, 16)
+
+[node name="Foliage" type="CSGSphere3D" parent="Decorations/Bushes/Bush_7"]
+transform = Transform3D(0.95, 0, 0, 0, 0.65, 0, 0, 0, 1.1, 0, 0.45, 0)
+radius = 0.55
+radial_segments = 6
+rings = 4
+
+[node name="Bush_8" type="Node3D" parent="Decorations/Bushes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23, -0.3, 20)
+
+[node name="Foliage" type="CSGSphere3D" parent="Decorations/Bushes/Bush_8"]
+transform = Transform3D(1.1, 0, 0, 0, 0.75, 0, 0, 0, 0.9, 0, 0.55, 0)
+radius = 0.65
+radial_segments = 6
+rings = 4
+
+[node name="Bush_9" type="Node3D" parent="Decorations/Bushes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21, -0.3, 10)
+
+[node name="Foliage" type="CSGSphere3D" parent="Decorations/Bushes/Bush_9"]
+transform = Transform3D(1, 0, 0, 0, 0.7, 0, 0, 0, 1, 0, 0.5, 0)
+radius = 0.6
+radial_segments = 6
+rings = 4
+
+[node name="Bush_10" type="Node3D" parent="Decorations/Bushes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, -0.3, 16)
+
+[node name="Foliage" type="CSGSphere3D" parent="Decorations/Bushes/Bush_10"]
+transform = Transform3D(0.9, 0, 0, 0, 0.6, 0, 0, 0, 1.05, 0, 0.4, 0)
+radius = 0.5
+radial_segments = 6
+rings = 4
+
+[node name="Bush_11" type="Node3D" parent="Decorations/Bushes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23, -0.3, 20)
+
+[node name="Foliage" type="CSGSphere3D" parent="Decorations/Bushes/Bush_11"]
+transform = Transform3D(1.1, 0, 0, 0, 0.75, 0, 0, 0, 0.9, 0, 0.55, 0)
+radius = 0.65
+radial_segments = 6
+rings = 4
+
+[node name="Bush_12" type="Node3D" parent="Decorations/Bushes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, -0.3, 3)
+
+[node name="Foliage" type="CSGSphere3D" parent="Decorations/Bushes/Bush_12"]
+transform = Transform3D(1, 0, 0, 0, 0.7, 0, 0, 0, 1, 0, 0.5, 0)
+radius = 0.6
+radial_segments = 6
+rings = 4
+
+[node name="Bush_13" type="Node3D" parent="Decorations/Bushes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, -0.3, -3)
+
+[node name="Foliage" type="CSGSphere3D" parent="Decorations/Bushes/Bush_13"]
+transform = Transform3D(0.95, 0, 0, 0, 0.65, 0, 0, 0, 1.1, 0, 0.45, 0)
+radius = 0.55
+radial_segments = 6
+rings = 4
+
+[node name="Bush_14" type="Node3D" parent="Decorations/Bushes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26, -0.3, -20)
+
+[node name="Foliage" type="CSGSphere3D" parent="Decorations/Bushes/Bush_14"]
+transform = Transform3D(1.1, 0, 0, 0, 0.75, 0, 0, 0, 0.9, 0, 0.55, 0)
+radius = 0.65
+radial_segments = 6
+rings = 4
+
+[node name="Bush_15" type="Node3D" parent="Decorations/Bushes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, -0.3, -20)
+
+[node name="Foliage" type="CSGSphere3D" parent="Decorations/Bushes/Bush_15"]
+transform = Transform3D(1, 0, 0, 0, 0.7, 0, 0, 0, 1, 0, 0.5, 0)
+radius = 0.6
+radial_segments = 6
+rings = 4
+
+[node name="Bush_16" type="Node3D" parent="Decorations/Bushes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, -0.3, 22)
+
+[node name="Foliage" type="CSGSphere3D" parent="Decorations/Bushes/Bush_16"]
+transform = Transform3D(0.9, 0, 0, 0, 0.6, 0, 0, 0, 1.05, 0, 0.4, 0)
+radius = 0.5
+radial_segments = 6
+rings = 4
+
+[node name="Bush_17" type="Node3D" parent="Decorations/Bushes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, -0.3, 22)
+
+[node name="Foliage" type="CSGSphere3D" parent="Decorations/Bushes/Bush_17"]
+transform = Transform3D(1.1, 0, 0, 0, 0.75, 0, 0, 0, 0.9, 0, 0.55, 0)
+radius = 0.65
+radial_segments = 6
+rings = 4
 
 [node name="Stumps" type="Node3D" parent="Decorations"]
 

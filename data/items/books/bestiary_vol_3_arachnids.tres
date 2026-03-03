@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "bestiary_vol_3_arachnids"
+display_name = "Bestiary Vol. III: Creepy Crawlies"
+description = "A scholarly treatise on the giant spiders that infest the dark places of the world. Includes detailed anatomical diagrams, notes on venomous bites, and advice on burning their webs before engagement."
+item_type = 5
+is_stackable = true
+max_stack = 5
+unlocks_bestiary = Array[String](["giant_spider", "fire_bat"])
+book_tier = 3
+base_value = 100
+weight = 0.5

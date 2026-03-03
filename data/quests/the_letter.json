@@ -1,7 +1,7 @@
 {
 	"id": "keepers_letter_delivery",
 	"title": "A Letter for Dalhurst",
-	"description": "Tharin Ironbeard has asked you to deliver a sealed letter to his contact in Dalhurst, a man named Aldric Vane who runs a curiosities shop. The dwarf was cryptic about its contents, mentioning only that it concerns 'matters of great importance'. The wax seal bears an unfamiliar crest - perhaps the mark of some secret society.",
+	"description": "Tharin Ironbeard has asked you to deliver a sealed letter to his contact in Dalhurst, a man named Aldric Vane who runs a curiosities shop. The dwarf spoke with unusual gravity, hinting that this concerns 'matters that predate the Empire itself.' The wax seal bears a symbol you've never seen - an eye within a circle of stars, marking it as correspondence of some secret society. Tharin mentioned that Aldric collects ancient artifacts and forbidden knowledge - the sort of man who knows things others have forgotten. Whatever truth this letter contains, it seems you've stumbled into something larger than yourself.",
 	"is_main_quest": true,
 	"quest_source": "story",
 	"giver_npc_id": "tharin_ironbeard",

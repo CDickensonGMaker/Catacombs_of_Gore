@@ -71,11 +71,14 @@ func get_morality_tier() -> MoralityTier:
 		return MoralityTier.PARAGON
 
 ## Get display name for a morality tier
-func get_tier_name(tier: MoralityTier = -1) -> String:
+func get_tier_name(tier: int = -1) -> String:
+	var resolved_tier: MoralityTier
 	if tier == -1:
-		tier = get_morality_tier()
+		resolved_tier = get_morality_tier()
+	else:
+		resolved_tier = tier as MoralityTier
 
-	match tier:
+	match resolved_tier:
 		MoralityTier.VILE:
 			return "Vile"
 		MoralityTier.WICKED:
@@ -90,11 +93,14 @@ func get_tier_name(tier: MoralityTier = -1) -> String:
 			return "Unknown"
 
 ## Get color for morality tier (for UI display)
-func get_tier_color(tier: MoralityTier = -1) -> Color:
+func get_tier_color(tier: int = -1) -> Color:
+	var resolved_tier: MoralityTier
 	if tier == -1:
-		tier = get_morality_tier()
+		resolved_tier = get_morality_tier()
+	else:
+		resolved_tier = tier as MoralityTier
 
-	match tier:
+	match resolved_tier:
 		MoralityTier.VILE:
 			return Color(0.5, 0.0, 0.0)  # Dark red
 		MoralityTier.WICKED:

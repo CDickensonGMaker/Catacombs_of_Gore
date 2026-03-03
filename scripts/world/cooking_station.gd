@@ -143,6 +143,9 @@ func _create_interaction_area() -> void:
 
 ## Called by player interaction system
 func interact(_interactor: Node) -> void:
+	# Play cooking sizzle sound when interacting with fire
+	if AudioManager:
+		AudioManager.play_cooking_sound(true)  # Sizzle sound
 	_open_crafting_ui()
 
 

@@ -1,0 +1,41 @@
+{
+	"id": "lost_locket_1",
+	"title": "The Lost Locket",
+	"description": "A grieving widow lost her late husband's locket while traveling. She believes it fell somewhere near Millbrook. It contains a portrait of him - her only memento.",
+	"is_main_quest": false,
+	"quest_source": "npc",
+	"giver_npc_id": "millbrook_civilian",
+	"giver_npc_type": "civilian",
+	"giver_region": "millbrook",
+	"faction": "common_folk",
+	"objectives": [
+		{
+			"id": "search_area",
+			"description": "Search the roads near Millbrook for the locket",
+			"type": "reach",
+			"target": "troll_bridge",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 0,
+		"xp": 50,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": [],
+	"next_quest": "lost_locket_2",
+	"spawn_on_accept": [
+		{
+			"type": "chest",
+			"location": "troll_bridge",
+			"coords": [-580, 0, 620],
+			"contains": ["silver_necklace"],
+			"loot_tier": "common"
+		}
+	],
+	"quest_items": ["silver_necklace"]
+}

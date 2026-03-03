@@ -3,9 +3,9 @@
 [ext_resource type="Script" path="res://scripts/levels/whalers_abyss.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
-[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://Sprite folders grab bag/stonewall.png" id="4"]
-[ext_resource type="Texture2D" uid="uid://dyhj3smpg4g87" path="res://Sprite folders grab bag/woodenfloor.png" id="5"]
-[ext_resource type="Texture2D" uid="uid://stonefloor_001" path="res://Sprite folders grab bag/stonefloor.png" id="6"]
+[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://assets/textures/environment/walls/stonewall.png" id="4"]
+[ext_resource type="Texture2D" uid="uid://dyhj3smpg4g87" path="res://assets/textures/environment/floors/woodenfloor.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://ctpx5tsjlmw4x" path="res://assets/textures/environment/floors/stonefloor.png" id="6"]
 
 [sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
 sky_top_color = Color(0.35, 0.4, 0.5, 1)

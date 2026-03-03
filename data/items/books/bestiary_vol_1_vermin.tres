@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "bestiary_vol_1_vermin"
+display_name = "Bestiary Vol. I: Common Vermin"
+description = "A well-worn field guide documenting the habits and weaknesses of common pests. Essential reading for any aspiring adventurer. Covers rats and bats found in cellars and caves throughout the realm."
+item_type = 5
+is_stackable = true
+max_stack = 5
+unlocks_bestiary = Array[String](["giant_rat", "bat"])
+book_tier = 1
+base_value = 50
+weight = 0.5

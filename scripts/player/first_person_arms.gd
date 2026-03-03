@@ -74,8 +74,8 @@ signal cast_animation_finished
 
 
 func _ready() -> void:
-	# Set layer to render on top of 3D but below UI (layer 1 = just above 3D, below UI text)
-	layer = 1
+	# Set layer to render on top of 3D but below border frame (layer 0)
+	layer = 0
 
 	# Create the UI structure
 	_setup_ui()
@@ -118,11 +118,11 @@ func _setup_ui() -> void:
 	container.clip_contents = true  # Clip anything outside the viewport
 	add_child(container)
 
-	# Create weapon sprite (centered at bottom of screen)
+	# Create weapon sprite (anchored at bottom of screen)
 	weapon_sprite = TextureRect.new()
 	weapon_sprite.name = "WeaponSprite"
 	weapon_sprite.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	weapon_sprite.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	weapon_sprite.stretch_mode = TextureRect.STRETCH_SCALE  # Scale to fill, anchored to top-left
 	weapon_sprite.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	weapon_sprite.custom_minimum_size = Vector2(256, 256)  # Base size
 	container.add_child(weapon_sprite)
@@ -225,6 +225,9 @@ func _on_viewport_size_changed() -> void:
 ## Horizontal offset to adjust weapon centering (positive = shift right)
 var weapon_x_offset: float = 22.0  # Slight shift right to keep sword centered
 
+## Vertical offset from bottom of screen (lower number = hands more visible above bottom edge)
+var weapon_y_offset: float = -60.0  # Negative = lower on screen, positive = higher
+
 func _position_sprites() -> void:
 	if not weapon_sprite:
 		return
@@ -232,10 +235,13 @@ func _position_sprites() -> void:
 	var viewport_size := get_viewport().get_visible_rect().size
 	var weapon_size := weapon_sprite.custom_minimum_size
 
-	# Center horizontally with offset, anchor to bottom but raised for visibility
+	# Center horizontally with offset, anchor to very bottom of screen
+	# Y position: viewport bottom - part of sprite height to show + offset
+	# Only show top portion of the hands/weapon sprite
+	var visible_height := weapon_size.y * 0.5  # Show top 50% of the sprite
 	weapon_base_position = Vector2(
 		(viewport_size.x - weapon_size.x) / 2.0 + weapon_x_offset,
-		viewport_size.y - weapon_size.y - 30  # Raised higher so weapon is more visible
+		viewport_size.y - visible_height + weapon_y_offset
 	)
 	weapon_sprite.position = weapon_base_position
 	weapon_sprite.size = weapon_size
@@ -318,7 +324,7 @@ func _process(delta: float) -> void:
 		_update_sprite_frame()
 
 
-func _process_idle(delta: float) -> void:
+func _process_idle(_delta: float) -> void:
 	# Gentle bobbing motion
 	var bob_offset := sin(time_elapsed * idle_bob_speed * TAU) * idle_bob_amount
 
@@ -482,6 +488,17 @@ func _update_sprite_frame() -> void:
 func _finish_attack() -> void:
 	current_state = ArmState.IDLE
 	animation_playing = false
+
+	# If unarmed, switch back to idle fist texture
+	if is_unarmed and unarmed_idle_texture:
+		weapon_base_texture = unarmed_idle_texture
+		weapon_atlas.atlas = unarmed_idle_texture
+		weapon_atlas.region = Rect2(Vector2.ZERO, unarmed_idle_texture.get_size())
+		weapon_sprite.texture = weapon_atlas
+		weapon_h_frames = 1
+		weapon_v_frames = 1
+		total_frames = 1
+
 	emit_signal("attack_animation_finished")
 
 
@@ -538,6 +555,9 @@ func update_equipped_weapon() -> void:
 	_clear_3d_weapon()
 
 	if weapon and not weapon.fps_sprite_path.is_empty():
+		# Clear unarmed state when weapon is equipped
+		is_unarmed = false
+
 		# Load the FPS weapon sprite sheet
 		print("[FPSArms] Loading texture: %s" % weapon.fps_sprite_path)
 		var tex := load(weapon.fps_sprite_path) as Texture2D
@@ -601,6 +621,7 @@ func update_equipped_weapon() -> void:
 ## Setup a 3D weapon mesh
 func _setup_3d_weapon(weapon: WeaponData) -> void:
 	_clear_3d_weapon()
+	is_unarmed = false  # Clear unarmed state when 3D weapon equipped
 
 	# Load the mesh resource (GLB loads as PackedScene, OBJ loads as Mesh)
 	var resource = load(weapon.fps_mesh_path)
@@ -656,11 +677,43 @@ func _clear_3d_weapon() -> void:
 		weapon_mesh_instance = null
 
 
+## Unarmed sprite paths
+const UNARMED_IDLE_PATH := "res://assets/sprites/weapons/unarmed_idle.png"
+const UNARMED_PUNCH_PATH := "res://assets/sprites/weapons/unarmed_punch.png"
+
+## Track if currently unarmed (for punch animation)
+var is_unarmed: bool = false
+var unarmed_idle_texture: Texture2D = null
+var unarmed_punch_texture: Texture2D = null
+
 func _show_placeholder_weapon() -> void:
-	# Show a placeholder or empty hands
-	# For now, create a simple colored rectangle as placeholder
-	weapon_sprite.texture = null
-	weapon_sprite.visible = true  # Keep visible, could show fist sprite
+	# Show unarmed fist sprite
+	is_unarmed = true
+	using_3d_weapon = false
+
+	# Load unarmed textures
+	if ResourceLoader.exists(UNARMED_IDLE_PATH):
+		unarmed_idle_texture = load(UNARMED_IDLE_PATH)
+	if ResourceLoader.exists(UNARMED_PUNCH_PATH):
+		unarmed_punch_texture = load(UNARMED_PUNCH_PATH)
+
+	# Show idle fist
+	if unarmed_idle_texture:
+		weapon_base_texture = unarmed_idle_texture
+		weapon_atlas = AtlasTexture.new()
+		weapon_atlas.atlas = unarmed_idle_texture
+		weapon_atlas.region = Rect2(Vector2.ZERO, unarmed_idle_texture.get_size())
+		weapon_sprite.texture = weapon_atlas
+		weapon_sprite.custom_minimum_size = Vector2(640, 640)  # 200% larger for visibility
+		weapon_sprite.visible = true
+		# Configure for single frame idle
+		weapon_h_frames = 1
+		weapon_v_frames = 1
+		total_frames = 1
+		_position_sprites()
+	else:
+		weapon_sprite.texture = null
+		weapon_sprite.visible = true
 
 
 ## Trigger attack animation
@@ -672,6 +725,15 @@ func play_attack() -> void:
 	current_state = ArmState.ATTACKING
 	animation_timer = attack_duration
 	current_frame = 0
+
+	# If unarmed, switch to punch animation sprite
+	if is_unarmed and unarmed_punch_texture:
+		weapon_base_texture = unarmed_punch_texture
+		weapon_atlas.atlas = unarmed_punch_texture
+		# Punch sprite is 3 frames horizontal
+		weapon_h_frames = 3
+		weapon_v_frames = 1
+		total_frames = 3
 
 	if not using_3d_weapon:
 		_update_sprite_frame()

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "soulstone_greater_empty"
+display_name = "Greater Soulstone (Empty)"
+description = "A powerful gem that can capture large amounts of soul energy from slain enemies."
+item_type = 5
+stack_size = 10
+base_value = 1000
+weight = 0.3

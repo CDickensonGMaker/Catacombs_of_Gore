@@ -1,0 +1,44 @@
+{
+	"id": "the_imprisoned_king",
+	"title": "The Imprisoned King",
+	"description": "You have found the King - alive after nearly fifty years, sustained by the magic of the Chamber of Immortality. But he is not a prisoner in the traditional sense. He knows that the moment he leaves, the immortality magic will fail and he will rapidly age and die. He chose to stay rather than return to his mortal life and his kingdom. Now you must decide the fate of the Empire.",
+	"is_main_quest": true,
+	"quest_source": "story",
+	"giver_npc_id": "king_aldric",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "chamber_of_immortality",
+	"objectives": [
+		{
+			"id": "speak_to_king",
+			"description": "Speak with King Aldric",
+			"type": "talk",
+			"target": "king_aldric",
+			"required_count": 1
+		},
+		{
+			"id": "learn_truth",
+			"description": "Learn the full truth of his disappearance",
+			"type": "talk",
+			"target": "king_aldric",
+			"required_count": 1
+		},
+		{
+			"id": "make_choice",
+			"description": "Decide the fate of the kingdom",
+			"type": "interact",
+			"target": "chamber_throne",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "choice",
+	"turn_in_target": "endgame_choice",
+	"turn_in_zone": "chamber_of_immortality",
+	"rewards": {
+		"gold": 0,
+		"xp": 2000,
+		"items": []
+	},
+	"prerequisites": ["the_kings_secret"],
+	"next_quest": null,
+	"branches": ["ending_restore_king", "ending_claim_throne"]
+}

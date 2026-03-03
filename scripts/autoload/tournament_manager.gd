@@ -3,6 +3,14 @@
 ## NOTE: This is an autoload singleton - do not use class_name
 extends Node
 
+## Preload scripts for spawning arena enemies (avoids class resolution issues in autoloads)
+const GladiatorNPCScript = preload("res://scripts/npcs/gladiator_npc.gd")
+## EnemyBase is loaded lazily at runtime to avoid circular dependency issues
+var _enemy_base_script: GDScript = null
+
+## Tournament tier levels
+enum TournamentTier { NOVICE, VETERAN, CHAMPION, LEGEND }
+
 ## Signals for tournament events
 signal tournament_started()
 signal wave_started(wave_number: int, total_waves: int)
@@ -70,6 +78,28 @@ func _ready() -> void:
 	# Connect to combat signals to track kills
 	if CombatManager:
 		CombatManager.entity_killed.connect(_on_entity_killed)
+
+	# Connect to scene manager to clear node references before scene changes
+	if SceneManager:
+		SceneManager.scene_load_started.connect(_on_scene_load_started)
+
+
+## Called when a scene change begins - clear all node references to prevent stale casts
+func _on_scene_load_started(_scene_path: String) -> void:
+	_clear_node_references()
+
+
+## Clear all node references to prevent "Trying to cast a freed object" errors
+## Called at the START of scene transitions, before the old scene is freed
+func _clear_node_references() -> void:
+	# Clear enemy references since they will be freed with the old scene
+	current_wave_enemies.clear()
+
+	# If tournament was active, reset state (player is leaving the arena)
+	if is_tournament_active:
+		is_tournament_active = false
+		current_wave = 0
+		is_equipment_locked = false
 
 
 ## Check if player can enter the tournament
@@ -185,29 +215,44 @@ func _spawn_enemy(arena: Node, spawn_pos: Vector3, enemy_type: String) -> void:
 	# Use GladiatorNPC if available, otherwise fall back to EnemyBase
 	var enemy: Node = null
 
-	if ClassDB.class_exists("GladiatorNPC") or Engine.has_singleton("GladiatorNPC"):
-		enemy = GladiatorNPC.spawn_gladiator(
+	if GladiatorNPCScript:
+		enemy = GladiatorNPCScript.spawn_gladiator(
 			arena,
 			spawn_pos,
 			enemy_data,
-			0  # tier - not used in new system
+			TournamentTier.NOVICE  # Use enum instead of magic number
 		)
 	else:
 		# Fallback to standard enemy spawning
+		# Check ActorRegistry for Zoo patches first
 		var sprite_path: String = enemy_data.sprite_path if enemy_data.sprite_path else enemy_data.icon_path
+		var h_frames: int = enemy_data.sprite_hframes if enemy_data.sprite_hframes > 0 else 4
+		var v_frames: int = enemy_data.sprite_vframes if enemy_data.sprite_vframes > 0 else 4
+
+		if ActorRegistry:
+			var sprite_config: Dictionary = ActorRegistry.get_sprite_config(enemy_type)
+			if not sprite_config.is_empty():
+				sprite_path = sprite_config.get("sprite_path", sprite_path)
+				h_frames = sprite_config.get("h_frames", h_frames)
+				v_frames = sprite_config.get("v_frames", v_frames)
+
 		if sprite_path.is_empty():
 			sprite_path = "res://assets/sprites/enemies/human_bandit.png"
 
 		var sprite_texture: Texture2D = load(sprite_path) as Texture2D
 		if sprite_texture:
-			enemy = EnemyBase.spawn_billboard_enemy(
-				arena,
-				spawn_pos,
-				enemy_data_path,
-				sprite_texture,
-				enemy_data.sprite_hframes if enemy_data.sprite_hframes > 0 else 4,
-				enemy_data.sprite_vframes if enemy_data.sprite_vframes > 0 else 4
-			)
+			# Lazy load EnemyBase to avoid circular dependency at parse time
+			if not _enemy_base_script:
+				_enemy_base_script = load("res://scripts/enemies/enemy_base.gd")
+			if _enemy_base_script:
+				enemy = _enemy_base_script.spawn_billboard_enemy(
+					arena,
+					spawn_pos,
+					enemy_data_path,
+					sprite_texture,
+					h_frames,
+					v_frames
+				)
 
 	if enemy:
 		enemy.add_to_group("tournament_enemy")
@@ -233,13 +278,25 @@ func _on_entity_killed(victim: Node, _killer: Node) -> void:
 	if not is_tournament_active:
 		return
 
-	# Check if victim is a tournament enemy
-	if victim.is_in_group("tournament_enemy"):
+	# Check if victim is valid and is a tournament enemy
+	if is_instance_valid(victim) and victim.is_in_group("tournament_enemy"):
 		current_wave_enemies.erase(victim)
+
+		# Clean up any other invalid enemies from the list
+		_cleanup_invalid_enemies()
 
 		# Check if wave is complete
 		if current_wave_enemies.is_empty():
 			_on_wave_complete()
+
+
+## Remove any invalid/freed enemies from tracking array
+func _cleanup_invalid_enemies() -> void:
+	var valid_enemies: Array[Node] = []
+	for enemy: Node in current_wave_enemies:
+		if is_instance_valid(enemy):
+			valid_enemies.append(enemy)
+	current_wave_enemies = valid_enemies
 
 
 ## Called when all enemies in a wave are defeated

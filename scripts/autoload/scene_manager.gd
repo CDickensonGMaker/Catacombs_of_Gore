@@ -7,7 +7,7 @@ extends Node
 const RETURN_TO_WILDERNESS := "__RETURN_TO_WILDERNESS__"
 
 ## Procedural dungeons regenerate each time, so saved positions are invalid
-const PROCEDURAL_DUNGEON_ZONES := ["test_dungeon"]
+const PROCEDURAL_DUNGEON_ZONES := []
 
 ## Dev mode - enables fast travel to any location (set to false for normal gameplay)
 var dev_mode: bool = false
@@ -28,6 +28,9 @@ var loading_progress: float = 0.0
 var target_scene_path: String = ""
 var spawn_point_id: String = ""
 
+## Tracks if any scene has been loaded through SceneManager (not direct F6 test)
+var has_transitioned: bool = false
+
 ## Previous scene tracking (for returning from interiors)
 var previous_scene_path: String = ""
 var previous_spawn_id: String = ""
@@ -43,7 +46,10 @@ var current_room_coords: Vector2i = Vector2i.ZERO
 ## Transition effect
 var transition_overlay: CanvasLayer
 var transition_rect: ColorRect
+var loading_background: TextureRect
+var loading_label: Label
 var transition_duration: float = 0.5
+const LOADING_BG_PATH := "res://assets/ui/loading_background.png"
 
 ## Player spawn data (from save or scene transition)
 var pending_player_position: Vector3 = Vector3.ZERO
@@ -73,12 +79,42 @@ func _create_transition_overlay() -> void:
 	transition_overlay.layer = 100
 	add_child(transition_overlay)
 
+	# Black background for fade
 	transition_rect = ColorRect.new()
 	transition_rect.color = Color.BLACK
 	transition_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
 	transition_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	transition_rect.modulate.a = 0.0
 	transition_overlay.add_child(transition_rect)
+
+	# Loading screen background image
+	loading_background = TextureRect.new()
+	loading_background.name = "LoadingBackground"
+	loading_background.set_anchors_preset(Control.PRESET_FULL_RECT)
+	loading_background.stretch_mode = TextureRect.STRETCH_SCALE
+	loading_background.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST  # PS1 pixelated
+	loading_background.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	loading_background.visible = false
+	if ResourceLoader.exists(LOADING_BG_PATH):
+		loading_background.texture = load(LOADING_BG_PATH)
+	transition_overlay.add_child(loading_background)
+
+	# "NOW LOADING..." text
+	loading_label = Label.new()
+	loading_label.name = "LoadingLabel"
+	loading_label.text = "NOW LOADING..."
+	loading_label.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	loading_label.offset_top = -80
+	loading_label.offset_bottom = -40
+	loading_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	loading_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	loading_label.add_theme_font_size_override("font_size", 32)
+	loading_label.add_theme_color_override("font_color", Color(0.9, 0.85, 0.7))  # Parchment color
+	loading_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
+	loading_label.add_theme_constant_override("shadow_offset_x", 2)
+	loading_label.add_theme_constant_override("shadow_offset_y", 2)
+	loading_label.visible = false
+	transition_overlay.add_child(loading_label)
 
 
 ## ============================================================================
@@ -163,6 +199,7 @@ func exit_interior(return_facing: float = -999.0) -> void:
 	await _fade_in()
 
 	is_loading = false
+	has_transitioned = true
 	scene_load_completed.emit("overworld")
 
 
@@ -209,6 +246,7 @@ func change_scene(scene_path: String, spawn_id: String = "", fade: bool = true) 
 		await _fade_in()
 
 	is_loading = false
+	has_transitioned = true
 	scene_load_completed.emit(scene_path)
 
 
@@ -402,16 +440,39 @@ func is_scene_preloaded(scene_path: String) -> bool:
 
 func _fade_out() -> void:
 	transition_started.emit()
+
+	# Fade to black first
 	var tween := create_tween()
 	tween.tween_property(transition_rect, "modulate:a", 1.0, transition_duration)
 	await tween.finished
 
+	# Show loading screen on top of black
+	_show_loading_screen()
+
 
 func _fade_in() -> void:
+	# Hide loading screen first
+	_hide_loading_screen()
+
+	# Then fade from black
 	var tween := create_tween()
 	tween.tween_property(transition_rect, "modulate:a", 0.0, transition_duration)
 	await tween.finished
 	transition_completed.emit()
+
+
+func _show_loading_screen() -> void:
+	if loading_background:
+		loading_background.visible = true
+	if loading_label:
+		loading_label.visible = true
+
+
+func _hide_loading_screen() -> void:
+	if loading_background:
+		loading_background.visible = false
+	if loading_label:
+		loading_label.visible = false
 
 
 func reload_current_scene() -> void:
@@ -510,20 +571,53 @@ func get_current_room_coords() -> Vector2i:
 ## ============================================================================
 
 ## Fast travel to a location (works in both dev and normal mode)
-## ALWAYS uses CellStreamer for seamless world navigation
+## Handles both hand-crafted scenes (loaded directly) and procedural cells (via CellStreamer)
 func fast_travel_to(location_id: String) -> void:
 	print("[SceneManager] Fast traveling to: %s" % location_id)
 
-	var coords := WorldGrid.get_location_coords(location_id)
-	print("[SceneManager] Using CellStreamer to teleport to coords: %s" % str(coords))
+	var coords: Vector2i = WorldGrid.get_location_coords(location_id)
+	var cell_info: WorldGrid.CellInfo = WorldGrid.get_cell(coords)
 
 	# Fade out
 	await _fade_out()
 
-	if CellStreamer:
-		await CellStreamer.teleport_to_cell(coords)
+	# For hand-crafted scenes, load as MAIN SCENE (not streaming cell)
+	if cell_info and cell_info.scene_path != "":
+		print("[SceneManager] Fast travel to hand-crafted scene: %s" % cell_info.scene_path)
+
+		# Stop streaming completely to prevent conflicts
+		if CellStreamer:
+			CellStreamer.stop_streaming()
+			await get_tree().process_frame
+
+		# Load scene directly (player stays intact via change_scene)
+		await change_scene(cell_info.scene_path, "from_fast_travel", false)  # false = no fade (we already faded)
+
+		# Wait for geometry/physics to initialize
+		await get_tree().create_timer(0.2).timeout
 	else:
-		push_error("[SceneManager] CellStreamer not available!")
+		# Procedural cell - use teleport via CellStreamer
+		print("[SceneManager] Fast travel to procedural cell: %s" % str(coords))
+		if CellStreamer:
+			await CellStreamer.teleport_to_cell(coords)
+		else:
+			push_error("[SceneManager] CellStreamer not available!")
+
+		# Wait for cell to fully load
+		await get_tree().create_timer(0.1).timeout
+
+	# Update PlayerGPS location after teleport
+	if PlayerGPS:
+		PlayerGPS.set_position(coords)
+		if cell_info and cell_info.location_id != "":
+			PlayerGPS.current_location_id = cell_info.location_id
+		else:
+			PlayerGPS.current_location_id = ""
+
+	# Update SceneManager's tracked position (used by world map)
+	current_room_coords = coords
+	if cell_info and cell_info.location_id != "":
+		current_region_id = cell_info.location_id
 
 	# Fade in
 	await _fade_in()

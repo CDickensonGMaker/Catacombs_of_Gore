@@ -1,0 +1,38 @@
+{
+	"id": "bandit_justice_2",
+	"title": "Eliminate the Bandits",
+	"description": "You've found the camp. Now eliminate all the bandits to end their threat permanently.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "human_empire",
+	"objectives": [
+		{
+			"id": "kill_bandits",
+			"description": "Kill all bandits in the camp",
+			"type": "kill",
+			"target": "human_bandit",
+			"required_count": 6
+		},
+		{
+			"id": "kill_leader",
+			"description": "Kill the Bandit Boss",
+			"type": "kill",
+			"target": "bandit_boss",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 0,
+		"xp": 300,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": ["bandit_justice_1"],
+	"next_quest": "bandit_justice_3"
+}

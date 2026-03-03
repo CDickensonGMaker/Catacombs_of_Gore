@@ -1,0 +1,150 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/data/enemy_attack_data.gd" id="2"]
+
+[sub_resource type="Resource" id="1"]
+script = ExtResource("2")
+id = "assassin_strike"
+display_name = "Assassin's Strike"
+damage = Array[int]([1, 4, 2])
+damage_type = 0
+windup_time = 0.3
+active_time = 0.15
+recovery_time = 0.25
+cooldown = 1.0
+range_distance = 2.5
+is_ranged = false
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 15.0
+inflicts_condition = 6
+condition_chance = 0.35
+condition_duration = 5.0
+stagger_power = 0.6
+knockback_force = 2.0
+weight = 1.0
+min_range = 0.0
+max_range = 2.8
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[sub_resource type="Resource" id="2"]
+script = ExtResource("2")
+id = "shadow_bolt"
+display_name = "Shadow Bolt"
+damage = Array[int]([1, 6, 2])
+damage_type = 5
+windup_time = 0.5
+active_time = 0.2
+recovery_time = 0.3
+cooldown = 3.0
+range_distance = 12.0
+is_ranged = true
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 18.0
+inflicts_condition = 0
+condition_chance = 0.0
+condition_duration = 0.0
+stagger_power = 0.4
+knockback_force = 1.0
+weight = 0.6
+min_range = 4.0
+max_range = 15.0
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[sub_resource type="Resource" id="3"]
+script = ExtResource("2")
+id = "venomous_stab"
+display_name = "Venomous Stab"
+damage = Array[int]([1, 4, 2])
+damage_type = 0
+windup_time = 0.4
+active_time = 0.15
+recovery_time = 0.3
+cooldown = 2.0
+range_distance = 2.2
+is_ranged = false
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 15.0
+inflicts_condition = 2
+condition_chance = 0.8
+condition_duration = 8.0
+stagger_power = 0.5
+knockback_force = 1.5
+weight = 0.8
+min_range = 0.0
+max_range = 2.5
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[resource]
+script = ExtResource("1")
+id = "ratfang_snotcheeze"
+display_name = "Ratfang Snotcheeze"
+description = "A notorious rat-man assassin known for his cunning and cruelty. His blade has ended many lives for coin."
+level = 20
+min_level = 18
+max_level = 22
+max_hp = 200
+armor_value = 22
+movement_speed = 5.5
+turn_speed = 6.0
+grit = 8
+agility = 14
+will = 10
+knowledge = 6
+bravery = 7
+behavior = 0
+faction = 3
+aggro_range = 15.0
+attack_range = 2.5
+preferred_distance = 2.0
+flee_hp_threshold = 0.1
+is_boss = false
+allows_dialogue = true
+attacks = Array[ExtResource("2")]([SubResource("1"), SubResource("2"), SubResource("3")])
+can_block = true
+block_chance = 0.25
+stagger_resistance = 0.4
+fire_resistance = 0.0
+frost_resistance = 0.0
+lightning_resistance = 0.0
+poison_resistance = 0.8
+necrotic_resistance = 0.2
+physical_resistance = 0.15
+fire_weakness = 0.0
+frost_weakness = 0.0
+lightning_weakness = 0.0
+holy_weakness = 0.2
+causes_horror = false
+horror_difficulty = 10
+loot_table_av = 8
+gold_drop = Array[int]([400, 600])
+guaranteed_drops = Array[String](["mysterious_contract"])
+drop_table = {
+"health_potion": 0.5,
+"antidote": 0.6,
+"lockpick": 0.4
+}
+xp_reward = 300
+scene_path = ""
+icon_path = "res://assets/sprites/enemies/ratgan_idle.png"
+scale = 1.0
+sprite_path = "res://assets/sprites/enemies/ratgan_idle.png"
+attack_sprite_path = "res://assets/sprites/enemies/ratgan_walking.png"
+sprite_hframes = 1
+sprite_vframes = 1
+attack_hframes = 4
+attack_vframes = 1
+sprite_pixel_size = 0.025
+idle_sounds = Array[String]([])
+attack_sounds = Array[String]([])
+hurt_sounds = Array[String]([])
+death_sounds = Array[String]([])

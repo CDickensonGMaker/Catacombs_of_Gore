@@ -4,6 +4,7 @@ extends Node
 signal item_added(item_id: String, quantity: int)
 signal item_removed(item_id: String, quantity: int)
 signal item_used(item_id: String)
+signal item_sold(item_id: String, quantity: int, quality: Enums.ItemQuality)  # For quest temptation tracking
 signal equipment_changed(slot: String, old_item: Dictionary, new_item: Dictionary)
 signal gold_changed(old_amount: int, new_amount: int)
 signal quick_slot_changed(slot_index: int, item_id: String)
@@ -122,6 +123,7 @@ func _load_item_databases() -> void:
 		"scroll_cone_of_cold", "scroll_iron_guard", "scroll_chain_lightning",
 		# Quest items
 		"corrupted_totem_shard", "goblin_war_horn", "bandit_bounty_note",
+		"mysterious_contract",
 		# Materials
 		"iron_ore", "iron_ingot", "gold_ore", "gold_ingot",
 		"silver_ore", "silver_ingot",
@@ -148,6 +150,22 @@ func _load_item_databases() -> void:
 	]
 	for item_id in item_files:
 		var path := "res://data/items/%s.tres" % item_id
+		var item = load(path)
+		if item and item is ItemData and item.id:
+			item_database[item.id] = item
+			print("[InventoryManager] Loaded item: %s (id=%s)" % [path, item.id])
+		else:
+			print("[InventoryManager] FAILED to load item: %s" % path)
+
+	# Load bestiary books
+	var book_files := [
+		"bestiary_vol_1_vermin", "bestiary_vol_2_predators", "bestiary_vol_3_arachnids",
+		"bestiary_vol_4_goblins", "bestiary_vol_5_bandits", "bestiary_vol_6_undead",
+		"bestiary_vol_7_cultists", "bestiary_vol_8_monsters", "bestiary_vol_9_tengers",
+		"bestiary_vol_10_legendary"
+	]
+	for book_id in book_files:
+		var path := "res://data/items/books/%s.tres" % book_id
 		var item = load(path)
 		if item and item is ItemData and item.id:
 			item_database[item.id] = item
@@ -481,6 +499,8 @@ func use_item(inventory_index: int) -> bool:
 			success = _use_repair_kit(item)
 		ItemData.ItemType.BEDROLL:
 			success = _use_bedroll()
+		ItemData.ItemType.BOOK:
+			success = _use_book(item)
 		_:
 			return false  # Other item types cannot be used
 
@@ -565,6 +585,43 @@ func _use_scroll(item: ItemData) -> bool:
 
 	print("[InventoryManager] FAILED: learn_spell_by_id returned false")
 	return false
+
+
+## Use a bestiary book to unlock creature knowledge
+func _use_book(item: ItemData) -> bool:
+	print("[InventoryManager] _use_book called for: %s" % item.id)
+
+	if item.unlocks_bestiary.is_empty():
+		push_warning("Book has no unlocks_bestiary entries: " + item.id)
+		return false
+
+	var hud = GameManager.get_tree().get_first_node_in_group("hud")
+	var new_entries: int = 0
+	var already_known: int = 0
+
+	# Unlock each creature in the book
+	for creature_id: String in item.unlocks_bestiary:
+		if JournalManager and JournalManager.unlock_bestiary_from_book(creature_id):
+			new_entries += 1
+		else:
+			already_known += 1
+
+	# Show feedback
+	if new_entries > 0:
+		if hud and hud.has_method("show_notification"):
+			hud.show_notification("Learned about %d creature%s from %s!" % [
+				new_entries,
+				"s" if new_entries > 1 else "",
+				item.display_name
+			])
+		AudioManager.play_ui_confirm()
+		return true
+	else:
+		# All entries already known
+		if hud and hud.has_method("show_notification"):
+			hud.show_notification("You already know everything in this book.")
+		return false
+
 
 ## Apply consumable effect
 func _apply_item_effect(item: ItemData) -> bool:

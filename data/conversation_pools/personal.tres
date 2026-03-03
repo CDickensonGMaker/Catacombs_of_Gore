@@ -3,10 +3,6 @@
 [ext_resource type="Script" path="res://scripts/dialogue/conversation_response_pool.gd" id="1_pool"]
 [ext_resource type="Script" path="res://scripts/dialogue/conversation_response.gd" id="2_resp"]
 
-# =============================================================================
-# FARMER PERSONAL RESPONSES
-# =============================================================================
-
 [sub_resource type="Resource" id="personal_farmer_1"]
 script = ExtResource("2_resp")
 text = "Me? Just a simple farmer. Been working this land since my father's time."
@@ -97,10 +93,6 @@ weight = 0.9
 actions = []
 conditions = []
 response_id = "personal_farmer_7"
-
-# =============================================================================
-# GUARD PERSONAL RESPONSES
-# =============================================================================
 
 [sub_resource type="Resource" id="personal_guard_1"]
 script = ExtResource("2_resp")
@@ -206,10 +198,6 @@ actions = []
 conditions = []
 response_id = "personal_guard_8"
 
-# =============================================================================
-# MERCHANT PERSONAL RESPONSES
-# =============================================================================
-
 [sub_resource type="Resource" id="personal_merchant_1"]
 script = ExtResource("2_resp")
 text = "Trade's been slow lately. Too much danger on the roads keeps the caravans away."
@@ -314,10 +302,6 @@ actions = []
 conditions = []
 response_id = "personal_merchant_8"
 
-# =============================================================================
-# INNKEEPER PERSONAL RESPONSES
-# =============================================================================
-
 [sub_resource type="Resource" id="personal_innkeeper_1"]
 script = ExtResource("2_resp")
 text = "{npc_name}'s the name. Been running this place for nigh on fifteen years now."
@@ -395,10 +379,6 @@ weight = 0.85
 actions = []
 conditions = []
 response_id = "personal_innkeeper_6"
-
-# =============================================================================
-# SCHOLAR PERSONAL RESPONSES
-# =============================================================================
 
 [sub_resource type="Resource" id="personal_scholar_1"]
 script = ExtResource("2_resp")
@@ -478,10 +458,6 @@ actions = []
 conditions = []
 response_id = "personal_scholar_6"
 
-# =============================================================================
-# BLACKSMITH PERSONAL RESPONSES
-# =============================================================================
-
 [sub_resource type="Resource" id="personal_blacksmith_1"]
 script = ExtResource("2_resp")
 text = "I've worked the forge since I was tall enough to hold a hammer. It's all I know."
@@ -559,10 +535,6 @@ weight = 0.8
 actions = []
 conditions = []
 response_id = "personal_blacksmith_6"
-
-# =============================================================================
-# PRIEST PERSONAL RESPONSES
-# =============================================================================
 
 [sub_resource type="Resource" id="personal_priest_1"]
 script = ExtResource("2_resp")
@@ -668,10 +640,6 @@ actions = []
 conditions = []
 response_id = "personal_priest_8"
 
-# =============================================================================
-# CIVILIAN BACKSTORY RESPONSES (Why they live in Elder Moor)
-# =============================================================================
-
 [sub_resource type="Resource" id="personal_civilian_backstory_1"]
 script = ExtResource("2_resp")
 text = "Born here, raised here, and I'll die here. Elder Moor is in my bones."
@@ -750,10 +718,6 @@ actions = []
 conditions = []
 response_id = "personal_civilian_backstory_6"
 
-# =============================================================================
-# FAMILY MENTION RESPONSES
-# =============================================================================
-
 [sub_resource type="Resource" id="personal_family_1"]
 script = ExtResource("2_resp")
 text = "My children are my whole world. Everything I do, I do for them."
@@ -818,10 +782,6 @@ weight = 0.8
 actions = []
 conditions = []
 response_id = "personal_family_5"
-
-# =============================================================================
-# DREAMS AND ASPIRATIONS RESPONSES
-# =============================================================================
 
 [sub_resource type="Resource" id="personal_dreams_1"]
 script = ExtResource("2_resp")
@@ -888,10 +848,6 @@ actions = []
 conditions = []
 response_id = "personal_dreams_5"
 
-# =============================================================================
-# COMPLAINTS AND CONCERNS RESPONSES
-# =============================================================================
-
 [sub_resource type="Resource" id="personal_complaints_1"]
 script = ExtResource("2_resp")
 text = "The smell of the moor never truly leaves you. Gets into your clothes, your hair, everything."
@@ -957,10 +913,6 @@ actions = []
 conditions = []
 response_id = "personal_complaints_5"
 
-# =============================================================================
-# MEMORIES RESPONSES (Better/Worse Times)
-# =============================================================================
-
 [sub_resource type="Resource" id="personal_memories_1"]
 script = ExtResource("2_resp")
 text = "I remember when the festivals lasted three days. Music, dancing, feasting. We don't celebrate like that anymore."
@@ -1025,10 +977,6 @@ weight = 0.8
 actions = []
 conditions = []
 response_id = "personal_memories_5"
-
-# =============================================================================
-# GENERIC PERSONAL RESPONSES (No specific archetype)
-# =============================================================================
 
 [sub_resource type="Resource" id="personal_generic_1"]
 script = ExtResource("2_resp")
@@ -1107,10 +1055,6 @@ weight = 0.8
 actions = []
 conditions = []
 response_id = "personal_generic_6"
-
-# =============================================================================
-# HOSTILE/UNFRIENDLY PERSONAL RESPONSES
-# =============================================================================
 
 [sub_resource type="Resource" id="personal_hostile"]
 script = ExtResource("2_resp")

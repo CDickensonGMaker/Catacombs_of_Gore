@@ -30,7 +30,8 @@ enum ConditionType {
 	SKILL_CHECK,        ## Check if player skill meets threshold
 	TIME_OF_DAY,        ## Check current time of day
 	REPUTATION,         ## Check faction reputation (future)
-	RANDOM_CHANCE       ## Random percentage chance
+	RANDOM_CHANCE,      ## Random percentage chance
+	PLAYER_RACE         ## Check player's race (param_string: "human", "elf", "halfling", "dwarf")
 }
 
 ## Action types that can trigger when a choice is selected

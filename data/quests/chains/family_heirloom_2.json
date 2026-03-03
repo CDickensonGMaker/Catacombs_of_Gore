@@ -1,0 +1,32 @@
+{
+	"id": "family_heirloom_2",
+	"title": "Retrieve the Ring",
+	"description": "You found a chest near the Crossroads. Search it for the family ring.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "common_folk",
+	"objectives": [
+		{
+			"id": "get_ring",
+			"description": "Retrieve the family ring from the chest",
+			"type": "collect",
+			"target": "gold_ring",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 0,
+		"xp": 75,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": ["family_heirloom_1"],
+	"next_quest": "family_heirloom_3",
+	"quest_items": ["gold_ring"]
+}

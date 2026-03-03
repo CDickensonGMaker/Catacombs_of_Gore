@@ -22,6 +22,6 @@ repair_amount = 0
 repairs_quality = false
 base_value = 12
 weight = 0.1
-icon_path = ""
+icon_path = "res://assets/sprites/items/blue_flower.png"
 mesh_path = ""
 use_sound = ""

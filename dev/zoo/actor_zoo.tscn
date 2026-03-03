@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://bjxz5k8qy3mwp"]
+
+[ext_resource type="Script" path="res://dev/zoo/actor_zoo.gd" id="1_main"]
+
+[node name="ActorZoo" type="Node3D"]
+script = ExtResource("1_main")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 10, 0)
+light_energy = 1.2
+shadow_enabled = true

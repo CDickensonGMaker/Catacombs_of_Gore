@@ -362,7 +362,7 @@ func _create_boss_template() -> void:
 
 	# Boss: Vampire Lord
 	template.boss_data_path = "res://data/enemies/vampire_lord.tres"
-	template.boss_sprite_path = "res://Sprite folders grab bag/vampirelord.png"
+	template.boss_sprite_path = "res://assets/sprites/enemies/undead/vampire_lord_alt.png"
 	template.boss_h_frames = 5
 	template.boss_v_frames = 3
 

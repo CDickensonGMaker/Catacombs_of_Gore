@@ -1,0 +1,34 @@
+{
+	"id": "bounty_wolf_menace",
+	"title": "Wolf Menace",
+	"description": "Wolves have been attacking travelers near the Elder Moor. The local hunters' guild is offering a bounty for anyone who can thin out the pack.",
+	"is_main_quest": false,
+	"quest_source": "bounty",
+	"giver_npc_id": "bounty_board",
+	"giver_npc_type": "bounty_board",
+	"giver_region": "elder_moor",
+	"faction": "hunters_guild",
+	"objectives": [
+		{
+			"id": "kill_wolves",
+			"description": "Kill wolves near Elder Moor",
+			"type": "kill",
+			"target": "wolf",
+			"required_count": 5
+		}
+	],
+	"turn_in_type": "bounty_board",
+	"turn_in_target": "bounty_board",
+	"turn_in_zone": "elder_moor",
+	"rewards": {
+		"gold": 50,
+		"xp": 150,
+		"items": [],
+		"faction_reputation": {
+			"hunters_guild": 10
+		}
+	},
+	"cooldown_days": 5,
+	"prerequisites": [],
+	"next_quest": ""
+}

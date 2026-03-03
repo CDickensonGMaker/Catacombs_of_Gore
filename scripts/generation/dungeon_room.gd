@@ -7,11 +7,11 @@ const TorchProp = preload("res://scripts/props/torch_prop.gd")
 
 ## Enemy spawner decoration textures
 const SPAWNER_TEXTURES := [
-	"res://Sprite folders grab bag/pile of skulls.png",
-	"res://Sprite folders grab bag/candlepentagram.png",
-	"res://Sprite folders grab bag/skullpillar.png",
+	"res://assets/sprites/props/dungeon/skull_pile.png",
+	"res://assets/sprites/props/dungeon/pentagram.png",
+	"res://assets/sprites/props/dungeon/skull_pillar.png",
 ]
-const BOSS_SPAWNER_TEXTURE := "res://Sprite folders grab bag/coffinskeleton.png"
+const BOSS_SPAWNER_TEXTURE := "res://assets/sprites/props/dungeon/coffin_skeleton.png"
 
 signal room_entered(room: DungeonRoom)
 signal room_cleared(room: DungeonRoom)
@@ -60,8 +60,8 @@ func setup(room_template: RoomTemplate, world_position: Vector3, index: int) -> 
 ## Create materials based on template colors and textures
 func _create_materials() -> void:
 	# Load textures
-	var floor_texture: Texture2D = load("res://Sprite folders grab bag/stonefloor.png")
-	var wall_texture: Texture2D = load("res://Sprite folders grab bag/stonewall.png")
+	var floor_texture: Texture2D = load("res://assets/textures/environment/floors/stonefloor.png")
+	var wall_texture: Texture2D = load("res://assets/textures/environment/walls/stonewall.png")
 
 	floor_material = StandardMaterial3D.new()
 	floor_material.albedo_color = template.floor_color
@@ -314,7 +314,7 @@ func _create_guard_room_decorations() -> void:
 
 	# Skull pentagram on back wall (centered)
 	var pentagram_pos := Vector3(0, template.height * 0.5, pentagram_z)
-	_create_wall_decoration(pentagram_pos, "res://Sprite folders grab bag/candlepentagram.png", 1.0, back_wall_dir)
+	_create_wall_decoration(pentagram_pos, "res://assets/sprites/props/dungeon/pentagram.png", 1.0, back_wall_dir)
 
 	# Two skull pillars flanking the pentagram
 	var pillar_offset := 3.0  # Distance from center
@@ -385,7 +385,7 @@ func _create_wall_decoration(local_pos: Vector3, texture_path: String, scale_fac
 
 ## Create a skull pillar decoration (3D pillar + skull billboard on top)
 func _create_skull_pillar_decoration(local_pos: Vector3) -> void:
-	var texture: Texture2D = load("res://Sprite folders grab bag/skullpillar.png")
+	var texture: Texture2D = load("res://assets/sprites/props/dungeon/skull_pillar.png")
 	if not texture:
 		return
 
@@ -410,7 +410,7 @@ func _create_skull_pillar_decoration(local_pos: Vector3) -> void:
 
 ## Create a corner pentagram (smaller, angled into corner)
 func _create_corner_pentagram(local_pos: Vector3, scale_factor: float) -> void:
-	var texture: Texture2D = load("res://Sprite folders grab bag/candlepentagram.png")
+	var texture: Texture2D = load("res://assets/sprites/props/dungeon/pentagram.png")
 	if not texture:
 		return
 
@@ -517,6 +517,15 @@ func _create_spawner_decoration(local_pos: Vector3, is_boss: bool = false) -> vo
 	add_child(spawner)
 
 
+## Extract enemy type ID from data path for ActorRegistry lookup
+## e.g., "res://data/enemies/wolf.tres" -> "wolf"
+func _get_enemy_type_from_path(data_path: String) -> String:
+	if data_path.is_empty():
+		return ""
+	var filename: String = data_path.get_file()
+	return filename.get_basename()
+
+
 ## Spawn a single enemy with optional roaming behavior
 func spawn_single_enemy(parent: Node, generator: Node, roaming: bool = false) -> void:
 	if template.enemy_data_paths.is_empty():
@@ -551,15 +560,28 @@ func spawn_single_enemy(parent: Node, generator: Node, roaming: bool = false) ->
 			enemy.persistent_id = enemy_id
 	else:
 		# Billboard sprite enemy
-		var sprite_texture: Texture2D = load(enemy_config.sprite_path)
+		# Check ActorRegistry for patched sprite configuration (Zoo patches)
+		var sprite_path: String = enemy_config.sprite_path
+		var h_frames: int = enemy_config.h_frames
+		var v_frames: int = enemy_config.v_frames
+
+		var enemy_type: String = _get_enemy_type_from_path(enemy_config.data_path)
+		if ActorRegistry and not enemy_type.is_empty():
+			var registry_config: Dictionary = ActorRegistry.get_sprite_config(enemy_type)
+			if not registry_config.is_empty():
+				sprite_path = registry_config.get("sprite_path", sprite_path)
+				h_frames = registry_config.get("h_frames", h_frames)
+				v_frames = registry_config.get("v_frames", v_frames)
+
+		var sprite_texture: Texture2D = load(sprite_path)
 		if sprite_texture:
 			enemy = EnemyBase.spawn_billboard_enemy(
 				parent,
 				world_pos,
 				enemy_config.data_path,
 				sprite_texture,
-				enemy_config.h_frames,
-				enemy_config.v_frames
+				h_frames,
+				v_frames
 			)
 			if enemy:
 				enemy.persistent_id = enemy_id
@@ -628,15 +650,28 @@ func spawn_enemies(parent: Node) -> void:
 				enemy_config.data_path
 			)
 		else:
-			var sprite_texture: Texture2D = load(enemy_config.sprite_path)
+			# Check ActorRegistry for patched sprite configuration (Zoo patches)
+			var sprite_path: String = enemy_config.sprite_path
+			var h_frames: int = enemy_config.h_frames
+			var v_frames: int = enemy_config.v_frames
+
+			var enemy_type: String = _get_enemy_type_from_path(enemy_config.data_path)
+			if ActorRegistry and not enemy_type.is_empty():
+				var registry_config: Dictionary = ActorRegistry.get_sprite_config(enemy_type)
+				if not registry_config.is_empty():
+					sprite_path = registry_config.get("sprite_path", sprite_path)
+					h_frames = registry_config.get("h_frames", h_frames)
+					v_frames = registry_config.get("v_frames", v_frames)
+
+			var sprite_texture: Texture2D = load(sprite_path)
 			if sprite_texture:
 				enemy = EnemyBase.spawn_billboard_enemy(
 					parent,
 					spawn_pos,
 					enemy_config.data_path,
 					sprite_texture,
-					enemy_config.h_frames,
-					enemy_config.v_frames
+					h_frames,
+					v_frames
 				)
 
 		if enemy:
@@ -670,19 +705,32 @@ func spawn_boss(parent: Node) -> void:
 		# No sprite path - use skeleton with multi-state sprites as fallback for boss
 		boss = EnemyBase.spawn_skeleton_enemy(parent, spawn_pos, template.boss_data_path)
 	else:
-		var sprite_texture: Texture2D = load(template.boss_sprite_path)
+		# Check ActorRegistry for patched sprite configuration (Zoo patches)
+		var sprite_path: String = template.boss_sprite_path
+		var h_frames: int = template.boss_h_frames
+		var v_frames: int = template.boss_v_frames
+
+		var boss_type: String = _get_enemy_type_from_path(template.boss_data_path)
+		if ActorRegistry and not boss_type.is_empty():
+			var registry_config: Dictionary = ActorRegistry.get_sprite_config(boss_type)
+			if not registry_config.is_empty():
+				sprite_path = registry_config.get("sprite_path", sprite_path)
+				h_frames = registry_config.get("h_frames", h_frames)
+				v_frames = registry_config.get("v_frames", v_frames)
+
+		var sprite_texture: Texture2D = load(sprite_path)
 		if sprite_texture:
 			boss = EnemyBase.spawn_billboard_enemy(
 				parent,
 				spawn_pos,
 				template.boss_data_path,
 				sprite_texture,
-				template.boss_h_frames,
-				template.boss_v_frames
+				h_frames,
+				v_frames
 			)
 		else:
 			# Sprite failed to load - fallback to skeleton
-			push_warning("[DungeonRoom] Failed to load boss sprite: %s, falling back to skeleton" % template.boss_sprite_path)
+			push_warning("[DungeonRoom] Failed to load boss sprite: %s, falling back to skeleton" % sprite_path)
 			boss = EnemyBase.spawn_skeleton_enemy(parent, spawn_pos, template.boss_data_path)
 
 	if boss:

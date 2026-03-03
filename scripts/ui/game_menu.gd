@@ -48,9 +48,8 @@ const SKILL_DESCRIPTIONS := {
 	"Ranged": "+5% ranged damage per level. +3% accuracy per level.",
 	"Dodge": "+3% dodge chance per level. Reduces incoming damage.",
 	"Stealth": "-5% detection per level. +10% backstab damage per level.",
-	"Endurance": "+2% max stamina per level. +3% stamina regen per level.",
+	"Endurance": "+2% max stamina per level. -5% fall damage. +5% jump height.",
 	"Thievery": "+5% pickpocket success per level. Better theft checks.",
-	"Acrobatics": "-5% fall damage per level. +5% jump height per level.",
 	"Athletics": "+2% movement speed per level. -2% stamina cost per level.",
 	# WILL-based
 	"Concentration": "+3% max mana per level. Reduces spell interrupt chance.",
@@ -58,15 +57,14 @@ const SKILL_DESCRIPTIONS := {
 	"Bravery": "+5% fear resistance per level. +2% damage vs undead.",
 	# SPEECH-based
 	"Persuasion": "+5% disposition per level. Unlocks dialogue options.",
-	"Deception": "+5% bluff success per level. Better disguise checks.",
+	"Deception": "+5% bluff success per level. High risk/reward checks.",
 	"Negotiation": "+3% better prices per level. +5% quest rewards.",
 	# KNOWLEDGE-based
 	"Arcana Lore": "+3% spell power per level. Better spell learning.",
 	"History": "+5% artifact identify chance. Unlocks lore dialogue.",
-	"Intuition": "+2% initiative per level. Detects ambushes and secrets.",
+	"Intuition": "+5 enemy radar range per level. Detects ambushes and traps.",
 	"Engineering": "+5% crafting success per level. +3% trap disarm.",
-	"Investigation": "+5% hidden item find chance. Better clue detection.",
-	"Perception": "+5% enemy detection range. Spots traps and secrets.",
+	"Investigation": "Press NPCs for info. Find hidden clues and items.",
 	"Religion": "+5% temple blessing duration. +3% vs undead.",
 	"Nature": "+5% animal calm chance. Better foraging yields.",
 	# VITALITY-based
@@ -571,7 +569,6 @@ func _refresh_character() -> void:
 		var lbl = _make_label("%s: %d" % [display_name, skill_level], skill_color, 14)
 		lbl.tooltip_text = SKILL_DESCRIPTIONS.get(display_name, "")
 		lbl.mouse_filter = Control.MOUSE_FILTER_STOP
-		lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		skill_grid.add_child(lbl)
 
 	# === CONDITIONS ===

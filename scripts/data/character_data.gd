@@ -225,7 +225,7 @@ func initialize_career() -> void:
 			skills[Enums.Skill.RELIGION] = 1
 			skills[Enums.Skill.BRAVERY] = 1
 		Enums.Career.SCOUT:
-			skills[Enums.Skill.PERCEPTION] = 2
+			skills[Enums.Skill.INTUITION] = 2
 			skills[Enums.Skill.STEALTH] = 1
 		Enums.Career.SOLDIER:
 			skills[Enums.Skill.MELEE] = 2
@@ -542,12 +542,12 @@ func get_horror_check_bonus() -> int:
 	var bravery_skill := get_skill(Enums.Skill.BRAVERY)
 	return eff_will + bravery_skill
 
-## Get trap detection bonus (Knowledge + Perception)
-## PERCEPTION: General awareness, helps detect traps and hidden objects
+## Get trap detection bonus (Knowledge + Intuition)
+## INTUITION: General awareness, helps detect traps and hidden objects
 func get_trap_detection_bonus() -> int:
 	var eff_knowledge := get_effective_stat(Enums.Stat.KNOWLEDGE)
-	var perception_skill := get_skill(Enums.Skill.PERCEPTION)
-	return eff_knowledge + perception_skill
+	var intuition_skill := get_skill(Enums.Skill.INTUITION)
+	return eff_knowledge + intuition_skill
 
 ## Get hidden door/object detection bonus (Knowledge + History + Investigation)
 ## HISTORY: Lore knowledge helps find secret passages

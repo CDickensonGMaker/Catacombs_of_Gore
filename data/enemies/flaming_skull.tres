@@ -104,9 +104,9 @@ drop_table = {
 }
 xp_reward = 65
 scene_path = ""
-icon_path = "res://Sprite folders grab bag/flaming_skull_enemy.png"
+icon_path = "res://assets/sprites/enemies/undead/flaming_skull_enemy.png"
 scale = 0.9
-sprite_path = "res://Sprite folders grab bag/flaming_skull_enemy.png"
+sprite_path = "res://assets/sprites/enemies/undead/flaming_skull_enemy.png"
 attack_sprite_path = ""
 sprite_hframes = 4
 sprite_vframes = 1

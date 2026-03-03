@@ -19,8 +19,8 @@ var has_been_harvested: bool = false
 
 ## Fallen tree textures
 const FALLEN_TREE_TEXTURES: Array[String] = [
-	"res://Sprite folders grab bag/swamp_downtree1.png",
-	"res://Sprite folders grab bag/swamp_downtree2.png"
+	"res://assets/sprites/environment/trees/swamp_fallen_1.png",
+	"res://assets/sprites/environment/trees/swamp_fallen_2.png"
 ]
 
 

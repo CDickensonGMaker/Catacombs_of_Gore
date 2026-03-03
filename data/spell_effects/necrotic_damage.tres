@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="SpellEffectData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/spell_effect_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "necrotic_damage"
+display_name = "Necrotic Damage"
+description = "Deals dark, life-draining damage"
+effect_type = 0
+damage_type = 5
+condition = 0
+stat = 0
+allowed_delivery = [1, 2, 3]
+base_magnitude = 5
+max_magnitude = 40
+base_duration = 0.0
+max_duration = 0.0
+base_cost = 9
+magnitude_cost_mult = 0.6
+duration_cost_mult = 0.0
+aoe_cost_mult = 2.0
+required_arcana = 6
+icon_path = ""
+effect_color = Color(0.4, 0.1, 0.5, 1)

@@ -1,5 +1,8 @@
 ## sea_encounter.gd - Resource class for sea encounter definitions
 ## Defines encounters that can occur during boat travel
+##
+## TODO: [FUTURE FEATURE] Sea encounter system infrastructure is complete but not active.
+## No .tres data files exist for encounters yet. See CLAUDE.md "Sea Travel & Encounters" section.
 @tool
 class_name SeaEncounter
 extends Resource

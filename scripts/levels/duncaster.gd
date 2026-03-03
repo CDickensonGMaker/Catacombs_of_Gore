@@ -5,11 +5,17 @@
 extends Node3D
 
 const ZONE_ID := "town_duncaster"
+const TOWN_AMBIENT_PATH := "res://assets/audio/Ambiance/towns/town_murmur_medieval_mix_60s_ps1_retro.wav"
 
 var nav_region: NavigationRegion3D
 
 func _ready() -> void:
 	SaveManager.set_current_zone(ZONE_ID, "Duncaster")
+	# Play town ambient sound (only when main scene)
+	var is_main_scene: bool = get_node_or_null("Player") != null
+	if is_main_scene:
+		AudioManager.play_ambient(TOWN_AMBIENT_PATH)
+		AudioManager.play_zone_music("village")
 
 	_create_terrain()
 	_create_mountain_walls()
@@ -28,13 +34,17 @@ func _ready() -> void:
 
 ## Setup dynamic day/night lighting
 func _setup_day_night_cycle() -> void:
-	DayNightCycle.add_to_level(self)
+	# Only setup day/night lighting when this is the main scene (has Player node)
+	# When loaded as a streamed cell, CellStreamer strips lighting to prevent doubling
+	var is_main_scene: bool = get_node_or_null("Player") != null
+	if is_main_scene:
+		DayNightCycle.add_to_level(self)
 
 
 ## Create mountain terrain - rocky ground with snow patches
 func _create_terrain() -> void:
 	# Load textures
-	var stone_floor_tex: Texture2D = load("res://Sprite folders grab bag/stonefloor.png")
+	var stone_floor_tex: Texture2D = load("res://assets/textures/environment/floors/stonefloor.png")
 
 	# Materials
 	var stone_mat := StandardMaterial3D.new()
@@ -322,7 +332,7 @@ func _create_warning_sign(pos: Vector3) -> void:
 
 ## Spawn town buildings
 func _spawn_buildings() -> void:
-	var stone_wall_tex: Texture2D = load("res://Sprite folders grab bag/stonewall.png")
+	var stone_wall_tex: Texture2D = load("res://assets/textures/environment/walls/stonewall.png")
 
 	var wall_mat := StandardMaterial3D.new()
 	wall_mat.albedo_color = Color(0.5, 0.48, 0.45)
@@ -391,8 +401,8 @@ func _create_merchant_shop(pos: Vector3, shop_name: String, shop_type: String, t
 	shop_root.name = "Shop_" + shop_name.replace(" ", "_")
 	add_child(shop_root)
 
-	var stone_wall_tex: Texture2D = load("res://Sprite folders grab bag/stonewall.png")
-	var wood_floor_tex: Texture2D = load("res://Sprite folders grab bag/woodenfloor.png")
+	var stone_wall_tex: Texture2D = load("res://assets/textures/environment/walls/stonewall.png")
+	var wood_floor_tex: Texture2D = load("res://assets/textures/environment/floors/woodenfloor.png")
 
 	var width := 7.0
 	var depth := 7.0
@@ -524,8 +534,8 @@ func _spawn_inn() -> void:
 	inn_root.name = "DuncasterInn"
 	add_child(inn_root)
 
-	var stone_wall_tex: Texture2D = load("res://Sprite folders grab bag/stonewall.png")
-	var wood_floor_tex: Texture2D = load("res://Sprite folders grab bag/woodenfloor.png")
+	var stone_wall_tex: Texture2D = load("res://assets/textures/environment/walls/stonewall.png")
+	var wood_floor_tex: Texture2D = load("res://assets/textures/environment/floors/woodenfloor.png")
 
 	var wall_mat := StandardMaterial3D.new()
 	wall_mat.albedo_color = Color(0.52, 0.48, 0.44)

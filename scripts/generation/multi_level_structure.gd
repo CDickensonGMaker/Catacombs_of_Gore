@@ -1,6 +1,9 @@
 ## multi_level_structure.gd - Factory for multi-level structures
 ## Creates towers, platforms, watch towers, and stairs
 ## PS1 aesthetic: 8-sided cylinders, low poly, hard edges
+##
+## TODO: [INACTIVE] This structure generation system is complete but not integrated.
+## Future work: Use in TownGenerator or for procedural outpost/camp generation.
 class_name MultiLevelStructure
 extends RefCounted
 
@@ -19,7 +22,7 @@ static func _create_stone_material() -> StandardMaterial3D:
 	mat.roughness = 0.85
 	mat.albedo_color = Color(0.45, 0.43, 0.4)
 
-	var tex: Texture2D = load("res://Sprite folders grab bag/stonewall.png") if ResourceLoader.exists("res://Sprite folders grab bag/stonewall.png") else null
+	var tex: Texture2D = load("res://assets/textures/environment/walls/stonewall.png") if ResourceLoader.exists("res://assets/textures/environment/walls/stonewall.png") else null
 	if tex:
 		mat.albedo_texture = tex
 		mat.uv1_scale = Vector3(0.25, 0.25, 1.0)
@@ -33,7 +36,7 @@ static func _create_wood_material() -> StandardMaterial3D:
 	mat.roughness = 0.9
 	mat.albedo_color = Color(0.4, 0.3, 0.2)
 
-	var tex: Texture2D = load("res://Sprite folders grab bag/wood_planks.png") if ResourceLoader.exists("res://Sprite folders grab bag/wood_planks.png") else null
+	var tex: Texture2D = load("res://assets/textures/environment/walls/wood.png") if ResourceLoader.exists("res://assets/textures/environment/walls/wood.png") else null
 	if tex:
 		mat.albedo_texture = tex
 		mat.uv1_scale = Vector3(0.5, 0.5, 1.0)

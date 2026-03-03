@@ -225,8 +225,8 @@ func _process(delta: float) -> void:
 ## Get formatted play time string
 func get_play_time_formatted() -> String:
 	var total_seconds: int = int(stats["play_time_seconds"])
-	var hours: int = total_seconds / 3600
-	var minutes: int = (total_seconds % 3600) / 60
+	var hours: int = int(total_seconds / 3600)
+	var minutes: int = int((total_seconds % 3600) / 60)
 	var seconds: int = total_seconds % 60
 	return "%02d:%02d:%02d" % [hours, minutes, seconds]
 

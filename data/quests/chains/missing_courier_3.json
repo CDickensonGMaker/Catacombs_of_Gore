@@ -1,0 +1,34 @@
+{
+	"id": "missing_courier_3",
+	"title": "Deliver the Letter",
+	"description": "You found the courier's body and recovered the letter. Deliver it to its intended recipient in Thornfield.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "merchants_guild",
+	"objectives": [
+		{
+			"id": "deliver_letter",
+			"description": "Deliver the letter to the recipient in Thornfield",
+			"type": "talk",
+			"target": "thornfield_merchant",
+			"target_zone": "thornfield",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "thornfield_merchant",
+	"turn_in_zone": "thornfield",
+	"rewards": {
+		"gold": 125,
+		"xp": 225,
+		"items": [],
+		"faction_reputation": {
+			"merchants_guild": 20
+		}
+	},
+	"prerequisites": ["missing_courier_2"],
+	"next_quest": ""
+}

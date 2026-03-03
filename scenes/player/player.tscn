@@ -8,7 +8,7 @@
 [ext_resource type="Script" path="res://scripts/player/third_person_weapon.gd" id="6"]
 
 [sub_resource type="CapsuleShape3D" id="1"]
-radius = 0.4
+radius = 0.7
 height = 1.8
 
 [sub_resource type="BoxShape3D" id="2"]
@@ -60,7 +60,7 @@ script = ExtResource("6")
 [node name="MeleeHitbox" type="Area3D" parent="MeshRoot" groups=["player_hitbox", "hitbox"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, -1.0)
 collision_layer = 8
-collision_mask = 64
+collision_mask = 65
 monitoring = false
 script = ExtResource("3")
 damage = 10

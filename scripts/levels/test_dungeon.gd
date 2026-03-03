@@ -1,5 +1,6 @@
-## test_dungeon.gd - Procedural test dungeon for development
-## Accessible from town portal for testing generation and map systems
+## test_dungeon.gd - Procedural dungeon level (production)
+## NOTE: "test" in name is historical - this is an active gameplay level
+## Accessible from town portal, demonstrates procedural generation
 extends Node3D
 
 const ZONE_ID := "test_dungeon"
@@ -145,7 +146,7 @@ func _create_corridor_template() -> void:
 	]
 	template.enemy_sprite_paths = [
 		"res://assets/sprites/enemies/skeleton_shade.png",
-		"res://Sprite folders grab bag/skeleton_warrior.png"
+		"res://assets/sprites/enemies/undead/skeleton_warrior.png"
 	]
 	template.enemy_h_frames = [4, 8]
 	template.enemy_v_frames = [4, 12]
@@ -187,7 +188,7 @@ func _create_guard_room_template() -> void:
 	]
 	template.enemy_sprite_paths = [
 		"res://assets/sprites/enemies/skeleton_shade.png",
-		"res://Sprite folders grab bag/skeleton_warrior.png"
+		"res://assets/sprites/enemies/undead/skeleton_warrior.png"
 	]
 	template.enemy_h_frames = [4, 8]
 	template.enemy_v_frames = [4, 12]
@@ -374,7 +375,7 @@ func _create_boss_template() -> void:
 
 	# Boss: Vampire Lord
 	template.boss_data_path = "res://data/enemies/vampire_lord.tres"
-	template.boss_sprite_path = "res://Sprite folders grab bag/vampirelord.png"
+	template.boss_sprite_path = "res://assets/sprites/enemies/undead/vampire_lord_alt.png"
 	template.boss_h_frames = 5
 	template.boss_v_frames = 3
 

@@ -272,6 +272,45 @@ var color := COL_GOLD if is_main else COL_TEXT  # May fail inference
 var color: Color = COL_GOLD if is_main else COL_TEXT
 ```
 
+### 9. Node vs Node3D (global_position)
+```gdscript
+# BAD - Node does NOT have global_position!
+class_name MyEncounter
+extends Node  # Wrong base class!
+
+func spawn_enemy() -> void:
+    var pos := global_position  # ERROR: Identifier "global_position" not declared
+
+# GOOD - Use Node3D for anything with position
+class_name MyEncounter
+extends Node3D  # Correct!
+
+func spawn_enemy() -> void:
+    var pos := global_position  # Works!
+```
+
+**Rule:** If your script needs `position`, `global_position`, `transform`, or `global_transform`, it MUST extend `Node3D` (or a subclass like `CharacterBody3D`).
+
+### 10. Static Function Signature Override Mismatch
+```gdscript
+# Parent class (civilian_npc.gd):
+static func spawn_dwarf_guard(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
+    pass
+
+# BAD - Child class with DIFFERENT signature causes parse error!
+class_name GuardNPC
+extends CivilianNPC
+
+static func spawn_dwarf_guard(parent: Node, pos: Vector3, patrol: Array[Vector3] = []) -> GuardNPC:
+    pass  # ERROR: The function signature doesn't match the parent
+
+# GOOD - Use a DIFFERENT function name to avoid conflict
+static func spawn_guard_dwarf(parent: Node, pos: Vector3, patrol: Array[Vector3] = []) -> GuardNPC:
+    pass  # Works! Different name, no override conflict
+```
+
+**Rule:** Static functions in child classes with the same name as parent MUST have the exact same signature. If you need different parameters, use a different function name.
+
 **Rule of thumb:** When working with Dictionary, untyped Array, comparisons, or conditional expressions, ALWAYS add explicit type annotations. This is especially critical in static functions, loop variables, and boolean expressions. **NEVER use `:=` for comparisons or conditional assignments - always use explicit `: Type =` syntax.**
 
 ---
@@ -669,6 +708,66 @@ func _ready():
     if enemies:
         # process enemies
 ```
+
+---
+
+## GLB/BLENDER MODEL COLLISION
+
+**CRITICAL:** Do NOT use `create_trimesh_collision()` on entire GLB models. This creates collision for ALL geometry including archways, railings, and decorative elements that players should walk through.
+
+### The Problem
+```gdscript
+# BAD - Creates collision on EVERYTHING including passable areas
+func _generate_terrain_collision() -> void:
+    var terrain := get_node_or_null("Terrain")
+    if terrain:
+        _add_collision_to_meshes(terrain)  # Blocks doorways, archways, etc!
+```
+
+### The Solution
+
+**Option 1: Use ground plane collision only**
+```gdscript
+# GOOD - Simple ground plane + barriers
+func _ready() -> void:
+    _setup_ground_plane()  # Floor collision
+    _setup_arena_barrier()  # Perimeter walls
+    # Do NOT call _generate_terrain_collision()
+```
+
+**Option 2: Use GLBCollisionProcessor with naming conventions**
+```gdscript
+# Use smart collision based on mesh names
+var terrain := get_node_or_null("Terrain")
+if terrain:
+    GLBCollisionProcessor.process_node(terrain)
+```
+
+### Blender Naming Conventions
+
+Tell artists to use these suffixes in Blender object names:
+
+**Gets collision (solid objects):**
+| Suffix | Use Case |
+|--------|----------|
+| `_floor`, `_ground` | Floor surfaces |
+| `_wall`, `_walls` | Solid walls |
+| `_pillar`, `_column` | Pillars/columns |
+| `_stairs`, `_steps` | Stairways |
+| `_solid`, `_block` | Generic solid objects |
+
+**No collision (passable/decorative):**
+| Suffix | Use Case |
+|--------|----------|
+| `_arch`, `_archway` | Archways (walk through) |
+| `_frame`, `_doorframe` | Door/window frames |
+| `_railing`, `_rail` | Railings (visual only) |
+| `_decor`, `_prop` | Decorative props |
+| `_trim`, `_molding` | Trim details |
+
+### Slash Command
+
+Use `/fix-mesh-collision <script-path>` to automatically fix collision issues in a level script.
 
 ---
 
@@ -1263,6 +1362,86 @@ Similar to the dungeon generator, create a system that procedurally generates to
 - Each generated town should have a unique zone_id for save system
 - Consider faction alignment affecting available services
 
+### Dynamic Quest System (Multi-Path Completion)
+
+**Vision:** Quests should be solvable in multiple ways with real consequences.
+
+**Example Scenario - "Deal with Bandit Camp" Quest:**
+| Path | Method | Consequence |
+|------|--------|-------------|
+| 1 | Kill all bandits (combat) | Standard reputation gain |
+| 2 | Intimidate leader to leave (skill check) | Peaceful resolution, different rep |
+| 3 | Bribe leader to leave (gold + persuasion) | Costs gold, bandits may return |
+| 4 | Take over operation (kill/intimidate leader) | Become bandit boss, ongoing mechanics |
+| 5 | Pre-completion (already killed bandits) | Auto-complete when quest offered |
+
+**Current State (~20% of Vision):**
+
+What EXISTS:
+- Linear quests (kill X, collect Y, talk to Z)
+- Quest chains (`next_quest` field auto-starts next)
+- Optional objectives (`is_optional: true`)
+- Prerequisites (gate quests behind other quests)
+- Skill checks in dialogue (DiceManager + branching nodes)
+- Persuasion system (ADMIRE/INTIMIDATE/BRIBE/TAUNT)
+- Humanoid dialogue for combat NPCs (FIGHT/BRIBE/NEGOTIATE/INTIMIDATE)
+- Faction reputation (-100 to +100, cascading)
+
+What's MISSING:
+- Multiple completion paths (quests are single-path only)
+- OR objectives (can't do "kill OR intimidate")
+- Dialogue → quest completion (skill checks don't complete objectives)
+- Pre-completion detection (no world state checks)
+- Method-based rewards (same reward regardless of approach)
+- Reputation from quests (JSON field exists but not parsed)
+- Branching quest paths (JSON structure exists, code doesn't execute)
+
+**Gap Analysis:**
+
+Quest System (`quest_manager.gd`):
+- Only parses basic fields, not `branching_quests` or `turn_in_options`
+- `_check_quest_completion()` just checks "are ALL objectives done?"
+- No tracking of HOW objectives were completed
+- No world state pre-checks
+
+Dialogue ↔ Quest Integration:
+- Dialogue can START quests via action
+- Dialogue CANNOT complete quest objectives
+- No `DialogueAction` type for "mark objective complete via method X"
+- Skill checks branch dialogue, but don't affect quest state
+
+World State Tracking:
+- No system to track: "bandits at location X are dead"
+- No pre-completion checks when quest is offered
+- No auto-complete for already-met conditions
+
+**Implementation Roadmap:**
+
+**Phase 1: Foundation**
+1. Extend Objective class - Add `completion_method` field to track HOW
+2. Parse branching fields - Read `branching_quests`, `turn_in_options` from JSON
+3. Add `complete_objective_via_method()` - New function for method-aware completion
+
+**Phase 2: Dialogue Integration**
+1. New DialogueAction type - `COMPLETE_QUEST_OBJECTIVE`
+2. Wire skill checks to quests - Success/fail routes to different quest branches
+3. Conversation → Quest bridge - Intimidating bandit leader completes "deal with bandits"
+
+**Phase 3: World State**
+1. Create WorldState autoload - Track flags like `bandits_camp_x_cleared`
+2. Pre-completion checks - When quest offered, check if already done
+3. Auto-complete system - Skip objectives that world state shows are met
+
+**Phase 4: Consequences**
+1. Parse reputation_changes - Already in some JSON, need to execute
+2. Method-based rewards - Different rewards per completion path
+3. NPC state changes - Bandit leader behavior changes if you're their boss
+
+**Phase 5: Advanced**
+1. Ongoing quest effects - Extortion payments as bandit leader
+2. Dynamic NPC behavior - NPCs react to your choices
+3. Faction consequences - Being bandit leader affects guard relations
+
 ---
 
 ## DIALOGUE SYSTEM ARCHITECTURE
@@ -1364,54 +1543,224 @@ sprite.offset = Vector2(0, frame_height / 2.0)
 
 ---
 
-## KNOWN ISSUES & TODO
+## COMMON RUNTIME CRASHES (AVOID THESE)
 
-### Dialogue System (FIXED)
-**Issues resolved:**
-1. ✅ **Escape key doesn't close dialogue** - Fixed by adding dialogue active check to HUD._is_menu_open()
-2. ✅ **Dialogue choice buttons not clickable** - Fixed mouse_filter issues:
-   - Changed root_control to MOUSE_FILTER_PASS (allows clicks through to children)
-   - Changed overlay to MOUSE_FILTER_STOP (blocks clicks outside dialogue)
-   - Added focus_mode and mouse_filter to buttons
-3. ✅ **HUD opening pause menu during dialogue** - HUD now checks DialogueManager.is_dialogue_active and ConversationSystem.is_active
-4. ✅ **Save/Load integration** - CrimeManager, DialogueManager, ConversationSystem now properly save/load
+These bugs cause crashes in exported .exe builds. Reference this list when writing code.
 
-**Files modified:**
-- `scripts/ui/dialogue_box.gd` - Fixed mouse filters and button focus
-- `scripts/ui/conversation_ui.gd` - Same fixes
-- `scripts/ui/hud.gd` - Added dialogue active checks to _is_menu_open()
-- `scripts/data/save_data.gd` - Added CrimeSaveData, DialogueSaveData, ConversationSaveData classes
-- `scripts/autoload/save_manager.gd` - Added collect/apply functions for crime, dialogue, conversation data
+### 1. "Trying to cast a freed object" (FIXED 2024)
 
-### Magic System (FIXED)
-- ✅ **MagicPanel shows ALL spells** - Fixed: Now properly filters `_populate_spell_list()` to only show learned spells
+**Cause:** Autoloads hold references to scene nodes. When scene changes or save/load happens, nodes are freed but autoload references persist. Casting the stale reference crashes.
 
-### World Map (RESOLVED)
-The world map system has been completely rebuilt:
-- WorldGrid now contains all location data with Elder Moor at (0, 0)
-- CellStreamer handles seamless cell loading/unloading
-- PlayerGPS tracks player position and discoveries
-- PaintedWorldMap displays the world with fog of war
-- Boat travel mechanics not yet implemented
+**Bad Pattern:**
+```gdscript
+# In an autoload
+var current_npc: Node = null  # This persists across scene changes!
 
-### NPC Spawning & Cell Streaming (TODO)
-NPCs need to be connected to the new cell streaming/map system:
-- NPCs in hand-crafted scenes should persist when cell is loaded as streaming cell
-- Traveling merchants, random encounters, etc. should spawn via CellStreamer
-- NPC positions should be tracked by PlayerGPS for minimap/compass
-- Consider: Should NPCs despawn when cell unloads? Or persist in memory?
-- Guard patrols, civilian schedules may need cell-aware logic
+func do_something():
+    var npc = current_npc as QuestGiver  # CRASH if node was freed!
+```
 
-### NPC Visual Issues (RESOLVED)
-- ✅ NPCs now at correct height (fixed floating)
-- ✅ NPCs now at correct size (fixed scaling)
-- ✅ Frame flicker on spawn fixed
-- ✅ Consistent pixel_size applied across all NPC types
+**Fix Pattern:**
+```gdscript
+# 1. Always check validity before casting
+func do_something():
+    if not is_instance_valid(current_npc):
+        current_npc = null
+        return
+    var npc = current_npc as QuestGiver
 
-### Starting Experience
-- Player starts with 10,000 gold and 100,000 XP for testing
-- Starter equipment: fine longsword, hunting bow, 20 arrows
-- **Remember to reduce these values before release**
+# 2. Clear references on scene change
+func _ready():
+    SceneManager.scene_load_started.connect(_on_scene_load_started)
+
+func _on_scene_load_started():
+    _clear_node_references()
+
+func _clear_node_references():
+    current_npc = null
+    # Clear all other node references
+```
+
+**Affected Autoloads (now fixed):**
+- CombatManager: `player`, `_pending_humanoid_enemy`, `_pending_humanoid_group`, `active_enemies`
+- ConversationSystem: `current_npc`
+- PlayerGPS: `registered_npcs` dictionary
+- TournamentManager: `current_wave_enemies`
+
+---
+
+### 2. Sprite hframes/vframes Mismatch
+
+**Cause:** Code specifies wrong frame count for sprite sheet, causing visual corruption or crashes.
+
+**Example:** Martha's sprite has 4 frames but code said `h_frames = 5`
+
+**Fix:** Always verify sprite dimensions match code:
+```gdscript
+# Check actual sprite: 160x64 with 4 poses = 4 frames
+sprite.hframes = 4  # NOT 5!
+sprite.vframes = 1
+```
+
+---
+
+### 3. Static Method Resolution on Non-Autoload Classes
+
+**Cause:** Autoloads load early. If autoload calls `ClassName.static_method()` on a non-autoload class, the class may not be parsed yet.
+
+**Bad Pattern:**
+```gdscript
+# In tournament_manager.gd (autoload)
+func spawn():
+    enemy = GladiatorNPC.spawn_gladiator(...)  # CRASH - GladiatorNPC not loaded yet!
+```
+
+**Fix Pattern:**
+```gdscript
+# Preload the script instead
+const GladiatorNPCScript = preload("res://scripts/npcs/gladiator_npc.gd")
+
+func spawn():
+    enemy = GladiatorNPCScript.spawn_gladiator(...)  # Works!
+```
+
+---
+
+### 4. Accessing Child Nodes Before add_child()
+
+**Cause:** BillboardSprite creates its `sprite` child in `_ready()`. Accessing it before adding to tree crashes.
+
+**Bad Pattern:**
+```gdscript
+var billboard = BillboardSprite.new()
+billboard.sprite.modulate = Color.RED  # CRASH - sprite doesn't exist yet!
+add_child(billboard)
+```
+
+**Fix Pattern:**
+```gdscript
+var billboard = BillboardSprite.new()
+add_child(billboard)  # Now _ready() runs and creates sprite
+if billboard.sprite:
+    billboard.sprite.modulate = Color.RED
+```
+
+---
+
+### 5. Dictionary/Array Type Inference in Static Functions
+
+**Cause:** GDScript static functions are stricter about type inference. Using `:=` with dictionary access or comparisons fails.
+
+**Bad Pattern:**
+```gdscript
+static func find_item(items: Array) -> Dictionary:
+    for item in items:
+        var id := item["id"]  # CRASH - cannot infer type
+```
+
+**Fix Pattern:**
+```gdscript
+static func find_item(items: Array[Dictionary]) -> Dictionary:
+    for item: Dictionary in items:
+        var id: String = item["id"]  # Explicit types work
+```
+
+---
+
+## CURRENT PRIORITY: SHIPPABLE .EXE
+
+**Goal:** Hard bug test and export a stable .exe for external playtesting and feedback.
+
+### Pre-Release Checklist
+- [ ] Full playthrough without crashes
+- [ ] Save/Load works correctly
+- [ ] All core systems functional (combat, dialogue, quests, inventory, crafting)
+- [ ] No game-breaking bugs
+- [ ] Reduce starting gold/XP to intended values (currently 10k gold, 100k XP for testing)
+- [ ] Export to Windows .exe
+- [ ] Test exported build
+
+### Systems Status (All Complete)
+| System | Status |
+|--------|--------|
+| Dialogue System | ✅ Fixed (mouse filters, escape key, save/load) |
+| Magic System | ✅ Fixed (spell list filtering) |
+| World Map | ✅ Complete (cell streaming, fog of war, fast travel) |
+| NPC Visuals | ✅ Fixed (height, size, frame flicker) |
+| Quest System | ✅ Working (linear quests, chains, prerequisites) |
+| Combat | ✅ Working |
+| Inventory/Crafting | ✅ Working |
+| Save/Load | ✅ Working |
+| Crime/Bounty | ✅ Working |
+
+### Known Working Features
+- Daggerfall-style cell streaming (seamless world traversal)
+- OpenMW-style world map with fog of war
+- Topic-based NPC conversation system
+- Skill checks in dialogue
+- Faction reputation system
+- Lootable corpses with tier-based loot
+- Hand-crafted + procedural dungeon generation
+
+---
+
+## POST-RELEASE / FUTURE FEATURES
+
+These features are deferred until after initial playtest release:
+
+### NPC & Cell Streaming Enhancements
+- Traveling merchants spawning via CellStreamer
+- Random encounters in wilderness
+- NPC positions tracked for minimap/compass
+- Guard patrols with cell-aware logic
+
+### Stealth & Crouch System
+- Crouch mechanic (Ctrl/C key)
+- Detection based on Stealth skill and light level
+- Backstab damage bonus
+- Enemy awareness states (Unaware → Suspicious → Alert → Combat)
+
+### Killable NPCs & Consequences
+- All NPCs killable (no essential flags)
+- Quest chains break permanently if giver dies
+- Jail system with escapable cells
+
+### Dynamic Quest System
+- Multiple completion paths per quest (see PLANNED FEATURES section)
+- OR objectives, method-based rewards
+- World state tracking and pre-completion detection
+
+### Boat Travel
+- Sea travel across the lake to Elven City
+- Pirates, ghost pirates, sea monster encounters
+
+### Skill System Enhancements
+
+**REMOVED SKILLS (consolidated):**
+- ~~PERCEPTION~~ → merged into INTUITION (awareness/detection)
+- ~~ACROBATICS~~ → merged into ENDURANCE (stamina/physical)
+
+**INTUITION (consolidated):**
+- Enemy radar on compass: Base 15 units + 5 per level
+- Thief pickpocket defense
+- Trap detection bonus
+- Ambush detection
+
+**ENDURANCE (consolidated):**
+- Stamina pool and regen
+- Fall damage reduction
+- Jump height bonus
+
+**Investigation:**
+- TODO: Use for pressing NPCs for information in dialogue
+- TODO: Finding hidden chests in wilderness cells
+- TODO: Hook up `get_hidden_detection_bonus()` in character_data.gd
+
+**Deception (HIGH RISK/REWARD):**
+- Deception skill checks should have CONSEQUENCES for failure
+- Higher rewards for successful deception checks
+- TODO: Implement failure consequences (hostility, combat, reputation loss)
+- TODO: Implement success rewards (extra gold, better info, exclusive options)
 
 ---
 
@@ -1447,82 +1796,70 @@ Main sources of inspiration:
 
 ---
 
-## NEXT SESSION PLAN
+## KNOWN BUGS / ISSUES TO FIX
 
-### Priority 1: Fix NPC Visual Issues (COMPLETED)
+### Visual Issues
+- [ ] **Elder Moor floor texture** - Should be fallen leaves, currently solid color
+- [ ] **Thornfield floor texture** - Should be fallen leaves
+- [x] **Human bandit sprite** - Fixed: changed h_frames from 3 to 4 (sprite has 4 horizontal frames)
+- [ ] **Thornfield leader sprite** - Wrong asset being used, check NPC data
 
-NPC visual issues have been resolved:
-- All NPC sprites audited for correct pixel_size
-- Sprite offset calculations fixed to use `frame_height / 2.0`
-- Frame flicker on spawn fixed by setting frame to 0 before AND after add_child
+### Spawn/World Issues
+- [ ] **Procedural content in hand-crafted zones** - Goblin artifacts and cursed totems spawning inside Elder Moor
+  - Need to exclude hand-crafted scene coordinates from wilderness procedural generation
+- [ ] **Fast travel spawn safety** - Can spawn on top of enemies/dangerous objects
+  - Need spawn point safety checks
+- [ ] **Autosave state accuracy** - Verify autosave captures correct game state
 
-**Standard sizes (now applied):**
-- Man civilian: pixel_size = 0.0518
-- Wizard/Lady in Red: pixel_size = 0.0134
-- Barmaid: pixel_size = 0.0326
-- Guard: pixel_size = 0.055
+### Cell Streaming Issues
+- [x] **Double scene loading** - Fixed: teleport_to_cell now preserves main scene registration
+- [ ] **Scene doubling on save/load** - May still occur when loading into main scene area
 
-### Priority 2: Expand World Content
+---
 
-With the cell streaming system working:
-- Add more hand-crafted locations (scenes in `scripts/levels/`)
-- Register locations in WorldGrid.LOCATIONS
-- Test seamless walking between cells
+## BUG TESTING CHECKLIST
 
-### Testing Checklist
-**Cell Streaming:**
-- [ ] Walk from Elder Moor into adjacent wilderness cells
-- [ ] Adjacent cells load seamlessly (no teleport/rotation)
-- [ ] Distant cells unload properly
-- [ ] Fast travel via world map works
+Use this checklist for hard bug testing before export:
 
-**World Map:**
-- [ ] World map shows player position
-- [ ] Fog of war reveals explored areas
-- [ ] Click on discovered towns to fast travel
-- [ ] Tooltip shows cell info on hover
+### Core Gameplay Loop
+- [ ] New game starts correctly
+- [ ] Player can move, attack, block, dodge
+- [ ] Enemies spawn and have correct AI behavior
+- [ ] Combat damage/death works both ways
+- [ ] Lootable corpses spawn and can be searched
+- [ ] XP awards correctly on kills
 
-**NPC Visual Issues (COMPLETED):**
-- [x] All NPCs at correct height (not floating)
-- [x] All NPCs at correct size (not too big/small)
-- [x] No frame flicker when NPCs spawn
+### UI & Menus
+- [ ] All menus open/close properly (Escape, Tab, etc.)
+- [ ] Inventory displays items correctly
+- [ ] Equipment can be equipped/unequipped
+- [ ] Crafting menu works
+- [ ] Magic panel shows only learned spells
+- [ ] Quest journal displays active/completed quests
+- [ ] World map opens and shows player position
 
-### Priority 3: Stealth & Crouch System
+### Dialogue & NPCs
+- [ ] NPCs can be interacted with
+- [ ] Dialogue choices are clickable
+- [ ] Skill checks in dialogue work
+- [ ] Shops open and transactions work
+- [ ] Quest givers can give/complete quests
 
-**Crouch Mechanic:**
-- Add crouch input (Ctrl or C key)
-- Reduce player height/collision when crouching
-- Slower movement while crouched
-- Visual feedback (camera lowered)
+### World & Navigation
+- [ ] Cell streaming loads adjacent cells
+- [ ] No crashes when crossing cell boundaries
+- [ ] Doors/zone transitions work
+- [ ] Fast travel functions correctly
+- [ ] Fog of war reveals on exploration
 
-**Stealth System:**
-- Detection radius based on Stealth skill
-- Light level affects detection (darker = harder to see)
-- Movement speed affects noise (crouching = quieter)
-- Backstab damage bonus when undetected
-- "Hidden" indicator on HUD when fully concealed
-- Enemy awareness states: Unaware → Suspicious → Alert → Combat
+### Save/Load
+- [ ] Game can be saved
+- [ ] Game can be loaded
+- [ ] All state restored correctly (inventory, quests, position, flags)
+- [ ] No crashes on save/load
 
-### Priority 4: Killable NPCs & Consequences
-
-**All NPCs Killable:**
-- Every NPC can be attacked and killed (no essential flags)
-- Quest givers dying breaks their quest chains permanently
-- Merchants dying removes their shop from the game
-- Unique items on NPCs can be looted from corpses
-
-**Morality & Faction System Tie-in:**
-- Killing innocents lowers reputation with factions
-- Witnesses report crimes to guards
-- Murder bounty placed on player
-- Faction standing affects NPC disposition and available quests
-
-**Crime & Jail System:**
-- Guards attempt arrest when bounty is active
-- Player can: Surrender, Pay bounty, Resist arrest, Flee
-- Surrender → Jail time (skip time, lose stolen goods)
-- Resist → Guards attack, bounty increases
-- **Dalhurst Jail** - First jail location to implement
-  - Cell with lockable door (escapable with high Lockpicking)
-  - Confiscated items chest (retrievable after release)
-  - Jail time scales with bounty amount
+### Export Testing
+- [ ] Export to Windows .exe completes
+- [ ] Exported build launches
+- [ ] No missing resources or errors in exported build
+- [ ] Performance acceptable in exported build

@@ -17,6 +17,6 @@ required_grit = 3
 base_value = 80
 weight = 4.0
 mesh_path = ""
-fps_sprite_path = "res://Sprite folders grab bag/arm swing 4x4fixed.png"
+fps_sprite_path = "res://assets/sprites/weapons/arm_swing_4x4.png"
 fps_v_frames = 4
 fps_sprite_size = Vector2(300, 300)

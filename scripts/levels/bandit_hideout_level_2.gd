@@ -21,6 +21,9 @@ func _ready() -> void:
 
 	SaveManager.set_current_zone(ZONE_ID, "Bandit Hideout - Boss Lair")
 
+	# Play dungeon music
+	AudioManager.play_zone_music("dungeon")
+
 	_setup_environment()
 	_setup_spawn_points()
 	_setup_enemies()
@@ -110,10 +113,28 @@ func _setup_enemies() -> void:
 func _spawn_enemy_at_marker(marker: Node3D) -> void:
 	# Get enemy configuration from marker metadata or use defaults
 	var enemy_data_path: String = marker.get_meta("enemy_data", "res://data/enemies/human_bandit.tres")
-	var sprite_path: String = marker.get_meta("sprite_path", "res://assets/sprites/enemies/human_bandit.png")
-	var h_frames: int = marker.get_meta("h_frames", 3)
-	var v_frames: int = marker.get_meta("v_frames", 1)
 	var is_boss: bool = marker.get_meta("is_boss", false)
+
+	# Extract enemy type ID from path (e.g., "human_bandit" from ".../human_bandit.tres")
+	var enemy_type: String = enemy_data_path.get_file().get_basename()
+
+	# Check ActorRegistry first for sprite config (includes zoo patches)
+	var sprite_config: Dictionary = ActorRegistry.get_sprite_config(enemy_type)
+
+	var sprite_path: String
+	var h_frames: int
+	var v_frames: int
+
+	if not sprite_config.is_empty():
+		# Use ActorRegistry values (includes zoo patches)
+		sprite_path = sprite_config.get("sprite_path", "")
+		h_frames = sprite_config.get("h_frames", 4)
+		v_frames = sprite_config.get("v_frames", 1)
+	else:
+		# Fall back to marker metadata
+		sprite_path = marker.get_meta("sprite_path", "res://assets/sprites/enemies/human_bandit.png")
+		h_frames = marker.get_meta("h_frames", 4)
+		v_frames = marker.get_meta("v_frames", 1)
 
 	var sprite_texture: Texture2D = load(sprite_path)
 	if not sprite_texture:
@@ -137,6 +158,9 @@ func _spawn_enemy_at_marker(marker: Node3D) -> void:
 		# Add to quest objective tracking groups
 		if is_boss or "bandit_leader" in enemy_data_path:
 			enemy.add_to_group("bandit_leader")
+			enemy.add_to_group("bosses")
+		elif "dark_general" in enemy_data_path:
+			enemy.add_to_group("dark_general")
 			enemy.add_to_group("bosses")
 		else:
 			enemy.add_to_group("human_bandit")

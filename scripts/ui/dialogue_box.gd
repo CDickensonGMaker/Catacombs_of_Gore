@@ -348,6 +348,7 @@ func _show_ui() -> void:
 	# Note: GameManager.start_dialogue() handles is_in_dialogue flag
 	# Player controller checks this flag to block input
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	GameManager.set_menu_cursor()  # Use menu cursor for dialogue
 	# Grab focus on first visible button after a frame
 	call_deferred("_focus_first_button")
 
@@ -370,6 +371,7 @@ func _hide_ui() -> void:
 		skill_check_overlay.visible = false
 	# Note: GameManager.end_dialogue() handles is_in_dialogue flag
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	GameManager.set_default_cursor()  # Restore default cursor
 
 
 func _start_typewriter(text: String) -> void:
@@ -555,7 +557,6 @@ func _get_skill_name(skill_enum: int) -> String:
 		Enums.Skill.STEALTH: return "Stealth"
 		Enums.Skill.ENDURANCE: return "Endurance"
 		Enums.Skill.THIEVERY: return "Thievery"
-		Enums.Skill.ACROBATICS: return "Acrobatics"
 		Enums.Skill.ATHLETICS: return "Athletics"
 		Enums.Skill.CONCENTRATION: return "Concentration"
 		Enums.Skill.RESIST: return "Resist"
@@ -568,7 +569,6 @@ func _get_skill_name(skill_enum: int) -> String:
 		Enums.Skill.INTUITION: return "Intuition"
 		Enums.Skill.ENGINEERING: return "Engineering"
 		Enums.Skill.INVESTIGATION: return "Investigation"
-		Enums.Skill.PERCEPTION: return "Perception"
 		Enums.Skill.RELIGION: return "Religion"
 		Enums.Skill.NATURE: return "Nature"
 		Enums.Skill.FIRST_AID: return "First Aid"

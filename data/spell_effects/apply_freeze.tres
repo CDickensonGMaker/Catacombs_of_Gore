@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="SpellEffectData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/spell_effect_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "apply_freeze"
+display_name = "Freeze"
+description = "Freezes the target, immobilizing them"
+effect_type = 4
+damage_type = 3
+condition = 4
+stat = 0
+allowed_delivery = [1, 2, 3]
+base_magnitude = 1
+max_magnitude = 5
+base_duration = 3.0
+max_duration = 10.0
+base_cost = 15
+magnitude_cost_mult = 0.0
+duration_cost_mult = 2.0
+aoe_cost_mult = 3.0
+required_arcana = 5
+icon_path = ""
+effect_color = Color(0.5, 0.8, 1, 1)

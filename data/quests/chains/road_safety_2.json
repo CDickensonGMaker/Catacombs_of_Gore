@@ -1,0 +1,38 @@
+{
+	"id": "road_safety_2",
+	"title": "Eliminate the Threat",
+	"description": "You've found the outpost. Eliminate the bandits to make the road safe again.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "human_empire",
+	"objectives": [
+		{
+			"id": "kill_bandits",
+			"description": "Kill the bandits",
+			"type": "kill",
+			"target": "human_bandit",
+			"required_count": 5
+		},
+		{
+			"id": "kill_captain",
+			"description": "Kill the Bandit Captain",
+			"type": "kill",
+			"target": "bandit_captain",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 0,
+		"xp": 275,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": ["road_safety_1"],
+	"next_quest": "road_safety_3"
+}

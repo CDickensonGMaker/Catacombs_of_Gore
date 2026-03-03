@@ -523,6 +523,10 @@ func _collect_world_data(world_data) -> void:
 	if RestManager:
 		world_data.rest_manager = RestManager.get_save_data()
 
+	# SpellCreator custom spells data
+	if SpellCreator:
+		world_data.custom_spells = SpellCreator.get_save_data()
+
 ## Collect dropped items in current zone
 func _collect_dropped_items() -> Dictionary:
 	var items := dropped_items.duplicate()
@@ -541,12 +545,19 @@ func _collect_dropped_items() -> Dictionary:
 	return items
 
 ## Collect quest data
+## QuestManager.to_dict() returns: {tracked_quest_id, quests, bounty_cooldowns}
+## We store the raw dict directly using QuestSaveData's fields as a container
 func _collect_quest_data(quest_data) -> void:
 	var quest_dict := QuestManager.to_dict()
-	quest_data.active = quest_dict.get("active", {})
-	quest_data.completed = quest_dict.get("completed", {})
-	quest_data.failed = quest_dict.get("failed", {})
-	quest_data.variables = quest_dict.get("variables", {})
+	# Store raw QuestManager data in QuestSaveData fields
+	# active = the full quests dictionary, completed/failed/variables used for compatibility
+	quest_data.active = quest_dict.get("quests", {})
+	quest_data.completed = {}  # Not used in new format, kept for save file compatibility
+	quest_data.failed = {}  # Not used in new format, kept for save file compatibility
+	quest_data.variables = {
+		"tracked_quest_id": quest_dict.get("tracked_quest_id", ""),
+		"bounty_cooldowns": quest_dict.get("bounty_cooldowns", {})
+	}
 
 ## Collect time data
 func _collect_time_data(time_data) -> void:
@@ -606,8 +617,28 @@ func _collect_errand_data(errand_data) -> void:
 	errand_data.bounty_counter = bounty_dict.get("bounty_counter", 0)
 	errand_data.current_settlement = bounty_dict.get("current_settlement", "elder_moor")
 
+## Clear node references in all autoloads to prevent "Trying to cast a freed object" errors
+## Called before applying save data as a safety measure
+func _clear_all_autoload_node_references() -> void:
+	if CombatManager and CombatManager.has_method("_clear_node_references"):
+		CombatManager._clear_node_references()
+
+	if ConversationSystem and ConversationSystem.has_method("_clear_node_references"):
+		ConversationSystem._clear_node_references()
+
+	if PlayerGPS and PlayerGPS.has_method("_clear_node_references"):
+		PlayerGPS._clear_node_references()
+
+	if TournamentManager and TournamentManager.has_method("_clear_node_references"):
+		TournamentManager._clear_node_references()
+
+
 ## Apply loaded save data
 func _apply_save_data(save_data) -> void:
+	# Clear all autoload node references FIRST to prevent stale object casts
+	# This is a safety measure in case scene_load_started wasn't called
+	_clear_all_autoload_node_references()
+
 	# Reset GameManager interaction state flags to prevent stuck states after load
 	GameManager.is_paused = false
 	GameManager.is_in_menu = false
@@ -760,13 +791,27 @@ func _apply_world_data(world_data) -> void:
 	if RestManager and not world_data.rest_manager.is_empty():
 		RestManager.load_save_data(world_data.rest_manager)
 
+	# SpellCreator custom spells data
+	if SpellCreator and not world_data.custom_spells.is_empty():
+		SpellCreator.load_save_data(world_data.custom_spells)
+
 ## Apply quest data
+## QuestManager.from_dict() expects: {tracked_quest_id, quests, bounty_cooldowns}
+## We reconstruct this from how we stored it in _collect_quest_data
 func _apply_quest_data(quest_data) -> void:
+	# Reconstruct QuestManager format from how we stored it
+	var tracked_id: String = ""
+	var bounty_cooldowns: Dictionary = {}
+
+	# Check if variables contains the new format data
+	if quest_data.variables is Dictionary:
+		tracked_id = quest_data.variables.get("tracked_quest_id", "")
+		bounty_cooldowns = quest_data.variables.get("bounty_cooldowns", {})
+
 	QuestManager.from_dict({
-		"active": quest_data.active,
-		"completed": quest_data.completed,
-		"failed": quest_data.failed,
-		"variables": quest_data.variables
+		"tracked_quest_id": tracked_id,
+		"quests": quest_data.active,  # active field holds the quests dict
+		"bounty_cooldowns": bounty_cooldowns
 	})
 
 ## Apply time data
@@ -927,6 +972,19 @@ func _apply_fog_of_war_data(_fog_data) -> void:
 var _pending_cell_streamer_data: Dictionary = {}
 
 
+## Check if there's pending cell streamer data from a load
+func has_pending_cell_data() -> bool:
+	return not _pending_cell_streamer_data.is_empty()
+
+
+## Get pending cell coordinates (for scene initialization)
+func get_pending_cell_coords() -> Vector2i:
+	return Vector2i(
+		_pending_cell_streamer_data.get("active_cell_x", 0),
+		_pending_cell_streamer_data.get("active_cell_y", 0)
+	)
+
+
 ## Collect cell streamer data (floating origin, active cell)
 func _collect_cell_streamer_data(cell_streamer_save_data) -> void:
 	if not CellStreamer:
@@ -959,6 +1017,14 @@ func _apply_pending_cell_streamer_data() -> void:
 		return
 
 	if not CellStreamer:
+		_pending_cell_streamer_data.clear()
+		return
+
+	# If streaming is already enabled (main scene's _setup_cell_streaming already ran),
+	# don't apply pending data - the scene has already set up streaming correctly.
+	# This prevents duplicate cell loading on save/load.
+	if CellStreamer.streaming_enabled:
+		print("[SaveManager] Skipping pending cell streamer data - streaming already active")
 		_pending_cell_streamer_data.clear()
 		return
 
@@ -1233,6 +1299,24 @@ func _on_scene_load_completed(_scene_path: String) -> void:
 	# Apply pending cell streamer data after scene loads
 	# This ensures player positioning is correct relative to world offset
 	_apply_pending_cell_streamer_data()
+
+	# Refresh compass quest marker after scene is fully loaded
+	# NPCs/enemies need time to initialize before compass can find them
+	call_deferred("_refresh_compass_after_load")
+
+
+## Refresh compass quest marker after save data is applied
+## Wait 2 frames for all NPCs/enemies to initialize, then force HUD to recalculate
+func _refresh_compass_after_load() -> void:
+	# Wait 2 frames for all NPCs/enemies to initialize
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+	# Force HUD to recalculate compass markers
+	var hud: Node = get_tree().get_first_node_in_group("hud")
+	if hud and hud.has_method("refresh_compass_quest_marker"):
+		hud.refresh_compass_quest_marker()
+		print("[SaveManager] Refreshed compass quest marker after load")
 
 
 ## Apply pending known spells to player's SpellCaster with retry mechanism

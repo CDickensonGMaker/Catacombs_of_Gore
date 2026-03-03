@@ -1,9 +1,14 @@
 ## town_generator.gd - Procedural town/city generator
 ## Generates settlements based on location type, biome, and population tier
+## Integrated with CellStreamer for procedural settlement generation.
 class_name TownGenerator
 extends Node3D
 
 signal town_generated(town: TownGenerator)
+
+## Set to true when this town is generated as a streamed cell (not a standalone scene)
+## When streamed, lighting and exit triggers are disabled (CellStreamer handles these)
+var is_streamed_cell: bool = false
 
 ## Town configuration from WorldData
 var location_type: WorldGrid.LocationType = WorldGrid.LocationType.VILLAGE
@@ -118,21 +123,25 @@ func generate() -> void:
 	_spawn_npcs()
 	_spawn_props()
 	_create_spawn_points()
+	_setup_audio()
 
 	town_generated.emit(self)
 	print("[TownGenerator] Town generation complete: %d buildings, %d NPCs" % [buildings.size(), npcs.size()])
 
 
 func _load_textures() -> void:
-	house_texture = load("res://Sprite folders grab bag/house textures.png")
-	stone_texture = load("res://Sprite folders grab bag/stonewall.png")
-	wood_texture = load("res://Sprite folders grab bag/wood wall.png")
+	house_texture = load("res://assets/textures/environment/walls/house_textures.png")
+	stone_texture = load("res://assets/textures/environment/walls/stonewall.png")
+	wood_texture = load("res://assets/textures/environment/walls/wood.png")
 
 
 func _create_ground() -> void:
 	var ground := CSGBox3D.new()
 	ground.name = "Ground"
-	ground.size = Vector3(town_size + 20, 1.0, town_size + 20)
+	# Ensure ground covers full cell (100 units) plus 40 unit extension ring for seamless connection
+	# This prevents gaps at cell edges where players could fall through
+	var ground_size: float = maxf(town_size + 20, WorldGrid.CELL_SIZE + 40.0)
+	ground.size = Vector3(ground_size, 1.0, ground_size)
 	ground.position = Vector3(0, -0.5, 0)
 	ground.use_collision = true
 
@@ -159,6 +168,10 @@ func _create_ground() -> void:
 
 
 func _create_sky_environment() -> void:
+	# Skip lighting when loaded as a streamed cell - main scene owns lighting
+	if is_streamed_cell:
+		return
+
 	# NOTE: Background manager removed - biome backgrounds handled by environment settings
 	# TODO: Add biome-specific environment settings if needed
 
@@ -236,10 +249,11 @@ func _create_town_center() -> void:
 		shrine.position = Vector3(rng.randf_range(-5, 5), 0, rng.randf_range(-5, 5))
 		add_child(shrine)
 
-	# Bounty board
-	var bounty_board := _create_bounty_board()
-	bounty_board.position = Vector3(6, 0, -3)
-	add_child(bounty_board)
+	# Bounty board (towns and larger only - villages are too small)
+	if location_type in [WorldGrid.LocationType.TOWN, WorldGrid.LocationType.CITY, WorldGrid.LocationType.CAPITAL]:
+		var bounty_board := _create_bounty_board()
+		bounty_board.position = Vector3(6, 0, -3)
+		add_child(bounty_board)
 
 
 func _create_fireplace() -> Node3D:
@@ -615,6 +629,10 @@ func _create_house(pos: Vector3) -> Node3D:
 
 
 func _create_exits() -> void:
+	# Skip exit triggers when loaded as a streamed cell - player walks across cell boundaries
+	if is_streamed_cell:
+		return
+
 	# Create zone edge triggers for each cardinal direction
 	var exit_positions := {
 		"north": Vector3(0, 0, -half_size - 2),
@@ -693,32 +711,35 @@ func _get_random_npc_position() -> Vector3:
 
 
 func _create_civilian_npc(pos: Vector3) -> Node3D:
-	# Try to use the CivilianNPC class if available
-	var CivilianNPCClass = load("res://scripts/world/civilian_npc.gd")
-	if CivilianNPCClass:
-		var npc: Node3D = CivilianNPCClass.new()
-		npc.position = pos
-		add_child(npc)
-		return npc
-
-	# Fallback: simple placeholder using cylinder (capsule shape)
-	var npc := Node3D.new()
-	npc.name = "Civilian_%d" % npcs.size()
-	npc.position = pos
-	npc.add_to_group("npcs")
-
-	var body: CSGCylinder3D = CSGCylinder3D.new()
-	body.radius = 0.3
-	body.height = 1.8
-	body.position = Vector3(0, 0.9, 0)
-
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color(0.6, 0.5, 0.4)
-	body.material = mat
-	npc.add_child(body)
-
-	add_child(npc)
+	# Use CivilianNPC spawn methods for proper variety
+	# spawn_gendered_random ensures male sprites get male names, female sprites get female names
+	var npc: Node3D = CivilianNPC.spawn_gendered_random(self, pos, location_id)
+	if npc:
+		# 15% chance to be a quest giver (for procedural bounties)
+		if rng.randf() < 0.15:
+			_make_quest_giver(npc)
 	return npc
+
+
+## Add quest-giving capability to an NPC for procedural bounties
+func _make_quest_giver(npc: Node3D) -> void:
+	var QuestGiverClass = load("res://scripts/quests/quest_giver.gd")
+	if not QuestGiverClass:
+		return
+
+	var giver: Node = QuestGiverClass.new()
+	giver.name = "QuestGiver"
+
+	# Set up for procedural bounties (empty quest_ids = use BountyManager)
+	if giver.has_method("set") or "npc_id" in giver:
+		giver.set("npc_id", "%s_quest_giver_%d" % [location_id, rng.randi()])
+	if "region_id" in giver:
+		giver.set("region_id", location_id)
+	if "quest_ids" in giver:
+		giver.set("quest_ids", [])  # Empty = procedural bounties
+
+	npc.add_child(giver)
+	npc.add_to_group("quest_givers")
 
 
 func _create_guard_npc(pos: Vector3) -> Node3D:
@@ -865,3 +886,19 @@ func _create_spawn_points() -> void:
 	# Mark default spawn
 	if spawn_points.size() > 0:
 		spawn_points[0].add_to_group("default_spawn")
+
+
+## Setup ambient sounds and background music for the town
+func _setup_audio() -> void:
+	# Skip audio when loaded as a streamed cell - main scene handles audio
+	if is_streamed_cell:
+		return
+
+	# Town ambient sound (medieval village murmur)
+	const TOWN_AMBIENT_PATH := "res://assets/audio/Ambiance/towns/town_murmur_medieval_mix_60s_ps1_retro.wav"
+	AudioManager.play_ambient(TOWN_AMBIENT_PATH)
+
+	# Play village background music
+	AudioManager.play_zone_music("village")
+
+	print("[TownGenerator] Audio setup complete for %s" % location_name)

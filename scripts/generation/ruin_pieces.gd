@@ -1,6 +1,9 @@
 ## ruin_pieces.gd - Modular ruin component factory
 ## Creates individual ruin pieces that combine into larger structures
 ## PS1 aesthetic: 8-15 faces per piece, hard edges, nearest-neighbor textures
+##
+## TODO: [INACTIVE] This ruin generation system is complete but not integrated.
+## Future work: Use in WildernessRoom for procedural ruin placement.
 class_name RuinPieces
 extends RefCounted
 
@@ -29,7 +32,7 @@ static func _create_ruin_material() -> StandardMaterial3D:
 	mat.roughness = 0.85
 	mat.albedo_color = Color(0.5, 0.48, 0.45)
 
-	var tex: Texture2D = load("res://Sprite folders grab bag/stonewall.png") if ResourceLoader.exists("res://Sprite folders grab bag/stonewall.png") else null
+	var tex: Texture2D = load("res://assets/textures/environment/walls/stonewall.png") if ResourceLoader.exists("res://assets/textures/environment/walls/stonewall.png") else null
 	if tex:
 		mat.albedo_texture = tex
 		mat.uv1_scale = Vector3(0.5, 0.5, 1.0)
@@ -232,7 +235,7 @@ static func create_overgrown_stone(size: float = 1.5) -> Node3D:
 	vine_sprite.position = Vector3(0, size * 0.5, size * 0.45)
 
 	# Create simple vine texture if none exists
-	var vine_tex: Texture2D = load("res://Sprite folders grab bag/vines.png") if ResourceLoader.exists("res://Sprite folders grab bag/vines.png") else null
+	var vine_tex: Texture2D = load("res://assets/sprites/environment/trees/herb_bush2.png") if ResourceLoader.exists("res://assets/sprites/environment/trees/herb_bush2.png") else null
 	if vine_tex:
 		vine_sprite.texture = vine_tex
 	else:
@@ -314,7 +317,7 @@ static func create_collapsed_temple() -> Node3D:
 	# Place columns in a rough rectangle
 	for i in range(column_count):
 		var column: Node3D = create_broken_column(randf_range(3.0, 5.0), randf_range(0.4, 0.6))
-		var row: int = i / 3
+		var row: int = int(i / 3)
 		var col: int = i % 3
 		column.position = Vector3(
 			(col - 1) * spacing + randf_range(-0.3, 0.3),

@@ -23,11 +23,11 @@ bg_color = Color(0.15, 0.3, 0.7, 1)
 [node name="SkullFrameHUD" type="Control"]
 layout_mode = 3
 anchors_preset = 0
-offset_left = -17.0
-offset_top = 9.0
-offset_right = 433.0
-offset_bottom = 61.0
-scale = Vector2(0.6011499, 0.7495961)
+offset_left = 28.0
+offset_top = 5.0
+offset_right = 478.0
+offset_bottom = 57.0
+scale = Vector2(0.60125023, 0.5050211)
 
 [node name="SkullFrame" type="TextureRect" parent="."]
 layout_mode = 0

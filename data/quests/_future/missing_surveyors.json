@@ -1,0 +1,67 @@
+{
+	"id": "missing_surveyors",
+	"title": "The Missing Surveyors",
+	"description": "Tharin Ironbeard is worried about three dwarf surveyors he sent to the town of Whaeler's Abyss months ago to help with their bridge construction. They haven't reported back and he fears something has happened to them. Travel to Whaeler's Abyss and find out what became of his kinsmen.",
+	"is_main_quest": false,
+	"quest_source": "npc",
+	"giver_npc_id": "tharin_ironbeard",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "elder_moor",
+	"objectives": [
+		{
+			"id": "travel_whaelers",
+			"description": "Travel to Whaeler's Abyss",
+			"type": "reach",
+			"target": "whaelers_abyss",
+			"required_count": 1
+		},
+		{
+			"id": "ask_about_dwarves",
+			"description": "Ask the townsfolk about the dwarf surveyors",
+			"type": "talk",
+			"target": "whaelers_abyss_mayor",
+			"required_count": 1
+		},
+		{
+			"id": "investigate_bridge",
+			"description": "Investigate the bridge construction site",
+			"type": "reach",
+			"target": "whaelers_abyss_bridge",
+			"required_count": 1
+		},
+		{
+			"id": "find_cultist_lair",
+			"description": "Follow the trail to the cultist hideout",
+			"type": "reach",
+			"target": "whaelers_abyss_cultist_lair",
+			"required_count": 1
+		},
+		{
+			"id": "rescue_dwarves",
+			"description": "Rescue the captured dwarf surveyors",
+			"type": "interact",
+			"target": "captured_surveyors",
+			"required_count": 1
+		},
+		{
+			"id": "defeat_cultists",
+			"description": "Defeat the cultist leader",
+			"type": "kill",
+			"target": "cultist_leader",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "tharin_ironbeard",
+	"turn_in_zone": "elder_moor",
+	"rewards": {
+		"gold": 200,
+		"xp": 500,
+		"items": ["dwarven_compass"],
+		"faction_reputation": {
+			"dwarves": 25
+		}
+	},
+	"prerequisites": ["keepers_letter_delivery"],
+	"next_quest": null
+}

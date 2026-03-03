@@ -32,6 +32,9 @@ enum Archetype {
 @export_range(0, 100) var base_disposition: int = 50
 ## Speech style affecting text presentation (e.g., "casual", "formal", "uneducated", "scholarly")
 @export var speech_style: String = "casual"
+## Custom topics this NPC can discuss (e.g., "Aldric Vane", "The Undead Problem")
+## Each entry: {id: String, display_text: String, response: String, required_knowledge: Array, unlock_topics: Array}
+@export var custom_topics: Array[Dictionary] = []
 
 
 # =============================================================================
@@ -149,6 +152,28 @@ func add_knowledge(tag: String) -> void:
 func add_trait(trait_name: String) -> void:
 	if trait_name not in personality_traits:
 		personality_traits.append(trait_name)
+
+## Get custom topics this NPC can discuss
+## Returns array of dictionaries with: id, display_text, response, required_knowledge, unlock_topics
+func get_custom_topics() -> Array[Dictionary]:
+	return custom_topics
+
+## Add a custom topic to this NPC
+func add_custom_topic(id: String, display_text: String, response: String, required_knowledge: Array = [], unlock_topics: Array = []) -> void:
+	custom_topics.append({
+		"id": id,
+		"display_text": display_text,
+		"response": response,
+		"required_knowledge": required_knowledge,
+		"unlock_topics": unlock_topics
+	})
+
+## Check if NPC has a specific custom topic
+func has_custom_topic(topic_id: String) -> bool:
+	for topic: Dictionary in custom_topics:
+		if topic.get("id", "") == topic_id:
+			return true
+	return false
 
 ## Get the archetype name as a string
 func get_archetype_name() -> String:

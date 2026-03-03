@@ -3,10 +3,6 @@
 [ext_resource type="Script" path="res://scripts/dialogue/conversation_response_pool.gd" id="1_pool"]
 [ext_resource type="Script" path="res://scripts/dialogue/conversation_response.gd" id="2_resp"]
 
-# =============================================================================
-# STRANGER FAREWELLS (Disposition 0-25)
-# =============================================================================
-
 [sub_resource type="Resource" id="farewell_stranger_1"]
 script = ExtResource("2_resp")
 text = "Leave me be."
@@ -58,10 +54,6 @@ weight = 1.0
 actions = []
 conditions = []
 response_id = "farewell_stranger_4"
-
-# =============================================================================
-# ACQUAINTANCE FAREWELLS (Disposition 26-50)
-# =============================================================================
 
 [sub_resource type="Resource" id="farewell_acquaint_1"]
 script = ExtResource("2_resp")
@@ -115,10 +107,6 @@ actions = []
 conditions = []
 response_id = "farewell_acquaint_4"
 
-# =============================================================================
-# FRIEND FAREWELLS (Disposition 51-75)
-# =============================================================================
-
 [sub_resource type="Resource" id="farewell_friend_1"]
 script = ExtResource("2_resp")
 text = "Take care of yourself, friend."
@@ -170,10 +158,6 @@ weight = 1.0
 actions = []
 conditions = []
 response_id = "farewell_friend_4"
-
-# =============================================================================
-# CLOSE FRIEND FAREWELLS (Disposition 76-100)
-# =============================================================================
 
 [sub_resource type="Resource" id="farewell_close_1"]
 script = ExtResource("2_resp")

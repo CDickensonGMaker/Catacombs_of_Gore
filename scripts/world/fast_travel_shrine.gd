@@ -1,6 +1,6 @@
-## fast_travel_shrine.gd - Interactable shrine for fast travel discovery
-## When interacted with, discovers the current location via PlayerGPS
-## Registers as a compass POI for easy navigation
+## fast_travel_shrine.gd - Decorative shrine (visual/puzzle asset)
+## World map now handles fast travel. Shrines remain as visual landmarks
+## and potential puzzle elements for dungeons (e.g., Willow Dale).
 class_name FastTravelShrine
 extends StaticBody3D
 
@@ -11,20 +11,21 @@ extends StaticBody3D
 var pillar_mesh: MeshInstance3D
 var altar_mesh: MeshInstance3D
 var glow_light: OmniLight3D
-var particle_effect: GPUParticles3D
 
-## Interaction area
-var interaction_area: Area3D
-
-## State
+## State (for visual appearance only)
 var is_discovered: bool = false
 
 
 func _ready() -> void:
-	add_to_group("interactable")
+	# Shrine is now decorative only - world map handles fast travel
 	add_to_group("fast_travel_shrines")
+	add_to_group("puzzle_element")
 
-	# Only create visuals/areas if not already present (supports scene instancing)
+	# Remove from interactable group - no longer interactive
+	if is_in_group("interactable"):
+		remove_from_group("interactable")
+
+	# Only create visuals if not already present (supports scene instancing)
 	if not get_node_or_null("Pillar"):
 		_create_visual()
 	else:
@@ -32,37 +33,26 @@ func _ready() -> void:
 		altar_mesh = get_node_or_null("AltarBase")
 		glow_light = get_node_or_null("ShrineGlow")
 
-	if not get_node_or_null("InteractionArea"):
-		_create_interaction_area()
-	else:
-		interaction_area = get_node_or_null("InteractionArea")
+	# Disable interaction area if it exists (from scene instancing)
+	var interaction_area: Area3D = get_node_or_null("InteractionArea")
+	if interaction_area:
+		interaction_area.monitoring = false
+		interaction_area.monitorable = false
 
 	if not get_node_or_null("Collision"):
 		_create_collision()
 
-	_register_compass_poi()
-
-	# Check if already discovered
+	# Check if already discovered (for visual state only)
 	var zone_id := _get_current_zone_id()
 	if PlayerGPS and PlayerGPS.is_location_discovered(zone_id):
 		is_discovered = true
 		_set_discovered_visual()
 
 
-## Register this shrine as a compass POI
-## Uses instance ID for guaranteed uniqueness across scenes
-func _register_compass_poi() -> void:
-	add_to_group("compass_poi")
-	# Use instance_id for guaranteed uniqueness - prevents ghost markers across scenes
-	set_meta("poi_id", "shrine_%d" % get_instance_id())
-	set_meta("poi_name", display_name)
-	set_meta("poi_color", Color(0.4, 0.7, 1.0))  # Mystical blue for shrines
-
-
 ## Create the visual representation (stone pillar/altar with mystical glow)
 func _create_visual() -> void:
 	# Load shrine texture
-	var shrine_texture: Texture2D = load("res://Sprite folders grab bag/shrinetexture.png")
+	var shrine_texture: Texture2D = load("res://assets/sprites/props/furniture/shrine.png")
 
 	# Materials - PS1 aesthetic with texture
 	var stone_mat := StandardMaterial3D.new()
@@ -163,7 +153,7 @@ func _create_visual() -> void:
 	base_light.position.y = 0.5
 	add_child(base_light)
 
-	# Rune markings on the base (simple flat quads arranged in circle)
+	# Rune markings on the base
 	_create_rune_markings()
 
 
@@ -192,23 +182,6 @@ func _create_rune_markings() -> void:
 		add_child(rune)
 
 
-## Create interaction area
-func _create_interaction_area() -> void:
-	interaction_area = Area3D.new()
-	interaction_area.name = "InteractionArea"
-	interaction_area.collision_layer = 256  # Layer 9 for interactables
-	interaction_area.collision_mask = 0
-
-	var collision := CollisionShape3D.new()
-	var shape := SphereShape3D.new()
-	shape.radius = 2.5  # Interaction range
-	collision.shape = shape
-	collision.position.y = 1.0
-	interaction_area.add_child(collision)
-
-	add_child(interaction_area)
-
-
 ## Create collision shape for the pillar
 func _create_collision() -> void:
 	var collision := CollisionShape3D.new()
@@ -219,29 +192,6 @@ func _create_collision() -> void:
 	collision.shape = shape
 	collision.position.y = 1.25
 	add_child(collision)
-
-
-## Interaction interface
-func interact(_interactor: Node) -> void:
-	var zone_id := _get_current_zone_id()
-
-	if not is_discovered:
-		# First time discovering this shrine
-		is_discovered = true
-		if PlayerGPS:
-			PlayerGPS.discover_location(zone_id)
-		_set_discovered_visual()
-		_show_discovery_message()
-		AudioManager.play_ui_confirm()
-
-	# Always open fast travel UI (discovery happens first if needed)
-	_open_fast_travel_ui(zone_id)
-
-
-func get_interaction_prompt() -> String:
-	if is_discovered:
-		return "Press [E] to meditate at " + display_name
-	return "Press [E] to attune to " + display_name
 
 
 ## Get the current zone ID
@@ -268,29 +218,6 @@ func _set_discovered_visual() -> void:
 	if orb and orb.material_override is StandardMaterial3D:
 		var mat: StandardMaterial3D = orb.material_override
 		mat.emission_energy_multiplier = 4.0
-
-
-## Show discovery notification
-func _show_discovery_message() -> void:
-	var hud := get_tree().get_first_node_in_group("hud")
-	if hud and hud.has_method("show_notification"):
-		hud.show_notification("%s discovered! Location added to map." % display_name)
-
-
-## Show already discovered message
-func _show_already_discovered_message() -> void:
-	var hud := get_tree().get_first_node_in_group("hud")
-	if hud and hud.has_method("show_notification"):
-		var zone_name := _get_current_zone_id().replace("_", " ").capitalize()
-		hud.show_notification("You feel the shrine's power. %s is marked on your map." % zone_name)
-
-
-## Open the fast travel UI
-func _open_fast_travel_ui(zone_id: String) -> void:
-	var FastTravelUIClass = load("res://scripts/ui/fast_travel_ui.gd")
-	if FastTravelUIClass:
-		var ui: FastTravelUI = FastTravelUIClass.get_or_create()
-		ui.show_ui(zone_id)
 
 
 ## Static factory method

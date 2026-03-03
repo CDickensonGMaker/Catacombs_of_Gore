@@ -193,6 +193,90 @@
       "weight": 1.0,
       "actions": [],
       "conditions": []
+    },
+    {
+      "response_id": "greeting_elf_friendly",
+      "text": "Ah, one of the fair folk! A rare sight in these parts.",
+      "topic_type": 7,
+      "personality_affinity": ["curious", "friendly"],
+      "min_disposition": 40,
+      "max_disposition": 100,
+      "required_knowledge": [],
+      "weight": 1.5,
+      "actions": [],
+      "conditions": [{"condition_type": 12, "string_value": "elf"}]
+    },
+    {
+      "response_id": "greeting_elf_wary",
+      "text": "An elf... We don't see many of your kind here. What brings you?",
+      "topic_type": 7,
+      "personality_affinity": ["suspicious", "cautious"],
+      "min_disposition": 20,
+      "max_disposition": 50,
+      "required_knowledge": [],
+      "weight": 1.3,
+      "actions": [],
+      "conditions": [{"condition_type": 12, "string_value": "elf"}]
+    },
+    {
+      "response_id": "greeting_dwarf_friendly",
+      "text": "A stout dwarf! Well met, master crafter!",
+      "topic_type": 7,
+      "personality_affinity": ["friendly", "warm"],
+      "min_disposition": 40,
+      "max_disposition": 100,
+      "required_knowledge": [],
+      "weight": 1.5,
+      "actions": [],
+      "conditions": [{"condition_type": 12, "string_value": "dwarf"}]
+    },
+    {
+      "response_id": "greeting_dwarf_tavern",
+      "text": "A dwarf! Finally, someone who appreciates a good ale!",
+      "topic_type": 7,
+      "personality_affinity": ["friendly", "jolly"],
+      "min_disposition": 50,
+      "max_disposition": 100,
+      "required_knowledge": ["tavern"],
+      "weight": 1.8,
+      "actions": [],
+      "conditions": [{"condition_type": 12, "string_value": "dwarf"}]
+    },
+    {
+      "response_id": "greeting_halfling_suspicious",
+      "text": "Hmm, a halfling... Keep your hands where I can see them.",
+      "topic_type": 7,
+      "personality_affinity": ["suspicious", "stern"],
+      "min_disposition": 10,
+      "max_disposition": 40,
+      "required_knowledge": [],
+      "weight": 1.3,
+      "actions": [],
+      "conditions": [{"condition_type": 12, "string_value": "halfling"}]
+    },
+    {
+      "response_id": "greeting_halfling_friendly",
+      "text": "Oh, a halfling! You folk always have the best stories.",
+      "topic_type": 7,
+      "personality_affinity": ["friendly", "curious"],
+      "min_disposition": 50,
+      "max_disposition": 100,
+      "required_knowledge": [],
+      "weight": 1.5,
+      "actions": [],
+      "conditions": [{"condition_type": 12, "string_value": "halfling"}]
+    },
+    {
+      "response_id": "greeting_human_common",
+      "text": "Another human traveler. What brings you through?",
+      "topic_type": 7,
+      "personality_affinity": ["neutral", "practical"],
+      "min_disposition": 30,
+      "max_disposition": 60,
+      "required_knowledge": [],
+      "weight": 1.2,
+      "actions": [],
+      "conditions": [{"condition_type": 12, "string_value": "human"}]
     }
   ]
 }

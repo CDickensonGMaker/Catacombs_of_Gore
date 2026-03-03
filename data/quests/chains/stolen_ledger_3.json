@@ -1,0 +1,35 @@
+{
+	"id": "stolen_ledger_3",
+	"title": "Return the Ledger",
+	"description": "You found the ledger. Return it to the merchant in Dalhurst before he loses his business.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "merchants_guild",
+	"objectives": [
+		{
+			"id": "return_ledger",
+			"description": "Return the ledger to the merchant",
+			"type": "talk",
+			"target": "dalhurst_merchant",
+			"target_zone": "dalhurst",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "dalhurst_merchant",
+	"turn_in_zone": "dalhurst",
+	"rewards": {
+		"gold": 150,
+		"xp": 250,
+		"items": [],
+		"faction_reputation": {
+			"merchants_guild": 25
+		}
+	},
+	"prerequisites": ["stolen_ledger_2"],
+	"next_quest": "",
+	"quest_items": ["trade_ledger"]
+}

@@ -1,347 +1,471 @@
-# Catacombs of Gore - Lore Bible
+# Broken Provinces: The Empty Throne - Lore Bible
 
-## Main Quest: The Missing King
+## World Overview
 
-### Overview
-The King of the Human Empire has been absent for **40 years**. During this time, an evil witch has secretly taken his place, ruling through impersonation and dark magic. The King himself is trapped in the **Immortality Dungeon**, a cursed labyrinth that keeps its prisoners alive indefinitely but unable to escape.
-
-### Key Story Beats
-1. **The Disappearance** - 40 years ago, the King ventured into the Immortality Dungeon seeking eternal life. He never returned.
-2. **The Impersonator** - The Witch seized the opportunity, using illusion magic to assume the King's identity. She has slowly corrupted the empire from within.
-3. **The Keepers** - A secret organization has preserved knowledge of the true King's fate, waiting for a worthy champion to rescue him.
-4. **The Revelation** - The player uncovers the truth and must decide whether to rescue the King, leave him imprisoned, or aid the Witch.
-
-### The Immortality Dungeon
-- Located in a remote, forbidden region
-- Grants immortality to anyone who enters - but also prevents escape
-- The King has been alive but trapped for four decades
-- Contains ancient secrets and powerful artifacts
-- Multiple factions want access to its power
+**World Name:** Seratheal
+**Game Title:** Broken Provinces: The Empty Throne
+**Tone:** Grim Dark / Morally Grey with LOTR touches
+**Era:** Dark Age fantasy - a decaying empire in crisis
 
 ---
 
-## The Keepers
+## Central Conflicts
 
-### Organization Overview
-The Keepers are a **secret society** dedicated to preserving dangerous knowledge and protecting the realm from threats both internal and external. They operate in the shadows, manipulating events without revealing themselves.
+The world of Seratheal faces multiple converging crises:
 
-### Structure
-- **The Inner Circle** - The true leaders, who know the full truth about the King
-- **Archivists** - Scholars who maintain records of forbidden lore
-- **Watchers** - Field agents who monitor threats and recruit allies
-- **Initiates** - New members who prove their worth through missions
+1. **The Tegner Threat** - For 100 years, the Tegner hordes have pushed from the south. Once a distant concern, their raids now threaten the heartland. They call humans "humies" and practice cannibalism.
 
-### Goals
-1. Rescue the true King from the Immortality Dungeon
-2. Expose and defeat the Witch impersonator
-3. Restore legitimate rule to the Human Empire
-4. Prevent the Immortality Dungeon's power from falling into wrong hands
+2. **The Empty Throne** - The King has been absent from Falkenhaften (the capital) for 40 years. Officially "in seclusion," rumors suggest he is missing or dead. The Royal Council and Temple leaders fight for power in his absence.
 
-### Relationship with Player
-- The Keepers observe the player early in the game
-- A Watcher contacts the player after they prove themselves capable
-- Joining provides access to exclusive quests, lore, and rewards
-- The player can ultimately become part of the Inner Circle
+3. **The Mountain Pass Collapse** - The northern route to Falkenhaften collapsed recently, cutting off the fastest road to the capital. This has made communication and reinforcement difficult.
+
+4. **The Empire's Decay** - Response to threats has slowed. Famine spreads in the outer provinces. Undead activity increases. The military is stretched thin on multiple fronts.
+
+5. **Ghost Pirates of Larton** - Spectral ships now blockade Larton harbor, disrupting sea trade and cutting off supplies to coastal towns.
 
 ---
 
-## Faction Hierarchy
+## The Three Gods
 
-### Major Factions
+The dominant religion of the Human Empire centers on three deities who represent the fundamental forces of existence. All major towns have temples dedicated to the Three, though smaller settlements often have only shrines or must travel to larger towns for religious services.
 
-#### Human Empire
-The dominant political power in the known world, currently ruled by the imposter King (the Witch).
+### Chronos - Father Time
 
-**Sub-factions:**
-- **The Crown** - The royal government and its loyalists
-- **The Nobility** - Landed aristocrats with their own agendas
-- **The Church of Three Gods** - Religious authority (Time, Harvest, Death/Rebirth)
-- **The Imperial Army** - Military forces loyal to the Crown
+**Domain:** Time, Fate, Inevitability, Memory
+**Symbol:** The Hourglass
+**Sacred Colors:** Gold, Silver, Grey
 
-**Alignment:** Lawful (corrupted by the Witch's influence)
+Chronos is the eldest of the Three, often called "Father Time" or "The Measurer." His temples feature hourglasses of various sizes, and his priests are meticulous record-keepers who track the passage of time with precise instruments.
 
-#### Dwarves
-The stout folk of the mountains, divided by internal politics.
+**Theology:** Chronos measures all things - lives, eras, empires. Nothing escapes his accounting. He is said to grow jealous of Morthane, for while he counts the moments of life, it is Death who claims the final tally.
 
-**Sub-factions:**
-- **Dwarves of Birth (Traditionalists)** - Value lineage, hereditary rule, ancient customs
-- **Dwarves of Power (Progressives)** - Value achievement, meritocracy, innovation
+**Priests of Chronos:**
+- Scholarly and precise, often recording local history
+- Speak in measured tones, carefully choosing words
+- Display subtle jealousy toward Morthane's clergy
+- Blessing: "May Father Time bless you, Child. May your moments be well-measured."
+- Common phrases: "Time reveals all truths," "Each grain of sand has its place"
 
-**Primary Hold:** Kazan-Dun (also spelled Kazer-Dun)
+### Gaela - The Harvest Mother
 
-**Alignment:** Lawful Neutral
+**Domain:** Growth, Fertility, Agriculture, Peace
+**Symbol:** Sheaf of Wheat, Full Moon
+**Sacred Colors:** Green, Gold, Brown
 
-#### Elves
-The ancient forest-dwellers, split by their relationship with humans.
+Gaela is the most serene of the Three, beloved by farmers and common folk. Her shrines stand at crossroads and field boundaries, and her blessings are sought before planting and harvest.
 
-**Sub-factions:**
-- **Anti-Human Elves** - Isolationists who view humans as a blight
-- **Pro-Human Elves** - Diplomats who seek coexistence and trade
+**Theology:** Gaela teaches that all things grow in their season. She represents the nurturing aspect of existence - the soil that feeds, the rain that nourishes, the sun that warms. Her worship emphasizes patience, community, and the cycles of nature.
 
-**Alignment:** Varies by faction
+**Priests of Gaela:**
+- Peaceful and nature-focused, often tending gardens
+- Speak gently, favoring agricultural metaphors
+- Popular with farmers and rural communities
+- Blessing: "May Gaela's warmth find your fields. May your harvest be plentiful."
+- Common phrases: "All things in their season," "The soil remembers what we give it"
 
-#### Goblins
-Tribal creatures viewed as pests by most civilized races, but with their own complex society.
+### Morthane - Lord of the Threshold
+
+**Domain:** Death, Rebirth, Transition, Endings
+**Symbol:** The Setting Sun, The Empty Doorway
+**Sacred Colors:** Black, Deep Purple, Pale White
+
+Morthane governs the transition between life and death. Neither cruel nor kind, Morthane simply is - the final doorway all must pass through. The god is depicted as having two aspects: the Reaper who ends and the Gardener who plants anew.
+
+**Theology:** Death is not an ending but a transformation. The soul passes through Morthane's door to whatever lies beyond. The undead are seen as souls trapped in the doorway - unable to pass through. This association with undeath has made Morthane's worship somewhat suspect, though it remains legitimate.
+
+**Priests of Morthane:**
+- Morbid but legitimate, performing funeral rites
+- Misunderstood due to undead worship of Morthane
+- Somber and philosophical, comfortable with death
+- Often viewed with suspicion despite their orthodoxy
+- Blessing: "May Morthane's door open gently for you. May your transition be peaceful."
+- Common phrases: "All doors close eventually," "The Threshold waits for all"
+
+### Temple Relationships
+
+- Chronos priests secretly resent Morthane's clergy, feeling that death "steals" the time they so carefully measure
+- Gaela's priests mediate between the other two, emphasizing that growth and decay are part of the same cycle
+- In larger temples, the three faiths share a single building with separate altars; tension is common
+- Small villages without temples must travel to larger towns like Dalhurst for temple services
+
+---
+
+## Political Structure
+
+### The Empty Throne
+
+King Aldric III of Falkenhaften has been "in seclusion" for 40 years. The official story is that he retreated to meditate on matters of state. The truth is more complicated:
+
+- The King entered the Immortality Dungeon seeking eternal life
+- He became trapped there, unable to escape
+- A powerful Witch discovered this and assumed his identity
+- She has ruled in his place, slowly corrupting the empire
+
+### Current Power Struggle
+
+With the "King" increasingly absent from public life, power has fractured:
+
+- **The Royal Council** - Nobles and advisors who claim to speak for the King
+- **Temple Leadership** - High priests who believe divine mandate supersedes secular rule
+- **Provincial Governors** - Local lords who act increasingly independently
+- **The Keepers** - A secret society that knows the truth and seeks to restore the true King
+
+### The Keepers
+
+A secret organization preserving knowledge of the King's fate:
+
+- **Inner Circle** - Know the full truth about the King and the Witch
+- **Archivists** - Scholars maintaining records of forbidden lore
+- **Watchers** - Field agents monitoring threats and recruiting allies
+- **Initiates** - New members proving their worth through missions
+
+---
+
+## Race Relations
+
+### Humans (Dominant Race)
+
+Humans are the primary race of Seratheal, building the empire and most settlements. They view other races through a lens of utility and historical prejudice.
+
+### Elves (Tolerated)
+
+**Human View of Elves:** Elves are tolerated but not embraced. They are seen as aloof, condescending, and unreliable allies. Trade exists but is limited.
+
+**Elf View of Humans:** Varies by faction - some seek coexistence, others view humans as a temporary blight on the world.
+
+**Elf View of Dwarves:** Wary. The elves remember ancient conflicts and distrust dwarven ambitions. Trade is minimal and conducted at arm's length.
+
+### Dwarves (Needed)
+
+**Human View of Dwarves:** Dwarves are needed for their exceptional smithing, mining, and engineering. Without dwarven logistics, the empire's supply lines would falter. Humans respect dwarves but maintain social distance.
+
+**Dwarven Politics:**
+- **Dwarves of Birth (Traditionalists)** - Value lineage and hereditary rule
+- **Dwarves of Power (Progressives)** - Value achievement and meritocracy
+
+### Tegners (Enemy)
+
+The Tegners are a human subgroup from the southern wastes - fierce raiders and conquerors who have pushed north for a century. They are the primary military threat to the empire.
 
 **Characteristics:**
-- Opportunistic and cunning
-- Organized into clans with shifting allegiances
-- Often employed as mercenaries or bandits
-- Some seek legitimacy through trade
+- Call humans "humies" as a slur
+- Practice cannibalism of fallen enemies
+- Fierce warrior culture with clan-based society
+- Worship of strength and conquest
+- Hardy people, resistant to harsh conditions
 
-**Alignment:** Chaotic Neutral
+**Human View:** Tegners are monsters in human form - savages to be exterminated, not negotiated with. A hundred years of war has bred only hatred.
 
-#### Undead
-Not a unified faction, but various groups of the risen dead.
+### Goblins (Pests)
 
-**Types:**
-- **Mindless Undead** - Zombies, skeletons controlled by necromancers
-- **Sentient Undead** - Vampires, liches, ghosts with their own agendas
-- **The Cursed** - Those afflicted by undeath against their will
-
-**Alignment:** Varies (mostly Evil)
-
-#### Tegner (Tengers)
-A human subgroup known for their fierce warrior culture and northern territories.
-
-**Characteristics:**
-- Hardy northerners, resistant to cold
-- Proud martial tradition
-- Distrust of magic
-- Clan-based society
-
-**Alignment:** Neutral (honorable but pragmatic)
-
-### Guilds
-
-#### Thieves Guild
-The organized criminal underworld operating in major cities.
-
-**Services:**
-- Fencing stolen goods
-- Information brokering
-- Assassination (high-tier)
-- Protection rackets
-
-**Joining:** Requires proving criminal skill and loyalty
-
-#### Merchants Guild
-The trade organization controlling commerce across the realm.
-
-#### Adventurers Guild
-A loose association of sellswords, explorers, and monster hunters.
-
-#### Mages Guild
-The academic institution for magical study and regulation.
+Organized into clans with shifting allegiances. Viewed as pests by most civilized races, though some seek legitimacy through trade. Currently causing trouble in Kazan-Dun.
 
 ---
 
 ## Key NPCs
 
 ### Tharin Ironbeard
-**Role:** Dwarf leader, Forge Master of Kazan-Dun, Secret Keeper operative
-**Faction:** Dwarves of Power (but respected by both factions), The Keepers (secretly)
-**Location:** Elder Moor (traveling) / Kazan-Dun (home)
+
+**Role:** Dwarf guild leader, boss of Elder Moor logging operation, secret Keeper operative
+**Faction:** Dwarves of Power (respected by both factions), The Keepers (secretly)
+**Location:** Elder Moor (current), Kazan-Dun (home)
 
 **Background:**
-Tharin rose to prominence through skill rather than birth, embodying the ideals of the Power faction. Despite this, his fairness and dedication to dwarven prosperity have earned him grudging respect from traditionalists. Unknown to most, he is also a member of The Keepers, using his travels as cover for the organization's work.
+Tharin represents the interests of the Ironbeard Trading Guild in Elder Moor. He oversees the logging operation that sustains the hamlet, managing both dwarven and human workers. Unknown to most, he is also a member of The Keepers, using his merchant travels as cover for the organization's work.
 
 **Personality:**
 - Gruff but fair
 - Focused on practical solutions
-- Suspicious of outsiders until they prove themselves
+- Treats workers well but expects hard work
 - Fiercely protective of his people
 - Speaks cryptically about "important matters" to trusted individuals
 
 **Quest Involvement:**
-- **The Letter** - First quest hook for The Keepers. Asks the player to deliver a sealed letter to his contact Aldric Vane in Dalhurst.
+- **The Letter** - First quest hook for The Keepers. Asks the player to deliver a sealed letter to Aldric Vane in Dalhurst.
 - Can provide access to dwarven smithing secrets
 - Key ally in the Kazan-Dun questline
-- May request help mediating between dwarf factions
+
+### Aldric Vane
+
+**Role:** Curiosity shop owner, Keeper contact
+**Location:** Dalhurst, runs "Vane's Oddities"
+
+Uses his merchant cover to gather information. Will accept Tharin's letter and reveal his Keeper connection only with proper credentials or high disposition.
 
 ### The Witch
+
 **Role:** Main antagonist, impersonating the King
-**Faction:** None (self-serving)
-**Location:** The Imperial Palace (secret lair elsewhere)
+**Location:** Imperial Palace, Falkenhaften
 
-**Background:**
-A powerful sorceress who discovered the King's disappearance and seized the opportunity to claim the throne. For 40 years, she has ruled through illusion and manipulation, slowly corrupting the empire.
-
-**True Goals:**
-- Maintain power indefinitely
-- Access the Immortality Dungeon for herself
-- Eliminate threats to her rule (including the player)
-
-**Personality:**
-- Cunning and patient
-- Paranoid about discovery
-- Ruthless when threatened
-- Maintains a convincing "King" persona
+A powerful sorceress who discovered the King's disappearance and seized the opportunity. For 40 years, she has ruled through illusion and manipulation.
 
 ### The True King
-**Role:** Imprisoned monarch, potential savior or relic
-**Faction:** Human Empire (legitimate ruler)
+
+**Role:** Imprisoned monarch
 **Location:** Immortality Dungeon
 
-**Background:**
-Once a noble if flawed ruler, the King sought immortality to continue his reign forever. His hubris led him to enter the Immortality Dungeon, where he has been trapped for four decades.
-
-**Current State:**
-- Physically unchanged due to the dungeon's magic
-- Mentally affected by 40 years of isolation
-- May be grateful for rescue or driven mad
-- Player must decide if restoring him is wise
-
-### Prospector Gralmir
-**Role:** Dwarf prospector, quest giver
-**Faction:** Dwarves (neutral between Birth/Power)
-**Location:** Kazan-Dun mines
-
-**Background:**
-An old prospector who has spent decades mapping the deep tunnels beneath Kazan-Dun. He knows secrets about the ancient dwarven kingdoms that both factions would pay dearly for.
-
-**Quest Involvement:**
-- Provides mining and exploration quests
-- Knows about a secret passage that could be vital
-- May have information about the Immortality Dungeon's location
-
-### Other Notable NPCs
-
-#### Elder Moor NPCs
-- **Magistrate Aldric** - Local authority figure
-- **Father Brennan** - Priest at the Temple of Three Gods
-- **Gretta the Herbalist** - Potion seller and healer
-
-#### Dalhurst NPCs
-- **Captain Helena** - Town guard commander
-- **Merchant Tobias** - Wealthy trader with connections
-- **Aldric Vane** - Runs "Vane's Oddities" curiosity shop. Secretly a Keeper contact, uses his merchant cover to gather information. Will accept Tharin's letter and reveal his Keeper connection only with proper credentials or high disposition.
-
-#### Thornfield NPCs
-- **Farmer Cedric** - Concerned about bandit attacks
-- **Innkeeper Martha** - Source of local rumors
+King Aldric III sought immortality and became trapped. 40 years of isolation may have affected his sanity.
 
 ---
 
-## Regional Topics
+## Regional Details
 
-### Elder Moor
-**Type:** Starting village/logging camp
-**Terrain:** Swampy moorland with scattered forests
+### Elder Moor (Starting Location)
+
+**Type:** Logging camp/hamlet (25-30 years old)
+**Terrain:** Moorland with scattered forests
 **Danger Level:** 1-3
+**Coordinates:** (0, 0) - Center of the known world grid
 
-**Key Features:**
-- Temple of Three Gods
-- Basic merchants and services
-- Logging operations provide the main economy
-- Gateway to the wider world
+**Identity:**
+- A young settlement - one of the first generation born here is now adult (the player)
+- Logging camp that has slowly become a permanent hamlet
+- Tharin Ironbeard is the boss - manages the logging operation
+- NO GUARDS - too small and remote for an official garrison
+- NO INNKEEPER - no proper inn, just a common house
+- NO TEMPLE - too small; residents travel to Dalhurst for religious services
+- Carefree about distant problems, focused on immediate survival
 
-**Local Issues:**
-- Wildlife attacks from the moors
-- Occasional bandit raids
-- Mysterious disappearances in the swamps
+**Local Concerns:**
+- Wolves threatening livestock and workers
+- Goblin scouts on the roads
+- Bandits demanding "protection" money
+- The mountain pass collapse (affects trade routes)
+- Strange lights in the moors at night (Sunken Crypts)
+
+**Economy:**
+- Logging is the primary industry
+- Lumber shipped to Dalhurst via caravan
+- Dalhurst is the lifeline - all supplies come from there
+- Some small-scale farming and hunting
+
+**Rumors NPCs Know:**
+- The Sunken Crypts are dangerous - don't go there
+- Bandits have a hideout nearby and are extorting travelers
+- Something's wrong in Kazan-Dun (dwarves buying emergency supplies)
+- The mountain pass collapsed (blocks route to the capital)
+- The King is rumored to be missing (distant news, not their immediate concern)
+- Tegner horde moving from the south (worrying but far away)
+- Ghost pirates blocking Larton harbor (affects trade)
 
 ### Dalhurst
-**Type:** Major trade town
-**Terrain:** River valley, agricultural
+
+**Type:** Major port town
+**Terrain:** River valley, coastal
 **Danger Level:** 2-4
+**Coordinates:** (-8, -2)
+
+**Identity:**
+- Busy port town with significant trade
+- Harbor Master effectively rules the town
+- Look down on Elder Moor folk as "backwoods loggers"
+- Temple of Three Gods present (all three faiths)
+- Multiple guild halls and merchants
 
 **Key Features:**
 - Major market square
-- River port for trade
+- River and sea port
 - Larger temple complex
 - Guild representations
+- Thieves Guild operates here
 
 **Local Issues:**
 - Trade disputes between merchants
 - Corruption in the town guard
 - Smuggling operations
-
-### Kazan-Dun (Kazer-Dun)
-**Type:** Dwarven stronghold
-**Terrain:** Mountain fortress, deep mines
-**Danger Level:** 3-6 (deeper = more dangerous)
-
-**Key Features:**
-- Five dungeon levels of increasing difficulty
-- Ancient dwarven architecture
-- Active forges and mining operations
-- Political tension between factions
-
-**Local Issues:**
-- Internal political conflict (Birth vs Power)
-- Deep tunnels breached by monsters
-- Ancient evils stirring in the depths
+- Tension between temple factions
 
 ### Thornfield
-**Type:** Farming hamlet
+
+**Type:** Farming village
 **Terrain:** Rolling hills, farmland
 **Danger Level:** 2-4
+**Coordinates:** (3, -2)
 
-**Key Features:**
-- Small farming community
-- Single tavern/inn
-- Surrounded by bandit territory
+**Identity:**
+- Sister village to Elder Moor (settled around the same time)
+- Near the recent rock collapse that blocked the northern pass
+- Farming community struggling with bandit raids
+- Small temple shrine (not a full temple)
 
 **Local Issues:**
-- Bandit raids threaten livelihoods
 - Crops failing mysteriously
+- Bandit raids threatening livelihoods
 - Young people leaving for cities
+- Concerns about the pass collapse affecting travel
 
-### Willow Dale (Ruins)
-**Type:** Dungeon/ruins
-**Terrain:** Overgrown ruins in foothills
-**Danger Level:** 3-5
+### Millbrook
 
-**Key Features:**
-- Ancient ruins of unknown origin
-- Undead presence
-- Hidden treasures and lore
+**Type:** Mill town
+**Terrain:** Lakeside, forested
+**Danger Level:** 2-4
+**Coordinates:** (-7, 4)
 
-**History:**
-Once a prosperous settlement, Willow Dale was destroyed in a cataclysm centuries ago. Now undead roam its streets, and adventurers seek its buried secrets.
+**Identity:**
+- Secretly bandit-controlled (player discovers this slowly)
+- On the surface, a peaceful mill town
+- The "mayor" answers to bandit leadership
+- Lake provides fishing and water power for mills
+
+**Secret:**
+- Bandits use Millbrook as a legitimate front
+- Local officials are complicit or intimidated
+- Player may discover this through investigation
+- Can be liberated or exploited
+
+### Crossroads
+
+**Type:** Landmark/waystation
+**Terrain:** Where major roads meet
+**Danger Level:** 2-3
+**Coordinates:** (-5, -2)
+
+A significant road intersection with a small waystation. Travelers often rest here before continuing to their destinations.
+
+### Kazan-Dun (Full Game)
+
+**Type:** Dwarven stronghold
+**Terrain:** Mountain fortress, deep mines
+**Danger Level:** 3-6
+
+**Identity:**
+- Ancient dwarven hold with stunning architecture
+- Currently facing internal crisis
+- Goblin invasion in the deep tunnels
+- Political tension between Birth and Power factions
+
+**Current Events:**
+- Goblins have breached the lower levels
+- Dwarves buying emergency supplies in bulk
+- Some tunnels sealed to contain the threat
+- Accepting outside help for the first time in memory
+
+### Aberdeen (Full Game)
+
+**Type:** Highland fortress town
+**Terrain:** Northern mountains
+**Danger Level:** 4-6
+
+A grim fortress town in the northern highlands, serving as a bulwark against threats from the mountains.
+
+### Border Wars Graveyard (Full Game)
+
+**Type:** Battlefield/dungeon
+**Terrain:** Scarred wasteland
+**Danger Level:** 5-7
+
+The site of massive battles during the Tegner Wars. Now haunted by the restless dead of both sides.
+
+### Whaeler's Abyss (Full Game)
+
+**Type:** Coastal dungeon
+**Terrain:** Seaside cliffs, underwater caves
+**Danger Level:** 4-6
+
+A treacherous stretch of coast where ships have wrecked for centuries. Said to be home to sea monsters and ghost pirates.
+
+### Pola Perron (Full Game)
+
+**Type:** Elven city
+**Terrain:** Western sea, island
+**Danger Level:** Variable
+
+The elven city across the western sea. Beautiful but unwelcoming to humans.
+
+### King's Watch (Full Game)
+
+**Type:** Royal fortress
+**Terrain:** Mountain pass
+**Danger Level:** 5-8
+
+The fortress guarding the approach to Falkenhaften. Now cut off by the pass collapse.
+
+### Falkenhaften (Full Game)
+
+**Type:** Imperial capital
+**Terrain:** Mountain valley
+**Danger Level:** 3-5 (social danger)
+
+The seat of the Human Empire, where the Witch rules in the King's place. A city of intrigue and danger.
+
+---
+
+## Dungeons
+
+### Sunken Crypts
+
+**Location:** Near Elder Moor
+**Danger Level:** 2-4
+**Type:** Undead dungeon
+
+Ancient burial site now awakening. Local legend says dark things stir in its depths.
 
 ### Bandit Hideout
-**Type:** Dungeon/hostile camp
-**Terrain:** Cave system northeast of Elder Moor
-**Danger Level:** 2-4
 
-**Key Features:**
-- Multi-level cave complex
-- Organized bandit gang
-- Stolen goods cache
+**Location:** Northeast of Elder Moor (1, -4)
+**Danger Level:** 2-4
+**Type:** Hostile camp/cave system
+
+Multi-level cave complex used by bandits extorting travelers and settlements.
 
 **Quest Hooks:**
 - Retrieve stolen goods
 - Rescue kidnapped villagers
 - Eliminate bandit leadership
+- Discover connection to Millbrook
 
-### Millbrook
-**Type:** Mill town
-**Terrain:** Lakeside, forested
-**Danger Level:** 2-4
+### Willow Dale Ruins
 
-**Key Features:**
-- Watermill operations
-- Lake provides fishing
-- Trade route crossroads
+**Location:** (-5, -5)
+**Danger Level:** 3-5
+**Type:** Undead ruins
 
-**Local Issues:**
-- Lake monster sightings
-- Disputes over water rights
-- Missing fishermen
+Once a prosperous settlement, destroyed by unknown cataclysm centuries ago. Undead now roam its streets.
+
+### The Immortality Dungeon (Full Game)
+
+**Location:** Remote, forbidden region
+**Danger Level:** 10+
+
+The legendary dungeon that grants immortality to all who enter - but also prevents escape. The true King has been trapped here for 40 years.
+
+---
+
+## Timeline
+
+### Historical Events
+- **Year 0** - Founding of the Human Empire
+- **Year 847** - Construction of Kazan-Dun begins
+- **Year 1203** - Willow Dale destroyed by unknown cataclysm
+- **Year 1400** - First Tegner raids from the south
+- **Year 1460** - The King enters the Immortality Dungeon
+- **Year 1460** - The Witch assumes the throne
+- **Year 1475** - Elder Moor founded as logging camp
+- **Year 1495** - Thornfield settled
+- **Year 1498** - Mountain pass collapse
+- **Year 1500** - Present day (game begins)
+
+### Recent History (Last 40 Years)
+- The empire has slowly declined under the Witch's rule
+- Tegner raids have intensified, reaching deeper into empire territory
+- Border conflicts have increased on all fronts
+- Banditry has risen due to weakened patrols
+- Dwarves have become more isolationist, facing their own crisis
+- Elven factions have grown more divided
+- The Keepers have been preparing for a champion
+- Famine and plague have weakened the outer provinces
+- Undead activity has increased significantly
 
 ---
 
 ## Version 0.7 Demo Scope
 
 ### Included Regions
-The 0.7 demo focuses on the following playable areas:
 
 1. **Elder Moor** (0, 0) - Starting location
-   - Full town services
-   - Temple of Three Gods
+   - Logging camp services
    - Initial quest givers
+   - Tharin Ironbeard
 
 2. **Thornfield** (3, -2) - First major destination
    - Farming village
@@ -355,51 +479,22 @@ The 0.7 demo focuses on the following playable areas:
 4. **Willow Dale Ruins** (-5, -5) - Second dungeon
    - Undead themed
    - Lore discovery
-   - Challenging combat
 
 5. **Dalhurst** (-8, -2) - Major town
-   - Expanded services
+   - Full services
+   - Temple of Three Gods
    - Multiple quest givers
    - Faction introductions
 
 6. **Millbrook** (-7, 4) - Optional town
+   - Secret bandit connection
    - Side quests
-   - Unique merchants
-   - Lake exploration
-
-### Demo Features
-- Full morality system
-- Basic faction reputation
-- Main quest hook (hints about the King)
-- Multiple side quests
-- All core combat mechanics
-- Crafting and inventory systems
-- Save/load functionality
 
 ### Content Not in Demo
 - Kazan-Dun (referenced but not accessible)
 - The Immortality Dungeon
 - The Witch reveal
 - Full faction questlines
-- Sea travel and elven city
+- Sea travel and Pola Perron
+- Falkenhaften and capital intrigue
 - High-level content (level 10+)
-
----
-
-## Appendix: Timeline
-
-### Historical Events
-- **Year 0** - Founding of the Human Empire
-- **Year 847** - Construction of Kazan-Dun begins
-- **Year 1203** - Willow Dale destroyed by unknown cataclysm
-- **Year 1460** - The King disappears into the Immortality Dungeon
-- **Year 1460** - The Witch assumes the throne
-- **Year 1500** - Present day (game begins)
-
-### Recent History (Last 40 Years)
-- The empire has slowly declined under the Witch's rule
-- Border conflicts have increased
-- Banditry has risen due to weakened patrols
-- Dwarves have become more isolationist
-- Elven factions have grown more divided
-- The Keepers have been preparing for a champion

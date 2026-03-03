@@ -12,8 +12,8 @@ enum AnimState {
 	DEATH
 }
 
-## Ground sink offset - lower sprites slightly to prevent floating appearance
-const GROUND_SINK: float = -0.05  ## Lower sprites 5cm below origin to sit into ground
+## Ground sink offset - adjust if sprites appear floating or sunk
+const GROUND_SINK: float = 0.0  ## No offset - user will calibrate sprites manually
 
 ## Configuration
 @export var sprite_sheet: Texture2D
@@ -69,6 +69,16 @@ var is_dead: bool = false
 var use_directional_sprites: bool = false
 var direction_count: int = 8
 var facing_direction: Vector3 = Vector3.FORWARD
+
+## Front/Back texture support (2-directional sprites)
+var use_front_back_sprites: bool = false
+var front_texture: Texture2D = null
+var back_texture: Texture2D = null
+var front_h_frames: int = 1
+var front_v_frames: int = 1
+var back_h_frames: int = 1
+var back_v_frames: int = 1
+var _showing_back: bool = false  # Track which side is currently shown
 
 ## Owner enemy reference
 var owner_enemy: Node = null
@@ -131,14 +141,67 @@ func _create_sprite() -> void:
 
 ## Make sprite face the camera
 func _face_camera() -> void:
-	var camera := get_viewport().get_camera_3d()
-	if not camera:
+	# PERFORMANCE: Use cached camera from CellStreamer instead of per-frame lookup
+	var camera: Camera3D = null
+	if CellStreamer and CellStreamer.cached_camera and is_instance_valid(CellStreamer.cached_camera):
+		camera = CellStreamer.cached_camera
+	else:
+		camera = get_viewport().get_camera_3d()
+	if not camera or not is_instance_valid(camera):
 		return
+
+	# Handle front/back texture switching for 2-directional sprites
+	if use_front_back_sprites and front_texture and back_texture:
+		_update_front_back_texture(camera)
 
 	# The billboard setting handles facing, but we might want to select
 	# a different sprite frame based on view angle for 8-directional sprites
 	if use_directional_sprites and owner_enemy:
 		_update_directional_frame(camera)
+
+## Update front/back texture based on camera angle (for 2-directional sprites)
+func _update_front_back_texture(camera: Camera3D) -> void:
+	if not sprite:
+		return
+
+	# Get direction from NPC to camera
+	var to_camera: Vector3 = (camera.global_position - global_position).normalized()
+	to_camera.y = 0
+	if to_camera.length_squared() < 0.001:
+		return
+	to_camera = to_camera.normalized()
+
+	# Get NPC's facing direction
+	var facing: Vector3 = facing_direction
+	facing.y = 0
+	if facing.length_squared() < 0.001:
+		facing = Vector3.FORWARD
+	facing = facing.normalized()
+
+	# Calculate dot product: positive = camera in front, negative = camera behind
+	var dot: float = facing.dot(to_camera)
+
+	# Determine if we should show back (camera is behind NPC)
+	var should_show_back: bool = dot < 0.0
+
+	# Only switch if needed
+	if should_show_back != _showing_back:
+		_showing_back = should_show_back
+		if _showing_back:
+			sprite.texture = back_texture
+			sprite.hframes = back_h_frames
+			sprite.vframes = back_v_frames
+		else:
+			sprite.texture = front_texture
+			sprite.hframes = front_h_frames
+			sprite.vframes = front_v_frames
+
+		# Recalculate vertical offset for new texture size
+		var tex: Texture2D = sprite.texture
+		if tex:
+			var frame_height: float = tex.get_height() / float(sprite.vframes)
+			sprite.offset = Vector2(0, frame_height / 2.0)
+
 
 ## Update frame based on camera angle (for 8-directional sprites)
 func _update_directional_frame(camera: Camera3D) -> void:
@@ -401,6 +464,30 @@ static func create_billboard(parent: Node3D, texture: Texture2D, h: int = 4, v: 
 	billboard.offset_y = y_offset
 	parent.add_child(billboard)
 	return billboard
+
+
+## Setup front/back textures for 2-directional sprites
+## Call this AFTER adding billboard to scene tree
+func setup_front_back_textures(
+	p_front_texture: Texture2D, p_front_h: int, p_front_v: int,
+	p_back_texture: Texture2D, p_back_h: int, p_back_v: int
+) -> void:
+	use_front_back_sprites = true
+	front_texture = p_front_texture
+	front_h_frames = p_front_h
+	front_v_frames = p_front_v
+	back_texture = p_back_texture
+	back_h_frames = p_back_h
+	back_v_frames = p_back_v
+
+	# Start showing front
+	_showing_back = false
+	if sprite and front_texture:
+		sprite.texture = front_texture
+		sprite.hframes = front_h_frames
+		sprite.vframes = front_v_frames
+		var frame_height: float = front_texture.get_height() / float(front_v_frames)
+		sprite.offset = Vector2(0, frame_height / 2.0)
 
 
 ## Setup separate textures for different animation states

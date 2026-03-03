@@ -1,22 +1,22 @@
-[gd_scene load_steps=18 format=3 uid="uid://pola_perron_monastery_001"]
+[gd_scene load_steps=38 format=3 uid="uid://bckyoxy4oeifp"]
 
-[ext_resource type="Script" path="res://scripts/levels/pola_perron.gd" id="1"]
+[ext_resource type="Script" uid="uid://flmm5rbijvcj" path="res://scripts/levels/pola_perron.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
-[ext_resource type="Texture2D" path="res://Sprite folders grab bag/monastary_altar1.png.png" id="4"]
-[ext_resource type="Texture2D" path="res://Sprite folders grab bag/monastary_hanging1.png" id="5"]
-[ext_resource type="Texture2D" path="res://Sprite folders grab bag/monastary_hanging2.png" id="6"]
-[ext_resource type="Texture2D" path="res://Sprite folders grab bag/monastary_wall1.png" id="7"]
-[ext_resource type="Texture2D" path="res://Sprite folders grab bag/monastary_wall2.png" id="8"]
-[ext_resource type="Texture2D" path="res://Sprite folders grab bag/perro_bush1.png" id="9"]
-[ext_resource type="Texture2D" path="res://Sprite folders grab bag/perro_bush2.png" id="10"]
-[ext_resource type="Texture2D" path="res://Sprite folders grab bag/herb_bush2.png" id="11"]
-[ext_resource type="Texture2D" path="res://Sprite folders grab bag/town_jugs1.png" id="12"]
-[ext_resource type="Texture2D" path="res://Sprite folders grab bag/town_jugs2.png" id="13"]
-[ext_resource type="Texture2D" path="res://Sprite folders grab bag/town_jugs3.png" id="14"]
-[ext_resource type="Texture2D" path="res://Sprite folders grab bag/monastary_floor_outside1.png" id="15"]
-[ext_resource type="Texture2D" path="res://Sprite folders grab bag/monastary_floor_outside2.png" id="16"]
-[ext_resource type="Texture2D" path="res://Sprite folders grab bag/monastary_floor_outside3.png" id="17"]
+[ext_resource type="Texture2D" uid="uid://0hffer2b6laj" path="res://assets/sprites/props/monastery/monastary_altar1.png.png" id="4"]
+[ext_resource type="Texture2D" uid="uid://b3g15ijc5nbx8" path="res://assets/sprites/props/monastery/monastary_hanging1.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://ck1bo1dubf6m8" path="res://assets/sprites/props/monastery/monastary_hanging2.png" id="6"]
+[ext_resource type="Texture2D" uid="uid://dj2ios8vapgw1" path="res://assets/sprites/props/monastery/monastary_wall1.png" id="7"]
+[ext_resource type="Texture2D" uid="uid://cc3ga53xav6mu" path="res://assets/sprites/props/monastery/monastary_wall2.png" id="8"]
+[ext_resource type="Texture2D" uid="uid://cwq42e2lmp788" path="res://assets/sprites/environment/trees/bush_1.png" id="9"]
+[ext_resource type="Texture2D" uid="uid://cos7dxjnh4dr1" path="res://assets/sprites/environment/trees/bush_2.png" id="10"]
+[ext_resource type="Texture2D" uid="uid://tmx4wofj7ctt" path="res://assets/sprites/environment/trees/herb_bush2.png" id="11"]
+[ext_resource type="Texture2D" uid="uid://8l2y8aulgqyh" path="res://assets/sprites/props/monastery/town_jugs1.png" id="12"]
+[ext_resource type="Texture2D" uid="uid://wl3q4tcgo3n5" path="res://assets/sprites/props/monastery/town_jugs2.png" id="13"]
+[ext_resource type="Texture2D" uid="uid://8o1r7r64sqld" path="res://assets/sprites/props/monastery/town_jugs3.png" id="14"]
+[ext_resource type="Texture2D" uid="uid://bryukqr50fm6w" path="res://assets/textures/environment/floors/monastary_floor_outside1.png" id="15"]
+[ext_resource type="Texture2D" uid="uid://bmb05bgwi386f" path="res://assets/sprites/props/monastery/monastary_floor_outside2.png" id="16"]
+[ext_resource type="Texture2D" uid="uid://brrqywdrxqmql" path="res://assets/sprites/props/monastery/monastary_floor_outside3.png" id="17"]
 
 [sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
 sky_top_color = Color(0.45, 0.55, 0.7, 1)
@@ -42,7 +42,6 @@ fog_height_density = 0.05
 
 [sub_resource type="StandardMaterial3D" id="mat_cliff"]
 albedo_color = Color(0.4, 0.38, 0.35, 1)
-roughness = 1.0
 
 [sub_resource type="StandardMaterial3D" id="mat_stone_floor"]
 albedo_color = Color(0.55, 0.52, 0.48, 1)
@@ -68,15 +67,6 @@ roughness = 0.9
 albedo_color = Color(0.35, 0.32, 0.3, 1)
 roughness = 0.95
 
-[sub_resource type="StandardMaterial3D" id="mat_stone_bench"]
-albedo_color = Color(0.5, 0.48, 0.45, 1)
-roughness = 0.9
-
-[sub_resource type="StandardMaterial3D" id="mat_water"]
-albedo_color = Color(0.3, 0.4, 0.5, 0.8)
-transparency = 1
-roughness = 0.1
-
 [sub_resource type="StandardMaterial3D" id="mat_wall"]
 albedo_color = Color(0.55, 0.5, 0.45, 1)
 roughness = 0.9
@@ -84,6 +74,15 @@ roughness = 0.9
 [sub_resource type="StandardMaterial3D" id="mat_pilgrims_roof"]
 albedo_color = Color(0.4, 0.35, 0.28, 1)
 roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_stone_bench"]
+albedo_color = Color(0.5, 0.48, 0.45, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="mat_water"]
+transparency = 1
+albedo_color = Color(0.3, 0.4, 0.5, 0.8)
+roughness = 0.1
 
 [sub_resource type="StandardMaterial3D" id="mat_candle_stand"]
 albedo_color = Color(0.45, 0.42, 0.4, 1)
@@ -128,55 +127,49 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 26)
 
 [node name="HUD" parent="." instance=ExtResource("3")]
 
-;; ============== TERRAIN ==============
 [node name="Terrain" type="Node3D" parent="."]
 
-;; Mountain Base
 [node name="MountainBase" type="CSGBox3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -10, 0)
 use_collision = true
 size = Vector3(100, 20, 100)
 material = SubResource("mat_cliff")
 
-;; Lower Terrace (pilgrim area) - BASE_LEVEL = 0
 [node name="LowerTerrace" type="CSGBox3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 20)
 use_collision = true
 size = Vector3(50, 2, 30)
 material = SubResource("mat_stone_floor")
 
-;; Middle Terrace (meditation garden) - TERRACE_LEVEL = 3
 [node name="MiddleTerrace" type="CSGBox3D" parent="Terrain"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.84905624, 0)
 use_collision = true
 size = Vector3(45, 2, 25)
 material = SubResource("mat_stone_floor")
 
-;; Upper Terrace (monastery) - MONASTERY_LEVEL = 6
 [node name="UpperTerrace" type="CSGBox3D" parent="Terrain"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, -18)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3180904, -18)
 use_collision = true
 size = Vector3(40, 2, 35)
 material = SubResource("mat_stone_floor")
 
-;; Grass Patches
 [node name="GrassPatch_0" type="CSGBox3D" parent="Terrain"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 3.02, 5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 1.8690562, 5)
 size = Vector3(6, 0.08, 5)
 material = SubResource("mat_grass")
 
 [node name="GrassPatch_1" type="CSGBox3D" parent="Terrain"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 3.02, -3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 1.8690562, -3)
 size = Vector3(5, 0.08, 6)
 material = SubResource("mat_grass")
 
 [node name="GrassPatch_2" type="CSGBox3D" parent="Terrain"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 6.02, -25)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 3.3380904, -25)
 size = Vector3(7, 0.08, 5)
 material = SubResource("mat_grass")
 
 [node name="GrassPatch_3" type="CSGBox3D" parent="Terrain"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 6.02, -20)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 3.3380904, -20)
 size = Vector3(6, 0.08, 6)
 material = SubResource("mat_grass")
 
@@ -190,7 +183,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0.02, 25)
 size = Vector3(7, 0.08, 5)
 material = SubResource("mat_grass")
 
-;; Mountain Backdrop
 [node name="NorthMountain" type="CSGBox3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, -45)
 use_collision = true
@@ -209,209 +201,196 @@ use_collision = true
 size = Vector3(15, 28, 80)
 material = SubResource("mat_cliff")
 
-;; Stairs: Lower to Middle Terrace
 [node name="LowerToMiddleStairs" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 8)
 
 [node name="Step_0" type="CSGBox3D" parent="Terrain/LowerToMiddleStairs"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.0009438, 0)
 use_collision = true
 size = Vector3(4, 0.3, 1)
 material = SubResource("mat_path")
 
 [node name="Step_1" type="CSGBox3D" parent="Terrain/LowerToMiddleStairs"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, -1.3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.70094377, -1.3000002)
 use_collision = true
 size = Vector3(4, 0.3, 1)
 material = SubResource("mat_path")
 
 [node name="Step_2" type="CSGBox3D" parent="Terrain/LowerToMiddleStairs"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, -2.6)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.40094376, -2.6)
 use_collision = true
 size = Vector3(4, 0.3, 1)
 material = SubResource("mat_path")
 
 [node name="Step_3" type="CSGBox3D" parent="Terrain/LowerToMiddleStairs"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, -3.9)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.100943804, -3.9)
 use_collision = true
 size = Vector3(4, 0.3, 1)
 material = SubResource("mat_path")
 
 [node name="Step_4" type="CSGBox3D" parent="Terrain/LowerToMiddleStairs"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, -5.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.19905627, -5.2)
 use_collision = true
 size = Vector3(4, 0.3, 1)
 material = SubResource("mat_path")
 
 [node name="Step_5" type="CSGBox3D" parent="Terrain/LowerToMiddleStairs"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, -6.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.49905622, -6.5)
 use_collision = true
 size = Vector3(4, 0.3, 1)
 material = SubResource("mat_path")
 
 [node name="Step_6" type="CSGBox3D" parent="Terrain/LowerToMiddleStairs"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.95, -7.8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7990563, -7.8)
 use_collision = true
 size = Vector3(4, 0.3, 1)
 material = SubResource("mat_path")
 
 [node name="Step_7" type="CSGBox3D" parent="Terrain/LowerToMiddleStairs"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.25, -9.1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0990562, -9.1)
 use_collision = true
 size = Vector3(4, 0.3, 1)
 material = SubResource("mat_path")
 
 [node name="Step_8" type="CSGBox3D" parent="Terrain/LowerToMiddleStairs"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.55, -10.4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3990562, -10.4)
 use_collision = true
 size = Vector3(4, 0.3, 1)
 material = SubResource("mat_path")
 
 [node name="Step_9" type="CSGBox3D" parent="Terrain/LowerToMiddleStairs"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.85, -11.7)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6990561, -11.7)
 use_collision = true
 size = Vector3(4, 0.3, 1)
 material = SubResource("mat_path")
 
-;; Stairs: Middle to Upper Terrace
 [node name="MiddleToUpperStairs" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -10)
 
 [node name="Step_0" type="CSGBox3D" parent="Terrain/MiddleToUpperStairs"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.5319095, 0)
 use_collision = true
 size = Vector3(4, 0.3, 1)
 material = SubResource("mat_path")
 
 [node name="Step_1" type="CSGBox3D" parent="Terrain/MiddleToUpperStairs"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, -0.8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.2319095, -0.8000002)
 use_collision = true
 size = Vector3(4, 0.3, 1)
 material = SubResource("mat_path")
 
 [node name="Step_2" type="CSGBox3D" parent="Terrain/MiddleToUpperStairs"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, -1.6)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.9319096, -1.6000004)
 use_collision = true
 size = Vector3(4, 0.3, 1)
 material = SubResource("mat_path")
 
 [node name="Step_3" type="CSGBox3D" parent="Terrain/MiddleToUpperStairs"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, -2.4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.6319094, -2.3999996)
 use_collision = true
 size = Vector3(4, 0.3, 1)
 material = SubResource("mat_path")
 
 [node name="Step_4" type="CSGBox3D" parent="Terrain/MiddleToUpperStairs"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, -3.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.3319097, -3.1999998)
 use_collision = true
 size = Vector3(4, 0.3, 1)
 material = SubResource("mat_path")
 
 [node name="Step_5" type="CSGBox3D" parent="Terrain/MiddleToUpperStairs"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, -4.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.0319095, -4)
 use_collision = true
 size = Vector3(4, 0.3, 1)
 material = SubResource("mat_path")
 
 [node name="Step_6" type="CSGBox3D" parent="Terrain/MiddleToUpperStairs"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.95, -4.8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.73190975, -4.8)
 use_collision = true
 size = Vector3(4, 0.3, 1)
 material = SubResource("mat_path")
 
 [node name="Step_7" type="CSGBox3D" parent="Terrain/MiddleToUpperStairs"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.25, -5.6)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.43190956, -5.6000004)
 use_collision = true
 size = Vector3(4, 0.3, 1)
 material = SubResource("mat_path")
 
 [node name="Step_8" type="CSGBox3D" parent="Terrain/MiddleToUpperStairs"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.55, -6.4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.13190937, -6.3999996)
 use_collision = true
 size = Vector3(4, 0.3, 1)
 material = SubResource("mat_path")
 
 [node name="Step_9" type="CSGBox3D" parent="Terrain/MiddleToUpperStairs"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.85, -7.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.16809034, -7.200001)
 use_collision = true
 size = Vector3(4, 0.3, 1)
 material = SubResource("mat_path")
 
-;; ============== BUILDINGS ==============
 [node name="Buildings" type="Node3D" parent="."]
 
-;; Main Temple
 [node name="MainTemple" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, -25)
 
 [node name="TempleWalls" type="CSGBox3D" parent="Buildings/MainTemple"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3180904, 0)
 use_collision = true
 size = Vector3(16, 8, 12)
 material = SubResource("mat_monastery")
 
 [node name="Roof" type="CSGBox3D" parent="Buildings/MainTemple"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.75, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.0680904, 0)
 use_collision = true
 size = Vector3(18, 1.5, 14)
 material = SubResource("mat_roof")
 
 [node name="EntranceColumn_0" type="CSGCylinder3D" parent="Buildings/MainTemple"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 3, 7.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0.31809044, 7.5)
 use_collision = true
-radius = 0.5
 height = 6.0
-sides = 8
 material = SubResource("mat_monastery")
 
 [node name="EntranceColumn_1" type="CSGCylinder3D" parent="Buildings/MainTemple"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 3, 7.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0.31809044, 7.5)
 use_collision = true
-radius = 0.5
 height = 6.0
-sides = 8
 material = SubResource("mat_monastery")
 
 [node name="EntranceColumn_2" type="CSGCylinder3D" parent="Buildings/MainTemple"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 3, 7.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0.31809044, 7.5)
 use_collision = true
-radius = 0.5
 height = 6.0
-sides = 8
 material = SubResource("mat_monastery")
 
 [node name="EntranceColumn_3" type="CSGCylinder3D" parent="Buildings/MainTemple"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 3, 7.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 0.31809044, 7.5)
 use_collision = true
-radius = 0.5
 height = 6.0
-sides = 8
 material = SubResource("mat_monastery")
 
 [node name="Portico" type="CSGBox3D" parent="Buildings/MainTemple"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.4, 7.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.71809, 7.5)
 use_collision = true
 size = Vector3(12, 0.8, 3)
 material = SubResource("mat_roof")
 
 [node name="AltarGlow" type="OmniLight3D" parent="Buildings/MainTemple"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, -2)
-light_color = Color(1.0, 0.95, 0.8, 1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3180904, -2)
+light_color = Color(1, 0.95, 0.8, 1)
 light_energy = 2.0
 omni_range = 12.0
 
-;; Bell Tower
 [node name="BellTower" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 6, -20)
 
 [node name="TowerBody" type="CSGBox3D" parent="Buildings/BellTower"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.469034, 0)
 use_collision = true
 size = Vector3(5, 14, 5)
 material = SubResource("mat_monastery")
 
 [node name="BellChamber" type="CSGBox3D" parent="Buildings/BellTower"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 13.969034, 0)
 use_collision = true
 size = Vector3(6, 3, 6)
 material = SubResource("mat_monastery")
@@ -424,79 +403,74 @@ height = 3.0
 sides = 4
 material = SubResource("mat_roof")
 
-;; Monks Quarters
 [node name="MonksQuarters" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 6, -15)
 
 [node name="QuartersWalls" type="CSGBox3D" parent="Buildings/MonksQuarters"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18190956, 0)
 use_collision = true
 size = Vector3(10, 5, 14)
 material = SubResource("mat_monastery")
 
 [node name="Roof" type="CSGBox3D" parent="Buildings/MonksQuarters"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.3, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6180906, 0)
 use_collision = true
 size = Vector3(10.8, 0.6, 14.8)
 material = SubResource("mat_roof")
 
 [node name="QuartersLight" type="OmniLight3D" parent="Buildings/MonksQuarters"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
-light_color = Color(1.0, 0.9, 0.7, 1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3180904, 0)
+light_color = Color(1, 0.9, 0.7, 1)
 light_energy = 1.2
 omni_range = 8.0
 
-;; Library
 [node name="Library" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 6, -10)
 
 [node name="LibraryWalls" type="CSGBox3D" parent="Buildings/Library"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.31809044, 0)
 use_collision = true
 size = Vector3(8, 6, 10)
 material = SubResource("mat_monastery")
 
 [node name="Roof" type="CSGBox3D" parent="Buildings/Library"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.25, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5680904, 0)
 use_collision = true
 size = Vector3(8.6, 0.5, 10.6)
 material = SubResource("mat_roof")
 
 [node name="LibraryLight" type="OmniLight3D" parent="Buildings/Library"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
-light_color = Color(1.0, 0.85, 0.6, 1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8180904, 0)
+light_color = Color(1, 0.85, 0.6, 1)
 light_energy = 1.5
 omni_range = 7.0
 
-;; Crypt Entrance
 [node name="CryptEntrance" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, -32)
 
 [node name="LeftPillar" type="CSGBox3D" parent="Buildings/CryptEntrance"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1.75, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, -0.93190956, 0)
 use_collision = true
 size = Vector3(1.5, 3.5, 1.5)
 material = SubResource("mat_dark_stone")
 
 [node name="RightPillar" type="CSGBox3D" parent="Buildings/CryptEntrance"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.75, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, -0.93190956, 0)
 use_collision = true
 size = Vector3(1.5, 3.5, 1.5)
 material = SubResource("mat_dark_stone")
 
 [node name="Arch" type="CSGBox3D" parent="Buildings/CryptEntrance"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3180904, 0)
 use_collision = true
 size = Vector3(5.5, 1, 1.5)
 material = SubResource("mat_dark_stone")
 
 [node name="CryptGlow" type="OmniLight3D" parent="Buildings/CryptEntrance"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.6819096, -1)
 light_color = Color(0.3, 0.4, 0.6, 1)
 light_energy = 0.8
-omni_range = 5.0
 
-;; Pilgrim Shelter
 [node name="PilgrimShelter" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, 22)
 
@@ -507,18 +481,15 @@ size = Vector3(10, 4, 8)
 material = SubResource("mat_wall")
 
 [node name="Roof" type="CSGBox3D" parent="Buildings/PilgrimShelter"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.0098248, 0)
 use_collision = true
 size = Vector3(10.6, 0.4, 8.6)
 material = SubResource("mat_pilgrims_roof")
 
 [node name="InteriorLight" type="OmniLight3D" parent="Buildings/PilgrimShelter"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
-light_color = Color(1.0, 0.9, 0.7, 1)
-light_energy = 1.0
-omni_range = 5.0
+light_color = Color(1, 0.9, 0.7, 1)
 
-;; Pilgrim Store
 [node name="PilgrimStore" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 25)
 
@@ -536,19 +507,15 @@ material = SubResource("mat_pilgrims_roof")
 
 [node name="InteriorLight" type="OmniLight3D" parent="Buildings/PilgrimStore"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
-light_color = Color(1.0, 0.9, 0.7, 1)
-light_energy = 1.0
-omni_range = 5.0
+light_color = Color(1, 0.9, 0.7, 1)
 
-;; ============== DECORATIONS ==============
 [node name="Decorations" type="Node3D" parent="."]
 
-;; Meditation Garden
 [node name="MeditationGarden" type="Node3D" parent="Decorations"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -1.8741913)
 
 [node name="ReflectionPool" type="CSGCylinder3D" parent="Decorations/MeditationGarden"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.90094376, 10.14705)
 use_collision = true
 radius = 4.0
 height = 0.5
@@ -556,79 +523,77 @@ sides = 12
 material = SubResource("mat_stone_bench")
 
 [node name="Water" type="CSGCylinder3D" parent="Decorations/MeditationGarden"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.75094366, 10.188862)
 radius = 3.5
 height = 0.2
 sides = 12
 material = SubResource("mat_water")
 
 [node name="MeditationBench_0" type="CSGBox3D" parent="Decorations/MeditationGarden"]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -6, 0.25, 0)
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -6, -0.90094376, 0)
 use_collision = true
 size = Vector3(3, 0.5, 1)
 material = SubResource("mat_stone_bench")
 
 [node name="MeditationBench_1" type="CSGBox3D" parent="Decorations/MeditationGarden"]
-transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 6, 0.25, 0)
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 6, -0.90094376, 0)
 use_collision = true
 size = Vector3(3, 0.5, 1)
 material = SubResource("mat_stone_bench")
 
 [node name="MeditationBench_2" type="CSGBox3D" parent="Decorations/MeditationGarden"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -6)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.4319096, -6)
 use_collision = true
 size = Vector3(3, 0.5, 1)
 material = SubResource("mat_stone_bench")
 
 [node name="MeditationBench_3" type="CSGBox3D" parent="Decorations/MeditationGarden"]
-transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.25, 6)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, -0.90094376, 6)
 use_collision = true
 size = Vector3(3, 0.5, 1)
 material = SubResource("mat_stone_bench")
 
-;; Zen Rocks
 [node name="ZenRock_0_0" type="CSGSphere3D" parent="Decorations/MeditationGarden"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.5, 5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, -0.65094376, 5)
 use_collision = true
 radius = 0.6
 material = SubResource("mat_stone_bench")
 
 [node name="ZenRock_0_1" type="CSGSphere3D" parent="Decorations/MeditationGarden"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.5, 0.4, 4.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.5, -0.75094366, 4.5)
 use_collision = true
 radius = 0.4
 material = SubResource("mat_stone_bench")
 
 [node name="ZenRock_1_0" type="CSGSphere3D" parent="Decorations/MeditationGarden"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.5, -5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, -2.1819096, -5)
 use_collision = true
 radius = 0.6
 material = SubResource("mat_stone_bench")
 
 [node name="ZenRock_1_1" type="CSGSphere3D" parent="Decorations/MeditationGarden"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.5, 0.35, -4.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.5, -2.3319097, -4.5)
 use_collision = true
 radius = 0.35
 material = SubResource("mat_stone_bench")
 
 [node name="ZenRock_2_0" type="CSGSphere3D" parent="Decorations/MeditationGarden"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.55, -8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, -2.1319096, -8)
 use_collision = true
 radius = 0.55
 material = SubResource("mat_stone_bench")
 
 [node name="ZenRock_3_0" type="CSGSphere3D" parent="Decorations/MeditationGarden"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.45, 8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, -0.7009437, 8)
 use_collision = true
 radius = 0.45
 material = SubResource("mat_stone_bench")
 
-;; Candle Stands
 [node name="CandleStand_0" type="Node3D" parent="Decorations"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 3, -8)
 
 [node name="Stand" type="CSGCylinder3D" parent="Decorations/CandleStand_0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.0819097, 0)
 use_collision = true
 radius = 0.3
 height = 1.2
@@ -636,24 +601,21 @@ sides = 6
 material = SubResource("mat_candle_stand")
 
 [node name="Bowl" type="CSGCylinder3D" parent="Decorations/CandleStand_0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.3819094, 0)
 use_collision = true
 radius = 0.4
 height = 0.2
-sides = 8
 material = SubResource("mat_candle_stand")
 
 [node name="CandleLight" type="OmniLight3D" parent="Decorations/CandleStand_0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
-light_color = Color(1.0, 0.85, 0.5, 1)
-light_energy = 1.0
-omni_range = 5.0
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.0819097, 0)
+light_color = Color(1, 0.85, 0.5, 1)
 
 [node name="CandleStand_1" type="Node3D" parent="Decorations"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3, -8)
 
 [node name="Stand" type="CSGCylinder3D" parent="Decorations/CandleStand_1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.0819097, 0)
 use_collision = true
 radius = 0.3
 height = 1.2
@@ -661,24 +623,21 @@ sides = 6
 material = SubResource("mat_candle_stand")
 
 [node name="Bowl" type="CSGCylinder3D" parent="Decorations/CandleStand_1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.3819094, 0)
 use_collision = true
 radius = 0.4
 height = 0.2
-sides = 8
 material = SubResource("mat_candle_stand")
 
 [node name="CandleLight" type="OmniLight3D" parent="Decorations/CandleStand_1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
-light_color = Color(1.0, 0.85, 0.5, 1)
-light_energy = 1.0
-omni_range = 5.0
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.0819097, 0)
+light_color = Color(1, 0.85, 0.5, 1)
 
 [node name="CandleStand_2" type="Node3D" parent="Decorations"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 6, -18)
 
 [node name="Stand" type="CSGCylinder3D" parent="Decorations/CandleStand_2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.0819097, 0)
 use_collision = true
 radius = 0.3
 height = 1.2
@@ -686,24 +645,21 @@ sides = 6
 material = SubResource("mat_candle_stand")
 
 [node name="Bowl" type="CSGCylinder3D" parent="Decorations/CandleStand_2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.3819094, 0)
 use_collision = true
 radius = 0.4
 height = 0.2
-sides = 8
 material = SubResource("mat_candle_stand")
 
 [node name="CandleLight" type="OmniLight3D" parent="Decorations/CandleStand_2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
-light_color = Color(1.0, 0.85, 0.5, 1)
-light_energy = 1.0
-omni_range = 5.0
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.0819097, 0)
+light_color = Color(1, 0.85, 0.5, 1)
 
 [node name="CandleStand_3" type="Node3D" parent="Decorations"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 6, -18)
 
 [node name="Stand" type="CSGCylinder3D" parent="Decorations/CandleStand_3"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.0819097, 0)
 use_collision = true
 radius = 0.3
 height = 1.2
@@ -711,24 +667,21 @@ sides = 6
 material = SubResource("mat_candle_stand")
 
 [node name="Bowl" type="CSGCylinder3D" parent="Decorations/CandleStand_3"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.3819094, 0)
 use_collision = true
 radius = 0.4
 height = 0.2
-sides = 8
 material = SubResource("mat_candle_stand")
 
 [node name="CandleLight" type="OmniLight3D" parent="Decorations/CandleStand_3"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
-light_color = Color(1.0, 0.85, 0.5, 1)
-light_energy = 1.0
-omni_range = 5.0
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.0819097, 0)
+light_color = Color(1, 0.85, 0.5, 1)
 
 [node name="CandleStand_4" type="Node3D" parent="Decorations"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, -12)
 
 [node name="Stand" type="CSGCylinder3D" parent="Decorations/CandleStand_4"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.0819097, 0)
 use_collision = true
 radius = 0.3
 height = 1.2
@@ -736,356 +689,272 @@ sides = 6
 material = SubResource("mat_candle_stand")
 
 [node name="Bowl" type="CSGCylinder3D" parent="Decorations/CandleStand_4"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.3819094, 0)
 use_collision = true
 radius = 0.4
 height = 0.2
-sides = 8
 material = SubResource("mat_candle_stand")
 
 [node name="CandleLight" type="OmniLight3D" parent="Decorations/CandleStand_4"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
-light_color = Color(1.0, 0.85, 0.5, 1)
-light_energy = 1.0
-omni_range = 5.0
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.0819097, 0)
+light_color = Color(1, 0.85, 0.5, 1)
 
-;; Prayer Flags
 [node name="PrayerFlag_0" type="CSGBox3D" parent="Decorations"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 18, -20)
-size = Vector3(1.5, 1.0, 0.05)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 16.469034, -20)
+size = Vector3(1.5, 1, 0.05)
 material = SubResource("mat_flag_blue")
 
 [node name="PrayerFlag_1" type="CSGBox3D" parent="Decorations"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.25, 17.25, -20.5)
-size = Vector3(1.5, 1.0, 0.05)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.25, 15.719034, -20.5)
+size = Vector3(1.5, 1, 0.05)
 material = SubResource("mat_flag_white")
 
 [node name="PrayerFlag_2" type="CSGBox3D" parent="Decorations"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.5, 16.5, -21)
-size = Vector3(1.5, 1.0, 0.05)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.5, 13.81809, -21)
+size = Vector3(1.5, 1, 0.05)
 material = SubResource("mat_flag_red")
 
 [node name="PrayerFlag_3" type="CSGBox3D" parent="Decorations"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.75, 15.75, -21.5)
-size = Vector3(1.5, 1.0, 0.05)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.75, 13.06809, -21.5)
+size = Vector3(1.5, 1, 0.05)
 material = SubResource("mat_flag_green")
 
 [node name="PrayerFlag_4" type="CSGBox3D" parent="Decorations"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, -22)
-size = Vector3(1.5, 1.0, 0.05)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12.31809, -22)
+size = Vector3(1.5, 1, 0.05)
 material = SubResource("mat_flag_yellow")
 
-;; ============== BILLBOARDS ==============
 [node name="Billboards" type="Node3D" parent="."]
 
-;; Temple Interior - Altar
 [node name="Temple_Altar" type="Sprite3D" parent="Billboards"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.5, -23)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.8180904, -23)
 pixel_size = 0.025
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("4")
 
-;; Temple Interior - Wall Decorations
 [node name="Temple_Wall1" type="Sprite3D" parent="Billboards"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 8, -24)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 5.3180904, -24)
 pixel_size = 0.02
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("7")
 
 [node name="Temple_Wall2" type="Sprite3D" parent="Billboards"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 8, -24)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 5.3180904, -24)
 pixel_size = 0.02
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("8")
 
-;; Temple Interior - Hanging Tapestries/Lanterns
 [node name="Temple_Hanging1" type="Sprite3D" parent="Billboards"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 9, -20)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 6.3180904, -20)
 pixel_size = 0.018
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("5")
 
 [node name="Temple_Hanging2" type="Sprite3D" parent="Billboards"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 9, -20)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 6.3180904, -20)
 pixel_size = 0.018
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("6")
 
 [node name="Temple_Hanging3" type="Sprite3D" parent="Billboards"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 9, -27)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 6.3180904, -27)
 pixel_size = 0.018
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("5")
 
 [node name="Temple_Hanging4" type="Sprite3D" parent="Billboards"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 9, -27)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 6.3180904, -27)
 pixel_size = 0.018
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("6")
 
-;; Meditation Garden - Bushes
 [node name="Garden_Bush1" type="Sprite3D" parent="Billboards"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 3.5, 2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 2.3490562, 2)
 pixel_size = 0.022
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("9")
 
 [node name="Garden_Bush2" type="Sprite3D" parent="Billboards"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3.5, 2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 2.3490562, 2)
 pixel_size = 0.022
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("10")
 
 [node name="Garden_Bush3" type="Sprite3D" parent="Billboards"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 3.5, -5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.81809044, -5)
 pixel_size = 0.022
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("9")
 
 [node name="Garden_Bush4" type="Sprite3D" parent="Billboards"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 3.5, -5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2.3490562, -5)
 pixel_size = 0.022
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("10")
 
-;; Meditation Garden - Herb Bushes
 [node name="Garden_Herb1" type="Sprite3D" parent="Billboards"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 3.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.3490562, 0)
 pixel_size = 0.02
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("11")
 
 [node name="Garden_Herb2" type="Sprite3D" parent="Billboards"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 3.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 2.3490562, 0)
 pixel_size = 0.02
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("11")
 
 [node name="Garden_Herb3" type="Sprite3D" parent="Billboards"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 3.5, -8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.81809044, -8)
 pixel_size = 0.02
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("11")
 
 [node name="Garden_Herb4" type="Sprite3D" parent="Billboards"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 3.5, -8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.81809044, -8)
 pixel_size = 0.02
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("11")
 
-;; Library/Quarters - Jugs and Decorations
 [node name="Library_Jugs1" type="Sprite3D" parent="Billboards"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 6.5, -8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 3.8180904, -8)
 pixel_size = 0.018
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("12")
 
 [node name="Library_Jugs2" type="Sprite3D" parent="Billboards"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 6.5, -12)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 3.8180904, -12)
 pixel_size = 0.018
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("13")
 
 [node name="Library_Hanging1" type="Sprite3D" parent="Billboards"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 8, -10)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 5.3180904, -10)
 pixel_size = 0.016
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("5")
 
-;; Monks Quarters - Jugs and Decorations
 [node name="Quarters_Jugs1" type="Sprite3D" parent="Billboards"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 6.5, -12)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 3.8180904, -12)
 pixel_size = 0.018
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("14")
 
 [node name="Quarters_Jugs2" type="Sprite3D" parent="Billboards"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 6.5, -18)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 3.8180904, -18)
 pixel_size = 0.018
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("12")
 
 [node name="Quarters_Hanging1" type="Sprite3D" parent="Billboards"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 8, -15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 5.3180904, -15)
 pixel_size = 0.016
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("6")
 
-;; Pilgrim Shelter - Jugs
 [node name="Shelter_Jugs1" type="Sprite3D" parent="Billboards"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 0.5, 20)
 pixel_size = 0.018
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("13")
 
 [node name="Shelter_Jugs2" type="Sprite3D" parent="Billboards"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 0.5, 24)
 pixel_size = 0.018
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("14")
 
-;; Pilgrim Store - Jugs
 [node name="Store_Jugs1" type="Sprite3D" parent="Billboards"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 0.5, 23)
 pixel_size = 0.018
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("12")
 
 [node name="Store_Jugs2" type="Sprite3D" parent="Billboards"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 0.5, 27)
 pixel_size = 0.018
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("13")
 
-;; Outdoor Path Decorations - Floor sprites as ground decoration
 [node name="Path_Floor1" type="Sprite3D" parent="Billboards"]
 transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -5, 0.05, 18)
 pixel_size = 0.03
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("15")
 
 [node name="Path_Floor2" type="Sprite3D" parent="Billboards"]
 transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 5, 0.05, 22)
 pixel_size = 0.03
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("16")
 
 [node name="Path_Floor3" type="Sprite3D" parent="Billboards"]
 transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -8, 0.05, 28)
 pixel_size = 0.03
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("17")
 
 [node name="Path_Floor4" type="Sprite3D" parent="Billboards"]
 transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 10, 0.05, 30)
 pixel_size = 0.03
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("15")
 
-;; Scattered Atmosphere Bushes
 [node name="Atmos_Bush1" type="Sprite3D" parent="Billboards"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0.5, 15)
 pixel_size = 0.022
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("9")
 
 [node name="Atmos_Bush2" type="Sprite3D" parent="Billboards"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0.5, 20)
 pixel_size = 0.022
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("10")
 
 [node name="Atmos_Bush3" type="Sprite3D" parent="Billboards"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 3.5, 8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 2.3490562, 8)
 pixel_size = 0.022
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("9")
 
 [node name="Atmos_Bush4" type="Sprite3D" parent="Billboards"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 3.5, 5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 2.3490562, 5)
 pixel_size = 0.022
 billboard = 1
-transparent = true
 alpha_cut = 2
-alpha_scissor_threshold = 0.5
 texture = ExtResource("10")
 
-;; ============== LIGHTS ==============
 [node name="Lights" type="Node3D" parent="."]
 
-;; ============== SPAWN POINTS ==============
 [node name="SpawnPoints" type="Node3D" parent="."]
 
 [node name="SpawnPoint_default" type="Marker3D" parent="SpawnPoints"]
@@ -1095,22 +964,21 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 26)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 28)
 
 [node name="SpawnPoint_from_wilderness" type="Marker3D" parent="SpawnPoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 3.1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 1.9490561, 0)
 
 [node name="SpawnPoint_from_crypt" type="Marker3D" parent="SpawnPoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.1, -30)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.4180903, -30)
 
-;; ============== NPC SPAWN POINTS ==============
 [node name="NPCSpawnPoints" type="Node3D" parent="."]
 
 [node name="NPC_AbbotSerenian" type="Marker3D" parent="NPCSpawnPoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, -20)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.3180904, -20)
 
 [node name="NPC_BrotherAldric" type="Marker3D" parent="NPCSpawnPoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 6, -8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 3.3180904, -8)
 
 [node name="NPC_SisterMei" type="Marker3D" parent="NPCSpawnPoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 6)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8490562, 6)
 
 [node name="NPC_BrotherFenwick" type="Marker3D" parent="NPCSpawnPoints"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 15)
@@ -1119,31 +987,29 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 15)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 25)
 
 [node name="NPC_Civilian_0" type="Marker3D" parent="NPCSpawnPoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 6, -18)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3.3180904, -18)
 
 [node name="NPC_Civilian_1" type="Marker3D" parent="NPCSpawnPoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 3, 3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 1.8490562, 3)
 
 [node name="NPC_Civilian_2" type="Marker3D" parent="NPCSpawnPoints"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 0, 24)
 
-;; ============== INTERACTABLES ==============
 [node name="Interactables" type="Node3D" parent="."]
 
 [node name="FastTravelShrine" type="Marker3D" parent="Interactables"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.31809044, -8)
 
 [node name="RestSpot" type="Marker3D" parent="Interactables"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 22)
 
 [node name="DoorPosition_Crypt" type="Marker3D" parent="Interactables"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, -33)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.3180904, -33)
 
 [node name="DoorPosition_Whalers" type="Marker3D" parent="Interactables"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 32)
 
 [node name="DoorPosition_Wilderness" type="Marker3D" parent="Interactables"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 3, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 1.8490562, 0)
 
-;; ============== NAVIGATION ==============
 [node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]

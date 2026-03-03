@@ -1,5 +1,8 @@
 ## boat_travel_manager.gd - Manages boat travel between ports
 ## Handles route registration, journey execution, and encounter triggering
+##
+## TODO: [FUTURE FEATURE] Boat travel system autoload is registered but not active.
+## No route data files or UI integration yet. See CLAUDE.md "Sea Travel & Encounters" section.
 extends Node
 
 signal journey_started(route: BoatTravelData)
@@ -702,7 +705,7 @@ func _hex_distance(a: Vector2i, b: Vector2i) -> int:
 
 
 ## Trigger a sea-specific encounter
-func _trigger_sea_encounter(encounter_type: String, waypoint: Vector2i) -> void:
+func _trigger_sea_encounter(encounter_type: String, _waypoint: Vector2i) -> void:
 	current_state = JourneyState.IN_ENCOUNTER
 
 	match encounter_type:

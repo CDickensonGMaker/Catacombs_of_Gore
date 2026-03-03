@@ -4,9 +4,12 @@ extends Control
 
 signal character_created
 
+# Background image
+const BG_TEXTURE_PATH := "res://assets/ui/char_creation_bg.png"
+
 # Dark gothic colors (matching game_menu)
 const COL_BG = Color(0.08, 0.08, 0.1)
-const COL_PANEL = Color(0.12, 0.12, 0.15)
+const COL_PANEL = Color(0.12, 0.12, 0.15, 0.85)  # Slightly transparent for layering
 const COL_BORDER = Color(0.3, 0.25, 0.2)
 const COL_TEXT = Color(0.9, 0.85, 0.75)
 const COL_DIM = Color(0.5, 0.5, 0.5)
@@ -91,6 +94,30 @@ const CAREER_DATA = {
 		"description": "Locks yield to your picks and shadows hide your passage. You take what you want from those who have too much.",
 		"skills": "Stealth +2, Lockpicking +1",
 		"equipment": "Dagger, Lockpicks, Dark cloak"
+	},
+	Enums.Career.NOBLE: {
+		"name": "Noble",
+		"description": "Born to privilege but cast down by fate. Your education and social graces remain, even if your fortune does not.",
+		"skills": "Persuasion +2, Negotiation +1",
+		"equipment": "Dagger, Wealthy purse"
+	},
+	Enums.Career.CULTIST: {
+		"name": "Cultist",
+		"description": "You have delved into forbidden texts and dark rituals. The old gods whisper secrets to those who listen.",
+		"skills": "Arcana Lore +2, Religion +1",
+		"equipment": "Dagger, Health potions"
+	},
+	Enums.Career.ALCHEMIST: {
+		"name": "Alchemist",
+		"description": "Trained in the art of brewing potions and identifying herbs. You prefer science over swords.",
+		"skills": "Alchemy +2, Herbalism +1",
+		"equipment": "Health potions, Healing herbs"
+	},
+	Enums.Career.BEGGAR: {
+		"name": "Beggar",
+		"description": "Life on the streets taught you to survive with nothing. Your fists and wits are all you have.",
+		"skills": "Survival +2, Endurance +1",
+		"equipment": "Bread, Empty pockets"
 	}
 }
 
@@ -114,28 +141,38 @@ func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 
 func _build_ui() -> void:
-	# Full screen dark background
+	# Full screen dark background (base layer)
 	var bg = ColorRect.new()
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	bg.color = COL_BG
 	add_child(bg)
 
-	# Main container - compact margins
+	# Background image (stretched to fit with pixelated look)
+	if ResourceLoader.exists(BG_TEXTURE_PATH):
+		var bg_tex = TextureRect.new()
+		bg_tex.texture = load(BG_TEXTURE_PATH)
+		bg_tex.set_anchors_preset(Control.PRESET_FULL_RECT)
+		bg_tex.stretch_mode = TextureRect.STRETCH_SCALE
+		bg_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		bg_tex.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST  # Pixelated look
+		add_child(bg_tex)
+
+	# Main container - compact margins with extra bottom padding to keep buttons visible
 	var main_vbox = VBoxContainer.new()
 	main_vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
 	main_vbox.add_theme_constant_override("separation", 4)
 	main_vbox.offset_left = 15
 	main_vbox.offset_top = 10
 	main_vbox.offset_right = -15
-	main_vbox.offset_bottom = -10
+	main_vbox.offset_bottom = -50  # Extra bottom padding to ensure buttons stay visible
 	add_child(main_vbox)
 
-	# Title - smaller
+	# Title
 	var title = Label.new()
 	title.text = "CREATE YOUR CHARACTER"
 	title.add_theme_color_override("font_color", COL_GOLD)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 18)
+	title.add_theme_font_size_override("font_size", 28)
 	main_vbox.add_child(title)
 
 	# Name input section - inline with title area
@@ -147,13 +184,13 @@ func _build_ui() -> void:
 	var name_label = Label.new()
 	name_label.text = "NAME:"
 	name_label.add_theme_color_override("font_color", COL_GOLD)
-	name_label.add_theme_font_size_override("font_size", 12)
+	name_label.add_theme_font_size_override("font_size", 18)
 	name_hbox.add_child(name_label)
 
 	name_input = LineEdit.new()
 	name_input.placeholder_text = "Enter name..."
-	name_input.custom_minimum_size.x = 180
-	name_input.custom_minimum_size.y = 24
+	name_input.custom_minimum_size.x = 220
+	name_input.custom_minimum_size.y = 32
 	name_input.text_changed.connect(_on_name_changed)
 	_style_line_edit(name_input)
 	name_hbox.add_child(name_input)
@@ -180,25 +217,28 @@ func _build_ui() -> void:
 	var bottom_hbox = HBoxContainer.new()
 	bottom_hbox.add_theme_constant_override("separation", 15)
 	bottom_hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	bottom_hbox.custom_minimum_size.y = 50  # Ensure minimum height for buttons
 	main_vbox.add_child(bottom_hbox)
 
 	# Preview label
 	preview_label = Label.new()
 	preview_label.add_theme_color_override("font_color", COL_TEXT)
-	preview_label.add_theme_font_size_override("font_size", 12)
-	preview_label.custom_minimum_size.x = 200
+	preview_label.add_theme_font_size_override("font_size", 18)
+	preview_label.custom_minimum_size.x = 250
 	bottom_hbox.add_child(preview_label)
 
 	var random_btn = Button.new()
 	random_btn.text = "RANDOM"
-	random_btn.custom_minimum_size = Vector2(70, 26)
+	random_btn.custom_minimum_size = Vector2(100, 36)
+	random_btn.add_theme_font_size_override("font_size", 16)
 	random_btn.pressed.connect(_on_randomize_pressed)
 	_style_button(random_btn)
 	bottom_hbox.add_child(random_btn)
 
 	start_button = Button.new()
 	start_button.text = "BEGIN"
-	start_button.custom_minimum_size = Vector2(80, 26)
+	start_button.custom_minimum_size = Vector2(120, 36)
+	start_button.add_theme_font_size_override("font_size", 16)
 	start_button.pressed.connect(_on_start_pressed)
 	_style_button(start_button, true)
 	bottom_hbox.add_child(start_button)
@@ -207,11 +247,11 @@ func _build_selection_panel(title: String, data: Dictionary, is_race: bool) -> V
 	var vbox = VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 4)
 
-	# Title - smaller
+	# Section title
 	var title_label = Label.new()
 	title_label.text = title
 	title_label.add_theme_color_override("font_color", COL_GOLD)
-	title_label.add_theme_font_size_override("font_size", 13)
+	title_label.add_theme_font_size_override("font_size", 20)
 	vbox.add_child(title_label)
 
 	# Button grid - compact
@@ -226,8 +266,8 @@ func _build_selection_panel(title: String, data: Dictionary, is_race: bool) -> V
 		var btn = Button.new()
 		btn.text = data[key]["name"]
 		btn.toggle_mode = true
-		btn.custom_minimum_size = Vector2(72, 22)
-		btn.add_theme_font_size_override("font_size", 11)
+		btn.custom_minimum_size = Vector2(90, 30)
+		btn.add_theme_font_size_override("font_size", 14)
 		btn.pressed.connect(_on_selection_button_pressed.bind(key, is_race))
 		_style_button(btn)
 		button_grid.add_child(btn)
@@ -238,10 +278,10 @@ func _build_selection_panel(title: String, data: Dictionary, is_race: bool) -> V
 	else:
 		career_buttons = buttons_array
 
-	# Description panel - compact
+	# Description panel
 	var desc_panel = PanelContainer.new()
 	desc_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	desc_panel.custom_minimum_size.y = 80
+	desc_panel.custom_minimum_size.y = 120
 	var desc_style = StyleBoxFlat.new()
 	desc_style.bg_color = COL_PANEL
 	desc_style.border_color = COL_BORDER
@@ -261,7 +301,7 @@ func _build_selection_panel(title: String, data: Dictionary, is_race: bool) -> V
 	desc_text.fit_content = false
 	desc_text.scroll_active = true
 	desc_text.add_theme_color_override("default_color", COL_TEXT)
-	desc_text.add_theme_font_size_override("normal_font_size", 11)
+	desc_text.add_theme_font_size_override("normal_font_size", 16)
 	desc_margin.add_child(desc_text)
 
 	if is_race:
@@ -315,7 +355,7 @@ func _style_line_edit(line_edit: LineEdit) -> void:
 	line_edit.add_theme_color_override("font_color", COL_TEXT)
 	line_edit.add_theme_color_override("font_placeholder_color", COL_DIM)
 	line_edit.add_theme_color_override("caret_color", COL_GOLD)
-	line_edit.add_theme_font_size_override("font_size", 12)
+	line_edit.add_theme_font_size_override("font_size", 16)
 
 func _on_selection_button_pressed(key: int, is_race: bool) -> void:
 	if is_race:
@@ -450,3 +490,19 @@ func _apply_career_starting_equipment(career: Enums.Career) -> void:
 			# Street skills - tools of the trade
 			InventoryManager.add_item("dagger", 1)
 			InventoryManager.add_item("lockpick", 3)
+		Enums.Career.NOBLE:
+			# Fallen aristocrat - silver tongue and gold
+			InventoryManager.add_item("dagger", 1)
+			InventoryManager.add_gold(150)  # Total 160 gold
+		Enums.Career.CULTIST:
+			# Dark knowledge seeker
+			InventoryManager.add_item("dagger", 1)
+			InventoryManager.add_item("health_potion", 2)
+		Enums.Career.ALCHEMIST:
+			# Potion brewer
+			InventoryManager.add_item("health_potion", 3)
+			InventoryManager.add_item("healing_herb", 3)
+		Enums.Career.BEGGAR:
+			# Street survivor - starts with nothing
+			InventoryManager.add_item("bread", 1)
+			InventoryManager.remove_gold(10)  # Remove the base 10 gold - starts broke

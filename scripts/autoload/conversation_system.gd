@@ -22,11 +22,17 @@ signal memory_reminder(response_id: String, original_text: String)
 ## Emitted when conversation ends
 signal conversation_ended(npc: Node)
 
+## Emitted when farewell is delivered (before conversation actually ends)
+signal farewell_delivered(farewell_text: String)
+
 ## Emitted when a persuasion attempt is made
 signal persuasion_performed(action: String, success: bool, disposition_change: int, roll_data: Dictionary)
 
 ## Emitted when a skill check is performed in dialogue
 signal skill_check_performed(skill: int, dc: int, success: bool, roll_data: Dictionary)
+
+## Emitted when a topic is unlocked (Morrowind-style topic discovery)
+signal topic_unlocked(topic_id: String)
 
 ## Emitted when a scripted line is shown
 signal scripted_line_shown(line: Dictionary, index: int)
@@ -92,6 +98,14 @@ var conversation_ui: Node = null
 ## Migrated from DialogueManager for centralized flag management
 var conversation_flags: Dictionary = {}
 
+## Quest turn-in response variants by archetype
+## Format: archetype_key -> Array[String]
+var quest_turnin_responses: Dictionary = {}
+
+## Player's discovered topics (Morrowind-style topic discovery)
+## Topics are unlocked by hearing certain responses and can then be asked to other NPCs
+var player_known_topics: Array[String] = []
+
 ## Context variables for placeholder substitution in flag names
 ## Example: {"merchant_id": "blacksmith_01"} allows flags like "{merchant_id}:befriend"
 var context_variables: Dictionary = {}
@@ -101,6 +115,14 @@ var is_scripted_mode: bool = false
 var scripted_lines: Array[Dictionary] = []  # Array of ScriptedLine dictionaries
 var scripted_current_index: int = 0
 var scripted_callback: Callable  # Called when scripted dialogue ends
+
+## Greeting responses (separate from standard topic pools)
+## These are shown at conversation start based on disposition
+var greeting_pool: Array[ConversationResponse] = []
+
+## Farewell responses (separate from standard topic pools)
+## These are shown when player selects GOODBYE
+var farewell_pool: Array[ConversationResponse] = []
 
 
 # =============================================================================
@@ -116,6 +138,32 @@ func _ready() -> void:
 	# and ConversationResponse classes aren't registered when autoload runs
 	call_deferred("_load_response_pools")
 	_instantiate_conversation_ui()
+
+	# Connect to scene manager to clear node references before scene changes
+	if SceneManager:
+		SceneManager.scene_load_started.connect(_on_scene_load_started)
+
+
+## Called when a scene change begins - clear all node references to prevent stale casts
+func _on_scene_load_started(_scene_path: String) -> void:
+	_clear_node_references()
+
+
+## Clear all node references to prevent "Trying to cast a freed object" errors
+## Called at the START of scene transitions, before the old scene is freed
+func _clear_node_references() -> void:
+	# End any active conversation first
+	if is_active:
+		# Don't emit signals during cleanup to avoid accessing freed objects
+		is_active = false
+		is_scripted_mode = false
+
+	current_npc = null
+	current_context = null
+	scripted_lines.clear()
+	scripted_current_index = 0
+	scripted_callback = Callable()
+	context_variables.clear()
 
 
 func _instantiate_conversation_ui() -> void:
@@ -190,7 +238,18 @@ func _register_pool(pool: ConversationResponsePool) -> void:
 ## Parse responses from a JSON pool dictionary and register them
 func _load_responses_from_dict(pool_data: Dictionary) -> int:
 	var responses: Array = pool_data.get("responses", [])
+	var pool_id: String = pool_data.get("pool_id", "")
 	var count := 0
+
+	# Load quest turn-in response variants if present (quests.json)
+	if pool_id == "quests" and pool_data.has("quest_turnin_responses"):
+		var turnin_data: Dictionary = pool_data.get("quest_turnin_responses", {})
+		for archetype_key: String in turnin_data:
+			var variants: Array = turnin_data[archetype_key]
+			quest_turnin_responses[archetype_key] = []
+			for variant: Variant in variants:
+				quest_turnin_responses[archetype_key].append(str(variant))
+		print("ConversationSystem: Loaded %d quest turn-in archetype variants" % quest_turnin_responses.size())
 
 	for resp_data: Variant in responses:
 		if not resp_data is Dictionary:
@@ -232,7 +291,13 @@ func _load_responses_from_dict(pool_data: Dictionary) -> int:
 				if condition:
 					response.conditions.append(condition)
 
-		register_response(response.topic_type, response)
+		# Route greetings and farewells to their separate pools
+		if pool_id == "greetings":
+			greeting_pool.append(response)
+		elif pool_id == "farewells":
+			farewell_pool.append(response)
+		else:
+			register_response(response.topic_type, response)
 		count += 1
 
 	return count
@@ -300,15 +365,31 @@ func start_conversation(npc: Node, profile: NPCKnowledgeProfile) -> bool:
 	# Emit signal for UI to respond
 	conversation_started.emit(npc, current_context)
 
+	# Play NPC greeting bark sound (gender-matched)
+	if AudioManager:
+		var is_female: bool = false
+		if "is_female" in npc:
+			is_female = npc.is_female
+		elif npc_name.begins_with("Lady") or npc_name.begins_with("Sister") or npc_name.contains("ella") or npc_name.contains("ina"):
+			is_female = true
+		var npc_pos: Vector3 = npc.global_position if npc is Node3D else Vector3.ZERO
+		AudioManager.play_npc_bark(is_female, npc_pos, -5.0)
+
 	return true
 
 
 ## End the current conversation
 func end_conversation() -> void:
+	# If in scripted mode, use the scripted dialogue end instead
+	if is_scripted_mode:
+		_end_scripted_dialogue()
+		return
+
 	if not is_active:
 		return
 
-	var finished_npc := current_npc
+	# Store reference before clearing (check validity before emitting signal)
+	var finished_npc: Node = current_npc if is_instance_valid(current_npc) else null
 
 	# Clear state
 	current_context = null
@@ -318,7 +399,7 @@ func end_conversation() -> void:
 	# Resume game
 	GameManager.end_dialogue()
 
-	# Emit signal
+	# Emit signal (finished_npc may be null if it was freed)
 	conversation_ended.emit(finished_npc)
 
 
@@ -357,16 +438,84 @@ func get_available_topics(profile: NPCKnowledgeProfile) -> Array[ConversationTop
 		topics.append(ConversationTopic.TopicType.TRADE)
 
 	# Also add TRADE if NPC is in merchants group
-	if current_npc and current_npc.is_in_group("merchants"):
+	if is_instance_valid(current_npc) and current_npc.is_in_group("merchants"):
 		if ConversationTopic.TopicType.TRADE not in topics:
 			topics.append(ConversationTopic.TopicType.TRADE)
 
 	# Add QUESTS topic if this NPC has quests to give or receive
-	if current_npc and _npc_has_quests(current_npc):
+	if is_instance_valid(current_npc) and _npc_has_quests(current_npc):
 		topics.append(ConversationTopic.TopicType.QUESTS)
 
 	# GOODBYE is always last
 	topics.append(ConversationTopic.TopicType.GOODBYE)
+
+	return topics
+
+
+## Get location-aware custom topics from WorldLexicon based on NPC knowledge
+## Returns topics for nearby regions, settlements, and creatures the NPC knows about
+func get_location_custom_topics(profile: NPCKnowledgeProfile) -> Array[Dictionary]:
+	var topics: Array[Dictionary] = []
+
+	if not profile:
+		return topics
+
+	# Get current settlement from PlayerGPS
+	var settlement_id: String = ""
+	if PlayerGPS and not PlayerGPS.current_location_id.is_empty():
+		# Map location_id to WorldLexicon settlement format
+		# WorldLexicon uses "village_elder_moor", PlayerGPS uses "elder_moor"
+		var location_id: String = PlayerGPS.current_location_id
+		for key: String in WorldLexicon.SETTLEMENTS.keys():
+			if key.ends_with(location_id) or key.contains(location_id):
+				settlement_id = key
+				break
+
+	# If we found a settlement, add nearby region topics
+	if not settlement_id.is_empty() and WorldLexicon.SETTLEMENTS.has(settlement_id):
+		var settlement_data: Dictionary = WorldLexicon.SETTLEMENTS[settlement_id]
+		var nearby_regions: Array = settlement_data.get("nearby_regions", [])
+
+		# Add topics for regions the NPC knows about
+		for region_id: String in nearby_regions:
+			if not WorldLexicon.REGIONS.has(region_id):
+				continue
+
+			var region_data: Dictionary = WorldLexicon.REGIONS[region_id]
+			var region_name: String = region_data.get("name", region_id)
+
+			# Check if NPC has knowledge to discuss this region
+			var can_discuss: bool = false
+			if profile.has_knowledge("local_area"):
+				can_discuss = true
+			elif profile.has_knowledge("wilderness") and region_id != settlement_data.get("region", ""):
+				can_discuss = true
+			elif profile.has_knowledge("creatures"):
+				can_discuss = true
+
+			if can_discuss:
+				# Get a direction hint for this region
+				var directions: Array = region_data.get("directions", [])
+				var direction_hint: String = directions[randi() % directions.size()] if not directions.is_empty() else "Somewhere in the wilds."
+
+				# Get creature info for this region
+				var creatures: Array = region_data.get("creatures", [])
+				var creature_names: Array[String] = []
+				for creature_id: String in creatures:
+					creature_names.append(WorldLexicon.get_creature_display(creature_id))
+
+				var creature_text: String = ""
+				if not creature_names.is_empty():
+					creature_text = " You might encounter %s there." % ", ".join(creature_names.slice(0, 2))
+
+				topics.append({
+					"id": "region_" + region_id,
+					"display_text": region_name,
+					"text": region_name,
+					"type": ConversationTopic.TopicType.DIRECTIONS,
+					"response": "%s%s" % [direction_hint, creature_text],
+					"is_location_topic": true
+				})
 
 	return topics
 
@@ -382,7 +531,7 @@ func select_custom_topic(custom_id: String, topic_data: Dictionary) -> void:
 	topic_selected.emit(base_type)
 
 	# Check if NPC has a custom handler for this topic
-	if current_npc and current_npc.has_method("handle_custom_topic"):
+	if is_instance_valid(current_npc) and current_npc.has_method("handle_custom_topic"):
 		var handled: bool = current_npc.handle_custom_topic(custom_id, topic_data)
 		if handled:
 			return
@@ -432,10 +581,12 @@ func select_topic(topic_type: ConversationTopic.TopicType) -> void:
 		push_warning("ConversationSystem: No active conversation")
 		return
 
-	# Handle goodbye specially
+	# Handle goodbye specially - show farewell before ending
 	if topic_type == ConversationTopic.TopicType.GOODBYE:
 		topic_selected.emit(topic_type)
-		end_conversation()
+		var farewell: String = get_farewell()
+		farewell_delivered.emit(farewell)
+		# UI will handle showing farewell and then calling end_conversation()
 		return
 
 	# Handle RUMORS topic with bounty system
@@ -488,6 +639,11 @@ func select_topic(topic_type: ConversationTopic.TopicType) -> void:
 	for action in response.actions:
 		execute_action(action)
 
+	# Check for topic unlocks (Morrowind-style topic discovery)
+	if response.unlock_topics and not response.unlock_topics.is_empty():
+		for topic_id: String in response.unlock_topics:
+			unlock_topic(topic_id)
+
 	# Emit response delivered signal
 	response_delivered.emit(response, current_context)
 
@@ -534,6 +690,78 @@ func select_response(topic_type: ConversationTopic.TopicType) -> ConversationRes
 	fallback.text = "I'm not sure what to say about that."
 	fallback.topic_type = topic_type
 	return fallback
+
+
+## Get a greeting based on current context (disposition, personality, time)
+## Called at conversation start to select an appropriate greeting from the pool
+func get_greeting() -> String:
+	if not current_context:
+		return "Greetings."
+
+	var profile: NPCKnowledgeProfile = current_context.npc_profile
+	var disposition: int = current_context.disposition
+
+	# Filter greetings by disposition
+	var filtered := _filter_responses(greeting_pool, profile, disposition)
+	if filtered.is_empty():
+		# Fallback if no matching greeting
+		return _get_fallback_greeting(disposition)
+
+	# Select using weighted random with personality matching
+	var selected: ConversationResponse = _weighted_select(filtered, profile)
+	if selected:
+		# Inject context variables into greeting text
+		return current_context.inject_variables(selected.text)
+
+	return _get_fallback_greeting(disposition)
+
+
+## Fallback greeting when pool is empty or no match
+func _get_fallback_greeting(disposition: int) -> String:
+	if disposition >= 75:
+		return "Well met, friend! What can I do for you?"
+	elif disposition >= 50:
+		return "Greetings. What brings you here?"
+	elif disposition >= 25:
+		return "What do you want?"
+	else:
+		return "Make it quick."
+
+
+## Get a farewell based on current context (disposition, personality)
+## Called when player selects GOODBYE to show a proper sendoff
+func get_farewell() -> String:
+	if not current_context:
+		return "Farewell."
+
+	var profile: NPCKnowledgeProfile = current_context.npc_profile
+	var disposition: int = current_context.disposition
+
+	# Filter farewells by disposition
+	var filtered := _filter_responses(farewell_pool, profile, disposition)
+	if filtered.is_empty():
+		# Fallback if no matching farewell
+		return _get_fallback_farewell(disposition)
+
+	# Select using weighted random with personality matching
+	var selected: ConversationResponse = _weighted_select(filtered, profile)
+	if selected:
+		# Inject context variables into farewell text
+		return current_context.inject_variables(selected.text)
+
+	return _get_fallback_farewell(disposition)
+
+
+## Fallback farewell when pool is empty or no match
+func _get_fallback_farewell(disposition: int) -> String:
+	if disposition >= 75:
+		return "Farewell, friend. Safe travels!"
+	elif disposition >= 50:
+		return "Until next time."
+	elif disposition >= 25:
+		return "Be on your way."
+	else:
+		return "Good riddance."
 
 
 ## Check if NPC has already said this response
@@ -709,6 +937,43 @@ func pop_pending_shop() -> String:
 
 
 # =============================================================================
+# TOPIC DISCOVERY (Morrowind-style)
+# =============================================================================
+
+## Unlock a topic for the player (can now be asked to other NPCs)
+func unlock_topic(topic_id: String) -> void:
+	if topic_id.is_empty():
+		return
+	if topic_id not in player_known_topics:
+		player_known_topics.append(topic_id)
+		topic_unlocked.emit(topic_id)
+		print("[ConversationSystem] Topic unlocked: %s" % topic_id)
+
+
+## Check if player knows a topic
+func has_topic(topic_id: String) -> bool:
+	return topic_id in player_known_topics
+
+
+## Get all known topics
+func get_known_topics() -> Array[String]:
+	return player_known_topics.duplicate()
+
+
+## Check if a custom topic should be available (based on discovery)
+## Returns true if topic doesn't require discovery OR if player has discovered it
+func is_topic_available(topic_id: String, requires_discovery: bool = false) -> bool:
+	if not requires_discovery:
+		return true
+	return has_topic(topic_id)
+
+
+## Clear all known topics (for new game)
+func clear_known_topics() -> void:
+	player_known_topics.clear()
+
+
+# =============================================================================
 # SAVE/LOAD
 # =============================================================================
 
@@ -716,7 +981,8 @@ func pop_pending_shop() -> String:
 func to_dict() -> Dictionary:
 	return {
 		"npc_memory": npc_memory.duplicate(),
-		"conversation_flags": conversation_flags.duplicate()
+		"conversation_flags": conversation_flags.duplicate(),
+		"player_known_topics": player_known_topics.duplicate()
 	}
 
 
@@ -724,6 +990,12 @@ func to_dict() -> Dictionary:
 func from_dict(data: Dictionary) -> void:
 	npc_memory = data.get("npc_memory", {}).duplicate()
 	conversation_flags = data.get("conversation_flags", {}).duplicate()
+	# Load known topics (convert to typed array)
+	var topics_data: Array = data.get("player_known_topics", [])
+	player_known_topics.clear()
+	for topic: Variant in topics_data:
+		if topic is String:
+			player_known_topics.append(topic)
 
 
 ## Reset state for new game
@@ -732,10 +1004,11 @@ func reset_for_new_game() -> void:
 	if is_active:
 		end_conversation()
 
-	# Clear memory and flags
+	# Clear memory, flags, and known topics
 	npc_memory.clear()
 	conversation_flags.clear()
 	context_variables.clear()
+	player_known_topics.clear()
 
 
 # =============================================================================
@@ -772,11 +1045,19 @@ static func create_scripted_choice(text: String, next_index: int, actions: Array
 ## lines: Array of ScriptedLine dictionaries
 ## callback: Optional callable to run when dialogue ends
 func start_scripted_dialogue(lines: Array, callback: Callable = Callable()) -> void:
+	# Guard against re-entry - if already active, ignore
+	if is_active or is_scripted_mode:
+		push_warning("ConversationSystem: start_scripted_dialogue called while already in dialogue (is_active=%s, is_scripted_mode=%s)" % [is_active, is_scripted_mode])
+		return
+
 	if lines.is_empty():
 		push_warning("ConversationSystem: Cannot start scripted dialogue with no lines")
 		return
 
+	# Set flags FIRST before any other operations to prevent re-entry
+	is_active = true
 	is_scripted_mode = true
+
 	scripted_lines.clear()
 	for line: Variant in lines:
 		if line is Dictionary:
@@ -786,7 +1067,6 @@ func start_scripted_dialogue(lines: Array, callback: Callable = Callable()) -> v
 
 	# Pause game
 	GameManager.start_dialogue()
-	is_active = true
 
 	# Show the first line
 	_show_scripted_line(0)
@@ -869,6 +1149,12 @@ func _end_scripted_dialogue() -> void:
 	scripted_dialogue_ended.emit()
 
 
+## Public method to end scripted dialogue (for escape key, etc.)
+func end_scripted_dialogue() -> void:
+	if is_scripted_mode:
+		_end_scripted_dialogue()
+
+
 ## Execute an action from scripted dialogue
 func _execute_scripted_action(action_data: Dictionary) -> void:
 	var action_type: String = action_data.get("type", "")
@@ -925,12 +1211,12 @@ func _execute_scripted_action(action_data: Dictionary) -> void:
 
 		"turn_hostile":
 			# Make the current NPC hostile
-			if current_npc and current_npc.has_method("turn_hostile"):
+			if is_instance_valid(current_npc) and current_npc.has_method("turn_hostile"):
 				current_npc.turn_hostile()
 
 		"arrest":
 			# Handle arrest logic - this would be NPC-specific
-			if current_npc and current_npc.has_method("arrest_player"):
+			if is_instance_valid(current_npc) and current_npc.has_method("arrest_player"):
 				current_npc.arrest_player()
 
 
@@ -940,7 +1226,7 @@ func _execute_scripted_action(action_data: Dictionary) -> void:
 
 ## Handle the RUMORS topic - offer bounties or process turn-ins
 func _handle_bounty_topic() -> void:
-	if not current_npc or not current_context:
+	if not is_instance_valid(current_npc) or not current_context:
 		return
 
 	var npc_id := _get_npc_id(current_npc)
@@ -1010,24 +1296,43 @@ func decline_pending_bounty() -> void:
 
 ## Handle QUESTS topic - quest offers and turn-ins
 func _handle_quest_topic() -> void:
-	if not current_npc or not current_context:
+	if not is_instance_valid(current_npc) or not current_context:
 		return
 
 	var npc_id := _get_npc_id(current_npc)
 	var npc_name := current_context.npc_name
 
+	# Priority 0: Check for incomplete "talk" objectives targeting this NPC
+	# This shows an explicit dialogue option for objectives like "Deliver message to Elder Vorn"
+	var talk_objectives: Array[Dictionary] = _get_incomplete_talk_objectives_for_npc(npc_id)
+	if not talk_objectives.is_empty():
+		var obj_info: Dictionary = talk_objectives[0]  # Handle first matching objective
+		current_context.pending_talk_objective = obj_info
+		_show_talk_objective_dialogue(obj_info)
+		return
+
 	# Priority 1: Check if player can complete/turn-in a quest to this NPC
+	# NOTE: We do NOT auto-complete here. Instead, we show a message and add
+	# a "Turn in [Quest Name]" choice to the topic menu. The player must
+	# explicitly select that option to complete the quest.
 	var completable_quest := QuestManager.get_completable_quest_for_npc(npc_id)
 	if completable_quest:
 		var quest_title: String = completable_quest.title
-		var turnin_text := "You've done well. The task is complete.\n\n[Quest Complete: %s]" % quest_title
+		var quest_data: Dictionary = QuestManager.get_quest_data(completable_quest.id)
+		var next_quest_id: String = quest_data.get("next_quest", "")
 
-		# Complete the quest (rewards given automatically)
-		QuestManager.complete_quest(completable_quest.id)
+		# Store the pending turn-in info (do NOT complete yet)
+		current_context.pending_quest_turnin = {
+			"quest_id": completable_quest.id,
+			"quest_title": quest_title,
+			"next_quest_id": next_quest_id
+		}
 
+		# Show a message indicating the quest is ready to turn in
+		# The UI will add a "Turn in [Quest Name]" option to the topic menu
 		var response := ConversationResponse.new()
-		response.response_id = "quest_complete_" + completable_quest.id
-		response.text = turnin_text
+		response.response_id = "quest_ready_" + completable_quest.id
+		response.text = "Ah, you've completed the task. Select 'Turn in: %s' when you're ready to collect your reward." % quest_title
 		response.topic_type = ConversationTopic.TopicType.QUESTS
 		response_delivered.emit(response, current_context)
 		return
@@ -1098,6 +1403,40 @@ func _get_quest_offer_text(quest_data: Dictionary) -> String:
 	return text
 
 
+## Get personality-matched turn-in response based on NPC archetype
+func _get_turnin_response(profile: NPCKnowledgeProfile, quest_title: String) -> String:
+	var archetype_key := "default"
+
+	# Map archetype enum to JSON key
+	if profile:
+		match profile.archetype:
+			NPCKnowledgeProfile.Archetype.MERCHANT:
+				archetype_key = "merchant"
+			NPCKnowledgeProfile.Archetype.GUARD:
+				archetype_key = "guard"
+			NPCKnowledgeProfile.Archetype.SCHOLAR:
+				archetype_key = "scholar"
+			NPCKnowledgeProfile.Archetype.PRIEST:
+				archetype_key = "priest"
+			NPCKnowledgeProfile.Archetype.INNKEEPER:
+				archetype_key = "innkeeper"
+			NPCKnowledgeProfile.Archetype.FARMER, NPCKnowledgeProfile.Archetype.GENERIC_VILLAGER:
+				archetype_key = "farmer"
+
+	# Get variants for this archetype (fall back to default)
+	var variants: Array = quest_turnin_responses.get(archetype_key, [])
+	if variants.is_empty():
+		variants = quest_turnin_responses.get("default", [])
+	if variants.is_empty():
+		return "Quest complete.\n\n[Quest Complete: %s]" % quest_title
+
+	# Pick a random variant
+	var base_text: String = variants[randi() % variants.size()]
+
+	# Append quest completion notice
+	return "%s\n\n[Quest Complete: %s]" % [base_text, quest_title]
+
+
 ## Accept the pending quest offer
 func accept_pending_quest() -> bool:
 	if not current_context or current_context.pending_quest_id.is_empty():
@@ -1122,9 +1461,60 @@ func decline_pending_quest() -> void:
 		current_context.pending_quest_id = ""
 
 
+## Complete the pending quest turn-in (called when player selects "Turn in [Quest]")
+## This is the deliberate dialogue action that completes the quest and gives rewards
+func complete_pending_quest_turnin() -> bool:
+	if not current_context or current_context.pending_quest_turnin.is_empty():
+		return false
+
+	var turnin_info: Dictionary = current_context.pending_quest_turnin
+	var quest_id: String = turnin_info.get("quest_id", "")
+	var quest_title: String = turnin_info.get("quest_title", "")
+	var next_quest_id: String = turnin_info.get("next_quest_id", "")
+
+	if quest_id.is_empty():
+		return false
+
+	# Complete the quest (rewards given automatically by QuestManager)
+	QuestManager.complete_quest(quest_id)
+
+	# Clear the pending turn-in
+	current_context.pending_quest_turnin = {}
+
+	# Get personality-matched turn-in response
+	var turnin_text := _get_turnin_response(current_context.npc_profile, quest_title)
+
+	var response := ConversationResponse.new()
+	response.response_id = "quest_complete_" + quest_id
+	response.text = turnin_text
+	response.topic_type = ConversationTopic.TopicType.QUESTS
+	response_delivered.emit(response, current_context)
+
+	# Check for next_quest in chain and offer it
+	if not next_quest_id.is_empty() and QuestManager.is_quest_available(next_quest_id):
+		current_context.pending_quest_id = next_quest_id
+		# The UI should show an "Accept Next Quest" option
+
+	return true
+
+
+## Check if there's a pending quest turn-in available
+func has_pending_quest_turnin() -> bool:
+	if not current_context:
+		return false
+	return not current_context.pending_quest_turnin.is_empty()
+
+
+## Get the pending quest turn-in info for UI display
+func get_pending_quest_turnin_info() -> Dictionary:
+	if not current_context:
+		return {}
+	return current_context.pending_quest_turnin
+
+
 ## Handle TRADE topic for merchant/innkeeper NPCs - opens their shop or inn menu
 func _handle_merchant_trade() -> void:
-	if not current_npc:
+	if not is_instance_valid(current_npc):
 		return
 
 	# Store reference to merchant/innkeeper before ending conversation
@@ -1136,7 +1526,7 @@ func _handle_merchant_trade() -> void:
 	# Small delay to let conversation UI close, then open shop/inn
 	await get_tree().create_timer(0.1).timeout
 
-	if not npc or not is_instance_valid(npc):
+	if not is_instance_valid(npc):
 		return
 
 	# Check for innkeeper-specific method first
@@ -1148,6 +1538,101 @@ func _handle_merchant_trade() -> void:
 	# Fallback - check if NPC is in merchants group
 	elif npc.is_in_group("merchants") and npc.has_method("open_shop"):
 		npc.open_shop()
+
+
+# =============================================================================
+# TALK OBJECTIVE DIALOGUE SYSTEM
+# =============================================================================
+
+## Check if player has incomplete "talk" objectives targeting this NPC
+## Returns array of dictionaries with quest/objective info for matching objectives
+func _get_incomplete_talk_objectives_for_npc(npc_id: String) -> Array[Dictionary]:
+	var results: Array[Dictionary] = []
+	for quest_id: String in QuestManager.quests:
+		var quest: QuestManager.Quest = QuestManager.quests[quest_id]
+		if quest.state != Enums.QuestState.ACTIVE:
+			continue
+		for obj: QuestManager.Objective in quest.objectives:
+			if obj.type == "talk" and obj.target == npc_id and not obj.is_completed:
+				# Check prerequisites are met
+				if QuestManager.are_prior_objectives_complete(quest, obj):
+					results.append({
+						"quest_id": quest_id,
+						"quest_title": quest.title,
+						"objective_id": obj.id,
+						"objective_description": obj.description
+					})
+	return results
+
+
+## Generate context-aware prompt text for a talk objective
+func _generate_talk_objective_prompt(obj_info: Dictionary) -> String:
+	var obj_desc: String = obj_info.get("objective_description", "Unknown objective")
+
+	# Check for common patterns in objective description
+	var obj_lower: String = obj_desc.to_lower()
+	if "deliver" in obj_lower or "message" in obj_lower:
+		return "[Complete: %s]\n\nI have something for you." % obj_desc
+	elif "report" in obj_lower:
+		return "[Complete: %s]\n\nI'm here to report." % obj_desc
+	elif "speak" in obj_lower or "talk" in obj_lower:
+		return "[Complete: %s]\n\nI need to speak with you." % obj_desc
+	else:
+		return "[Complete: %s]" % obj_desc
+
+
+## Show dialogue prompt for completing a talk objective
+func _show_talk_objective_dialogue(obj_info: Dictionary) -> void:
+	var response := ConversationResponse.new()
+	response.response_id = "talk_objective_" + obj_info.get("quest_id", "unknown")
+	response.topic_type = ConversationTopic.TopicType.QUESTS
+
+	# Generate context-aware prompt text
+	response.text = _generate_talk_objective_prompt(obj_info)
+
+	response_delivered.emit(response, current_context)
+
+
+## Complete the pending talk objective and show NPC response
+func complete_pending_talk_objective() -> void:
+	if not current_context or current_context.pending_talk_objective.is_empty():
+		return
+
+	if not is_instance_valid(current_npc):
+		return
+
+	var obj_info: Dictionary = current_context.pending_talk_objective
+	var npc_id: String = _get_npc_id(current_npc)
+
+	# Complete the objective via QuestManager
+	QuestManager.on_npc_talked(npc_id)
+
+	# Clear pending
+	current_context.pending_talk_objective = {}
+
+	# Show NPC response to the completed objective
+	_show_talk_objective_response(obj_info)
+
+
+## Show NPC response after completing a talk objective
+func _show_talk_objective_response(obj_info: Dictionary) -> void:
+	var response := ConversationResponse.new()
+	response.response_id = "talk_objective_response_" + obj_info.get("quest_id", "unknown")
+	response.topic_type = ConversationTopic.TopicType.QUESTS
+
+	# Get context-aware response based on objective description
+	var obj_desc: String = obj_info.get("objective_description", "Unknown objective")
+	var obj_lower: String = obj_desc.to_lower()
+
+	# Select appropriate response based on keywords
+	if "deliver" in obj_lower or "message" in obj_lower:
+		response.text = "Ah, thank you for bringing this to me. You've done well.\n\n[Objective Complete: %s]" % obj_desc
+	elif "report" in obj_lower or "news" in obj_lower or "inform" in obj_lower:
+		response.text = "I see. Thank you for the report. This information is valuable.\n\n[Objective Complete: %s]" % obj_desc
+	else:
+		response.text = "Very good. I appreciate you taking the time to speak with me about this.\n\n[Objective Complete: %s]" % obj_desc
+
+	response_delivered.emit(response, current_context)
 
 
 # =============================================================================
@@ -1165,7 +1650,7 @@ enum PersuasionAction {
 ## Perform a persuasion attempt on the current NPC
 ## Returns dictionary with: success, disposition_change, roll_data, turned_hostile
 func perform_persuasion(action: PersuasionAction, bribe_amount: int = 0) -> Dictionary:
-	if not is_active or not current_context or not current_npc:
+	if not is_active or not current_context or not is_instance_valid(current_npc):
 		return {"success": false, "disposition_change": 0, "roll_data": {}, "turned_hostile": false}
 
 	var npc_id := _get_npc_id(current_npc)
@@ -1255,7 +1740,7 @@ func perform_persuasion(action: PersuasionAction, bribe_amount: int = 0) -> Dict
 				InventoryManager.remove_gold(bribe_amount)
 			if success:
 				# Success: +5 to +20 based on bribe amount
-				var base_change: int = 5 + mini(bribe_amount / 5, 15)  # +1 per 5 gold, max +15 bonus
+				var base_change: int = 5 + mini(int(bribe_amount / 5), 15)  # +1 per 5 gold, max +15 bonus
 				disposition_change = base_change
 				if is_crit:
 					disposition_change = int(disposition_change * 1.5)
@@ -1279,7 +1764,7 @@ func perform_persuasion(action: PersuasionAction, bribe_amount: int = 0) -> Dict
 		current_context.disposition = get_disposition(npc_id)
 
 	# Handle hostile state
-	if turned_hostile and current_npc.has_method("turn_hostile"):
+	if turned_hostile and is_instance_valid(current_npc) and current_npc.has_method("turn_hostile"):
 		current_npc.turn_hostile()
 
 	var result := {
@@ -1342,7 +1827,7 @@ func _get_skill_governing_stat(skill_enum: int) -> int:
 		Enums.Skill.MELEE, Enums.Skill.INTIMIDATION:
 			return Enums.Stat.GRIT
 		Enums.Skill.RANGED, Enums.Skill.DODGE, Enums.Skill.STEALTH, \
-		Enums.Skill.ENDURANCE, Enums.Skill.THIEVERY, Enums.Skill.ACROBATICS, \
+		Enums.Skill.ENDURANCE, Enums.Skill.THIEVERY, \
 		Enums.Skill.ATHLETICS, Enums.Skill.LOCKPICKING:
 			return Enums.Stat.AGILITY
 		Enums.Skill.CONCENTRATION, Enums.Skill.RESIST, Enums.Skill.BRAVERY:
@@ -1350,7 +1835,7 @@ func _get_skill_governing_stat(skill_enum: int) -> int:
 		Enums.Skill.PERSUASION, Enums.Skill.DECEPTION, Enums.Skill.NEGOTIATION:
 			return Enums.Stat.SPEECH
 		Enums.Skill.ARCANA_LORE, Enums.Skill.HISTORY, Enums.Skill.INTUITION, \
-		Enums.Skill.ENGINEERING, Enums.Skill.INVESTIGATION, Enums.Skill.PERCEPTION, \
+		Enums.Skill.ENGINEERING, Enums.Skill.INVESTIGATION, \
 		Enums.Skill.RELIGION, Enums.Skill.NATURE, Enums.Skill.ALCHEMY, Enums.Skill.SMITHING:
 			return Enums.Stat.KNOWLEDGE
 		Enums.Skill.FIRST_AID, Enums.Skill.HERBALISM, Enums.Skill.SURVIVAL:
@@ -1380,7 +1865,6 @@ func _get_skill_name(skill_enum: int) -> String:
 		Enums.Skill.STEALTH: return "Stealth"
 		Enums.Skill.ENDURANCE: return "Endurance"
 		Enums.Skill.THIEVERY: return "Thievery"
-		Enums.Skill.ACROBATICS: return "Acrobatics"
 		Enums.Skill.ATHLETICS: return "Athletics"
 		Enums.Skill.CONCENTRATION: return "Concentration"
 		Enums.Skill.RESIST: return "Resist"
@@ -1393,7 +1877,6 @@ func _get_skill_name(skill_enum: int) -> String:
 		Enums.Skill.INTUITION: return "Intuition"
 		Enums.Skill.ENGINEERING: return "Engineering"
 		Enums.Skill.INVESTIGATION: return "Investigation"
-		Enums.Skill.PERCEPTION: return "Perception"
 		Enums.Skill.RELIGION: return "Religion"
 		Enums.Skill.NATURE: return "Nature"
 		Enums.Skill.FIRST_AID: return "First Aid"
@@ -1557,10 +2040,21 @@ func _get_memory_key(npc_id: String, response_id: String) -> String:
 
 ## Populate location context from current scene/area
 func _populate_location_context(context: ConversationContext) -> void:
-	# Try to get town/region info from SceneManager or current scene
-	# This can be extended based on how zones are tracked in the game
-	context.town_name = "the area"
-	context.region_name = "these lands"
+	# Get location from PlayerGPS (player is always in same location as NPC during conversation)
+	if PlayerGPS:
+		context.region_name = PlayerGPS.current_region if PlayerGPS.current_region else "these lands"
+
+		# Get town name from location ID if in a named location
+		if not PlayerGPS.current_location_id.is_empty():
+			var location_name: String = WorldGrid.get_location_name(PlayerGPS.current_location_id)
+			context.town_name = location_name if location_name else PlayerGPS.current_region
+		else:
+			# In wilderness - use region name or "the wilderness"
+			context.town_name = PlayerGPS.current_region if PlayerGPS.current_region else "the wilderness"
+	else:
+		# Fallback if PlayerGPS not available
+		context.town_name = "the area"
+		context.region_name = "these lands"
 
 	# Get time of day from GameManager
 	context.time_of_day = GameManager.get_time_of_day_name().to_lower()
@@ -1673,20 +2167,12 @@ func _evaluate_condition_internal(condition: DialogueCondition) -> bool:
 			return InventoryManager.gold >= condition.param_int
 
 		DialogueData.ConditionType.FLAG_SET:
-			# Check both ConversationSystem and DialogueManager flags
-			if has_flag(condition.param_string):
-				return true
-			if DialogueManager and DialogueManager.has_flag(condition.param_string):
-				return true
-			return false
+			# Check ConversationSystem flags only (DialogueManager dependency removed)
+			return has_flag(condition.param_string)
 
 		DialogueData.ConditionType.FLAG_NOT_SET:
-			# Check both ConversationSystem and DialogueManager flags
-			if has_flag(condition.param_string):
-				return false
-			if DialogueManager and DialogueManager.has_flag(condition.param_string):
-				return false
-			return true
+			# Check ConversationSystem flags only (DialogueManager dependency removed)
+			return not has_flag(condition.param_string)
 
 		DialogueData.ConditionType.STAT_CHECK:
 			if not GameManager.player_data:
@@ -1720,6 +2206,20 @@ func _evaluate_condition_internal(condition: DialogueCondition) -> bool:
 
 		DialogueData.ConditionType.RANDOM_CHANCE:
 			return randf() <= condition.param_float
+
+		DialogueData.ConditionType.PLAYER_RACE:
+			# Check player's race against param_string
+			# Valid values: "human", "elf", "halfling", "dwarf"
+			if not GameManager.player_data:
+				return false
+			var player_race: Enums.Race = GameManager.player_data.race
+			var race_name: String = condition.param_string.to_lower().strip_edges()
+			match race_name:
+				"human": return player_race == Enums.Race.HUMAN
+				"elf": return player_race == Enums.Race.ELF
+				"halfling": return player_race == Enums.Race.HALFLING
+				"dwarf": return player_race == Enums.Race.DWARF
+			return false
 
 	return true
 

@@ -1,0 +1,34 @@
+{
+	"id": "bounty_basilisk_lair",
+	"title": "The Basilisk's Lair",
+	"description": "A basilisk has made its lair in the caves. Its petrifying gaze has already claimed several miners. This deadly creature must be destroyed.",
+	"is_main_quest": false,
+	"quest_source": "bounty",
+	"giver_npc_id": "bounty_board",
+	"giver_npc_type": "bounty_board",
+	"giver_region": "dalhurst",
+	"faction": "merchants_guild",
+	"objectives": [
+		{
+			"id": "kill_basilisk",
+			"description": "Slay the basilisk in its lair",
+			"type": "kill",
+			"target": "basilisk",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "bounty_board",
+	"turn_in_target": "bounty_board",
+	"turn_in_zone": "dalhurst",
+	"rewards": {
+		"gold": 275,
+		"xp": 475,
+		"items": [],
+		"faction_reputation": {
+			"merchants_guild": 30
+		}
+	},
+	"cooldown_days": 5,
+	"prerequisites": [],
+	"next_quest": ""
+}

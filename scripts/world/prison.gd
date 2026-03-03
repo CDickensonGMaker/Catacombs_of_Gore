@@ -106,7 +106,7 @@ func _create_materials() -> void:
 	wall_material.roughness = 0.95
 
 	# Try to load stone texture
-	var stone_tex: Texture2D = load("res://Sprite folders grab bag/stonefloor.png")
+	var stone_tex: Texture2D = load("res://assets/textures/environment/floors/stonefloor.png")
 	if stone_tex:
 		wall_material.albedo_texture = stone_tex
 		wall_material.uv1_scale = Vector3(2, 2, 1)

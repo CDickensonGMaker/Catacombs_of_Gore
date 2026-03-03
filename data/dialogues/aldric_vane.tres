@@ -1,223 +1,131 @@
-[gd_resource type="Resource" script_class="DialogueData" load_steps=40 format=3 uid="uid://c5aldric_vane"]
+[gd_resource type="Resource" script_class="DialogueData" load_steps=33 format=3 uid="uid://c3l61k4gy131v"]
 
-[ext_resource type="Script" path="res://scripts/dialogue/dialogue_data.gd" id="1_data"]
-[ext_resource type="Script" path="res://scripts/dialogue/dialogue_node.gd" id="2_node"]
-[ext_resource type="Script" path="res://scripts/dialogue/dialogue_choice.gd" id="3_choice"]
-[ext_resource type="Script" path="res://scripts/dialogue/dialogue_condition.gd" id="4_cond"]
-[ext_resource type="Script" path="res://scripts/dialogue/dialogue_action.gd" id="5_action"]
+[ext_resource type="Script" uid="uid://b180if7iangqj" path="res://scripts/dialogue/dialogue_data.gd" id="1_data"]
+[ext_resource type="Script" uid="uid://crflbvnhskixj" path="res://scripts/dialogue/dialogue_node.gd" id="2_node"]
+[ext_resource type="Script" uid="uid://csnc82dxff564" path="res://scripts/dialogue/dialogue_choice.gd" id="3_choice"]
+[ext_resource type="Script" uid="uid://dj6h3b0ivbfjv" path="res://scripts/dialogue/dialogue_condition.gd" id="4_cond"]
+[ext_resource type="Script" uid="uid://cidqmsbd3wwi6" path="res://scripts/dialogue/dialogue_action.gd" id="5_action"]
 
-; =============================================================================
-; CONDITIONS
-; =============================================================================
-
-; Condition: Player has the letter
-[sub_resource type="Resource" id="cond_has_letter"]
-script = ExtResource("4_cond")
-type = 3
-param_string = "tharins_letter"
-param_int = 1
-param_float = 0.0
-invert = false
-
-; Condition: Letter already delivered
-[sub_resource type="Resource" id="cond_letter_delivered"]
-script = ExtResource("4_cond")
-type = 5
-param_string = "keepers_letter_delivered"
-param_int = 0
-param_float = 0.0
-invert = false
-
-; Condition: Letter not yet delivered
-[sub_resource type="Resource" id="cond_letter_not_delivered"]
-script = ExtResource("4_cond")
-type = 6
-param_string = "keepers_letter_delivered"
-param_int = 0
-param_float = 0.0
-invert = false
-
-; =============================================================================
-; ACTIONS
-; =============================================================================
-
-; Action: Take the letter from player
 [sub_resource type="Resource" id="action_take_letter"]
 script = ExtResource("5_action")
 type = 2
 param_string = "tharins_letter"
 param_int = 1
-param_float = 0.0
-success_node_id = ""
-failure_node_id = ""
 
-; Action: Complete the quest
 [sub_resource type="Resource" id="action_complete_quest"]
 script = ExtResource("5_action")
 type = 6
 param_string = "keepers_letter_delivery"
-param_int = 0
-param_float = 0.0
-success_node_id = ""
-failure_node_id = ""
 
-; Action: Give gold reward
 [sub_resource type="Resource" id="action_give_gold"]
 script = ExtResource("5_action")
 type = 3
-param_string = ""
 param_int = 50
-param_float = 0.0
-success_node_id = ""
-failure_node_id = ""
 
-; Action: Give XP
 [sub_resource type="Resource" id="action_give_xp"]
 script = ExtResource("5_action")
 type = 11
-param_string = ""
 param_int = 100
-param_float = 0.0
-success_node_id = ""
-failure_node_id = ""
 
-; Action: Set letter delivered flag
 [sub_resource type="Resource" id="action_set_delivered_flag"]
 script = ExtResource("5_action")
 type = 8
 param_string = "keepers_letter_delivered"
-param_int = 0
-param_float = 0.0
-success_node_id = ""
-failure_node_id = ""
 
-; Action: Set met Aldric flag
 [sub_resource type="Resource" id="action_set_met_aldric"]
 script = ExtResource("5_action")
 type = 8
 param_string = "met_aldric_vane"
-param_int = 0
-param_float = 0.0
-success_node_id = ""
-failure_node_id = ""
 
-; =============================================================================
-; CHOICES
-; =============================================================================
+[sub_resource type="Resource" id="cond_has_letter"]
+script = ExtResource("4_cond")
+type = 3
+param_string = "tharins_letter"
+param_int = 1
 
-[sub_resource type="Resource" id="choice_goodbye"]
-script = ExtResource("3_choice")
-text = "I should be going."
-next_node_id = "end"
-conditions = []
-show_when_unavailable = false
-unavailable_reason = ""
-actions = []
+[sub_resource type="Resource" id="cond_letter_not_delivered"]
+script = ExtResource("4_cond")
+type = 6
+param_string = "keepers_letter_delivered"
 
 [sub_resource type="Resource" id="choice_deliver_letter"]
 script = ExtResource("3_choice")
 text = "I have a letter from Tharin Ironbeard."
 next_node_id = "receive_letter"
-conditions = [SubResource("cond_has_letter"), SubResource("cond_letter_not_delivered")]
+conditions = Array[ExtResource("4_cond")]([SubResource("cond_has_letter"), SubResource("cond_letter_not_delivered")])
 show_when_unavailable = true
 unavailable_reason = "You don't have Tharin's letter"
-actions = [SubResource("action_take_letter"), SubResource("action_complete_quest"), SubResource("action_give_gold"), SubResource("action_give_xp"), SubResource("action_set_delivered_flag"), SubResource("action_set_met_aldric")]
+actions = Array[ExtResource("5_action")]([SubResource("action_take_letter"), SubResource("action_complete_quest"), SubResource("action_give_gold"), SubResource("action_give_xp"), SubResource("action_set_delivered_flag"), SubResource("action_set_met_aldric")])
 
 [sub_resource type="Resource" id="choice_browse_shop"]
 script = ExtResource("3_choice")
 text = "I'd like to browse your wares."
 next_node_id = "shop_browse"
-conditions = []
-show_when_unavailable = false
-unavailable_reason = ""
-actions = []
-
-[sub_resource type="Resource" id="choice_ask_about_keepers"]
-script = ExtResource("3_choice")
-text = "Tharin mentioned the Keepers. What can you tell me?"
-next_node_id = "about_keepers"
-conditions = [SubResource("cond_letter_delivered")]
-show_when_unavailable = false
-unavailable_reason = ""
-actions = []
 
 [sub_resource type="Resource" id="choice_ask_about_self"]
 script = ExtResource("3_choice")
 text = "Tell me about yourself."
 next_node_id = "about_self"
-conditions = []
-show_when_unavailable = false
-unavailable_reason = ""
-actions = []
 
 [sub_resource type="Resource" id="choice_ask_about_curiosities"]
 script = ExtResource("3_choice")
 text = "What kind of curiosities do you deal in?"
 next_node_id = "about_curiosities"
-conditions = []
-show_when_unavailable = false
-unavailable_reason = ""
-actions = []
 
-[sub_resource type="Resource" id="choice_ask_about_letter_contents"]
+[sub_resource type="Resource" id="cond_letter_delivered"]
+script = ExtResource("4_cond")
+type = 5
+param_string = "keepers_letter_delivered"
+
+[sub_resource type="Resource" id="choice_ask_about_keepers"]
 script = ExtResource("3_choice")
-text = "What was in the letter, if I may ask?"
-next_node_id = "letter_contents"
-conditions = [SubResource("cond_letter_delivered")]
-show_when_unavailable = false
-unavailable_reason = ""
-actions = []
+text = "Tharin mentioned the Keepers. What can you tell me?"
+next_node_id = "about_keepers"
+conditions = Array[ExtResource("4_cond")]([SubResource("cond_letter_delivered")])
 
-[sub_resource type="Resource" id="choice_back_to_start"]
+[sub_resource type="Resource" id="choice_goodbye"]
 script = ExtResource("3_choice")
-text = "I had another question."
-next_node_id = "start"
-conditions = []
-show_when_unavailable = false
-unavailable_reason = ""
-actions = []
-
-[sub_resource type="Resource" id="choice_continue_quest_talk"]
-script = ExtResource("3_choice")
-text = "What happens now?"
-next_node_id = "next_steps"
-conditions = []
-show_when_unavailable = false
-unavailable_reason = ""
-actions = []
-
-; =============================================================================
-; NODES
-; =============================================================================
+text = "I should be going."
+next_node_id = "end"
 
 [sub_resource type="Resource" id="node_start"]
 script = ExtResource("2_node")
 id = "start"
 speaker_name = "Aldric Vane"
 text = "*looks up from an ancient tome, his keen eyes assessing you* Welcome to Vane's Curiosities. I deal in the rare, the unusual, and the occasionally dangerous. Is there something specific that brings you to my establishment, or are you merely browsing?"
-choices = [SubResource("choice_deliver_letter"), SubResource("choice_browse_shop"), SubResource("choice_ask_about_self"), SubResource("choice_ask_about_curiosities"), SubResource("choice_ask_about_keepers"), SubResource("choice_goodbye")]
-is_end_node = false
-auto_continue_to = ""
+choices = Array[ExtResource("3_choice")]([SubResource("choice_deliver_letter"), SubResource("choice_browse_shop"), SubResource("choice_ask_about_self"), SubResource("choice_ask_about_curiosities"), SubResource("choice_ask_about_keepers"), SubResource("choice_goodbye")])
 portrait_id = "aldric_neutral"
+
+[sub_resource type="Resource" id="choice_ask_about_letter_contents"]
+script = ExtResource("3_choice")
+text = "What was in the letter, if I may ask?"
+next_node_id = "letter_contents"
+conditions = Array[ExtResource("4_cond")]([SubResource("cond_letter_delivered")])
+
+[sub_resource type="Resource" id="choice_continue_quest_talk"]
+script = ExtResource("3_choice")
+text = "What happens now?"
+next_node_id = "next_steps"
 
 [sub_resource type="Resource" id="node_receive_letter"]
 script = ExtResource("2_node")
 id = "receive_letter"
 speaker_name = "Aldric Vane"
 text = "*his expression sharpens as he recognizes the seal* Ah. From our mutual friend in Elder Moor. *breaks the seal and scans the contents, his face revealing nothing* This is... most interesting. You've done well to bring this to me intact. Here - your payment, as promised. *hands over a pouch of gold* But more importantly, I suspect this letter concerns you as well."
-choices = [SubResource("choice_ask_about_letter_contents"), SubResource("choice_continue_quest_talk"), SubResource("choice_goodbye")]
-is_end_node = false
-auto_continue_to = ""
+choices = Array[ExtResource("3_choice")]([SubResource("choice_ask_about_letter_contents"), SubResource("choice_continue_quest_talk"), SubResource("choice_goodbye")])
 portrait_id = "aldric_pleased"
+
+[sub_resource type="Resource" id="choice_back_to_start"]
+script = ExtResource("3_choice")
+text = "I had another question."
+next_node_id = "start"
 
 [sub_resource type="Resource" id="node_letter_contents"]
 script = ExtResource("2_node")
 id = "letter_contents"
 speaker_name = "Aldric Vane"
 text = "*sets the letter aside carefully* Tharin writes of dark movements in the eastern reaches. The Tengers grow bold, and something stirs in the old places that should remain buried. He also writes that you showed... potential. Discretion. Qualities we value in the Keepers. If you're interested, there may be more work for someone of your talents."
-choices = [SubResource("choice_continue_quest_talk"), SubResource("choice_ask_about_keepers"), SubResource("choice_back_to_start")]
-is_end_node = false
-auto_continue_to = ""
+choices = Array[ExtResource("3_choice")]([SubResource("choice_continue_quest_talk"), SubResource("choice_ask_about_keepers"), SubResource("choice_back_to_start")])
 portrait_id = "aldric_serious"
 
 [sub_resource type="Resource" id="node_next_steps"]
@@ -225,9 +133,7 @@ script = ExtResource("2_node")
 id = "next_steps"
 speaker_name = "Aldric Vane"
 text = "For now, nothing. You've proven yourself reliable, and that counts for something. Return to me when you've had time to consider your path. The Keepers could use someone like you, but such commitments are not made lightly. In the meantime, feel free to browse my wares - I may have something useful for your travels."
-choices = [SubResource("choice_browse_shop"), SubResource("choice_ask_about_keepers"), SubResource("choice_goodbye")]
-is_end_node = false
-auto_continue_to = ""
+choices = Array[ExtResource("3_choice")]([SubResource("choice_browse_shop"), SubResource("choice_ask_about_keepers"), SubResource("choice_goodbye")])
 portrait_id = "aldric_neutral"
 
 [sub_resource type="Resource" id="node_shop_browse"]
@@ -235,9 +141,7 @@ script = ExtResource("2_node")
 id = "shop_browse"
 speaker_name = "Aldric Vane"
 text = "By all means, look around. I have artifacts from the Second Age, relics from the dwarven holds, and a few items that... defy easy categorization. Do be careful with the items on the upper shelf - some of them are quite temperamental."
-choices = [SubResource("choice_back_to_start"), SubResource("choice_goodbye")]
-is_end_node = false
-auto_continue_to = ""
+choices = Array[ExtResource("3_choice")]([SubResource("choice_back_to_start"), SubResource("choice_goodbye")])
 portrait_id = "aldric_neutral"
 
 [sub_resource type="Resource" id="node_about_keepers"]
@@ -245,9 +149,7 @@ script = ExtResource("2_node")
 id = "about_keepers"
 speaker_name = "Aldric Vane"
 text = "*leans back, choosing his words carefully* The Keepers are... guardians of a sort. We preserve knowledge that others would see destroyed or forgotten. We watch for threats that most people cannot perceive. And when necessary, we act. Tharin and I serve the same cause, though our methods differ. He prefers hammers and directness. I prefer... subtlety."
-choices = [SubResource("choice_back_to_start"), SubResource("choice_goodbye")]
-is_end_node = false
-auto_continue_to = ""
+choices = Array[ExtResource("3_choice")]([SubResource("choice_back_to_start"), SubResource("choice_goodbye")])
 portrait_id = "aldric_serious"
 
 [sub_resource type="Resource" id="node_about_self"]
@@ -255,9 +157,7 @@ script = ExtResource("2_node")
 id = "about_self"
 speaker_name = "Aldric Vane"
 text = "I am a collector. A scholar. A merchant of the unusual. I've spent decades cataloguing artifacts and tracking down lost knowledge. This shop is merely the visible part of my work - a convenient cover for more... sensitive endeavors. But you didn't come here for my life story, did you?"
-choices = [SubResource("choice_ask_about_curiosities"), SubResource("choice_back_to_start"), SubResource("choice_goodbye")]
-is_end_node = false
-auto_continue_to = ""
+choices = Array[ExtResource("3_choice")]([SubResource("choice_ask_about_curiosities"), SubResource("choice_back_to_start"), SubResource("choice_goodbye")])
 portrait_id = "aldric_neutral"
 
 [sub_resource type="Resource" id="node_about_curiosities"]
@@ -265,9 +165,7 @@ script = ExtResource("2_node")
 id = "about_curiosities"
 speaker_name = "Aldric Vane"
 text = "I deal in anything that defies the ordinary. Enchanted weapons from the old wars. Tomes of forbidden knowledge. Artifacts whose origins have been lost to time. Some items I sell, others I merely study. And a few... a few I keep locked away, because some knowledge is too dangerous even for collectors."
-choices = [SubResource("choice_browse_shop"), SubResource("choice_back_to_start"), SubResource("choice_goodbye")]
-is_end_node = false
-auto_continue_to = ""
+choices = Array[ExtResource("3_choice")]([SubResource("choice_browse_shop"), SubResource("choice_back_to_start"), SubResource("choice_goodbye")])
 portrait_id = "aldric_neutral"
 
 [sub_resource type="Resource" id="node_end"]
@@ -275,19 +173,12 @@ script = ExtResource("2_node")
 id = "end"
 speaker_name = "Aldric Vane"
 text = "*returns to his tome with a knowing smile* Until we meet again. And we shall meet again, I suspect. The world has a way of bringing kindred spirits together."
-choices = []
 is_end_node = true
-auto_continue_to = ""
 portrait_id = "aldric_neutral"
-
-; =============================================================================
-; MAIN RESOURCE
-; =============================================================================
 
 [resource]
 script = ExtResource("1_data")
 id = "aldric_vane"
 display_name = "Aldric Vane Dialogue"
 description = "Dialogue tree for Aldric Vane, curiosities merchant and Keeper agent in Dalhurst. Receives the letter from keepers_letter_delivery quest."
-start_node_id = "start"
-nodes = [SubResource("node_start"), SubResource("node_receive_letter"), SubResource("node_letter_contents"), SubResource("node_next_steps"), SubResource("node_shop_browse"), SubResource("node_about_keepers"), SubResource("node_about_self"), SubResource("node_about_curiosities"), SubResource("node_end")]
+nodes = Array[ExtResource("2_node")]([SubResource("node_start"), SubResource("node_receive_letter"), SubResource("node_letter_contents"), SubResource("node_next_steps"), SubResource("node_shop_browse"), SubResource("node_about_keepers"), SubResource("node_about_self"), SubResource("node_about_curiosities"), SubResource("node_end")])

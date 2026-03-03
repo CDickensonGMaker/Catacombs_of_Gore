@@ -1,6 +1,300 @@
 {
   "pool_id": "directions",
+  "description": "DIRECTIONS topic responses including region-aware directions. Elder Moor has no temple (use Dalhurst), no guards (too small), no proper inn. Larger towns have full services.",
   "responses": [
+    {
+      "response_id": "dir_hostile",
+      "text": "Find it yourself.",
+      "topic_type": 3,
+      "personality_affinity": ["hostile", "cold"],
+      "min_disposition": 0,
+      "max_disposition": 25,
+      "required_knowledge": [],
+      "weight": 1.0,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "dir_generic_not_from_here",
+      "text": "I'm not from around here myself. Can't help you, I'm afraid.",
+      "topic_type": 3,
+      "personality_affinity": ["apologetic", "honest"],
+      "min_disposition": 25,
+      "max_disposition": 60,
+      "required_knowledge": [],
+      "weight": 0.6,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "dir_generic_busy",
+      "text": "Ask someone else. I've got better things to do than play guide.",
+      "topic_type": 3,
+      "personality_affinity": ["grumpy", "busy"],
+      "min_disposition": 15,
+      "max_disposition": 40,
+      "required_knowledge": [],
+      "weight": 0.8,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "dir_generic_confused",
+      "text": "Hmm, directions... I always get turned around myself. Ask someone who knows the place better.",
+      "topic_type": 3,
+      "personality_affinity": ["confused", "apologetic"],
+      "min_disposition": 30,
+      "max_disposition": 60,
+      "required_knowledge": [],
+      "weight": 0.5,
+      "actions": [],
+      "conditions": []
+    },
+
+    {
+      "response_id": "dir_eldermoor_tharin",
+      "text": "Looking for Tharin? He's usually at the lumber yard on the north side. Big dwarf, can't miss him.",
+      "topic_type": 3,
+      "personality_affinity": ["helpful", "local"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.3,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "dir_eldermoor_lumber",
+      "text": "The lumber yard's north of the common house. That's where most of the work happens around here.",
+      "topic_type": 3,
+      "personality_affinity": ["helpful", "practical"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.2,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "dir_eldermoor_common_house",
+      "text": "The common house is the biggest building in camp. That's where folk gather, share meals, sleep if they've nowhere else.",
+      "topic_type": 3,
+      "personality_affinity": ["helpful", "friendly"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.2,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "dir_eldermoor_no_inn",
+      "text": "An inn? We're not big enough for a proper inn, friend. The common house is the closest we've got.",
+      "topic_type": 3,
+      "personality_affinity": ["helpful", "apologetic"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.2,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "dir_eldermoor_no_temple",
+      "text": "Temple? We've got no temple here, too small for one. You'd have to travel to Dalhurst for religious services.",
+      "topic_type": 3,
+      "personality_affinity": ["helpful", "apologetic"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.2,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "dir_eldermoor_to_dalhurst",
+      "text": "Dalhurst is west of here, down the main road. Few days' travel, but worth it if you need supplies or temple services.",
+      "topic_type": 3,
+      "personality_affinity": ["helpful", "knowledgeable"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.1,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "dir_eldermoor_to_thornfield",
+      "text": "Thornfield's east of here. Sister village, mostly farmers. Good folk, but watch the roads - bandits.",
+      "topic_type": 3,
+      "personality_affinity": ["helpful", "cautious"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.1,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "dir_eldermoor_store",
+      "text": "The general store is by the common house. Old Mercer runs it. Got basic supplies, nothing fancy.",
+      "topic_type": 3,
+      "personality_affinity": ["helpful", "practical"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.1,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "dir_eldermoor_crypts",
+      "text": "The Sunken Crypts? Northeast, in the deep moors. But you don't want to go there. Folk don't come back from that place.",
+      "topic_type": 3,
+      "personality_affinity": ["helpful", "worried"],
+      "min_disposition": 35,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.0,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "dir_eldermoor_bandits",
+      "text": "The bandit hideout? Somewhere northeast, in the hills. Cave system, well hidden. Not that I'd recommend visiting.",
+      "topic_type": 3,
+      "personality_affinity": ["helpful", "cautious"],
+      "min_disposition": 40,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.0,
+      "actions": [],
+      "conditions": []
+    },
+
+    {
+      "response_id": "dir_dalhurst_harbor",
+      "text": "The harbor's on the west side of town, facing the water. You'll smell the fish before you see it.",
+      "topic_type": 3,
+      "personality_affinity": ["helpful", "practical"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["dalhurst"],
+      "weight": 1.2,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "dir_dalhurst_temple",
+      "text": "The Temple of Three Gods is on the hill at the south side of town. All three faiths under one roof.",
+      "topic_type": 3,
+      "personality_affinity": ["helpful", "pious"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["dalhurst", "temple"],
+      "weight": 1.2,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "dir_dalhurst_harbor_master",
+      "text": "The Harbor Master's office is at the main dock. He runs this town, one way or another.",
+      "topic_type": 3,
+      "personality_affinity": ["helpful", "cynical"],
+      "min_disposition": 35,
+      "max_disposition": 100,
+      "required_knowledge": ["dalhurst"],
+      "weight": 1.1,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "dir_dalhurst_vane",
+      "text": "Vane's Oddities? Curious shop on the back street, near the market. Aldric Vane runs it. Deals in strange goods.",
+      "topic_type": 3,
+      "personality_affinity": ["helpful", "curious"],
+      "min_disposition": 40,
+      "max_disposition": 100,
+      "required_knowledge": ["dalhurst"],
+      "weight": 1.0,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "dir_dalhurst_thieves",
+      "text": "The Thieves Guild? *laughs* Friend, if I knew where that was, I wouldn't be standing here. Watch your purse.",
+      "topic_type": 3,
+      "personality_affinity": ["humorous", "evasive"],
+      "min_disposition": 35,
+      "max_disposition": 100,
+      "required_knowledge": ["dalhurst"],
+      "weight": 1.0,
+      "actions": [],
+      "conditions": []
+    },
+
+    {
+      "response_id": "dir_thornfield_inn",
+      "text": "Martha's inn is at the center of the village. Best stew in the province, she'll tell you.",
+      "topic_type": 3,
+      "personality_affinity": ["helpful", "friendly"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["thornfield"],
+      "weight": 1.2,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "dir_thornfield_farms",
+      "text": "The farms are spread out around the village. Cedric's place is the biggest - you can see it from the main road.",
+      "topic_type": 3,
+      "personality_affinity": ["helpful", "local"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["thornfield"],
+      "weight": 1.1,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "dir_thornfield_collapse",
+      "text": "The collapsed pass? Northeast of here. You can see where the mountain came down. Best keep your distance - still unstable.",
+      "topic_type": 3,
+      "personality_affinity": ["helpful", "cautious"],
+      "min_disposition": 35,
+      "max_disposition": 100,
+      "required_knowledge": ["thornfield"],
+      "weight": 1.0,
+      "actions": [],
+      "conditions": []
+    },
+
+    {
+      "response_id": "dir_millbrook_mill",
+      "text": "The mill's down by the lake. Can't miss the sound of the wheel turning. It never stops.",
+      "topic_type": 3,
+      "personality_affinity": ["helpful", "practical"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["millbrook"],
+      "weight": 1.2,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "dir_millbrook_mayor",
+      "text": "The mayor's house is the largest in town. He's very... accessible. Maybe too accessible, if you ask me.",
+      "topic_type": 3,
+      "personality_affinity": ["helpful", "suspicious"],
+      "min_disposition": 40,
+      "max_disposition": 100,
+      "required_knowledge": ["millbrook"],
+      "weight": 1.0,
+      "actions": [],
+      "conditions": []
+    },
+
     {
       "response_id": "dir_inn_1",
       "text": "The inn? Head down the main road, you'll see it on your right. Can't miss the sign.",
@@ -25,18 +319,7 @@
       "actions": [],
       "conditions": []
     },
-    {
-      "response_id": "dir_inn_3",
-      "text": "The inn's near the center of town. Just follow your nose - you'll smell the cooking soon enough.",
-      "topic_type": 3,
-      "personality_affinity": ["humorous", "helpful"],
-      "min_disposition": 40,
-      "max_disposition": 100,
-      "required_knowledge": ["inn_location"],
-      "weight": 0.9,
-      "actions": [],
-      "conditions": []
-    },
+
     {
       "response_id": "dir_smith_1",
       "text": "The smithy is at the edge of town, near the east gate. Listen for the hammer.",
@@ -61,18 +344,7 @@
       "actions": [],
       "conditions": []
     },
-    {
-      "response_id": "dir_smith_3",
-      "text": "Follow the smoke and sparks. The old smith's been at it since sunrise, no doubt.",
-      "topic_type": 3,
-      "personality_affinity": ["observant", "friendly"],
-      "min_disposition": 40,
-      "max_disposition": 100,
-      "required_knowledge": ["smith_location"],
-      "weight": 0.9,
-      "actions": [],
-      "conditions": []
-    },
+
     {
       "response_id": "dir_store_1",
       "text": "The general store is on the main road, across from the well. Open 'til sundown.",
@@ -85,66 +357,7 @@
       "actions": [],
       "conditions": []
     },
-    {
-      "response_id": "dir_store_2",
-      "text": "Need supplies? Old Mercer runs the shop by the square. He's got a bit of everything.",
-      "topic_type": 3,
-      "personality_affinity": ["knowledgeable", "sociable"],
-      "min_disposition": 35,
-      "max_disposition": 100,
-      "required_knowledge": ["store_location"],
-      "weight": 1.0,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "dir_store_3",
-      "text": "There's a trader's shop past the fountain. Prices are fair, mostly.",
-      "topic_type": 3,
-      "personality_affinity": ["mercantile", "helpful"],
-      "min_disposition": 35,
-      "max_disposition": 100,
-      "required_knowledge": ["store_location"],
-      "weight": 0.9,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "dir_exit_1",
-      "text": "The main gate is to the south. Guards check everyone coming and going.",
-      "topic_type": 3,
-      "personality_affinity": ["formal", "helpful"],
-      "min_disposition": 30,
-      "max_disposition": 100,
-      "required_knowledge": ["exits"],
-      "weight": 1.0,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "dir_exit_2",
-      "text": "Looking to leave? North road leads to the wilds. South road takes you to the capital.",
-      "topic_type": 3,
-      "personality_affinity": ["helpful", "knowledgeable"],
-      "min_disposition": 35,
-      "max_disposition": 100,
-      "required_knowledge": ["exits", "roads"],
-      "weight": 1.0,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "dir_exit_3",
-      "text": "There's a back gate by the stables, but the guards don't like it used after dark.",
-      "topic_type": 3,
-      "personality_affinity": ["secretive", "helpful"],
-      "min_disposition": 45,
-      "max_disposition": 100,
-      "required_knowledge": ["exits"],
-      "weight": 0.8,
-      "actions": [],
-      "conditions": []
-    },
+
     {
       "response_id": "dir_temple_1",
       "text": "The temple is on the hill at the south side of town. Follow the stone steps.",
@@ -169,18 +382,7 @@
       "actions": [],
       "conditions": []
     },
-    {
-      "response_id": "dir_temple_3",
-      "text": "You'll hear the bells when you're close. The temple overlooks the whole town from the south side.",
-      "topic_type": 3,
-      "personality_affinity": ["observant", "friendly"],
-      "min_disposition": 40,
-      "max_disposition": 100,
-      "required_knowledge": ["temple_location"],
-      "weight": 0.9,
-      "actions": [],
-      "conditions": []
-    },
+
     {
       "response_id": "dir_guild_1",
       "text": "The guild hall is the big building with the banner, north side of town.",
@@ -205,117 +407,35 @@
       "actions": [],
       "conditions": []
     },
+
     {
-      "response_id": "dir_guild_3",
-      "text": "The guild? Can't miss it - biggest doors in town. They like to make an impression.",
+      "response_id": "dir_exit_1",
+      "text": "The main gate is to the south. Guards check everyone coming and going.",
       "topic_type": 3,
-      "personality_affinity": ["humorous", "sociable"],
-      "min_disposition": 40,
-      "max_disposition": 100,
-      "required_knowledge": ["guild_location"],
-      "weight": 0.9,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "dir_dungeon_1",
-      "text": "The old catacombs? There's an entrance in the ruins outside the east gate. Watch yourself.",
-      "topic_type": 3,
-      "personality_affinity": ["helpful", "cautious"],
-      "min_disposition": 35,
-      "max_disposition": 100,
-      "required_knowledge": ["dungeon_location"],
-      "weight": 1.0,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "dir_dungeon_2",
-      "text": "Fool's errand, going down there. But if you insist - follow the old road past the cemetery.",
-      "topic_type": 3,
-      "personality_affinity": ["grumpy", "knowledgeable"],
+      "personality_affinity": ["formal", "helpful"],
       "min_disposition": 30,
       "max_disposition": 100,
-      "required_knowledge": ["dungeon_location"],
+      "required_knowledge": ["exits", "guards"],
       "weight": 1.0,
       "actions": [],
       "conditions": []
     },
     {
-      "response_id": "dir_dungeon_3",
-      "text": "The dungeon entrance is hidden in the old chapel ruins. Look for the cracked floor near the altar.",
-      "topic_type": 3,
-      "personality_affinity": ["secretive", "helpful"],
-      "min_disposition": 45,
-      "max_disposition": 100,
-      "required_knowledge": ["dungeon_location"],
-      "weight": 0.8,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "dir_docks_1",
-      "text": "The docks are down by the waterfront, east side of town. You'll smell the fish before you see 'em.",
-      "topic_type": 3,
-      "personality_affinity": ["helpful", "practical"],
-      "min_disposition": 30,
-      "max_disposition": 100,
-      "required_knowledge": ["docks_location"],
-      "weight": 1.0,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "dir_docks_2",
-      "text": "Need a boat? The fishermen work the docks on the east shore. They might give you passage for coin.",
-      "topic_type": 3,
-      "personality_affinity": ["knowledgeable", "mercantile"],
-      "min_disposition": 35,
-      "max_disposition": 100,
-      "required_knowledge": ["docks_location"],
-      "weight": 1.0,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "dir_docks_3",
-      "text": "Follow the east road past the warehouses. The water's edge ain't far. Watch your step on the wet planks.",
-      "topic_type": 3,
-      "personality_affinity": ["friendly", "cautious"],
-      "min_disposition": 35,
-      "max_disposition": 100,
-      "required_knowledge": ["docks_location"],
-      "weight": 0.9,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "dir_watchtower_1",
-      "text": "The Old Watchtower? It's on the hill west of town. Abandoned years ago, but the path's still clear.",
+      "response_id": "dir_exit_2",
+      "text": "Looking to leave? North road leads to the wilds. South road takes you toward the capital - well, it used to before the collapse.",
       "topic_type": 3,
       "personality_affinity": ["helpful", "knowledgeable"],
-      "min_disposition": 30,
-      "max_disposition": 100,
-      "required_knowledge": ["watchtower_location"],
-      "weight": 1.0,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "dir_watchtower_2",
-      "text": "That old ruin to the west? Kids used to dare each other to climb it. Wouldn't go there at night if I were you.",
-      "topic_type": 3,
-      "personality_affinity": ["cautious", "superstitious"],
       "min_disposition": 35,
       "max_disposition": 100,
-      "required_knowledge": ["watchtower_location"],
+      "required_knowledge": ["exits", "roads"],
       "weight": 1.0,
       "actions": [],
       "conditions": []
     },
+
     {
       "response_id": "dir_road_east_1",
-      "text": "The east road leads out past the blacksmith. That way lies the wilds and eventually the mountain passes.",
+      "text": "The east road leads out past the blacksmith. That way lies the wilds and eventually the mountain passes - what's left of them.",
       "topic_type": 3,
       "personality_affinity": ["helpful", "knowledgeable"],
       "min_disposition": 30,
@@ -327,7 +447,7 @@
     },
     {
       "response_id": "dir_road_west_1",
-      "text": "West road goes toward the coast. Long journey, but the trade caravans make it regularly.",
+      "text": "West road goes toward the coast and Dalhurst. Long journey, but the trade caravans make it regularly.",
       "topic_type": 3,
       "personality_affinity": ["helpful", "mercantile"],
       "min_disposition": 30,
@@ -337,18 +457,7 @@
       "actions": [],
       "conditions": []
     },
-    {
-      "response_id": "dir_road_both_1",
-      "text": "East takes you to the mountains, west to the sea. North road is for the capital. Take your pick.",
-      "topic_type": 3,
-      "personality_affinity": ["knowledgeable", "practical"],
-      "min_disposition": 35,
-      "max_disposition": 100,
-      "required_knowledge": ["roads", "exits"],
-      "weight": 0.9,
-      "actions": [],
-      "conditions": []
-    },
+
     {
       "response_id": "dir_guard_inn",
       "text": "The Weary Traveler inn is straight down the main road, past the well on your right. Stay out of trouble.",
@@ -356,7 +465,7 @@
       "personality_affinity": ["guard", "lawful"],
       "min_disposition": 25,
       "max_disposition": 100,
-      "required_knowledge": ["inn_location"],
+      "required_knowledge": ["inn_location", "guards"],
       "weight": 1.2,
       "actions": [],
       "conditions": []
@@ -368,7 +477,7 @@
       "personality_affinity": ["guard", "lawful"],
       "min_disposition": 25,
       "max_disposition": 100,
-      "required_knowledge": ["smith_location"],
+      "required_knowledge": ["smith_location", "guards"],
       "weight": 1.2,
       "actions": [],
       "conditions": []
@@ -380,19 +489,7 @@
       "personality_affinity": ["guard", "lawful"],
       "min_disposition": 25,
       "max_disposition": 100,
-      "required_knowledge": ["temple_location"],
-      "weight": 1.2,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "dir_guard_guild",
-      "text": "Guild hall is the large building to the north. If you're looking for work, that's where the contracts are posted.",
-      "topic_type": 3,
-      "personality_affinity": ["guard", "lawful"],
-      "min_disposition": 25,
-      "max_disposition": 100,
-      "required_knowledge": ["guild_location"],
+      "required_knowledge": ["temple_location", "guards"],
       "weight": 1.2,
       "actions": [],
       "conditions": []
@@ -404,71 +501,12 @@
       "personality_affinity": ["guard", "lawful"],
       "min_disposition": 25,
       "max_disposition": 100,
-      "required_knowledge": ["exits"],
+      "required_knowledge": ["exits", "guards"],
       "weight": 1.2,
       "actions": [],
       "conditions": []
     },
-    {
-      "response_id": "dir_inn_grumpy",
-      "text": "The inn? Down the road. Now leave me be.",
-      "topic_type": 3,
-      "personality_affinity": ["grumpy", "antisocial"],
-      "min_disposition": 20,
-      "max_disposition": 45,
-      "required_knowledge": ["inn_location"],
-      "weight": 0.9,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "dir_smith_grumpy",
-      "text": "Blacksmith's by the east gate. Follow the noise and stop bothering me.",
-      "topic_type": 3,
-      "personality_affinity": ["grumpy", "impatient"],
-      "min_disposition": 20,
-      "max_disposition": 45,
-      "required_knowledge": ["smith_location"],
-      "weight": 0.9,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "dir_generic_1",
-      "text": "I'm not from around here myself. Can't help you, I'm afraid.",
-      "topic_type": 3,
-      "personality_affinity": ["apologetic", "honest"],
-      "min_disposition": 25,
-      "max_disposition": 60,
-      "required_knowledge": [],
-      "weight": 0.6,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "dir_generic_2",
-      "text": "Ask someone else. I've got better things to do than play guide.",
-      "topic_type": 3,
-      "personality_affinity": ["grumpy", "busy"],
-      "min_disposition": 15,
-      "max_disposition": 40,
-      "required_knowledge": [],
-      "weight": 0.8,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "dir_hostile",
-      "text": "Find it yourself.",
-      "topic_type": 3,
-      "personality_affinity": ["hostile", "cold"],
-      "min_disposition": 0,
-      "max_disposition": 25,
-      "required_knowledge": [],
-      "weight": 1.0,
-      "actions": [],
-      "conditions": []
-    },
+
     {
       "response_id": "dir_helpful_general",
       "text": "What are you looking for? The main shops are all around the town square.",
@@ -478,18 +516,6 @@
       "max_disposition": 100,
       "required_knowledge": [],
       "weight": 0.8,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "dir_confused",
-      "text": "Hmm, directions... I always get turned around myself. Try asking the guards.",
-      "topic_type": 3,
-      "personality_affinity": ["confused", "apologetic"],
-      "min_disposition": 30,
-      "max_disposition": 60,
-      "required_knowledge": [],
-      "weight": 0.5,
       "actions": [],
       "conditions": []
     }

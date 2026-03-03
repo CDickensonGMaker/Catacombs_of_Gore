@@ -1,0 +1,41 @@
+{
+	"id": "stolen_ledger_1",
+	"title": "The Stolen Ledger",
+	"description": "A merchant's trade ledger was stolen by bandits. Without it, he cannot prove his debts and may lose everything. The bandits fled toward the Sunken Crypts.",
+	"is_main_quest": false,
+	"quest_source": "npc",
+	"giver_npc_id": "dalhurst_merchant",
+	"giver_npc_type": "merchant",
+	"giver_region": "dalhurst",
+	"faction": "merchants_guild",
+	"objectives": [
+		{
+			"id": "search_area",
+			"description": "Search near the Sunken Crypts for the stolen ledger",
+			"type": "reach",
+			"target": "sunken_crypts",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 0,
+		"xp": 60,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": [],
+	"next_quest": "stolen_ledger_2",
+	"spawn_on_accept": [
+		{
+			"type": "chest",
+			"location": "sunken_crypts",
+			"coords": [-280, 0, 220],
+			"contains": ["trade_ledger"],
+			"loot_tier": "uncommon"
+		}
+	],
+	"quest_items": ["trade_ledger"]
+}

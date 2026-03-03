@@ -78,12 +78,16 @@ var compass_poi_markers: Dictionary = {}  # poi_id -> Label
 var compass_quest_marker: Label = null  # Quest objective marker
 var compass_enemy_markers: Dictionary = {}  # enemy instance_id -> Label (INTUITION-based radar)
 var compass_plant_markers: Dictionary = {}  # plant instance_id -> Label (HERBALISM-based detection)
+var compass_quest_target_markers: Dictionary = {}  # enemy instance_id -> Label (quest bounty targets)
 
 ## Bounty indicator
 var bounty_indicator: Label
 var bounty_flash_timer: float = 0.0
 const BOUNTY_FLASH_SPEED := 3.0
 const COMPASS_WIDTH := 300.0
+
+## PERFORMANCE: Cached enemies array - refreshed once per frame instead of multiple get_nodes_in_group() calls
+var _cached_enemies: Array = []
 
 ## Quest tracker (shows tracked quest at top of screen)
 var quest_tracker_container: Control
@@ -98,15 +102,16 @@ var minimap_coord_label: Label = null
 var conditions_container: HBoxContainer = null
 var condition_labels: Dictionary = {}  # Condition enum -> PanelContainer
 
+## Stealth indicator (HIDDEN text when player is hidden)
+var stealth_indicator: Label = null
+
 ## Town/settlement zone IDs - used for quest routing and turn-in
 const TOWN_ZONES: Array[String] = [
 	"elder_moor", "village_elder_moor",
 	"dalhurst", "city_dalhurst",
 	"riverside_village",
 	"town_aberdeen", "aberdeen",
-	"town_larton", "larton",
 	"town_whalers_abyss", "whalers_abyss",
-	"town_east_hollow", "east_hollow",
 	"city_rotherhine", "rotherhine",
 	"capital_falkenhafen", "falkenhafen",
 	"village_elven_outpost", "elven_outpost"
@@ -144,6 +149,9 @@ var debug_world_pos_label: Label
 var debug_active_cells_label: Label
 var debug_world_offset_label: Label
 var debug_fps_label: Label
+
+## Decorative border frame overlay
+var border_frame: GameBorderFrame = null
 
 func _ready() -> void:
 	# Add to hud group so other scripts can find us
@@ -189,10 +197,12 @@ func _ready() -> void:
 	_setup_bounty_indicator()
 	_setup_quest_tracker()
 	_setup_conditions_display()
+	_setup_stealth_indicator()
 	_connect_signals()
 	_setup_menus()
 	_connect_scene_signals()
 	_setup_debug_overlay()
+	_setup_border_frame()
 
 	# Try to load damage number scene
 	if ResourceLoader.exists("res://scenes/ui/damage_number.tscn"):
@@ -309,9 +319,11 @@ func _connect_scene_signals() -> void:
 	if SceneManager.has_signal("scene_load_completed"):
 		SceneManager.scene_load_completed.connect(_on_scene_load_completed)
 
-## Called when a new scene starts loading - clean up POI markers
+## Called when a new scene starts loading - clean up POI markers and stale references
 func _on_scene_load_started(_scene_path: String) -> void:
 	_clear_all_poi_markers()
+	# Clear combat target to prevent "Trying to cast a freed object" crash
+	current_target = null
 
 ## Called when scene loading completes - rebuild zone connections
 func _on_scene_load_completed(_scene_path: String) -> void:
@@ -361,7 +373,38 @@ func _clear_all_poi_markers() -> void:
 	for marker in plant_markers_to_free:
 		marker.queue_free()
 
-	print("[HUD] Cleared all POI, enemy, and plant markers for scene transition")
+	# Also clear quest target markers (bounty enemies)
+	var quest_target_markers_to_free: Array[Label] = []
+	for target_id in compass_quest_target_markers:
+		var marker = compass_quest_target_markers[target_id]
+		if marker and is_instance_valid(marker):
+			quest_target_markers_to_free.append(marker)
+	compass_quest_target_markers.clear()
+	for marker in quest_target_markers_to_free:
+		marker.queue_free()
+
+	print("[HUD] Cleared all POI, enemy, plant, and quest target markers for scene transition")
+
+
+## Refresh compass quest marker after loading a save
+## Call this after scene is fully loaded and NPCs/enemies are initialized
+## This forces the compass to recalculate objective positions for tracked quests
+func refresh_compass_quest_marker() -> void:
+	# Force recreation of quest marker if tracking a quest
+	var tracked_id: String = QuestManager.get_tracked_quest_id()
+	if tracked_id.is_empty():
+		return
+
+	# Clear the existing quest marker so it gets recreated fresh
+	if compass_quest_marker and is_instance_valid(compass_quest_marker):
+		compass_quest_marker.queue_free()
+		compass_quest_marker = null
+
+	# Clear cached enemy references to force fresh lookup
+	_cached_enemies.clear()
+
+	print("[HUD] Refreshed compass quest marker for tracked quest: %s" % tracked_id)
+
 
 ## Rebuild zone connection map from doors in current scene
 ## Now stores ARRAY of doors per zone to handle multiple exits
@@ -395,18 +438,17 @@ func _scene_path_to_zone_id(scene_path: String) -> String:
 		"elder_moor": return "elder_moor"
 		"dalhurst": return "dalhurst"
 		"aberdeen": return "aberdeen"
-		"larton": return "larton"
+		# "larton": return "larton"  # REMOVED - orphaned zone
 		"rotherhine": return "rotherhine"
 		"falkenhafen": return "falkenhafen"
 		"whalers_abyss": return "whalers_abyss"
-		"east_hollow": return "east_hollow"
+		# "east_hollow": return "east_hollow"  # REMOVED - orphaned zone
 		"open_world": return "open_world"
 		"goblin_cave": return "goblin_cave"
-		"dark_crypt": return "dark_crypt"
+		# "dark_crypt": return "dark_crypt"  # REMOVED - orphaned zone
 		"random_cave": return "random_cave"
 		"riverside_village": return "riverside_village"
 		"inn_interior": return "inn_interior"
-		"test_dungeon": return "test_dungeon"
 		_: return filename
 
 func _process(delta: float) -> void:
@@ -415,6 +457,9 @@ func _process(delta: float) -> void:
 		_cached_player = get_tree().get_first_node_in_group("player") as Node3D
 	if not _cached_player or not is_instance_valid(_cached_player) or not _cached_player.is_inside_tree():
 		return
+
+	# PERFORMANCE: Cache enemies once per frame instead of multiple get_nodes_in_group() calls
+	_cached_enemies = get_tree().get_nodes_in_group("enemies")
 
 	_update_bars()
 	_update_target_health()
@@ -428,6 +473,7 @@ func _process(delta: float) -> void:
 	_update_bounty_indicator(delta)
 	_update_quest_tracker()
 	_update_debug_overlay()
+	_update_stealth_indicator()
 
 ## Skull frame texture for health/stamina bars
 var skull_frame_texture: Texture2D = null
@@ -700,14 +746,18 @@ func _update_target_health() -> void:
 	else:
 		current_target = null
 
+	# Guard against freed objects - check validity before any access
+	if not is_instance_valid(current_target):
+		current_target = null
+
 	if current_target and current_target.has_method("is_dead") and not current_target.is_dead():
 		enemy_health_container.visible = true
 
-		if enemy_name_label and current_target is EnemyBase:
+		if enemy_name_label and is_instance_valid(current_target) and current_target is EnemyBase:
 			var enemy := current_target as EnemyBase
 			enemy_name_label.text = enemy.enemy_data.display_name if enemy.enemy_data else "Enemy"
 
-		if enemy_health_bar and current_target is EnemyBase:
+		if enemy_health_bar and is_instance_valid(current_target) and current_target is EnemyBase:
 			var enemy := current_target as EnemyBase
 			enemy_health_bar.max_value = enemy.max_hp
 			enemy_health_bar.value = enemy.current_hp
@@ -849,6 +899,69 @@ func _get_condition_name(condition: Enums.Condition) -> String:
 		Enums.Condition.SLOWED: return "SLOWED"
 		Enums.Condition.HASTED: return "HASTED"
 		_: return "UNKNOWN"
+
+## Setup stealth indicator (HIDDEN text at center-bottom of screen)
+func _setup_stealth_indicator() -> void:
+	stealth_indicator = Label.new()
+	stealth_indicator.name = "StealthIndicator"
+	stealth_indicator.text = "HIDDEN"
+	stealth_indicator.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	stealth_indicator.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+
+	# Style the label
+	stealth_indicator.add_theme_font_size_override("font_size", 24)
+	stealth_indicator.add_theme_color_override("font_color", Color(0.4, 0.8, 0.4, 1.0))  # Green
+	stealth_indicator.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.8))
+	stealth_indicator.add_theme_constant_override("shadow_offset_x", 2)
+	stealth_indicator.add_theme_constant_override("shadow_offset_y", 2)
+
+	# Position at center-bottom of screen
+	stealth_indicator.anchors_preset = Control.PRESET_CENTER_BOTTOM
+	stealth_indicator.anchor_left = 0.5
+	stealth_indicator.anchor_right = 0.5
+	stealth_indicator.anchor_top = 1.0
+	stealth_indicator.anchor_bottom = 1.0
+	stealth_indicator.offset_left = -60
+	stealth_indicator.offset_right = 60
+	stealth_indicator.offset_top = -100
+	stealth_indicator.offset_bottom = -70
+
+	# Start hidden
+	stealth_indicator.visible = false
+
+	add_child(stealth_indicator)
+
+## Update stealth indicator visibility
+func _update_stealth_indicator() -> void:
+	if not stealth_indicator:
+		return
+
+	var player := get_tree().get_first_node_in_group("player")
+	if not player:
+		stealth_indicator.visible = false
+		return
+
+	# Check if player is hidden
+	var is_hidden: bool = false
+	if player.has_method("get_is_hidden"):
+		is_hidden = player.get_is_hidden()
+
+	# Check if player is crouching (show different indicator)
+	var is_crouching: bool = false
+	if player.has_method("get_is_crouching"):
+		is_crouching = player.get_is_crouching()
+
+	# Update visibility and text
+	if is_hidden:
+		stealth_indicator.text = "HIDDEN"
+		stealth_indicator.add_theme_color_override("font_color", Color(0.4, 0.9, 0.4, 1.0))  # Bright green
+		stealth_indicator.visible = true
+	elif is_crouching:
+		stealth_indicator.text = "CROUCHING"
+		stealth_indicator.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7, 0.8))  # Gray
+		stealth_indicator.visible = true
+	else:
+		stealth_indicator.visible = false
 
 func _update_time() -> void:
 	if time_label:
@@ -1749,8 +1862,7 @@ func _get_friendly_region_name(zone_id: String) -> String:
 		"dungeon_mosshall_tombs": "Mosshall Tombs",
 		"goblin_cave": "Goblin Cave",
 		"random_cave": "Cave",
-		"dark_crypt": "Dark Crypt",
-		"test_dungeon": "Test Dungeon"
+		"dark_crypt": "Dark Crypt"
 	}
 
 	if friendly_names.has(zone_id):
@@ -1849,6 +1961,9 @@ func _update_compass() -> void:
 	# Update enemy radar markers (INTUITION skill)
 	_update_compass_enemies(player, yaw_degrees, ppd)
 
+	# Update quest target enemy markers (bounty targets - always visible)
+	_update_compass_quest_targets(player, yaw_degrees, ppd)
+
 	# Update harvestable plant markers (HERBALISM skill 5+)
 	_update_compass_plants(player, yaw_degrees, ppd)
 
@@ -1902,13 +2017,11 @@ func _update_compass_enemies(player: Node3D, yaw_degrees: float, ppd: float) -> 
 	# Calculate detection range: base + (INTUITION * bonus per level)
 	var detection_range: float = ENEMY_DETECTION_BASE + (intuition_level * ENEMY_DETECTION_PER_INTUITION)
 
-	# Get all enemies in the scene
-	var enemies := get_tree().get_nodes_in_group("enemies")
-
+	# PERFORMANCE: Use cached enemies instead of get_nodes_in_group()
 	# Track which enemy IDs are still valid this frame
 	var valid_enemy_ids: Dictionary = {}
 
-	for enemy in enemies:
+	for enemy in _cached_enemies:
 		if not enemy is Node3D:
 			continue
 
@@ -1995,6 +2108,127 @@ func _create_enemy_marker() -> Label:
 	marker.add_theme_constant_override("outline_size", 1)
 	marker.tooltip_text = "Enemy"
 	marker.size = Vector2(16, COMPASS_HEIGHT)
+
+	compass_strip.add_child(marker)
+	return marker
+
+
+## Update quest target enemy markers on compass (bounty targets)
+## Shows gold/teal markers for enemies that are targets of active kill quests
+## Always visible regardless of INTUITION skill - these are marked targets
+const QUEST_TARGET_RANGE := 100.0  # Range at which quest targets appear on compass
+func _update_compass_quest_targets(player: Node3D, yaw_degrees: float, ppd: float) -> void:
+	# PERFORMANCE: Use cached enemies instead of get_nodes_in_group()
+	# Track which enemy IDs are still valid this frame
+	var valid_enemy_ids: Dictionary = {}
+
+	for enemy in _cached_enemies:
+		if not enemy is Node3D:
+			continue
+
+		var enemy_node := enemy as Node3D
+
+		# Skip dead enemies
+		if enemy.has_method("is_dead") and enemy.is_dead():
+			continue
+
+		# Get enemy data ID to check against quest targets
+		var enemy_id_str: String = ""
+		if enemy.has_method("get_enemy_data"):
+			var enemy_data = enemy.get_enemy_data()
+			if enemy_data:
+				enemy_id_str = enemy_data.id if "id" in enemy_data else ""
+
+		if enemy_id_str.is_empty():
+			continue
+
+		# Check if this enemy is a quest target
+		var target_info: Dictionary = QuestManager.is_enemy_quest_target(enemy_id_str)
+		if target_info.is_empty():
+			continue
+
+		var enemy_instance_id: int = enemy_node.get_instance_id()
+		valid_enemy_ids[enemy_instance_id] = true
+
+		# Calculate distance to enemy
+		var to_enemy := enemy_node.global_position - player.global_position
+		var distance := to_enemy.length()
+
+		# Skip if too far
+		if distance > QUEST_TARGET_RANGE:
+			if compass_quest_target_markers.has(enemy_instance_id):
+				compass_quest_target_markers[enemy_instance_id].visible = false
+			continue
+
+		# Calculate angle to enemy (in degrees, 0 = north/+Z)
+		var enemy_angle := rad_to_deg(atan2(-to_enemy.x, -to_enemy.z))
+		enemy_angle = fmod(enemy_angle + 360.0, 360.0)
+
+		# Get or create marker
+		var marker: Label
+		var is_main: bool = target_info.get("is_main", false)
+		if compass_quest_target_markers.has(enemy_instance_id):
+			marker = compass_quest_target_markers[enemy_instance_id]
+			if not is_instance_valid(marker):
+				marker = _create_quest_target_marker(is_main)
+				compass_quest_target_markers[enemy_instance_id] = marker
+		else:
+			marker = _create_quest_target_marker(is_main)
+			compass_quest_target_markers[enemy_instance_id] = marker
+
+		# Calculate relative angle
+		var rel_angle := enemy_angle - yaw_degrees
+		while rel_angle < -180.0:
+			rel_angle += 360.0
+		while rel_angle > 180.0:
+			rel_angle -= 360.0
+
+		# Position marker
+		var x_pos := COMPASS_WIDTH + rel_angle * ppd
+		marker.position.x = x_pos - marker.size.x / 2
+		marker.position.y = (COMPASS_HEIGHT - marker.size.y) / 2  # Center vertically (like quest markers)
+
+		# Update tooltip with remaining count
+		var remaining: int = target_info.get("remaining", 1)
+		marker.tooltip_text = "Quest Target (%d remaining)" % remaining
+
+		# Only show if within view arc (roughly 90 degrees)
+		marker.visible = abs(rel_angle) < 50.0
+
+	# Clean up stale markers
+	var stale_ids: Array[int] = []
+	for enemy_id in compass_quest_target_markers:
+		var marker = compass_quest_target_markers[enemy_id]
+		if not valid_enemy_ids.has(enemy_id) or not is_instance_valid(marker):
+			stale_ids.append(enemy_id)
+
+	for enemy_id in stale_ids:
+		var marker = compass_quest_target_markers.get(enemy_id)
+		compass_quest_target_markers.erase(enemy_id)
+		if marker and is_instance_valid(marker):
+			marker.queue_free()
+
+
+## Create a quest target marker for the compass (gold/teal star)
+func _create_quest_target_marker(is_main_quest: bool) -> Label:
+	var marker := Label.new()
+
+	# Star icon for quest targets
+	marker.text = "★"
+	marker.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	marker.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	marker.add_theme_font_size_override("font_size", 14)
+
+	# Gold for main quests, teal for side quests/bounties
+	if is_main_quest:
+		marker.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))  # Gold
+	else:
+		marker.add_theme_color_override("font_color", Color(0.2, 0.8, 0.8))  # Teal
+
+	marker.add_theme_color_override("font_outline_color", Color(0, 0, 0))
+	marker.add_theme_constant_override("outline_size", 2)
+	marker.tooltip_text = "Quest Target"
+	marker.size = Vector2(18, COMPASS_HEIGHT)
 
 	compass_strip.add_child(marker)
 	return marker
@@ -2114,10 +2348,13 @@ func _create_plant_marker() -> Label:
 
 ## Update compass quest marker (points to objective or exit door)
 ## This is separate from the HUD quest tracker display
-## TODO: BUG - Compass quest marker not displaying for "reach" objectives
-## The minimap shows the golden marker correctly, but the compass dial does not.
-## Debug confirmed cached_pos is correct (300, 0, 200 for Thornfield).
-## Issue is likely in marker positioning or visibility logic below.
+## KNOWN BUG: Compass quest marker not displaying for "reach" objectives
+## Status: Minimap shows golden marker correctly, compass dial does not.
+## Diagnosis: cached_pos is correct (300, 0, 200 for Thornfield).
+## Root cause: marker positioning/visibility logic below may have FOV issues.
+## Suggested fix: Check _calculate_compass_marker_position() for edge cases
+## when target is behind player or at extreme angles. May need to clamp
+## marker to edge of compass rather than hiding it.
 var _compass_debug_timer: float = 0.0
 const COMPASS_DEBUG_ENABLED := false  # Set to true to enable compass debug logging
 func _update_compass_quest_marker(player: Node3D, yaw_degrees: float, ppd: float) -> void:
@@ -2242,8 +2479,17 @@ func _update_compass_quest_marker(player: Node3D, yaw_degrees: float, ppd: float
 					target_name = "Exit: " + exit_door.door_name
 					if should_log:
 						print("[Compass] Found exit door: %s at %s" % [target_name, target_pos])
-				# Note: No error print here - in outdoor regions, it's normal to not find doors
-				# The compass marker will be hidden until player approaches an exit
+
+		# FALLBACK: Use QuestManager's cached world position (same as minimap)
+		# This handles outdoor objectives like Bloodsand Arena that are reached via cell streaming
+		if not has_target and target_quest and target_objective:
+			var cached_pos: Vector3 = QuestManager.get_objective_world_pos(target_quest.id, target_objective.id)
+			if cached_pos != Vector3.ZERO:
+				target_pos = cached_pos
+				has_target = true
+				target_name = target_objective.description
+				if should_log:
+					print("[Compass] Using cached world position: %s at %s" % [target_name, target_pos])
 
 	if not has_target:
 		if compass_quest_marker and is_instance_valid(compass_quest_marker):
@@ -2480,8 +2726,8 @@ func _normalize_zone_id(zone: String) -> String:
 		return "kazan_dun"
 	if "aberdeen" in zone_lower:
 		return "aberdeen"
-	if "larton" in zone_lower:
-		return "larton"
+	# if "larton" in zone_lower:  # REMOVED - orphaned zone
+	#	return "larton"
 	if "falkenhafen" in zone_lower:
 		return "falkenhafen"
 	if "riverside" in zone_lower:
@@ -2510,8 +2756,8 @@ func _find_objective_in_current_zone(objective: QuestManager.Objective, quest: Q
 						return result
 			else:
 				# Still need kills - look for enemies of the target type
-				var enemies := get_tree().get_nodes_in_group("enemies")
-				for enemy in enemies:
+				# PERFORMANCE: Use cached enemies instead of get_nodes_in_group()
+				for enemy in _cached_enemies:
 					if enemy is Node3D and enemy.has_method("get_enemy_data"):
 						var enemy_data = enemy.get_enemy_data()
 						if enemy_data and (enemy_data.id == objective.target or enemy_data.id.begins_with(objective.target)):
@@ -2700,7 +2946,7 @@ func _get_objective_target_zone(objective: QuestManager.Objective) -> String:
 					return "open_world"
 				# Cultists - dungeons
 				"cultist", "cult_leader", "abomination", "vampire_lord":
-					return "dark_crypt"
+					return "open_world"  # Was dark_crypt but that zone was removed
 				_:
 					return "open_world"  # Default to wilderness for kill quests
 
@@ -2856,11 +3102,7 @@ func _find_exit_door_to_zone(target_zone: String) -> ZoneDoor:
 			"dalhurst": "open_world",
 			"open_world": "open_world"
 		},
-		"larton": {
-			"elder_moor": "open_world",
-			"dalhurst": "open_world",
-			"open_world": "open_world"
-		},
+		# "larton" zone paths removed - orphaned zone
 		"rotherhine": {
 			"elder_moor": "open_world",
 			"dalhurst": "open_world",
@@ -2878,10 +3120,7 @@ func _find_exit_door_to_zone(target_zone: String) -> ZoneDoor:
 			"riverside_village": "open_world",
 			"dalhurst": "open_world"
 		},
-		"dark_crypt": {
-			"elder_moor": "open_world",
-			"goblin_cave": "open_world"
-		},
+		# "dark_crypt" zone paths removed - orphaned zone
 		"random_cave": {
 			"elder_moor": "open_world",
 			"goblin_cave": "open_world"
@@ -3283,6 +3522,24 @@ func _toggle_debug_overlay() -> void:
 	if debug_overlay_container:
 		debug_overlay_container.visible = debug_overlay_visible
 	print("[HUD] Debug overlay: %s" % ("ON" if debug_overlay_visible else "OFF"))
+
+
+## ============================================================================
+## DECORATIVE BORDER FRAME
+## ============================================================================
+
+func _setup_border_frame() -> void:
+	# Create the border frame as a separate CanvasLayer
+	# It renders on top of regular HUD but hides when menus open
+	border_frame = GameBorderFrame.new()
+	border_frame.name = "GameBorderFrame"
+	# Layer 10 puts it above most HUD elements (HUD is usually layer 1)
+	# But it will hide itself when menus are open
+	border_frame.layer = 10
+
+	# Add to scene tree at root level so it's independent of HUD hierarchy
+	get_tree().root.call_deferred("add_child", border_frame)
+	print("[HUD] Border frame initialized")
 
 
 func _update_debug_overlay() -> void:

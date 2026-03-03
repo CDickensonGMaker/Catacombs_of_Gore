@@ -10,6 +10,7 @@ extends Node3D
 
 const ZONE_ID := "town_aberdeen"
 const ZONE_SIZE := 90.0  # 90x90 unit zone
+const TOWN_AMBIENT_PATH := "res://assets/audio/Ambiance/towns/town_murmur_medieval_mix_60s_ps1_retro.wav"
 
 @onready var nav_region: NavigationRegion3D = $NavigationRegion3D
 
@@ -19,6 +20,11 @@ var guard_spawn_count := 2  # Under-equipped guards
 
 
 func _ready() -> void:
+	# Play town ambient sound (only when main scene)
+	var is_main_scene: bool = get_node_or_null("Player") != null
+	if is_main_scene:
+		AudioManager.play_ambient(TOWN_AMBIENT_PATH)
+		AudioManager.play_zone_music("village")
 	_setup_spawn_point_metadata()
 	_setup_navigation()
 	_setup_day_night_cycle()
@@ -38,7 +44,11 @@ func _setup_spawn_point_metadata() -> void:
 
 ## Setup dynamic day/night lighting
 func _setup_day_night_cycle() -> void:
-	DayNightCycle.add_to_level(self)
+	# Only setup day/night lighting when this is the main scene (has Player node)
+	# When loaded as a streamed cell, CellStreamer strips lighting to prevent doubling
+	var is_main_scene: bool = get_node_or_null("Player") != null
+	if is_main_scene:
+		DayNightCycle.add_to_level(self)
 
 
 ## Setup navigation mesh for NPC pathfinding
@@ -158,7 +168,7 @@ func _create_frozen_corpse_decorations() -> void:
 	var decorations := $Decorations
 
 	# Frost monster texture (frozen creature corpse)
-	var frost_monster_tex: Texture2D = load("res://Sprite folders grab bag/frost_monster.png")
+	var frost_monster_tex: Texture2D = load("res://assets/sprites/enemies/beasts/frost_monster.png")
 	if not frost_monster_tex:
 		push_warning("[Aberdeen] Failed to load frost_monster.png")
 		return

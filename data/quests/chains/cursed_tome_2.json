@@ -1,0 +1,39 @@
+{
+	"id": "cursed_tome_2",
+	"title": "Recover the Tome",
+	"description": "The cultists guard the tome jealously. Defeat them and retrieve the dangerous book.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "scholars_guild",
+	"objectives": [
+		{
+			"id": "kill_cultists",
+			"description": "Kill the cultists",
+			"type": "kill",
+			"target": "cultist",
+			"required_count": 4
+		},
+		{
+			"id": "get_tome",
+			"description": "Retrieve the cursed tome",
+			"type": "collect",
+			"target": "cursed_tome",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 0,
+		"xp": 160,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": ["cursed_tome_1"],
+	"next_quest": "cursed_tome_3",
+	"quest_items": ["cursed_tome"]
+}

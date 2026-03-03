@@ -114,16 +114,16 @@ func _spawn_zone_exits() -> void:
 	to_wilderness.rotation.y = 0
 	to_wilderness.show_frame = false
 
-	# Exit to Border Wars Graveyard (west - safer retreat)
-	var to_graveyard := ZoneDoor.spawn_door(
+	# Exit to Western wilderness (was border_wars_graveyard - removed zone)
+	var to_west := ZoneDoor.spawn_door(
 		doors,
 		Vector3(-24, 0, -10),
-		"res://scenes/levels/border_wars_graveyard.tscn",
-		"from_windmere",
-		"Path to Border Wars Graveyard"
+		SceneManager.RETURN_TO_WILDERNESS,
+		"default",
+		"Western Path"
 	)
-	to_graveyard.rotation.y = PI/2
-	to_graveyard.show_frame = false
+	to_west.rotation.y = PI/2
+	to_west.show_frame = false
 
 	print("[Windmere] Spawned doors")
 

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="EnchantmentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enchantment_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "shocking"
+display_name = "Shocking"
+description = "Chance to stun enemies on hit."
+enchantment_type = 3
+effect_value = 0
+damage_type = 2
+stat_type = 0
+inflicts_condition = 7
+proc_chance = 0.15
+condition_duration = 2.0
+min_soulstone_tier = 2
+required_arcana = 4
+gold_cost = 300
+applicable_slots = ["weapon"]
+glow_color = Color(0.8, 0.9, 1, 1)

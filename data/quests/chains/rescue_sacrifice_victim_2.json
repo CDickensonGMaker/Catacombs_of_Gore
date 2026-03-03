@@ -1,0 +1,54 @@
+{
+	"id": "rescue_sacrifice_victim_2",
+	"title": "Stop the Sacrifice",
+	"description": "You've found the temple. The cultists are preparing their victim for sacrifice. Kill them and free her before it's too late.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "temple_of_three",
+	"objectives": [
+		{
+			"id": "kill_cultists",
+			"description": "Kill the cultists",
+			"type": "kill",
+			"target": "cultist",
+			"required_count": 5
+		},
+		{
+			"id": "kill_priest",
+			"description": "Kill the Dark Priest",
+			"type": "kill",
+			"target": "cult_leader",
+			"required_count": 1
+		},
+		{
+			"id": "free_victim",
+			"description": "Free the sacrifice victim",
+			"type": "talk",
+			"target": "hostage_sacrifice_victim",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 0,
+		"xp": 250,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": ["rescue_sacrifice_victim_1"],
+	"next_quest": "rescue_sacrifice_victim_3",
+	"spawn_on_accept": [
+		{
+			"type": "hostage",
+			"location": "cultist_temple_north",
+			"hostage_id": "hostage_sacrifice_victim",
+			"name": "Sacrifice Victim",
+			"objective_id": "free_victim"
+		}
+	]
+}

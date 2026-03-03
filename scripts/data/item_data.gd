@@ -104,6 +104,10 @@ enum ConsumableEffect {
 @export var repair_amount: int = 30  # How much durability to restore
 @export var repairs_quality: bool = false  # If true, can restore quality tier instead
 
+@export_group("Book Properties")
+@export var unlocks_bestiary: Array[String] = []  # Creature IDs to unlock in bestiary
+@export var book_tier: int = 1  # Book tier 1-10 (affects price and rarity)
+
 @export_group("Economy")
 @export var base_value: int = 10
 @export var weight: float = 0.1

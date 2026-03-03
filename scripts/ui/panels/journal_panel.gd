@@ -4,7 +4,7 @@ class_name JournalPanel
 extends Control
 
 ## Currently selected tab
-enum Tab { QUESTS, NOTES, FACTIONS, CODEX, BESTIARY, STATISTICS }
+enum Tab { QUESTS, NOTES, FACTIONS, CODEX, BESTIARY, STATISTICS, BOUNTIES }
 
 ## Quest sub-category
 enum QuestCategory { MAIN, SECONDARY }
@@ -108,7 +108,7 @@ func _build_tab_bar(parent: Control) -> void:
 	tab_bar.add_theme_constant_override("separation", 2)
 	parent.add_child(tab_bar)
 
-	var tab_names: Array[String] = ["Quests", "Notes", "Factions", "Codex", "Bestiary", "Stats"]
+	var tab_names: Array[String] = ["Quests", "Notes", "Factions", "Codex", "Bestiary", "Stats", "Bounties"]
 
 	for i: int in range(tab_names.size()):
 		var btn := Button.new()
@@ -168,6 +168,8 @@ func _switch_to_tab(tab: Tab) -> void:
 			current_content = _build_bestiary_content()
 		Tab.STATISTICS:
 			current_content = _build_statistics_content()
+		Tab.BOUNTIES:
+			current_content = _build_bounties_content()
 
 	if current_content:
 		content_container.add_child(current_content)
@@ -1089,6 +1091,162 @@ func _add_stat_section(parent: Control, title: String, stats: Array) -> void:
 	var spacer := Control.new()
 	spacer.custom_minimum_size.y = 12
 	parent.add_child(spacer)
+
+
+# =============================================================================
+# BOUNTIES TAB
+# =============================================================================
+
+## Displayed bounties
+var displayed_bounties: Array = []
+var selected_bounty_index: int = -1
+
+func _build_bounties_content() -> Control:
+	var container := VBoxContainer.new()
+	container.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	container.set_offsets_preset(Control.PRESET_FULL_RECT, Control.PRESET_MODE_MINSIZE, 8)
+
+	var header := Label.new()
+	header.text = "Active Bounties"
+	header.add_theme_color_override("font_color", COL_GOLD)
+	header.add_theme_font_size_override("font_size", 16)
+	container.add_child(header)
+
+	var split := HSplitContainer.new()
+	split.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	container.add_child(split)
+
+	# Bounty list
+	var list_panel := _create_panel()
+	list_panel.custom_minimum_size.x = 200
+	split.add_child(list_panel)
+
+	var bounty_list := ItemList.new()
+	bounty_list.name = "BountyList"
+	bounty_list.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	bounty_list.add_theme_color_override("font_color", COL_TEXT)
+	bounty_list.add_theme_color_override("font_selected_color", COL_GOLD)
+	bounty_list.item_selected.connect(_on_bounty_selected)
+	list_panel.add_child(bounty_list)
+
+	# Bounty details
+	var detail_panel := _create_panel()
+	detail_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	split.add_child(detail_panel)
+
+	var detail_vbox := VBoxContainer.new()
+	detail_vbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	detail_vbox.set_offsets_preset(Control.PRESET_FULL_RECT, Control.PRESET_MODE_MINSIZE, 8)
+	detail_panel.add_child(detail_vbox)
+
+	var title_label := Label.new()
+	title_label.name = "BountyTitle"
+	title_label.text = "Select a Bounty"
+	title_label.add_theme_color_override("font_color", COL_GOLD)
+	title_label.add_theme_font_size_override("font_size", 16)
+	detail_vbox.add_child(title_label)
+
+	var target_label := Label.new()
+	target_label.name = "BountyTarget"
+	target_label.add_theme_color_override("font_color", COL_TEXT)
+	detail_vbox.add_child(target_label)
+
+	var location_label := Label.new()
+	location_label.name = "BountyLocation"
+	location_label.add_theme_color_override("font_color", COL_DIM)
+	detail_vbox.add_child(location_label)
+
+	var giver_label := Label.new()
+	giver_label.name = "BountyGiver"
+	giver_label.add_theme_color_override("font_color", COL_DIM)
+	detail_vbox.add_child(giver_label)
+
+	var spacer := Control.new()
+	spacer.custom_minimum_size.y = 10
+	detail_vbox.add_child(spacer)
+
+	var rewards_label := Label.new()
+	rewards_label.name = "BountyRewards"
+	rewards_label.add_theme_color_override("font_color", COL_TEAL)
+	detail_vbox.add_child(rewards_label)
+
+	var status_label := Label.new()
+	status_label.name = "BountyStatus"
+	status_label.add_theme_color_override("font_color", COL_GREEN)
+	detail_vbox.add_child(status_label)
+
+	# Populate bounty list
+	_populate_bounty_list(bounty_list)
+
+	return container
+
+
+func _populate_bounty_list(bounty_list: ItemList) -> void:
+	displayed_bounties.clear()
+	bounty_list.clear()
+
+	if not BountyManager:
+		bounty_list.add_item("Bounty system unavailable")
+		return
+
+	var bounties: Array = BountyManager.get_active_bounties()
+
+	if bounties.is_empty():
+		bounty_list.add_item("No active bounties")
+		return
+
+	for bounty in bounties:
+		displayed_bounties.append(bounty)
+		var creature_name: String = bounty.target_creature.capitalize().replace("_", " ")
+		var status_prefix: String = ""
+		if bounty.is_ready_for_turnin:
+			status_prefix = "[READY] "
+		bounty_list.add_item(status_prefix + creature_name + " Hunt")
+
+
+func _on_bounty_selected(index: int) -> void:
+	selected_bounty_index = index
+	if index < 0 or index >= displayed_bounties.size():
+		return
+
+	var bounty = displayed_bounties[index]
+
+	var title_label: Label = content_container.find_child("BountyTitle", true, false)
+	var target_label: Label = content_container.find_child("BountyTarget", true, false)
+	var location_label: Label = content_container.find_child("BountyLocation", true, false)
+	var giver_label: Label = content_container.find_child("BountyGiver", true, false)
+	var rewards_label: Label = content_container.find_child("BountyRewards", true, false)
+	var status_label: Label = content_container.find_child("BountyStatus", true, false)
+
+	var creature_name: String = bounty.target_creature.capitalize().replace("_", " ")
+
+	if title_label:
+		title_label.text = creature_name + " Bounty"
+
+	if target_label:
+		target_label.text = "Hunt %d %s" % [bounty.target_count, creature_name]
+
+	if location_label:
+		var region_name: String = bounty.region.capitalize().replace("_", " ") if bounty.region else "Unknown"
+		var hint: String = bounty.direction_hint if bounty.direction_hint else ""
+		if hint:
+			location_label.text = "Location: %s (%s)" % [region_name, hint]
+		else:
+			location_label.text = "Location: %s" % region_name
+
+	if giver_label:
+		giver_label.text = "Posted by: %s" % bounty.giver_npc_name
+
+	if rewards_label:
+		rewards_label.text = "Reward: %d Gold, %d XP" % [bounty.reward_gold, bounty.reward_xp]
+
+	if status_label:
+		if bounty.is_ready_for_turnin:
+			status_label.text = "Status: Ready to turn in!"
+			status_label.add_theme_color_override("font_color", COL_GOLD)
+		else:
+			status_label.text = "Status: In Progress"
+			status_label.add_theme_color_override("font_color", COL_GREEN)
 
 
 # =============================================================================

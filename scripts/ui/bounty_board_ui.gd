@@ -25,7 +25,11 @@ func _ready() -> void:
 	_refresh_display()
 
 func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel"):
+	if not visible:
+		return
+
+	# Close on escape, pause, or tab menu key
+	if event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause") or event.is_action_pressed("menu"):
 		_close()
 		get_viewport().set_input_as_handled()
 
@@ -34,16 +38,26 @@ func _create_ui() -> void:
 	# Set root control to fill viewport (matching shop_ui.gd)
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 
-	# Dark overlay
+	# Click-outside overlay - clicking this closes the UI
+	var click_outside := Button.new()
+	click_outside.set_anchors_preset(Control.PRESET_FULL_RECT)
+	click_outside.flat = true
+	click_outside.focus_mode = Control.FOCUS_NONE
+	click_outside.mouse_filter = Control.MOUSE_FILTER_STOP
+	click_outside.pressed.connect(_close)
+	add_child(click_outside)
+
+	# Dark overlay (visual only)
 	var overlay := ColorRect.new()
 	overlay.color = Color(0, 0, 0, 0.75)
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(overlay)
 
 	# Main panel - full rect with margins (matching shop_ui.gd)
 	main_panel = PanelContainer.new()
 	main_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
+	main_panel.mouse_filter = Control.MOUSE_FILTER_STOP  # Block clicks from reaching overlay
 	main_panel.offset_left = 20
 	main_panel.offset_top = 20
 	main_panel.offset_right = -20

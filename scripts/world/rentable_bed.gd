@@ -552,7 +552,6 @@ func _get_skill_name(skill: Enums.Skill) -> String:
 		Enums.Skill.FIRST_AID: return "First Aid"
 		Enums.Skill.ENDURANCE: return "Endurance"
 		Enums.Skill.ATHLETICS: return "Athletics"
-		Enums.Skill.PERCEPTION: return "Perception"
 		Enums.Skill.INTIMIDATION: return "Intimidation"
 		Enums.Skill.PERSUASION: return "Persuasion"
 		Enums.Skill.DECEPTION: return "Deception"
@@ -564,7 +563,6 @@ func _get_skill_name(skill: Enums.Skill) -> String:
 		Enums.Skill.RELIGION: return "Religion"
 		Enums.Skill.NATURE: return "Nature"
 		Enums.Skill.INVESTIGATION: return "Investigation"
-		Enums.Skill.ACROBATICS: return "Acrobatics"
 		Enums.Skill.BRAVERY: return "Bravery"
 		_: return "Unknown"
 

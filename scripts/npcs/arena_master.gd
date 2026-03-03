@@ -74,7 +74,7 @@ func _ready() -> void:
 ## Create the visual representation (billboard sprite)
 func _create_visual() -> void:
 	# Load a burly gladiator/pitmaster sprite
-	var tex: Texture2D = load("res://Sprite folders grab bag/man_civilian.png") as Texture2D
+	var tex: Texture2D = load("res://assets/sprites/npcs/civilians/man_civilian.png") as Texture2D
 	if not tex:
 		push_warning("[ArenaMaster] No sprite texture available")
 		return
@@ -171,12 +171,21 @@ func get_interaction_prompt() -> String:
 func _show_tournament_dialogue() -> void:
 	var lines: Array = []
 
+	# Check if player was sent by Varn (meet_the_arena_master quest)
+	var sent_by_varn: bool = QuestManager.is_quest_active("meet_the_arena_master")
+	if sent_by_varn:
+		# Complete the quest objective by notifying QuestManager
+		QuestManager.on_npc_talked("arena_master_bloodsand")
+
 	# Greeting based on fame
 	var fame: int = TournamentManager.arena_fame
 	var fame_title: String = TournamentManager.get_fame_title()
 	var greeting: String
 
-	if fame == 0:
+	if sent_by_varn and fame == 0:
+		# Special greeting for players sent by Varn
+		greeting = "Ah, Varn sent you, did he? That old scarred warrior has a good eye for potential fighters. Welcome to the Bloodsand Arena! Here, glory is won through blood and steel. Think you've got what it takes to survive 5 waves of combat?"
+	elif fame == 0:
 		greeting = "Fresh meat! Welcome to the Bloodsand Arena, stranger. Here, glory is won through blood and steel. Think you've got what it takes to survive 5 waves of combat?"
 	elif fame < 75:
 		greeting = "Back for more, %s? Good. The crowd loves a returning fighter. Ready for another 5 waves?" % fame_title
@@ -496,7 +505,7 @@ func _spawn_corpse() -> void:
 	if randf() < 0.7:
 		corpse.add_item("health_potion", 2, Enums.ItemQuality.AVERAGE)
 	if randf() < 0.5:
-		corpse.add_item("strength_elixir", 1, Enums.ItemQuality.FINE)
+		corpse.add_item("strength_elixir", 1, Enums.ItemQuality.ABOVE_AVERAGE)
 
 
 func _exit_tree() -> void:

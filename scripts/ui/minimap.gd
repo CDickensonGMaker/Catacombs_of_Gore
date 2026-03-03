@@ -82,6 +82,14 @@ const MARKER_COLORS: Dictionary = {
 	MarkerType.PORTAL: Color(0.3, 0.5, 0.9),          # Blue
 }
 
+## PERFORMANCE: Pre-allocated cardinal direction data (avoids per-frame Array allocation)
+const CARDINAL_DIRECTIONS: Array[Dictionary] = [
+	{"label": "N", "base_angle": 0.0},
+	{"label": "E", "base_angle": 1.5707963},  # PI / 2
+	{"label": "S", "base_angle": 3.1415927},  # PI
+	{"label": "W", "base_angle": 4.7123890},  # 3 * PI / 2
+]
+
 ## Components
 var background: ColorRect
 var map_container: Control
@@ -273,30 +281,27 @@ func _draw_room_outlines(_center: Vector2) -> void:
 ## Draw rotating cardinal directions (N/E/S/W) around minimap edge
 ## Directions rotate based on player/camera heading
 func _draw_cardinal_directions(center: Vector2) -> void:
-	if not player:
+	if not player or not is_instance_valid(player):
 		return
 
-	# Get player/camera heading
-	var camera := get_viewport().get_camera_3d()
-	var player_yaw: float = 0.0
-	if camera:
-		player_yaw = -camera.global_rotation.y
+	# PERFORMANCE: Use cached camera from CellStreamer instead of per-frame lookup
+	var camera: Camera3D = null
+	if CellStreamer and CellStreamer.cached_camera and is_instance_valid(CellStreamer.cached_camera):
+		camera = CellStreamer.cached_camera
 	else:
+		camera = get_viewport().get_camera_3d()
+	var player_yaw: float = 0.0
+	if camera and is_instance_valid(camera):
+		player_yaw = -camera.global_rotation.y
+	elif is_instance_valid(player):
 		player_yaw = -player.global_rotation.y
 
-	# Cardinal direction labels and their base angles (0° = North, 90° = East, etc.)
-	var cardinals: Array[Dictionary] = [
-		{"label": "N", "base_angle": 0.0},
-		{"label": "E", "base_angle": PI / 2.0},
-		{"label": "S", "base_angle": PI},
-		{"label": "W", "base_angle": 3.0 * PI / 2.0},
-	]
-
+	# PERFORMANCE: Use pre-allocated constant instead of per-frame Array allocation
 	var radius: float = min(MAP_SIZE.x, MAP_SIZE.y) / 2.0 - 8.0
 	var font := ThemeDB.fallback_font
 	var font_size: int = 10
 
-	for cardinal: Dictionary in cardinals:
+	for cardinal: Dictionary in CARDINAL_DIRECTIONS:
 		var label: String = cardinal["label"]
 		var base_angle: float = cardinal["base_angle"]
 
@@ -317,16 +322,17 @@ func _draw_cardinal_directions(center: Vector2) -> void:
 		draw_string(font, text_pos, label, HORIZONTAL_ALIGNMENT_CENTER, -1, font_size, color)
 
 
+## PERFORMANCE: Pre-allocated marker group info (avoids per-frame Array allocation)
+const MARKER_GROUPS: Array[Dictionary] = [
+	{"group": "chests", "type": "chest"},
+	{"group": "portals", "type": "portal"},
+	{"group": "zone_doors", "type": "portal"},
+]
+
 ## Draw map markers (chests, portals, etc. from scene)
 func _draw_markers(center: Vector2) -> void:
-	# Get markers from scene groups instead of MapTracker
-	var marker_groups: Array[Dictionary] = [
-		{"group": "chests", "type": "chest"},
-		{"group": "portals", "type": "portal"},
-		{"group": "zone_doors", "type": "portal"},
-	]
-
-	for group_info: Dictionary in marker_groups:
+	# PERFORMANCE: Use pre-allocated array instead of creating new one each frame
+	for group_info: Dictionary in MARKER_GROUPS:
 		var group_name: String = group_info["group"]
 		var marker_type: String = group_info["type"]
 		var nodes := get_tree().get_nodes_in_group(group_name)
@@ -359,17 +365,21 @@ func _draw_markers(center: Vector2) -> void:
 
 ## Update player marker position and rotation
 func _update_player_marker() -> void:
-	if not player:
+	if not player or not is_instance_valid(player):
 		return
 
 	# Center of minimap
 	player_marker.position = MAP_SIZE / 2.0 - player_marker.size / 2.0
 
-	# Rotate based on player/camera facing
-	var camera := get_viewport().get_camera_3d()
-	if camera:
-		player_marker.rotation = -camera.global_rotation.y
+	# PERFORMANCE: Use cached camera from CellStreamer instead of per-frame lookup
+	var camera: Camera3D = null
+	if CellStreamer and CellStreamer.cached_camera and is_instance_valid(CellStreamer.cached_camera):
+		camera = CellStreamer.cached_camera
 	else:
+		camera = get_viewport().get_camera_3d()
+	if camera and is_instance_valid(camera):
+		player_marker.rotation = -camera.global_rotation.y
+	elif is_instance_valid(player):
 		player_marker.rotation = -player.global_rotation.y
 
 	player_marker.queue_redraw()
@@ -428,13 +438,32 @@ func _update_entity_markers() -> void:
 
 		var pixel_pos := center + Vector2(rel_cell.x, rel_cell.y) * cell_pixel_size
 
-		# Use symbol marker for enemies (scales with enemy level if available)
-		var size_scale: float = 1.0
-		if enemy.has_method("get_level"):
-			var level: int = enemy.get_level()
-			size_scale = clampf(0.8 + level * 0.02, 0.8, 1.5)  # Scale 0.8 to 1.5
+		# Check if this enemy is a quest target (bounty)
+		var enemy_id_str: String = ""
+		if enemy.has_method("get_enemy_data"):
+			var enemy_data = enemy.get_enemy_data()
+			if enemy_data and "id" in enemy_data:
+				enemy_id_str = enemy_data.id
 
-		var marker := _create_symbol_marker(pixel_pos, MarkerType.ENEMY, size_scale)
+		var marker_type: MarkerType = MarkerType.ENEMY
+		var size_scale: float = 1.0
+
+		# Check if enemy is a quest target
+		if not enemy_id_str.is_empty() and QuestManager:
+			var target_info: Dictionary = QuestManager.is_enemy_quest_target(enemy_id_str)
+			if not target_info.is_empty():
+				# Use quest marker type instead of enemy marker
+				var is_main: bool = target_info.get("is_main", false)
+				marker_type = MarkerType.QUEST_MAIN if is_main else MarkerType.QUEST_SIDE
+				size_scale = 1.2  # Slightly larger for quest targets
+
+		# Use symbol marker for enemies (scales with enemy level if available)
+		if marker_type == MarkerType.ENEMY:
+			if enemy.has_method("get_level"):
+				var level: int = enemy.get_level()
+				size_scale = clampf(0.8 + level * 0.02, 0.8, 1.5)  # Scale 0.8 to 1.5
+
+		var marker := _create_symbol_marker(pixel_pos, marker_type, size_scale)
 		add_child(marker)
 		entity_markers.append(marker)
 
@@ -651,7 +680,7 @@ func _find_quest_giver_world_position(quest) -> Vector3:
 
 
 ## Find world positions of objective targets
-func _find_objective_world_positions(objective, quest) -> Array[Vector3]:
+func _find_objective_world_positions(objective, _quest) -> Array[Vector3]:
 	var positions: Array[Vector3] = []
 
 	match objective.type:

@@ -76,11 +76,18 @@ func can_fast_travel_to(destination_id: String) -> Dictionary:
 		return {"allowed": false, "reason": "Already at this location"}
 
 	# Check if player is in combat
-	if GameManager and GameManager.player and GameManager.player.is_in_combat():
+	if CombatManager.is_in_combat():
 		return {"allowed": false, "reason": "Cannot fast travel during combat"}
+
+	# Check if player is overencumbered
+	if InventoryManager and InventoryManager.is_overencumbered():
+		return {"allowed": false, "reason": "Cannot fast travel while overencumbered"}
 
 	# Check for hostiles nearby (if applicable)
 	# TODO: Add enemy proximity check
+	# Implementation: Query enemies group within ~50 units of player.
+	# If any enemy.is_in_combat or enemy has aggro on player, block fast travel.
+	# Use CombatManager.get_enemies_near(pos, radius) when available.
 
 	return {"allowed": true, "reason": ""}
 
@@ -208,6 +215,10 @@ func _apply_travel_effects(hours: float, speed: TravelSpeed) -> void:
 
 	# Consume food/supplies (future feature)
 	# TODO: Add food consumption during travel
+	# Implementation: Calculate food_required = ceil(hours / 8) for normal survival.
+	# Check InventoryManager.has_item("food_ration", food_required).
+	# If player lacks food, apply hunger debuff or reduce HP on arrival.
+	# Consider adding travel_supplies item type to InventoryManager.
 
 
 ## Check for random encounters during travel
@@ -229,6 +240,8 @@ func _check_for_encounter(speed: TravelSpeed, mode: TravelMode, hours: float) ->
 
 	# Night travel is more dangerous
 	# TODO: Check DayNightCycle for time of day
+	# Implementation: if DayNightCycle.is_night(): chance += 0.10
+	# Also consider: chance *= (1.0 + danger_level * 0.05) for higher danger zones.
 
 	# Longer trips have more encounter opportunities
 	var encounter_checks: int = ceili(hours / 4.0)  # Check every 4 hours
@@ -307,9 +320,12 @@ func _ready() -> void:
 
 ## Load caravan routes from WorldData road registry
 func _load_caravan_routes() -> void:
-	# TODO: Implement caravan route loading from new square grid system
-	# For now, caravan routes are disabled until the new world system is complete
-	print("[FastTravelManager] Caravan routes not yet implemented for square grid system")
+	# TODO: Implement caravan route loading from new WorldGrid system
+	# Implementation: Use WorldGrid.LOCATIONS to build caravan routes between towns.
+	# Roads are now stored in WorldGrid.GRID_DATA with 'R' terrain type.
+	# Create route for each town-to-town road connection found in grid.
+	# Caravan cost based on WorldGrid.grid_distance(from, to).
+	pass  # Caravan routes disabled until WorldGrid integration complete
 
 
 ## Get available caravan destinations from a location
@@ -433,7 +449,7 @@ func travel_by_caravan(from_location: String, to_location: String) -> bool:
 
 
 ## Check for encounter during caravan segment
-func _check_caravan_encounter(danger_tier: String, segment: int) -> bool:
+func _check_caravan_encounter(danger_tier: String, _segment: int) -> bool:
 	var cost_data: Dictionary = CARAVAN_COSTS.get(danger_tier, CARAVAN_COSTS["medium"])
 	var encounter_chance: float = cost_data.encounter_chance
 

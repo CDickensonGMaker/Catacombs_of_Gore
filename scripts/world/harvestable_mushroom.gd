@@ -17,9 +17,9 @@ var has_been_harvested: bool = false
 @export var yield_max: int = 2
 @export var display_name: String = "Mushroom"
 
-## Mushroom textures - will use billboard sprites
+## Mushroom textures - uses actual mushroom sprite
 const MUSHROOM_TEXTURES: Array[String] = [
-	"res://Sprite folders grab bag/autmun bush.png"  # Placeholder until mushroom sprites are created
+	"res://assets/sprites/environment/ground/mushroom.png"
 ]
 
 

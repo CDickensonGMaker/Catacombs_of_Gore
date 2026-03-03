@@ -1,6 +1,6 @@
 {
   "pool_id": "local_news",
-  "description": "LOCAL_NEWS topic responses including generic town happenings, Elder Moor specific news, merchant and trade news, guard patrol updates, weather comments, Temple of Three Gods references, Guild Hall news, local NPC gossip, and archetype-specific responses for priests, civilians, and merchants",
+  "description": "LOCAL_NEWS topic responses including region-specific news. Elder Moor has no guards, no innkeeper, no temple - it's a small logging camp. Temple content requires 'temple' knowledge (Dalhurst+). Guard content requires 'guards' knowledge.",
   "responses": [
     {
       "response_id": "news_generic_1",
@@ -27,19 +27,7 @@
       "conditions": []
     },
     {
-      "response_id": "news_generic_3",
-      "text": "The guards have been more active lately. Must be trouble brewing.",
-      "topic_type": 0,
-      "personality_affinity": ["observant", "nervous"],
-      "min_disposition": 25,
-      "max_disposition": 100,
-      "required_knowledge": [],
-      "weight": 1.0,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "news_generic_4",
+      "response_id": "news_generic_travelers",
       "text": "More travelers passing through than usual. Wonder what's brought them here.",
       "topic_type": 0,
       "personality_affinity": ["curious", "sociable"],
@@ -62,11 +50,48 @@
       "actions": [],
       "conditions": []
     },
+
     {
-      "response_id": "news_eldermoor_1",
-      "text": "The moors have been restless of late. Strange lights in the fog at night. Folk are saying the old spirits are waking.",
+      "response_id": "news_eldermoor_logging_1",
+      "text": "Tharin's got us working double shifts this week. Big order from Dalhurst. Good for the coin, bad for the back.",
       "topic_type": 0,
-      "personality_affinity": ["superstitious", "nervous"],
+      "personality_affinity": ["practical", "tired"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.3,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_eldermoor_logging_2",
+      "text": "The lumber wagons are heading to Dalhurst tomorrow. Anyone got messages for the port, speak up now.",
+      "topic_type": 0,
+      "personality_affinity": ["helpful", "practical"],
+      "min_disposition": 35,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.2,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_eldermoor_logging_3",
+      "text": "Lost another axe to the swamp yesterday. Slipped right out of my hands into the bog. Tharin weren't pleased.",
+      "topic_type": 0,
+      "personality_affinity": ["apologetic", "clumsy"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.1,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_eldermoor_wolves_1",
+      "text": "Wolves got into the goat pen again last night. Third time this month. We need someone to deal with that pack.",
+      "topic_type": 0,
+      "personality_affinity": ["worried", "frustrated"],
       "min_disposition": 30,
       "max_disposition": 100,
       "required_knowledge": ["elder_moor"],
@@ -75,7 +100,127 @@
       "conditions": []
     },
     {
-      "response_id": "news_eldermoor_2",
+      "response_id": "news_eldermoor_wolves_2",
+      "text": "The loggers won't work the north stands anymore. Too many wolf tracks. Says it's not worth dying over timber.",
+      "topic_type": 0,
+      "personality_affinity": ["concerned", "practical"],
+      "min_disposition": 35,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.1,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_eldermoor_goblins_1",
+      "text": "Goblin tracks on the south road yesterday. Bold little beasts, getting closer every day.",
+      "topic_type": 0,
+      "personality_affinity": ["worried", "observant"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.2,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_eldermoor_goblins_2",
+      "text": "Someone needs to thin out those goblins before they get brave enough to raid us proper.",
+      "topic_type": 0,
+      "personality_affinity": ["practical", "frustrated"],
+      "min_disposition": 35,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.1,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_eldermoor_bandits_1",
+      "text": "Another caravan got hit by bandits on the Dalhurst road. Getting so you can't move goods safely.",
+      "topic_type": 0,
+      "personality_affinity": ["worried", "frustrated"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.2,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_eldermoor_bandits_2",
+      "text": "Those bandits are demanding 'protection money' from the traders now. As if we had coin to spare.",
+      "topic_type": 0,
+      "personality_affinity": ["angry", "defiant"],
+      "min_disposition": 35,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.1,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_eldermoor_tharin_1",
+      "text": "Tharin's been in a mood lately. Heard something in his letters from Kazan-Dun upset him. Won't say what.",
+      "topic_type": 0,
+      "personality_affinity": ["curious", "gossipy"],
+      "min_disposition": 40,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.0,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_eldermoor_tharin_2",
+      "text": "Say what you will about dwarves, but Tharin runs a fair operation. Pays on time, doesn't cheat us.",
+      "topic_type": 0,
+      "personality_affinity": ["respectful", "practical"],
+      "min_disposition": 35,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.0,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_eldermoor_home_1",
+      "text": "Been here since the camp was founded. Watched it grow from a few tents to proper buildings. Home, for what it's worth.",
+      "topic_type": 0,
+      "personality_affinity": ["nostalgic", "proud"],
+      "min_disposition": 35,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.0,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_eldermoor_home_2",
+      "text": "Some of us were born here, you know. First generation to call this swamp home. Strange thing to be proud of, but here we are.",
+      "topic_type": 0,
+      "personality_affinity": ["proud", "reflective"],
+      "min_disposition": 40,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.0,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_eldermoor_moors_1",
+      "text": "The moors have been restless of late. Strange lights in the fog at night. Folk are saying the old spirits are waking.",
+      "topic_type": 0,
+      "personality_affinity": ["superstitious", "nervous"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.1,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_eldermoor_moors_2",
       "text": "Elder Moor gets its name from what lies beneath, you know. Old bones. Old magic. Best not to dig too deep in this swamp.",
       "topic_type": 0,
       "personality_affinity": ["superstitious", "knowledgeable"],
@@ -87,10 +232,22 @@
       "conditions": []
     },
     {
-      "response_id": "news_eldermoor_3",
-      "text": "The boardwalks need mending again. Always rotting, what with all the damp. Town council's been squabbling over who pays for it.",
+      "response_id": "news_eldermoor_swamp_weather",
+      "text": "The swamp mists have been thicker than usual. Makes it hard to see the boardwalks. Two folk slipped into the bog just this week.",
       "topic_type": 0,
-      "personality_affinity": ["practical", "grumpy"],
+      "personality_affinity": ["concerned", "observant"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.0,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_eldermoor_supplies_1",
+      "text": "Supply wagon from Dalhurst is late. Hope nothing happened on the road. We're running low on salt.",
+      "topic_type": 0,
+      "personality_affinity": ["worried", "practical"],
       "min_disposition": 30,
       "max_disposition": 100,
       "required_knowledge": ["elder_moor"],
@@ -99,7 +256,141 @@
       "conditions": []
     },
     {
-      "response_id": "news_merchant_1",
+      "response_id": "news_eldermoor_carefree_1",
+      "text": "All this talk of kings and wars... far away problems. We got wolves and goblins to worry about right here.",
+      "topic_type": 0,
+      "personality_affinity": ["practical", "dismissive"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 1.0,
+      "actions": [],
+      "conditions": []
+    },
+
+    {
+      "response_id": "news_rock_collapse_1",
+      "text": "Heard the mountain pass collapsed. Whole section of road just... gone. Going to make trade with the capital difficult.",
+      "topic_type": 0,
+      "personality_affinity": ["concerned", "informed"],
+      "min_disposition": 35,
+      "max_disposition": 100,
+      "required_knowledge": [],
+      "weight": 1.0,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_rock_collapse_2",
+      "text": "The northern route to Falkenhaften is blocked. Some say it was natural, others whisper about sabotage.",
+      "topic_type": 0,
+      "personality_affinity": ["suspicious", "informed"],
+      "min_disposition": 40,
+      "max_disposition": 100,
+      "required_knowledge": [],
+      "weight": 0.9,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_king_missing_1",
+      "text": "There's talk from Falkenhaften... the King hasn't been seen in years. Council says he's meditating, but... forty years?",
+      "topic_type": 0,
+      "personality_affinity": ["curious", "suspicious"],
+      "min_disposition": 40,
+      "max_disposition": 100,
+      "required_knowledge": [],
+      "weight": 0.8,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_king_missing_2",
+      "text": "My cousin in the capital says the throne room's been locked for decades. Nobody sees the King anymore. Makes you wonder.",
+      "topic_type": 0,
+      "personality_affinity": ["gossipy", "suspicious"],
+      "min_disposition": 45,
+      "max_disposition": 100,
+      "required_knowledge": [],
+      "weight": 0.7,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_tegner_1",
+      "text": "Tegner horde's moving again, they say. Pushing north. A hundred years of war, and they just keep coming.",
+      "topic_type": 0,
+      "personality_affinity": ["worried", "informed"],
+      "min_disposition": 35,
+      "max_disposition": 100,
+      "required_knowledge": [],
+      "weight": 0.9,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_tegner_2",
+      "text": "The Tegners call us 'humies,' you know. Like we're something less. They eat their fallen enemies. Monsters in human skin.",
+      "topic_type": 0,
+      "personality_affinity": ["fearful", "hateful"],
+      "min_disposition": 40,
+      "max_disposition": 100,
+      "required_knowledge": [],
+      "weight": 0.8,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_larton_pirates_1",
+      "text": "Ghost pirates have blockaded Larton harbor. Spectral ships that appear at night. Sea trade's at a standstill.",
+      "topic_type": 0,
+      "personality_affinity": ["superstitious", "informed"],
+      "min_disposition": 40,
+      "max_disposition": 100,
+      "required_knowledge": [],
+      "weight": 0.9,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_larton_pirates_2",
+      "text": "They say the ships at Larton are crewed by the dead. Sailors who drowned years ago, come back to haunt the living.",
+      "topic_type": 0,
+      "personality_affinity": ["superstitious", "dramatic"],
+      "min_disposition": 35,
+      "max_disposition": 100,
+      "required_knowledge": [],
+      "weight": 0.8,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_kazandun_1",
+      "text": "Something's wrong in Kazan-Dun. The dwarves have been buying emergency supplies in bulk. Salt, preserved meat, arrows.",
+      "topic_type": 0,
+      "personality_affinity": ["observant", "concerned"],
+      "min_disposition": 40,
+      "max_disposition": 100,
+      "required_knowledge": ["trade"],
+      "weight": 1.0,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_kazandun_2",
+      "text": "A trader from Kazan-Dun let slip that goblins broke through into the lower tunnels. The dwarves are fighting for their home.",
+      "topic_type": 0,
+      "personality_affinity": ["informed", "worried"],
+      "min_disposition": 45,
+      "max_disposition": 100,
+      "required_knowledge": ["trade", "dwarves"],
+      "weight": 0.9,
+      "actions": [],
+      "conditions": []
+    },
+
+    {
+      "response_id": "news_merchant_caravan",
       "text": "A caravan came in from Dalhurst yesterday. Fresh goods, fair prices. Won't last long though.",
       "topic_type": 0,
       "personality_affinity": ["mercantile", "helpful"],
@@ -111,7 +402,7 @@
       "conditions": []
     },
     {
-      "response_id": "news_merchant_2",
+      "response_id": "news_merchant_roads",
       "text": "The roads have been dangerous lately. Fewer merchants coming through means higher prices for everyone.",
       "topic_type": 0,
       "personality_affinity": ["practical", "concerned"],
@@ -122,92 +413,46 @@
       "actions": [],
       "conditions": []
     },
+
     {
-      "response_id": "news_merchant_3",
-      "text": "Word is a merchant from the desert camp is setting up shop. Exotic goods, if you've got the coin for it.",
-      "topic_type": 0,
-      "personality_affinity": ["curious", "mercantile"],
-      "min_disposition": 40,
-      "max_disposition": 100,
-      "required_knowledge": ["trade"],
-      "weight": 1.0,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "news_guard_1",
+      "response_id": "news_guard_activity",
       "text": "The guard captain's doubled the night watch. Something's got the higher-ups spooked.",
       "topic_type": 0,
       "personality_affinity": ["observant", "suspicious"],
       "min_disposition": 35,
       "max_disposition": 100,
-      "required_knowledge": [],
+      "required_knowledge": ["guards"],
       "weight": 1.0,
       "actions": [],
       "conditions": []
     },
     {
-      "response_id": "news_guard_2",
+      "response_id": "news_guard_thief",
       "text": "Guards caught a thief near the market square last night. Threw him in the stockade. Serves him right.",
       "topic_type": 0,
       "personality_affinity": ["law-abiding", "satisfied"],
       "min_disposition": 30,
       "max_disposition": 100,
-      "required_knowledge": [],
+      "required_knowledge": ["guards"],
       "weight": 1.0,
       "actions": [],
       "conditions": []
     },
     {
-      "response_id": "news_guard_3",
-      "text": "Patrol found tracks in the swamp. Big ones. They're being tight-lipped about it, which worries me more than if they'd just told us.",
+      "response_id": "news_guard_patrol",
+      "text": "Patrol found tracks in the swamp. Big ones. They're being tight-lipped about it, which worries me more.",
       "topic_type": 0,
       "personality_affinity": ["worried", "observant"],
       "min_disposition": 40,
       "max_disposition": 100,
-      "required_knowledge": [],
+      "required_knowledge": ["guards"],
       "weight": 1.0,
       "actions": [],
       "conditions": []
     },
+
     {
-      "response_id": "news_weather_1",
-      "text": "This weather has everyone on edge. Hard to work when the skies won't cooperate.",
-      "topic_type": 0,
-      "personality_affinity": ["practical", "concerned"],
-      "min_disposition": 30,
-      "max_disposition": 100,
-      "required_knowledge": [],
-      "weight": 1.0,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "news_weather_2",
-      "text": "The old-timers say weather like this means something dark is stirring.",
-      "topic_type": 0,
-      "personality_affinity": ["superstitious", "worried"],
-      "min_disposition": 35,
-      "max_disposition": 100,
-      "required_knowledge": [],
-      "weight": 1.0,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "news_weather_3",
-      "text": "The swamp mists have been thicker than usual. Makes it hard to see the boardwalks. Two folk slipped into the bog just this week.",
-      "topic_type": 0,
-      "personality_affinity": ["concerned", "observant"],
-      "min_disposition": 30,
-      "max_disposition": 100,
-      "required_knowledge": ["elder_moor"],
-      "weight": 1.1,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "news_weather_4",
+      "response_id": "news_weather_crops",
       "text": "The rains have been good to us. The harvest should be plentiful, if Gaela smiles on us.",
       "topic_type": 0,
       "personality_affinity": ["optimistic", "devout"],
@@ -219,56 +464,8 @@
       "conditions": []
     },
     {
-      "response_id": "news_temple_1",
-      "text": "The Temple of Three Gods has been busy lately. More folk seeking blessings than I've seen in years. Troubled times bring folk to prayer, I suppose.",
-      "topic_type": 0,
-      "personality_affinity": ["observant", "devout"],
-      "min_disposition": 35,
-      "max_disposition": 100,
-      "required_knowledge": [],
-      "weight": 1.0,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "news_temple_2",
-      "text": "The priests of Chronos have been making pronouncements about the turning of ages. Cryptic stuff, but folk are listening.",
-      "topic_type": 0,
-      "personality_affinity": ["curious", "nervous"],
-      "min_disposition": 35,
-      "max_disposition": 100,
-      "required_knowledge": ["religion"],
-      "weight": 1.0,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "news_temple_3",
-      "text": "Gaela's shrine at the temple has been overflowing with offerings. Farmers want a good harvest after last year's blight.",
-      "topic_type": 0,
-      "personality_affinity": ["devout", "practical"],
-      "min_disposition": 30,
-      "max_disposition": 100,
-      "required_knowledge": ["religion"],
-      "weight": 1.0,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "news_temple_4",
-      "text": "Someone was found dead near the temple. Natural causes, they say, but the Morthane priests took a keen interest. Something about unfinished business with the cycle.",
-      "topic_type": 0,
-      "personality_affinity": ["gossipy", "morbid"],
-      "min_disposition": 40,
-      "max_disposition": 100,
-      "required_knowledge": ["religion"],
-      "weight": 0.9,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "news_temple_5",
-      "text": "The temple bell rang at midnight last fortnight. Priests won't say why. Some say it was a warning from the Three.",
+      "response_id": "news_weather_ominous",
+      "text": "The old-timers say weather like this means something dark is stirring.",
       "topic_type": 0,
       "personality_affinity": ["superstitious", "worried"],
       "min_disposition": 35,
@@ -278,8 +475,82 @@
       "actions": [],
       "conditions": []
     },
+
     {
-      "response_id": "news_guild_1",
+      "response_id": "news_temple_busy",
+      "text": "The Temple of Three Gods has been busy lately. More folk seeking blessings than I've seen in years.",
+      "topic_type": 0,
+      "personality_affinity": ["observant", "devout"],
+      "min_disposition": 35,
+      "max_disposition": 100,
+      "required_knowledge": ["temple"],
+      "weight": 1.0,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_temple_chronos",
+      "text": "The priests of Chronos have been making pronouncements about the turning of ages. Cryptic stuff, but folk are listening.",
+      "topic_type": 0,
+      "personality_affinity": ["curious", "nervous"],
+      "min_disposition": 35,
+      "max_disposition": 100,
+      "required_knowledge": ["temple", "religion"],
+      "weight": 1.0,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_temple_gaela",
+      "text": "Gaela's shrine at the temple has been overflowing with offerings. Farmers want a good harvest after last year's blight.",
+      "topic_type": 0,
+      "personality_affinity": ["devout", "practical"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["temple", "religion"],
+      "weight": 1.0,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_temple_morthane",
+      "text": "Someone was found dead near the temple. Natural causes, they say, but the Morthane priests took a keen interest.",
+      "topic_type": 0,
+      "personality_affinity": ["gossipy", "morbid"],
+      "min_disposition": 40,
+      "max_disposition": 100,
+      "required_knowledge": ["temple", "religion"],
+      "weight": 0.9,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_temple_bell",
+      "text": "The temple bell rang at midnight last fortnight. Priests won't say why. Some say it was a warning from the Three.",
+      "topic_type": 0,
+      "personality_affinity": ["superstitious", "worried"],
+      "min_disposition": 35,
+      "max_disposition": 100,
+      "required_knowledge": ["temple"],
+      "weight": 1.0,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_need_temple",
+      "text": "We could use a proper temple out here. As it is, you have to go all the way to Dalhurst for religious services.",
+      "topic_type": 0,
+      "personality_affinity": ["devout", "practical"],
+      "min_disposition": 35,
+      "max_disposition": 100,
+      "required_knowledge": ["elder_moor"],
+      "weight": 0.9,
+      "actions": [],
+      "conditions": []
+    },
+
+    {
+      "response_id": "news_guild_contracts",
       "text": "The Guild Hall's been posting new contracts. Dangerous work, but pays well if you've got the skills.",
       "topic_type": 0,
       "personality_affinity": ["adventurous", "practical"],
@@ -291,7 +562,7 @@
       "conditions": []
     },
     {
-      "response_id": "news_guild_2",
+      "response_id": "news_guild_recruits",
       "text": "Word at the Guild Hall is they're looking for new blood. Not enough hands for all the work coming in.",
       "topic_type": 0,
       "personality_affinity": ["helpful", "sociable"],
@@ -302,33 +573,10 @@
       "actions": [],
       "conditions": []
     },
+
     {
-      "response_id": "news_guild_3",
-      "text": "Two guild members came back from a job last night, looking rough. Whatever they found out there, they're not talking about it.",
-      "topic_type": 0,
-      "personality_affinity": ["observant", "curious"],
-      "min_disposition": 35,
-      "max_disposition": 100,
-      "required_knowledge": ["guild"],
-      "weight": 1.0,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "news_guild_4",
-      "text": "The Guild Hall raised their rates for monster bounties. Either there's more coin flowing, or the monsters are getting worse.",
-      "topic_type": 0,
-      "personality_affinity": ["mercantile", "cautious"],
-      "min_disposition": 35,
-      "max_disposition": 100,
-      "required_knowledge": ["guild"],
-      "weight": 1.0,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "news_gossip_1",
-      "text": "Old Henrick at the tavern's been drinking more than usual. Says he's seen things in the swamp. Nobody takes him seriously anymore.",
+      "response_id": "news_gossip_drunk",
+      "text": "Old Henrick's been drinking more than usual. Says he's seen things in the swamp. Nobody takes him seriously anymore.",
       "topic_type": 0,
       "personality_affinity": ["gossipy", "dismissive"],
       "min_disposition": 30,
@@ -339,8 +587,8 @@
       "conditions": []
     },
     {
-      "response_id": "news_gossip_2",
-      "text": "The blacksmith's daughter ran off with a traveling bard. Her father's been in a foul mood ever since. I'd wait a few days before bringing him business.",
+      "response_id": "news_gossip_blacksmith",
+      "text": "The blacksmith's daughter ran off with a traveling bard. Her father's been in a foul mood ever since.",
       "topic_type": 0,
       "personality_affinity": ["gossipy", "helpful"],
       "min_disposition": 35,
@@ -350,68 +598,34 @@
       "actions": [],
       "conditions": []
     },
+
     {
-      "response_id": "news_gossip_3",
-      "text": "The innkeeper's been asking questions about strangers. Acting on behalf of someone, but won't say who. Watch what you say around him.",
-      "topic_type": 0,
-      "personality_affinity": ["suspicious", "secretive"],
-      "min_disposition": 45,
-      "max_disposition": 100,
-      "required_knowledge": [],
-      "weight": 1.0,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "news_gossip_4",
-      "text": "The alchemist has been ordering strange ingredients. Nightshade, bone dust, that sort of thing. Folk are starting to wonder what he's brewing.",
-      "topic_type": 0,
-      "personality_affinity": ["curious", "suspicious"],
-      "min_disposition": 40,
-      "max_disposition": 100,
-      "required_knowledge": ["occult"],
-      "weight": 1.0,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "news_gossip_5",
-      "text": "The mayor's been having visitors at odd hours. Hooded types who come and go before dawn. Politics, or something darker? Who can say.",
-      "topic_type": 0,
-      "personality_affinity": ["observant", "suspicious"],
-      "min_disposition": 50,
-      "max_disposition": 100,
-      "required_knowledge": [],
-      "weight": 0.9,
-      "actions": [],
-      "conditions": []
-    },
-    {
-      "response_id": "news_priest_1",
+      "response_id": "news_priest_offerings",
       "text": "The faithful have been generous of late. The temple's coffers are full, and we've been able to help more of the needy.",
       "topic_type": 0,
       "personality_affinity": ["devout", "generous"],
       "min_disposition": 35,
       "max_disposition": 100,
-      "required_knowledge": ["religion"],
+      "required_knowledge": ["temple", "religion"],
       "weight": 1.0,
       "actions": [],
       "conditions": []
     },
     {
-      "response_id": "news_priest_2",
+      "response_id": "news_priest_guidance",
       "text": "We've had more souls seeking guidance lately. The Three are testing us all, it seems. But faith endures.",
       "topic_type": 0,
       "personality_affinity": ["devout", "wise"],
       "min_disposition": 30,
       "max_disposition": 100,
-      "required_knowledge": ["religion"],
+      "required_knowledge": ["temple", "religion"],
       "weight": 1.0,
       "actions": [],
       "conditions": []
     },
+
     {
-      "response_id": "news_civilian_1",
+      "response_id": "news_civilian_bread",
       "text": "Just trying to get by, same as everyone else. The price of bread's gone up again, but what can you do?",
       "topic_type": 0,
       "personality_affinity": ["practical", "resigned"],
@@ -423,8 +637,8 @@
       "conditions": []
     },
     {
-      "response_id": "news_civilian_2",
-      "text": "My cousin in Dalhurst says trade's been good there. Makes you wonder if we'd be better off leaving the moor.",
+      "response_id": "news_civilian_dalhurst",
+      "text": "My cousin in Dalhurst says trade's been good there. Makes you wonder if we'd be better off leaving.",
       "topic_type": 0,
       "personality_affinity": ["discontented", "dreamy"],
       "min_disposition": 35,
@@ -434,14 +648,113 @@
       "actions": [],
       "conditions": []
     },
+
     {
-      "response_id": "news_merchant_archetype_1",
-      "text": "Business has been steady. Not booming, but steady. I'll take that over excitement any day - excitement usually means trouble.",
+      "response_id": "news_dalhurst_trade",
+      "text": "Trade's been steady at the harbor. Ships from up and down the coast. Dalhurst thrives while other towns struggle.",
       "topic_type": 0,
-      "personality_affinity": ["practical", "mercantile"],
+      "personality_affinity": ["mercantile", "proud"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["dalhurst"],
+      "weight": 1.2,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_dalhurst_harbor_master",
+      "text": "The Harbor Master's tightened regulations again. Everything must be documented now. Good for order, bad for... flexibility.",
+      "topic_type": 0,
+      "personality_affinity": ["practical", "frustrated"],
       "min_disposition": 35,
       "max_disposition": 100,
-      "required_knowledge": ["trade"],
+      "required_knowledge": ["dalhurst"],
+      "weight": 1.1,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_dalhurst_smuggling",
+      "text": "They've caught another smuggling ring down at the docks. Third one this month. The Harbor Master's cracking down hard.",
+      "topic_type": 0,
+      "personality_affinity": ["observant", "gossipy"],
+      "min_disposition": 40,
+      "max_disposition": 100,
+      "required_knowledge": ["dalhurst"],
+      "weight": 1.0,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_dalhurst_eldermoor",
+      "text": "Another wagon of timber from Elder Moor came in. Those backwoods loggers keep the shipyards running, I suppose.",
+      "topic_type": 0,
+      "personality_affinity": ["condescending", "mercantile"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["dalhurst"],
+      "weight": 1.0,
+      "actions": [],
+      "conditions": []
+    },
+
+    {
+      "response_id": "news_thornfield_crops",
+      "text": "The western fields are doing poorly this year. Something in the soil, or maybe the curse folk whisper about.",
+      "topic_type": 0,
+      "personality_affinity": ["worried", "superstitious"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["thornfield"],
+      "weight": 1.2,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_thornfield_collapse",
+      "text": "We're closer to the collapse than most realize. You can still hear rocks falling sometimes. The whole mountain is unstable.",
+      "topic_type": 0,
+      "personality_affinity": ["nervous", "observant"],
+      "min_disposition": 35,
+      "max_disposition": 100,
+      "required_knowledge": ["thornfield"],
+      "weight": 1.1,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_thornfield_bandits",
+      "text": "Bandits hit old Cedric's farm again. Took half his harvest. He's talking about leaving, and who can blame him?",
+      "topic_type": 0,
+      "personality_affinity": ["sympathetic", "worried"],
+      "min_disposition": 35,
+      "max_disposition": 100,
+      "required_knowledge": ["thornfield"],
+      "weight": 1.0,
+      "actions": [],
+      "conditions": []
+    },
+
+    {
+      "response_id": "news_millbrook_peaceful",
+      "text": "Millbrook's been quiet lately. Too quiet, some say. But the mayor assures us everything's fine.",
+      "topic_type": 0,
+      "personality_affinity": ["observant", "naive"],
+      "min_disposition": 30,
+      "max_disposition": 100,
+      "required_knowledge": ["millbrook"],
+      "weight": 1.0,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "news_millbrook_strangers",
+      "text": "Lot of rough-looking strangers in Millbrook lately. The mayor says they're just traders, but they don't look like traders to me.",
+      "topic_type": 0,
+      "personality_affinity": ["suspicious", "observant"],
+      "min_disposition": 40,
+      "max_disposition": 100,
+      "required_knowledge": ["millbrook"],
       "weight": 1.0,
       "actions": [],
       "conditions": []

@@ -5,10 +5,6 @@
 [ext_resource type="Script" path="res://scripts/dialogue/dialogue_action.gd" id="3_action"]
 [ext_resource type="Script" path="res://scripts/dialogue/dialogue_condition.gd" id="4_cond"]
 
-# =============================================================================
-# DUNGEON RUMORS
-# =============================================================================
-
 [sub_resource type="Resource" id="rumor_dungeon_1"]
 script = ExtResource("2_resp")
 text = "They say {dungeon_name} has been stirring again. Lights in the depths, unnatural sounds..."
@@ -60,10 +56,6 @@ weight = 0.9
 actions = []
 conditions = []
 response_id = "rumor_dungeon_4"
-
-# =============================================================================
-# TREASURE RUMORS
-# =============================================================================
 
 [sub_resource type="Resource" id="rumor_treasure_1"]
 script = ExtResource("2_resp")
@@ -117,10 +109,6 @@ actions = []
 conditions = []
 response_id = "rumor_treasure_4"
 
-# =============================================================================
-# DANGER WARNINGS
-# =============================================================================
-
 [sub_resource type="Resource" id="rumor_danger_1"]
 script = ExtResource("2_resp")
 text = "Stay off the roads after dark. There are things out there... things that hunt."
@@ -173,10 +161,6 @@ actions = []
 conditions = []
 response_id = "rumor_danger_4"
 
-# =============================================================================
-# HOSTILE/DISMISSIVE RUMORS
-# =============================================================================
-
 [sub_resource type="Resource" id="rumor_hostile_1"]
 script = ExtResource("2_resp")
 text = "Rumors? I've heard plenty. None I'd share with the likes of you."
@@ -215,10 +199,6 @@ weight = 0.7
 actions = []
 conditions = []
 response_id = "rumor_none"
-
-# =============================================================================
-# MONSTER SIGHTINGS
-# =============================================================================
 
 [sub_resource type="Resource" id="rumor_monster_1"]
 script = ExtResource("2_resp")
@@ -272,10 +252,6 @@ actions = []
 conditions = []
 response_id = "rumor_monster_4"
 
-# =============================================================================
-# MYSTERIOUS HAPPENINGS
-# =============================================================================
-
 [sub_resource type="Resource" id="rumor_mystery_1"]
 script = ExtResource("2_resp")
 text = "The old well in the square has been singing at midnight. Not wind through the stones - actual singing."
@@ -327,10 +303,6 @@ weight = 0.9
 actions = []
 conditions = []
 response_id = "rumor_mystery_4"
-
-# =============================================================================
-# QUEST HOOKS (with DialogueAction to set flags)
-# =============================================================================
 
 [sub_resource type="Resource" id="action_set_flag_lost_heirloom"]
 script = ExtResource("3_action")
@@ -420,10 +392,6 @@ actions = [SubResource("action_set_flag_cult_investigation")]
 conditions = []
 response_id = "rumor_quest_4"
 
-# =============================================================================
-# CONDITIONAL RESPONSES (require specific flags or high disposition)
-# =============================================================================
-
 [sub_resource type="Resource" id="cond_high_disposition"]
 script = ExtResource("4_cond")
 type = 0
@@ -507,10 +475,6 @@ weight = 0.9
 actions = []
 conditions = [SubResource("cond_flag_not_heard_mine")]
 response_id = "rumor_conditional_mine"
-
-# =============================================================================
-# NAMED LOCATION RUMORS (Real explorable locations with treasure)
-# =============================================================================
 
 [sub_resource type="Resource" id="rumor_watchtower_1"]
 script = ExtResource("2_resp")
@@ -629,10 +593,6 @@ actions = []
 conditions = []
 response_id = "rumor_mine_3"
 
-# =============================================================================
-# ELDER MOOR / SWAMP RUMORS
-# =============================================================================
-
 [sub_resource type="Resource" id="rumor_elder_moor_1"]
 script = ExtResource("2_resp")
 text = "Strange lights have been seen floating over the moor at night. Will-o-wisps, the old folk call them. Follow one and you'll never find your way back."
@@ -684,10 +644,6 @@ weight = 0.9
 actions = []
 conditions = []
 response_id = "rumor_elder_moor_4"
-
-# =============================================================================
-# KAZAN-DUN DWARF HOLD RUMORS
-# =============================================================================
 
 [sub_resource type="Resource" id="rumor_kazan_dun_1"]
 script = ExtResource("2_resp")
@@ -741,10 +697,6 @@ actions = []
 conditions = []
 response_id = "rumor_kazan_dun_4"
 
-# =============================================================================
-# DESERT CAMP RUMORS
-# =============================================================================
-
 [sub_resource type="Resource" id="rumor_desert_camp_1"]
 script = ExtResource("2_resp")
 text = "There's a nomad camp in the southern desert, near a small oasis. Strange folk - they worship the sun and trade in exotic spices. But they know the desert's secrets better than anyone."
@@ -783,10 +735,6 @@ weight = 1.0
 actions = []
 conditions = []
 response_id = "rumor_desert_camp_3"
-
-# =============================================================================
-# ELVEN CITY RUMORS
-# =============================================================================
 
 [sub_resource type="Resource" id="rumor_elven_city_1"]
 script = ExtResource("2_resp")
@@ -839,10 +787,6 @@ weight = 1.0
 actions = []
 conditions = []
 response_id = "rumor_elven_city_4"
-
-# =============================================================================
-# SEA, GHOST SHIPS, AND SEA MONSTER RUMORS
-# =============================================================================
 
 [sub_resource type="Resource" id="rumor_ghost_ship_1"]
 script = ExtResource("2_resp")
@@ -922,10 +866,6 @@ actions = []
 conditions = []
 response_id = "rumor_island_ruins_1"
 
-# =============================================================================
-# DALHURST AND TRADE ROUTE RUMORS
-# =============================================================================
-
 [sub_resource type="Resource" id="rumor_dalhurst_1"]
 script = ExtResource("2_resp")
 text = "Dalhurst is the biggest trading hub in the region. Every road leads there eventually. If you're looking to buy or sell, that's the place. Just watch your purse - the thieves guild runs strong there."
@@ -951,10 +891,6 @@ weight = 1.0
 actions = []
 conditions = []
 response_id = "rumor_dalhurst_2"
-
-# =============================================================================
-# DANGEROUS CREATURE RUMORS
-# =============================================================================
 
 [sub_resource type="Resource" id="rumor_creature_1"]
 script = ExtResource("2_resp")
@@ -1007,10 +943,6 @@ weight = 1.0
 actions = []
 conditions = []
 response_id = "rumor_creature_4"
-
-# =============================================================================
-# HIDDEN TREASURE LOCATION RUMORS
-# =============================================================================
 
 [sub_resource type="Resource" id="rumor_hidden_treasure_1"]
 script = ExtResource("2_resp")

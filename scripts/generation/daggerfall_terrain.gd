@@ -1,6 +1,9 @@
 ## daggerfall_terrain.gd - Seamless terrain generation using world-space noise
 ## Creates continuous terrain across cell boundaries
 ## Heights are deterministic based on world coordinates
+##
+## ACTIVE: Used by WildernessRoom._create_heightmap_terrain() when use_heightmap=true
+## Cells that are NOT roads and NOT adjacent to hand-crafted scenes use this terrain.
 class_name DaggerfallTerrain
 extends RefCounted
 

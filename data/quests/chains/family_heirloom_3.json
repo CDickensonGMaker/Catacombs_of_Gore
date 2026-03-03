@@ -1,0 +1,35 @@
+{
+	"id": "family_heirloom_3",
+	"title": "Return the Heirloom",
+	"description": "You found the ring! Return it to the old woman in Elder Moor. Be careful not to lose or sell it.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "common_folk",
+	"objectives": [
+		{
+			"id": "return_ring",
+			"description": "Return the ring to the old woman",
+			"type": "talk",
+			"target": "elder_moor_civilian",
+			"target_zone": "elder_moor",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "elder_moor_civilian",
+	"turn_in_zone": "elder_moor",
+	"rewards": {
+		"gold": 100,
+		"xp": 200,
+		"items": [],
+		"faction_reputation": {
+			"common_folk": 20
+		}
+	},
+	"prerequisites": ["family_heirloom_2"],
+	"next_quest": "",
+	"quest_items": ["gold_ring"]
+}

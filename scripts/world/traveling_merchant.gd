@@ -121,7 +121,7 @@ func _setup_visuals() -> void:
 	sprite.name = "MerchantSprite"
 
 	# Try to load a merchant sprite, fallback to generic NPC
-	var merchant_tex: Texture2D = load("res://Sprite folders grab bag/3x4humanbandit.png")
+	var merchant_tex: Texture2D = load("res://assets/sprites/enemies/humanoid/human_bandit_alt.png")
 	if merchant_tex:
 		sprite.texture = merchant_tex
 		sprite.hframes = 4
@@ -149,7 +149,7 @@ func _create_cart() -> void:
 	add_child(cart)
 
 	# Load wood texture
-	var wood_tex: Texture2D = load("res://Sprite folders grab bag/wood wall.png")
+	var wood_tex: Texture2D = load("res://assets/textures/environment/walls/wood.png")
 
 	# Cart body (wooden box)
 	cart_body = CSGBox3D.new()
@@ -536,22 +536,22 @@ func get_effective_merchant_id() -> String:
 	return merchant_name.to_lower().replace(" ", "_")
 
 
-## Get dialogue-based price modifier from DialogueManager flags
+## Get dialogue-based price modifier from ConversationSystem flags
 ## Returns a multiplier: <1.0 = discount, >1.0 = markup
 func get_dialogue_price_modifier() -> float:
 	var mid := get_effective_merchant_id()
 	var modifier := 1.0
 
 	# Check for temporary discounts (from successful dialogue checks)
-	if DialogueManager.has_flag(mid + "_haggle_success"):
+	if ConversationSystem.has_flag(mid + "_haggle_success"):
 		modifier -= 0.10
-	if DialogueManager.has_flag(mid + "_intimidate_success"):
+	if ConversationSystem.has_flag(mid + "_intimidate_success"):
 		modifier -= 0.15
 
 	# Check for permanent relationship modifiers
-	if DialogueManager.has_flag(mid + "_befriend"):
+	if ConversationSystem.has_flag(mid + "_befriend"):
 		modifier -= 0.05
-	if DialogueManager.has_flag(mid + "_angered"):
+	if ConversationSystem.has_flag(mid + "_angered"):
 		modifier += 0.20
 
 	return maxf(0.5, modifier)

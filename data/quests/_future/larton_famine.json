@@ -1,0 +1,43 @@
+{
+	"id": "larton_famine",
+	"title": "The Starving Coast",
+	"description": "The coastal town of Larton, south of the great mountain range, is facing starvation. Something in the western bay is disrupting the fishing - boats that venture too far don't return, and those that stay close catch nothing. The town desperately needs someone to investigate the bay and find out what's killing their livelihood.",
+	"is_main_quest": false,
+	"quest_source": "npc",
+	"giver_npc_id": "larton_mayor",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "larton",
+	"objectives": [
+		{
+			"id": "speak_fishermen",
+			"description": "Speak with the fishermen about what they've seen",
+			"type": "talk",
+			"target": "larton_fisherman",
+			"required_count": 2
+		},
+		{
+			"id": "investigate_bay",
+			"description": "Investigate the western bay",
+			"type": "reach",
+			"target": "western_bay",
+			"required_count": 1
+		},
+		{
+			"id": "discover_threat",
+			"description": "Discover what threatens the bay",
+			"type": "interact",
+			"target": "bay_threat_evidence",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "larton_mayor",
+	"turn_in_zone": "larton",
+	"rewards": {
+		"gold": 100,
+		"xp": 300,
+		"items": []
+	},
+	"prerequisites": [],
+	"next_quest": "bay_menace"
+}

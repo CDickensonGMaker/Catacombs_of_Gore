@@ -90,7 +90,7 @@ func _create_visual() -> void:
 		tex = load("res://assets/sprites/enemies/human_bandit.png") as Texture2D
 
 	if not tex:
-		tex = load("res://Sprite folders grab bag/man_civilian.png") as Texture2D
+		tex = load("res://assets/sprites/npcs/civilians/man_civilian.png") as Texture2D
 
 	if not tex:
 		push_warning("[GladiatorNPC] No sprite texture available")
@@ -98,8 +98,9 @@ func _create_visual() -> void:
 
 	billboard = BillboardSprite.new()
 	billboard.sprite_sheet = tex
-	billboard.h_frames = 3
-	billboard.v_frames = 4
+	# human_bandit.png is a single image (1x1), other sprites may vary
+	billboard.h_frames = 1
+	billboard.v_frames = 1
 	billboard.pixel_size = 0.01
 	billboard.idle_frames = 3
 	billboard.walk_frames = 3
@@ -244,7 +245,7 @@ func take_damage(amount: int, damage_type: Enums.DamageType = Enums.DamageType.P
 		return 0
 
 	# Apply armor reduction
-	var reduced_amount: int = maxi(1, amount - (armor_value / 4))
+	var reduced_amount: int = maxi(1, amount - int(armor_value / 4))
 	var actual_damage: int = mini(reduced_amount, current_hp)
 	current_hp -= actual_damage
 

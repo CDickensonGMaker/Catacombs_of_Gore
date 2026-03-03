@@ -1,6 +1,9 @@
 ## marching_squares.gd - 2D mesh generation from boolean grid using marching squares algorithm
 ## Generates smooth floor/ceiling meshes from cellular automata cave data
 ## Maintains PS1 aesthetic with low-poly output
+##
+## TODO: [INACTIVE] This mesh generation system is complete but not integrated.
+## Future work: Use for cave/dungeon floor/ceiling mesh generation.
 class_name MarchingSquares
 extends RefCounted
 

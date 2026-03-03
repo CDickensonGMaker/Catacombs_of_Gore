@@ -22,37 +22,37 @@ var interaction_area: Area3D
 ## Target height for humanoids in units (roughly 1.8m)
 const TARGET_HEIGHT := 2.46
 
-## Per-sprite pixel sizes calculated from: pixel_size = TARGET_HEIGHT / frame_height
-## These values normalize all sprites to the same in-game height
-const PIXEL_SIZE_MAN := 0.0384       # 64px frame height
-const PIXEL_SIZE_LADY_RED := 0.0182  # 135px frame height
-const PIXEL_SIZE_WIZARD := 0.0189    # 130px frame height
-const PIXEL_SIZE_BARMAID_BLONDE := 0.0189  # 130px frame height
-const PIXEL_SIZE_BARMAID_BRUNETTE := 0.0234  # 105px frame height
+## Per-sprite pixel sizes - calculated from TARGET_HEIGHT / frame_height
+## Most sprites are 96px tall, target height 2.46 units = 0.0256 pixel_size
+const PIXEL_SIZE_MAN := 0.0256              # 96px frame, 2.46m target
+const PIXEL_SIZE_LADY_RED := 0.0256         # 96px frame, 2.46m target
+const PIXEL_SIZE_WIZARD := 0.0256           # 96px frame, 2.46m target
+const PIXEL_SIZE_BARMAID_BLONDE := 0.0256   # 96px frame, 2.46m target
+const PIXEL_SIZE_BARMAID_BRUNETTE := 0.0256 # 96px frame, 2.46m target
 ## Dwarf sprites are shorter and stockier - roughly 75% of human height
 const DWARF_TARGET_HEIGHT := 1.85  # Dwarves are shorter
-const PIXEL_SIZE_DWARF := 0.029    # 64px frame height, shorter stature
+const PIXEL_SIZE_DWARF := 0.0193            # 96px frame, 1.85m target (shorter)
 
-## New civilian sprite pixel sizes (2-4 frame reference sheets)
-const PIXEL_SIZE_GUY_CIVILIAN := 0.0164     # 150px frame height
-const PIXEL_SIZE_PINK_LADY := 0.0164        # 150px frame height
-const PIXEL_SIZE_MAGIC_SHOP := 0.0137       # 180px frame height
-const PIXEL_SIZE_SEDUCTRESS := 0.0154       # 160px frame height
-const PIXEL_SIZE_SEDUCTRESS2 := 0.0145      # 170px frame height
+## New civilian sprite pixel sizes - 96px frame height
+const PIXEL_SIZE_GUY_CIVILIAN := 0.0256     # 96px frame, 2.46m target
+const PIXEL_SIZE_PINK_LADY := 0.0256        # 96px frame, 2.46m target
+const PIXEL_SIZE_MAGIC_SHOP := 0.0256       # 96px frame, 2.46m target
+const PIXEL_SIZE_SEDUCTRESS := 0.0256       # 96px frame, 2.46m target
+const PIXEL_SIZE_SEDUCTRESS2 := 0.0256      # 96px frame, 2.46m target
 
-## Newer single-frame reference sprites (~200-250px)
-const PIXEL_SIZE_NOBLE := 0.0123            # ~200px frame height
-const PIXEL_SIZE_GLADIATOR := 0.0115        # ~215px frame height
-const PIXEL_SIZE_HUNTER := 0.0123           # ~200px frame height
-const PIXEL_SIZE_GUARD_CIV := 0.0110        # ~225px frame height
-const PIXEL_SIZE_WIZARD_CIV := 0.0115       # ~215px frame height
-const PIXEL_SIZE_BARD := 0.0123             # ~200px frame height
-const PIXEL_SIZE_MERCHANT := 0.0115         # ~215px frame height
-const PIXEL_SIZE_BANDIT := 0.0120           # ~205px frame height
+## Newer single-frame reference sprites - 96px frame height
+const PIXEL_SIZE_NOBLE := 0.0256            # 96px frame, 2.46m target
+const PIXEL_SIZE_GLADIATOR := 0.0256        # 96px frame, 2.46m target
+const PIXEL_SIZE_HUNTER := 0.0256           # 96px frame, 2.46m target
+const PIXEL_SIZE_GUARD_CIV := 0.0256        # 96px frame, 2.46m target
+const PIXEL_SIZE_WIZARD_CIV := 0.0256       # 96px frame, 2.46m target
+const PIXEL_SIZE_BARD := 0.0256             # 96px frame, 2.46m target
+const PIXEL_SIZE_MERCHANT := 0.0256         # 96px frame, 2.46m target
+const PIXEL_SIZE_BANDIT := 0.0256           # 96px frame, 2.46m target
 
 var sprite_texture: Texture2D
-var sprite_h_frames: int = 8  # Default for most civilian sprites
-var sprite_v_frames: int = 3  # Default for most civilian sprites
+var sprite_h_frames: int = 1  # Default: single frame (48x96 sprites)
+var sprite_v_frames: int = 1  # Default: single frame (48x96 sprites)
 var sprite_pixel_size: float = PIXEL_SIZE_MAN  # Default to man size
 var sprite_offset_y: float = 0.0  # Vertical offset adjustment
 
@@ -77,6 +77,42 @@ var alignment: int = 0
 
 ## Region this NPC belongs to (for bounty checks)
 var region: String = ""
+
+## Gender for audio/dialogue purposes
+var is_female: bool = false
+
+## ============================================================================
+## HEALTH & COMBAT SYSTEM
+## All NPCs can be attacked and killed with consequences
+## ============================================================================
+
+## Health values
+@export var max_health: int = 30
+var current_health: int = 30
+
+## Is this NPC dead?
+var _is_dead: bool = false
+
+## Is this NPC essential (cannot be killed, goes unconscious instead)?
+## Set to true for critical quest NPCs
+@export var is_essential: bool = false
+
+## Gold carried by this NPC (dropped on death)
+@export var gold_carried: int = 0
+
+## Items carried by this NPC (dropped on death)
+## Format: [{item_id: String, quantity: int}]
+var carried_items: Array[Dictionary] = []
+
+## Witness detection radius (how far NPCs can witness crimes)
+const WITNESS_RADIUS := 20.0
+
+## Fleeing behavior when attacked
+var is_fleeing: bool = false
+var flee_target: Vector3 = Vector3.ZERO
+const FLEE_SPEED := 4.0
+const FLEE_DURATION := 10.0
+var flee_timer: float = 0.0
 
 ## Color variations for female NPCs (dress tints)
 const DRESS_COLORS := [
@@ -130,10 +166,18 @@ func _ready() -> void:
 	add_to_group("civilians")
 	add_to_group("npcs")
 	add_to_group("interactable")
+	add_to_group("attackable")  # Can be attacked by player
 
-	# Setup collision
+	# Setup collision - NPCs collide with world geometry (same layers as player)
 	collision_layer = 1
-	collision_mask = 1
+	collision_mask = 5  # Layers 1 and 3 (world geometry + static objects)
+
+	# Initialize health
+	current_health = max_health
+
+	# Random gold (poor civilians have little, merchants have more)
+	if gold_carried <= 0:
+		gold_carried = randi_range(1, 15)
 
 	_create_visual()
 	_create_collision()
@@ -282,12 +326,23 @@ func will_interact() -> bool:
 	return get_disposition_status() != DispositionCalculator.DispositionStatus.HOSTILE
 
 
+## Wander behavior configuration (can be overridden per NPC)
+@export var wander_radius: float = 12.0      ## How far from spawn to wander
+@export var wander_speed: float = 1.8        ## Walking speed
+@export var wander_min_wait: float = 0.5     ## Minimum pause at destination
+@export var wander_max_wait: float = 2.5     ## Maximum pause at destination
+@export var enable_wandering: bool = true    ## Set false for stationary NPCs
+
 func _setup_wandering() -> void:
+	if not enable_wandering:
+		return
+
 	wander = WanderBehavior.new()
-	wander.wander_radius = 8.0
-	wander.move_speed = 1.5
-	wander.min_wait_time = 2.0
-	wander.max_wait_time = 6.0
+	wander.wander_radius = wander_radius
+	wander.move_speed = wander_speed
+	wander.min_wait_time = wander_min_wait
+	wander.max_wait_time = wander_max_wait
+	wander.min_wander_dist = 3.0  # Don't pick targets too close
 	add_child(wander)
 
 	# Connect signals for animation
@@ -305,10 +360,363 @@ func _on_stopped_moving() -> void:
 		billboard.set_state(BillboardSprite.AnimState.IDLE)
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	# Handle fleeing behavior
+	if is_fleeing:
+		_update_fleeing(delta)
+		return
+
 	# Update billboard facing direction
 	if billboard and wander:
 		billboard.facing_direction = wander.get_facing_direction()
+
+
+## Update fleeing behavior
+func _update_fleeing(delta: float) -> void:
+	flee_timer -= delta
+	if flee_timer <= 0:
+		is_fleeing = false
+		if wander:
+			wander.resume()
+		return
+
+	# Move away from danger
+	var direction: Vector3 = (flee_target - global_position).normalized()
+	direction.y = 0
+	velocity = direction * FLEE_SPEED
+	move_and_slide()
+
+	# Update facing direction
+	if billboard:
+		billboard.facing_direction = direction
+
+
+## ============================================================================
+## COMBAT & DAMAGE SYSTEM
+## ============================================================================
+
+## Take damage from an attacker
+## Returns actual damage taken
+func take_damage(amount: int, damage_type: Enums.DamageType = Enums.DamageType.PHYSICAL, attacker: Node = null) -> int:
+	if _is_dead:
+		return 0
+
+	# Apply damage
+	var actual_damage: int = mini(amount, current_health)
+	current_health -= actual_damage
+
+	# Visual feedback - flash red
+	if billboard and billboard.sprite:
+		var original_color: Color = billboard.sprite.modulate
+		billboard.sprite.modulate = Color(1.0, 0.3, 0.3)
+		get_tree().create_timer(0.15).timeout.connect(func():
+			if billboard and billboard.sprite:
+				billboard.sprite.modulate = original_color
+		)
+
+	# Report crime if attacker is the player
+	if attacker and attacker.is_in_group("player"):
+		_report_attack_crime(attacker)
+
+	# Start fleeing from attacker
+	if not is_fleeing and attacker and attacker is Node3D:
+		_start_fleeing(attacker as Node3D)
+
+	# Check for death
+	if current_health <= 0:
+		if is_essential:
+			# Essential NPCs go unconscious instead
+			current_health = 1
+			_go_unconscious()
+		else:
+			_die(attacker)
+
+	var damage_type_name: String = Enums.DamageType.keys()[damage_type] if damage_type < Enums.DamageType.size() else "UNKNOWN"
+	var attacker_name: String = attacker.name if attacker else "unknown"
+	print("[NPC] %s took %d %s damage from %s (HP: %d/%d)" % [
+		npc_name,
+		actual_damage,
+		damage_type_name,
+		attacker_name,
+		current_health,
+		max_health
+	])
+
+	return actual_damage
+
+
+## Check if this NPC is dead
+func is_dead() -> bool:
+	return _is_dead
+
+
+## Start fleeing from a threat
+func _start_fleeing(threat: Node3D) -> void:
+	is_fleeing = true
+	flee_timer = FLEE_DURATION
+
+	# Calculate flee direction (away from threat)
+	var direction: Vector3 = (global_position - threat.global_position).normalized()
+	direction.y = 0
+	flee_target = global_position + direction * 20.0
+
+	# Pause normal wandering
+	if wander:
+		wander.pause()
+
+	# Alert nearby NPCs
+	_alert_nearby_npcs(threat)
+
+
+## Alert nearby NPCs about danger
+func _alert_nearby_npcs(threat: Node3D) -> void:
+	var nearby_npcs := get_tree().get_nodes_in_group("npcs")
+	for npc in nearby_npcs:
+		if npc == self:
+			continue
+		if not npc is Node3D:
+			continue
+
+		var distance: float = global_position.distance_to((npc as Node3D).global_position)
+		if distance <= WITNESS_RADIUS:
+			if npc.has_method("on_npc_attacked"):
+				npc.on_npc_attacked(self, threat)
+
+
+## Called when a nearby NPC is attacked
+func on_npc_attacked(victim: Node, attacker: Node) -> void:
+	if _is_dead or is_fleeing:
+		return
+
+	# Witness the crime
+	if attacker and attacker.is_in_group("player") and attacker is Node3D:
+		_start_fleeing(attacker as Node3D)
+
+
+## Report attack crime to CrimeManager
+func _report_attack_crime(attacker: Node) -> void:
+	# Find witnesses (other NPCs who can see this)
+	var witnesses: Array = _get_witnesses()
+
+	# Always include self as witness if still alive
+	if not _is_dead:
+		witnesses.append(self)
+
+	# Determine region
+	var crime_region: String = region
+	if crime_region.is_empty():
+		crime_region = _get_current_region()
+
+	# Report assault
+	CrimeManager.report_crime(CrimeManager.CrimeType.ASSAULT, crime_region, witnesses)
+
+
+## Report murder crime when NPC dies
+func _report_murder_crime(attacker: Node) -> void:
+	# Find witnesses (other NPCs who can see this)
+	var witnesses: Array = _get_witnesses()
+
+	# Determine region
+	var crime_region: String = region
+	if crime_region.is_empty():
+		crime_region = _get_current_region()
+
+	# Report murder (more serious than assault)
+	CrimeManager.report_crime(CrimeManager.CrimeType.MURDER, crime_region, witnesses)
+
+	# Apply faction reputation penalty
+	_apply_murder_faction_penalty(attacker)
+
+
+## Get all NPCs who can witness this crime
+func _get_witnesses() -> Array:
+	var witnesses: Array = []
+	var nearby_npcs := get_tree().get_nodes_in_group("npcs")
+
+	for npc in nearby_npcs:
+		if npc == self:
+			continue
+		if not npc is Node3D:
+			continue
+		if npc.has_method("is_dead") and npc.is_dead():
+			continue
+
+		var distance: float = global_position.distance_to((npc as Node3D).global_position)
+		if distance <= WITNESS_RADIUS:
+			# Check line of sight (optional, can be simplified)
+			witnesses.append(npc)
+
+	# Also check for guards specifically
+	var guards := get_tree().get_nodes_in_group("guards")
+	for guard in guards:
+		if guard in witnesses:
+			continue
+		if not guard is Node3D:
+			continue
+
+		var distance: float = global_position.distance_to((guard as Node3D).global_position)
+		if distance <= WITNESS_RADIUS * 1.5:  # Guards have better detection
+			witnesses.append(guard)
+
+	return witnesses
+
+
+## Get current region based on position
+func _get_current_region() -> String:
+	# Try to get region from WorldGrid
+	var cell: Vector2i = WorldGrid.world_to_cell(global_position)
+	var cell_info: WorldGrid.CellInfo = WorldGrid.get_cell(cell)
+	if cell_info and not cell_info.region_name.is_empty():
+		return cell_info.region_name.to_lower().replace(" ", "_")
+
+	# Fallback to parent zone_id
+	var parent: Node = get_parent()
+	while parent:
+		if "zone_id" in parent:
+			return parent.zone_id
+		parent = parent.get_parent()
+
+	return "unknown"
+
+
+## Apply faction reputation penalty for murder
+func _apply_murder_faction_penalty(attacker: Node) -> void:
+	if not attacker or not attacker.is_in_group("player"):
+		return
+
+	# Penalty to local faction
+	if not faction_id.is_empty() and FactionManager:
+		FactionManager.modify_reputation(faction_id, -25, "murdered %s" % npc_name)
+
+	# General civilian penalty
+	if FactionManager and FactionManager.factions.has("civilians"):
+		FactionManager.modify_reputation("civilians", -10, "murdered innocent")
+
+
+## Handle NPC death
+func _die(killer: Node = null) -> void:
+	if _is_dead:
+		return
+
+	_is_dead = true
+
+	print("[NPC] %s has been killed by %s" % [npc_name, killer.name if killer else "unknown"])
+
+	# Report murder crime
+	if killer and killer.is_in_group("player"):
+		_report_murder_crime(killer)
+
+	# Remove from groups
+	remove_from_group("interactable")
+	remove_from_group("npcs")
+	remove_from_group("attackable")
+
+	# Stop any movement
+	if wander:
+		wander.queue_free()
+		wander = null
+	is_fleeing = false
+	velocity = Vector3.ZERO
+
+	# Spawn lootable corpse
+	_spawn_corpse()
+
+	# Emit killed signal via CombatManager
+	CombatManager.entity_killed.emit(self, killer)
+
+	# Play death sound
+	if AudioManager:
+		AudioManager.play_sfx("npc_death")
+
+	# Queue removal after short delay (let corpse spawn)
+	get_tree().create_timer(0.1).timeout.connect(queue_free)
+
+
+## Spawn a lootable corpse at death position
+func _spawn_corpse() -> void:
+	var corpse: LootableCorpse = LootableCorpse.spawn_corpse(
+		get_parent(),
+		global_position,
+		npc_name,
+		npc_id,
+		1  # Level 1 civilian
+	)
+
+	# Add gold
+	corpse.gold = gold_carried
+
+	# Add any carried items
+	for item: Dictionary in carried_items:
+		var item_id: String = item.get("item_id", "") as String
+		var qty: int = item.get("quantity", 1) as int
+		if not item_id.is_empty():
+			corpse.add_item(item_id, qty, Enums.ItemQuality.AVERAGE)
+
+	# Maybe add some random civilian items
+	if randf() < 0.3:
+		corpse.add_item("bread", 1, Enums.ItemQuality.AVERAGE)
+	if randf() < 0.2:
+		corpse.add_item("cheese", 1, Enums.ItemQuality.AVERAGE)
+	if randf() < 0.1:
+		var random_jewelry: Array[String] = ["iron_ring", "copper_amulet"]
+		var jewelry_id: String = random_jewelry[randi() % random_jewelry.size()]
+		if InventoryManager.armor_database.has(jewelry_id):
+			corpse.add_item(jewelry_id, 1, Enums.ItemQuality.AVERAGE)
+
+
+## Handle essential NPC going unconscious
+func _go_unconscious() -> void:
+	print("[NPC] %s (essential) has been knocked unconscious" % npc_name)
+
+	# Visual feedback - darken sprite
+	if billboard and billboard.sprite:
+		billboard.sprite.modulate = Color(0.4, 0.4, 0.4)
+
+	# Stop movement
+	if wander:
+		wander.pause()
+	is_fleeing = false
+
+	# Recover after some time
+	get_tree().create_timer(30.0).timeout.connect(_recover_from_unconscious)
+
+
+## Recover from unconscious state
+func _recover_from_unconscious() -> void:
+	if _is_dead:
+		return
+
+	current_health = max_health / 2  # Recover to half health
+
+	# Restore visual
+	if billboard and billboard.sprite:
+		billboard.sprite.modulate = tint_color
+
+	# Resume behavior
+	if wander:
+		wander.resume()
+
+	print("[NPC] %s has recovered" % npc_name)
+
+
+## Heal this NPC
+func heal(amount: int) -> int:
+	if _is_dead:
+		return 0
+
+	var actual_heal: int = mini(amount, max_health - current_health)
+	current_health += actual_heal
+	return actual_heal
+
+
+## Get armor value (civilians have no armor)
+func get_armor_value() -> int:
+	return 0
+
+
+## Get damage type multiplier (no special resistances)
+func get_damage_type_multiplier(_damage_type: Enums.DamageType) -> float:
+	return 1.0
 
 
 ## Validate a spawn position is not inside an object
@@ -376,9 +784,31 @@ static func _is_position_clear(space_state: PhysicsDirectSpaceState3D, pos: Vect
 	return results.is_empty()
 
 
+## Helper to get ActorRegistry sprite config with fallback to defaults
+## Returns [sprite_path, h_frames, v_frames, pixel_size] or null if not in registry
+static func _get_registry_sprite_config(parent: Node, actor_id: String) -> Variant:
+	var actor_registry: Node = Engine.get_singleton("ActorRegistry") if Engine.has_singleton("ActorRegistry") else null
+	if not actor_registry:
+		actor_registry = parent.get_node_or_null("/root/ActorRegistry")
+
+	if actor_registry and actor_registry.has_actor(actor_id):
+		var config: Dictionary = actor_registry.get_sprite_config(actor_id)
+		if not config.is_empty():
+			var sprite_path: String = config.get("sprite_path", "")
+			if not sprite_path.is_empty() and ResourceLoader.exists(sprite_path):
+				return {
+					"sprite_path": sprite_path,
+					"h_frames": config.get("h_frames", 1),
+					"v_frames": config.get("v_frames", 1),
+					"pixel_size": config.get("pixel_size", PIXEL_SIZE_MAN),
+					"offset_y": config.get("offset_y", 0.0)
+				}
+	return null
+
+
 ## Static factory method for spawning civilians
 static func spawn_civilian(parent: Node, pos: Vector3, sprite_path: String,
-		h_frames: int = 7, v_frames: int = 8, random_color: bool = true,
+		h_frames: int = 1, v_frames: int = 1, random_color: bool = true,
 		pixel_size: float = PIXEL_SIZE_MAN) -> CivilianNPC:  # Default to man size
 	var npc := CivilianNPC.new()
 
@@ -403,17 +833,109 @@ static func spawn_civilian(parent: Node, pos: Vector3, sprite_path: String,
 	return npc
 
 
-## Spawn a woman NPC specifically (uses lady in red sprite with color variations)
-## zone_id: Optional zone for unique name generation
-static func spawn_woman(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
+## Spawn an NPC using configuration from ActorRegistry
+## This applies any Zoo patches automatically
+## actor_id: The actor ID from ZooRegistry (e.g., "woman_civilian", "dwarf_guard")
+## Falls back to spawn_random if actor not found in registry
+static func spawn_from_registry(parent: Node, pos: Vector3, actor_id: String, zone_id: String = "") -> CivilianNPC:
+	# Get ActorRegistry autoload (static functions cannot access autoloads directly)
+	var actor_registry: Node = Engine.get_singleton("ActorRegistry") if Engine.has_singleton("ActorRegistry") else null
+	if not actor_registry:
+		actor_registry = parent.get_node_or_null("/root/ActorRegistry")
+
+	# Check if ActorRegistry has this actor
+	if not actor_registry or not actor_registry.has_actor(actor_id):
+		push_warning("[CivilianNPC] Actor not found in registry: %s - using random" % actor_id)
+		return spawn_random(parent, pos, zone_id)
+
+	var config: Dictionary = actor_registry.get_sprite_config(actor_id)
+	if config.is_empty():
+		return spawn_random(parent, pos, zone_id)
+
+	var sprite_path: String = config.get("sprite_path", "")
+	if sprite_path.is_empty() or not ResourceLoader.exists(sprite_path):
+		push_warning("[CivilianNPC] Sprite not found for actor: %s" % actor_id)
+		return spawn_random(parent, pos, zone_id)
+
 	var npc := spawn_civilian(
 		parent,
 		pos,
-		"res://Sprite folders grab bag/new lady in red.png",
-		8,  # 8 columns
-		1,  # 1 row
+		sprite_path,
+		config.get("h_frames", 1),
+		config.get("v_frames", 1),
+		false,  # No random color - let registry control it
+		config.get("pixel_size", PIXEL_SIZE_MAN)
+	)
+
+	# Apply offset_y if specified
+	npc.sprite_offset_y = config.get("offset_y", 0.0)
+
+	# Get actor data for name generation hints
+	var actor_data: Dictionary = actor_registry.get_actor_config(actor_id)
+	var is_female: bool = _is_female_actor(actor_data)
+	var title: String = _get_actor_title(actor_data)
+
+	_assign_unique_name(npc, zone_id, is_female, title)
+
+	return npc
+
+
+## Helper to determine if an actor is female (for name generation)
+static func _is_female_actor(actor_data: Dictionary) -> bool:
+	var actor_id: String = actor_data.get("id", "")
+	var actor_name: String = actor_data.get("name", "")
+
+	# Check for female keywords
+	var female_keywords: Array[String] = ["woman", "female", "lady", "barmaid", "seductress", "girl", "priestess"]
+	for keyword: String in female_keywords:
+		if keyword in actor_id.to_lower() or keyword in actor_name.to_lower():
+			return true
+
+	return false
+
+
+## Helper to get a title from actor data (for name generation)
+static func _get_actor_title(actor_data: Dictionary) -> String:
+	var subcategory: String = actor_data.get("subcategory", "")
+
+	# Map subcategories to titles
+	match subcategory:
+		"merchant":
+			return "Merchant"
+		"combat":
+			return ""
+		"temple":
+			return "Monk"
+		"dwarf":
+			return ""
+		_:
+			return ""
+
+
+## Spawn a woman NPC specifically (uses lady in red sprite with color variations)
+## zone_id: Optional zone for unique name generation
+static func spawn_woman(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
+	# Check ActorRegistry for Zoo patches first
+	var registry_config: Variant = _get_registry_sprite_config(parent, "woman_civilian")
+	var sprite_path: String = "res://assets/sprites/npcs/civilians/lady_in_red.png"
+	var h_frames: int = 8
+	var v_frames: int = 1
+	var pixel_size: float = PIXEL_SIZE_LADY_RED
+
+	if registry_config != null:
+		sprite_path = registry_config["sprite_path"]
+		h_frames = registry_config["h_frames"]
+		v_frames = registry_config["v_frames"]
+		pixel_size = registry_config["pixel_size"]
+
+	var npc := spawn_civilian(
+		parent,
+		pos,
+		sprite_path,
+		h_frames,
+		v_frames,
 		false,  # Don't use default colors
-		PIXEL_SIZE_LADY_RED  # Normalized for 135px frame height
+		pixel_size
 	)
 	npc.tint_color = DRESS_COLORS[randi() % DRESS_COLORS.size()]
 	_assign_unique_name(npc, zone_id, true)
@@ -423,14 +945,27 @@ static func spawn_woman(parent: Node, pos: Vector3, zone_id: String = "") -> Civ
 ## Spawn a man NPC specifically
 ## zone_id: Optional zone for unique name generation
 static func spawn_man(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
+	# Check ActorRegistry for Zoo patches first
+	var registry_config: Variant = _get_registry_sprite_config(parent, "man_civilian")
+	var sprite_path: String = "res://assets/sprites/npcs/civilians/man_civilian.png"
+	var h_frames: int = 1
+	var v_frames: int = 1
+	var pixel_size: float = PIXEL_SIZE_MAN
+
+	if registry_config != null:
+		sprite_path = registry_config["sprite_path"]
+		h_frames = registry_config["h_frames"]
+		v_frames = registry_config["v_frames"]
+		pixel_size = registry_config["pixel_size"]
+
 	var npc := spawn_civilian(
 		parent,
 		pos,
-		"res://Sprite folders grab bag/man_civilian.png",
-		8,  # 8 columns
-		2,  # 2 rows
+		sprite_path,
+		h_frames,
+		v_frames,
 		false,   # Don't use default colors
-		PIXEL_SIZE_MAN  # Reference size (64px frame height)
+		pixel_size
 	)
 	npc.tint_color = MALE_COLORS[randi() % MALE_COLORS.size()]
 	_assign_unique_name(npc, zone_id, false)
@@ -449,14 +984,27 @@ static func spawn_barmaid(parent: Node, pos: Vector3, zone_id: String = "") -> C
 ## Spawn blonde barmaid (blue dress)
 ## zone_id: Optional zone for unique name generation
 static func spawn_barmaid_blonde(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
+	# Check ActorRegistry for Zoo patches first
+	var registry_config: Variant = _get_registry_sprite_config(parent, "barmaid_blonde")
+	var sprite_path: String = "res://assets/sprites/npcs/civilians/barmaid_4x4.png"
+	var h_frames: int = 1
+	var v_frames: int = 1
+	var pixel_size: float = PIXEL_SIZE_BARMAID_BLONDE
+
+	if registry_config != null:
+		sprite_path = registry_config["sprite_path"]
+		h_frames = registry_config["h_frames"]
+		v_frames = registry_config["v_frames"]
+		pixel_size = registry_config["pixel_size"]
+
 	var npc := spawn_civilian(
 		parent,
 		pos,
-		"res://Sprite folders grab bag/4x4barmaid_civilian.png",
-		4,
-		2,
+		sprite_path,
+		h_frames,
+		v_frames,
 		false,   # Don't use default colors
-		PIXEL_SIZE_BARMAID_BLONDE  # Normalized for 130px frame height
+		pixel_size
 	)
 	npc.tint_color = Color.WHITE  # Keep original colors (blue dress)
 	_assign_unique_name(npc, zone_id, true, "Barmaid")
@@ -466,14 +1014,27 @@ static func spawn_barmaid_blonde(parent: Node, pos: Vector3, zone_id: String = "
 ## Spawn brunette barmaid (brown dress)
 ## zone_id: Optional zone for unique name generation
 static func spawn_barmaid_brunette(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
+	# Check ActorRegistry for Zoo patches first
+	var registry_config: Variant = _get_registry_sprite_config(parent, "barmaid_brunette")
+	var sprite_path: String = "res://assets/sprites/npcs/civilians/barmaid_3x3.png"
+	var h_frames: int = 1
+	var v_frames: int = 1
+	var pixel_size: float = PIXEL_SIZE_BARMAID_BRUNETTE
+
+	if registry_config != null:
+		sprite_path = registry_config["sprite_path"]
+		h_frames = registry_config["h_frames"]
+		v_frames = registry_config["v_frames"]
+		pixel_size = registry_config["pixel_size"]
+
 	var npc := spawn_civilian(
 		parent,
 		pos,
-		"res://Sprite folders grab bag/3x3barmaid_civilian.png",
-		3,
-		1,
+		sprite_path,
+		h_frames,
+		v_frames,
 		false,   # Don't use default colors
-		PIXEL_SIZE_BARMAID_BRUNETTE  # Normalized for 105px frame height
+		pixel_size
 	)
 	npc.tint_color = Color.WHITE  # Keep original colors (brown dress)
 	_assign_unique_name(npc, zone_id, true, "Barmaid")
@@ -483,14 +1044,27 @@ static func spawn_barmaid_brunette(parent: Node, pos: Vector3, zone_id: String =
 ## Spawn a wizard/mage NPC
 ## zone_id: Optional zone for unique name generation
 static func spawn_wizard(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
+	# Check ActorRegistry for Zoo patches first
+	var registry_config: Variant = _get_registry_sprite_config(parent, "wizard_mage")
+	var sprite_path: String = "res://assets/sprites/npcs/civilians/wizard_mage.png"
+	var h_frames: int = 1
+	var v_frames: int = 1
+	var pixel_size: float = PIXEL_SIZE_WIZARD
+
+	if registry_config != null:
+		sprite_path = registry_config["sprite_path"]
+		h_frames = registry_config["h_frames"]
+		v_frames = registry_config["v_frames"]
+		pixel_size = registry_config["pixel_size"]
+
 	var npc := spawn_civilian(
 		parent,
 		pos,
-		"res://Sprite folders grab bag/wizard_mage.png",
-		4,  # 4 columns
-		1,  # 1 row
+		sprite_path,
+		h_frames,
+		v_frames,
 		false,
-		PIXEL_SIZE_WIZARD  # Normalized for 130px frame height
+		pixel_size
 	)
 	npc.tint_color = WIZARD_COLORS[randi() % WIZARD_COLORS.size()]
 	_assign_unique_name(npc, zone_id, false, "Mage")
@@ -500,14 +1074,27 @@ static func spawn_wizard(parent: Node, pos: Vector3, zone_id: String = "") -> Ci
 ## Spawn a lady in red NPC
 ## zone_id: Optional zone for unique name generation
 static func spawn_lady_in_red(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
+	# Check ActorRegistry for Zoo patches first (same actor as woman_civilian)
+	var registry_config: Variant = _get_registry_sprite_config(parent, "woman_civilian")
+	var sprite_path: String = "res://assets/sprites/npcs/civilians/lady_in_red.png"
+	var h_frames: int = 8
+	var v_frames: int = 1
+	var pixel_size: float = PIXEL_SIZE_LADY_RED
+
+	if registry_config != null:
+		sprite_path = registry_config["sprite_path"]
+		h_frames = registry_config["h_frames"]
+		v_frames = registry_config["v_frames"]
+		pixel_size = registry_config["pixel_size"]
+
 	var npc := spawn_civilian(
 		parent,
 		pos,
-		"res://Sprite folders grab bag/new lady in red.png",
-		8,  # 8 columns
-		1,  # 1 row
+		sprite_path,
+		h_frames,
+		v_frames,
 		false,   # Don't use default colors
-		PIXEL_SIZE_LADY_RED  # Normalized for 135px frame height
+		pixel_size
 	)
 	npc.tint_color = Color.WHITE  # Keep original colors
 	_assign_unique_name(npc, zone_id, true)
@@ -535,6 +1122,9 @@ static func spawn_random(parent: Node, pos: Vector3, zone_id: String = "") -> Ci
 ## is_female: Whether to use female names
 ## title: Optional title to append (e.g., "Barmaid" -> "Elara the Barmaid")
 static func _assign_unique_name(npc: CivilianNPC, zone_id: String, is_female: bool, title: String = "") -> void:
+	# Set gender property for audio/dialogue
+	npc.is_female = is_female
+
 	var first_name: String
 	if zone_id.is_empty():
 		# No zone tracking - use random name
@@ -568,9 +1158,9 @@ static func spawn_dwarf_guard(parent: Node, pos: Vector3, zone_id: String = "") 
 	var npc := spawn_civilian(
 		parent,
 		pos,
-		"res://Sprite folders grab bag/dwarf_2.png",
-		4,  # 4 columns
-		1,  # 1 row
+		"res://assets/sprites/npcs/dwarves/dwarf_2.png",
+		1,  # Single frame (48x96)
+		1,  # Single frame
 		false,
 		PIXEL_SIZE_DWARF
 	)
@@ -585,9 +1175,9 @@ static func spawn_dwarf_warrior(parent: Node, pos: Vector3, zone_id: String = ""
 	var npc := spawn_civilian(
 		parent,
 		pos,
-		"res://Sprite folders grab bag/dwarf_3.png",
-		4,  # 4 columns
-		1,  # 1 row
+		"res://assets/sprites/npcs/dwarves/dwarf_3.png",
+		1,  # Single frame (48x96)
+		1,  # Single frame
 		false,
 		PIXEL_SIZE_DWARF
 	)
@@ -602,18 +1192,18 @@ static func spawn_dwarf_civilian(parent: Node, pos: Vector3, zone_id: String = "
 	var sprite_path: String
 	var title: String
 	if randf() < 0.5:
-		sprite_path = "res://Sprite folders grab bag/dwarf_2.png"
+		sprite_path = "res://assets/sprites/npcs/dwarves/dwarf_2.png"
 		title = ""  # Just a regular dwarf
 	else:
-		sprite_path = "res://Sprite folders grab bag/dwarf_3.png"
+		sprite_path = "res://assets/sprites/npcs/dwarves/dwarf_3.png"
 		title = ""
 
 	var npc := spawn_civilian(
 		parent,
 		pos,
 		sprite_path,
-		4,  # 4 columns
-		1,  # 1 row
+		1,  # Single frame (48x96)
+		1,  # Single frame
 		false,
 		PIXEL_SIZE_DWARF
 	)
@@ -625,7 +1215,7 @@ static func spawn_dwarf_civilian(parent: Node, pos: Vector3, zone_id: String = "
 ## Spawn a dwarf refugee (wounded, displaced - slightly muted colors)
 ## zone_id: Optional zone for unique name generation
 static func spawn_dwarf_refugee(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
-	var sprite_path: String = "res://Sprite folders grab bag/dwarf_3.png" if randf() < 0.5 else "res://Sprite folders grab bag/dwarf_2.png"
+	var sprite_path: String = "res://assets/sprites/npcs/dwarves/dwarf_3.png" if randf() < 0.5 else "res://assets/sprites/npcs/dwarves/dwarf_2.png"
 
 	var npc := spawn_civilian(
 		parent,
@@ -645,22 +1235,17 @@ static func spawn_dwarf_refugee(parent: Node, pos: Vector3, zone_id: String = ""
 ## Spawn a wounded dwarf soldier (darkened/muted colors to show injury)
 ## zone_id: Optional zone for unique name generation
 static func spawn_dwarf_wounded(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
-	var npc := spawn_civilian(
-		parent,
-		pos,
-		"res://Sprite folders grab bag/dwarf_3.png",  # Red armor for soldiers
-		4,  # 4 columns
-		1,  # 1 row
-		false,
-		PIXEL_SIZE_DWARF
-	)
+	var npc := CivilianNPC.new()
+	npc.position = pos
+	npc.enable_wandering = false  # Wounded soldiers can't move
+	npc.sprite_texture = load("res://assets/sprites/npcs/dwarves/dwarf_3.png")
+	npc.sprite_h_frames = 1  # Single frame (48x96)
+	npc.sprite_v_frames = 1  # Single frame
+	npc.sprite_pixel_size = PIXEL_SIZE_DWARF
 	# Pale, injured look
 	npc.tint_color = Color(0.75, 0.7, 0.7)
+	parent.add_child(npc)
 	_assign_dwarf_name(npc, zone_id, false, "Wounded Soldier")
-	# Wounded soldiers don't wander
-	if npc.wander:
-		npc.wander.queue_free()
-		npc.wander = null
 	return npc
 
 
@@ -678,6 +1263,9 @@ static func spawn_dwarf_random(parent: Node, pos: Vector3, zone_id: String = "")
 
 ## Helper to assign a dwarf name to an NPC
 static func _assign_dwarf_name(npc: CivilianNPC, zone_id: String, is_female: bool, title: String = "") -> void:
+	# Set gender property for audio/dialogue
+	npc.is_female = is_female
+
 	var first_name: String
 	if is_female:
 		first_name = DWARF_FEMALE_NAMES[randi() % DWARF_FEMALE_NAMES.size()]
@@ -705,9 +1293,9 @@ static func spawn_dwarf_forge_master(parent: Node, pos: Vector3, zone_id: String
 	var npc := spawn_civilian(
 		parent,
 		pos,
-		"res://Sprite folders grab bag/dwarf_molten1.png",
-		5,  # 5 columns
-		1,  # 1 row
+		"res://assets/sprites/npcs/dwarves/dwarf_molten1.png",
+		1,  # Single frame (48x96)
+		1,  # Single frame
 		false,
 		PIXEL_SIZE_DWARF
 	)
@@ -722,9 +1310,9 @@ static func spawn_dwarf_forge_worker(parent: Node, pos: Vector3, zone_id: String
 	var npc := spawn_civilian(
 		parent,
 		pos,
-		"res://Sprite folders grab bag/dwarf_molten2.png",
-		4,  # 4 columns
-		1,  # 1 row
+		"res://assets/sprites/npcs/dwarves/dwarf_molten2.png",
+		1,  # Single frame (48x96)
+		1,  # Single frame
 		false,
 		PIXEL_SIZE_DWARF
 	)
@@ -739,9 +1327,9 @@ static func spawn_dwarf_forge_guard(parent: Node, pos: Vector3, zone_id: String 
 	var npc := spawn_civilian(
 		parent,
 		pos,
-		"res://Sprite folders grab bag/dwarf_molten3.png",
-		4,  # 4 columns
-		1,  # 1 row
+		"res://assets/sprites/npcs/dwarves/dwarf_molten3.png",
+		1,  # Single frame (48x96)
+		1,  # Single frame
 		false,
 		PIXEL_SIZE_DWARF
 	)
@@ -767,15 +1355,15 @@ static func spawn_dwarf_forge_random(parent: Node, pos: Vector3, zone_id: String
 ## These sprites have 2-4 viewing angles, used as static or minimal animation
 ## ============================================================================
 
-## Spawn a guy in green vest (2 frames: front/back)
+## Spawn a guy in green vest (single frame)
 ## zone_id: Optional zone for unique name generation
 static func spawn_guy_green_vest(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
 	var npc := spawn_civilian(
 		parent,
 		pos,
-		"res://Sprite folders grab bag/guy_civilian1.png",
-		2,  # 2 columns (front/back)
-		1,  # 1 row
+		"res://assets/sprites/npcs/civilians/guy_civilian1.png",
+		1,  # Single frame (48x96)
+		1,  # Single frame
 		false,
 		PIXEL_SIZE_GUY_CIVILIAN
 	)
@@ -784,15 +1372,15 @@ static func spawn_guy_green_vest(parent: Node, pos: Vector3, zone_id: String = "
 	return npc
 
 
-## Spawn a pink lady civilian (2 frames: front/back)
+## Spawn a pink lady civilian (single frame)
 ## zone_id: Optional zone for unique name generation
 static func spawn_pink_lady(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
 	var npc := spawn_civilian(
 		parent,
 		pos,
-		"res://Sprite folders grab bag/pinklady.png",
-		2,  # 2 columns (front/back)
-		1,  # 1 row
+		"res://assets/sprites/npcs/civilians/pinklady.png",
+		1,  # Single frame (48x96)
+		1,  # Single frame
 		false,
 		PIXEL_SIZE_PINK_LADY
 	)
@@ -801,15 +1389,15 @@ static func spawn_pink_lady(parent: Node, pos: Vector3, zone_id: String = "") ->
 	return npc
 
 
-## Spawn a magic shop worker (4 frames: 4 viewing angles)
+## Spawn a magic shop worker (single frame)
 ## zone_id: Optional zone for unique name generation
 static func spawn_magic_shop_worker(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
 	var npc := spawn_civilian(
 		parent,
 		pos,
-		"res://Sprite folders grab bag/magic shop worker.png",
-		4,  # 4 columns (4 angles)
-		1,  # 1 row
+		"res://assets/sprites/npcs/merchants/magic_shop_worker.png",
+		1,  # Single frame (48x96)
+		1,  # Single frame
 		false,
 		PIXEL_SIZE_MAGIC_SHOP
 	)
@@ -818,32 +1406,40 @@ static func spawn_magic_shop_worker(parent: Node, pos: Vector3, zone_id: String 
 	return npc
 
 
-## Spawn a seductress civilian - dark hair variant (2 frames: front/back)
+## Spawn a seductress civilian - dark hair variant (front/back directional)
 ## zone_id: Optional zone for unique name generation
 static func spawn_seductress(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
 	var npc := spawn_civilian(
 		parent,
 		pos,
-		"res://Sprite folders grab bag/seductress_civilian.png",
-		2,  # 2 columns (front/back)
+		"res://assets/sprites/npcs/civilians/seductress_civilian_Front.png",
+		1,  # 1 column (single frame)
 		1,  # 1 row
 		false,
 		PIXEL_SIZE_SEDUCTRESS
 	)
 	npc.tint_color = Color.WHITE
 	_assign_unique_name(npc, zone_id, true)
+
+	# Setup front/back directional sprites
+	if npc.billboard:
+		var front_tex: Texture2D = load("res://assets/sprites/npcs/civilians/seductress_civilian_Front.png")
+		var back_tex: Texture2D = load("res://assets/sprites/npcs/civilians/seductress_civilian_back.png")
+		if front_tex and back_tex:
+			npc.billboard.setup_front_back_textures(front_tex, 1, 1, back_tex, 1, 1)
+
 	return npc
 
 
-## Spawn a seductress civilian - blue dress variant (2 frames: front/back)
+## Spawn a seductress civilian - blue dress variant (single frame)
 ## zone_id: Optional zone for unique name generation
 static func spawn_blue_dress_lady(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
 	var npc := spawn_civilian(
 		parent,
 		pos,
-		"res://Sprite folders grab bag/seductress2_civilian.png",
-		2,  # 2 columns (front/back)
-		1,  # 1 row
+		"res://assets/sprites/npcs/civilians/seductress2_civilian.png",
+		1,  # Single frame (48x96)
+		1,  # Single frame
 		false,
 		PIXEL_SIZE_SEDUCTRESS2
 	)
@@ -883,80 +1479,155 @@ static func spawn_any_random(parent: Node, pos: Vector3, zone_id: String = "") -
 
 ## Spawn a female noble NPC
 static func spawn_female_noble(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
-	return spawn_civilian(parent, pos,
-		"res://Sprite folders grab bag/female_noble1.png",
-		1, 1, PIXEL_SIZE_NOBLE, _generate_npc_name("female", zone_id), Color.WHITE)
+	var npc := spawn_civilian(
+		parent, pos,
+		"res://assets/sprites/npcs/civilians/female_noble1.png",
+		1, 1, false, PIXEL_SIZE_NOBLE
+	)
+	npc.tint_color = Color.WHITE
+	_assign_unique_name(npc, zone_id, true, "Noble")
+	return npc
 
 
 ## Spawn a male noble NPC
 static func spawn_male_noble(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
-	return spawn_civilian(parent, pos,
-		"res://Sprite folders grab bag/man_noble1.png",
-		1, 1, PIXEL_SIZE_NOBLE, _generate_npc_name("male", zone_id), Color.WHITE)
+	var npc := spawn_civilian(
+		parent, pos,
+		"res://assets/sprites/npcs/civilians/man_noble1.png",
+		1, 1, false, PIXEL_SIZE_NOBLE
+	)
+	npc.tint_color = Color.WHITE
+	_assign_unique_name(npc, zone_id, false, "Noble")
+	return npc
 
 
 ## Spawn a female gladiator NPC
 static func spawn_female_gladiator(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
-	return spawn_civilian(parent, pos,
-		"res://Sprite folders grab bag/female_gladiator1.png",
-		1, 1, PIXEL_SIZE_GLADIATOR, _generate_npc_name("female", zone_id), Color.WHITE)
+	var npc := spawn_civilian(
+		parent, pos,
+		"res://assets/sprites/npcs/combat/female_gladiator1.png",
+		1, 1, false, PIXEL_SIZE_GLADIATOR
+	)
+	npc.tint_color = Color.WHITE
+	_assign_unique_name(npc, zone_id, true, "Gladiator")
+	return npc
 
 
 ## Spawn a male gladiator NPC
 static func spawn_male_gladiator(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
-	return spawn_civilian(parent, pos,
-		"res://Sprite folders grab bag/male_gladiator1.png",
-		1, 1, PIXEL_SIZE_GLADIATOR, _generate_npc_name("male", zone_id), Color.WHITE)
+	var npc := spawn_civilian(
+		parent, pos,
+		"res://assets/sprites/npcs/combat/male_gladiator1.png",
+		1, 1, false, PIXEL_SIZE_GLADIATOR
+	)
+	npc.tint_color = Color.WHITE
+	_assign_unique_name(npc, zone_id, false, "Gladiator")
+	return npc
 
 
-## Spawn a female hunter NPC
+## Spawn a female hunter NPC (single frame image)
 static func spawn_female_hunter(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
-	return spawn_civilian(parent, pos,
-		"res://Sprite folders grab bag/female hunter.png",
-		1, 1, PIXEL_SIZE_HUNTER, _generate_npc_name("female", zone_id), Color.WHITE)
+	var npc := spawn_civilian(
+		parent, pos,
+		"res://assets/sprites/npcs/civilians/female_hunter.png",
+		1, 1, false, PIXEL_SIZE_HUNTER
+	)
+	npc.tint_color = Color.WHITE
+	_assign_unique_name(npc, zone_id, true, "Hunter")
+	return npc
 
 
-## Spawn a guard (civilian clothes) NPC
+## Spawn a guard (dwarf style - stocky armored) NPC - male
 static func spawn_guard_civilian(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
-	return spawn_civilian(parent, pos,
-		"res://Sprite folders grab bag/guard_civilian.png",
-		1, 1, PIXEL_SIZE_GUARD_CIV, _generate_npc_name("male", zone_id), Color.WHITE)
+	var npc := spawn_civilian(
+		parent, pos,
+		"res://assets/sprites/npcs/civilians/guard_civilian.png",
+		1, 1, false, PIXEL_SIZE_GUARD_CIV
+	)
+	npc.tint_color = Color.WHITE
+	_assign_unique_name(npc, zone_id, false, "Guard")
+	return npc
 
 
-## Spawn a wild wizard NPC
+## Spawn a guard (roman style - spear and shield) NPC - male
+static func spawn_guard_roman_civilian(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
+	var npc := spawn_civilian(
+		parent, pos,
+		"res://assets/sprites/npcs/civilians/guard2_civilian.png",
+		1, 1, false, PIXEL_SIZE_GUARD_CIV
+	)
+	npc.tint_color = Color.WHITE
+	_assign_unique_name(npc, zone_id, false, "Soldier")
+	return npc
+
+
+## Spawn a random guard civilian (either dwarf or roman style)
+static func spawn_guard_civilian_random(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
+	if randf() < 0.5:
+		return spawn_guard_civilian(parent, pos, zone_id)
+	else:
+		return spawn_guard_roman_civilian(parent, pos, zone_id)
+
+
+## Spawn a wild wizard NPC - male
 static func spawn_wizard_wild(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
-	return spawn_civilian(parent, pos,
-		"res://Sprite folders grab bag/wizard_wild.png",
-		1, 1, PIXEL_SIZE_WIZARD_CIV, _generate_npc_name("male", zone_id), Color.WHITE)
+	var npc := spawn_civilian(
+		parent, pos,
+		"res://assets/sprites/npcs/civilians/wizard_wild.png",
+		1, 1, false, PIXEL_SIZE_WIZARD_CIV
+	)
+	npc.tint_color = Color.WHITE
+	_assign_unique_name(npc, zone_id, false, "Hermit")
+	return npc
 
 
-## Spawn a civilian wizard NPC
+## Spawn a civilian wizard NPC - male
 static func spawn_wizard_civilian(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
-	return spawn_civilian(parent, pos,
-		"res://Sprite folders grab bag/wizard_civilian.png",
-		1, 1, PIXEL_SIZE_WIZARD_CIV, _generate_npc_name("male", zone_id), Color.WHITE)
+	var npc := spawn_civilian(
+		parent, pos,
+		"res://assets/sprites/npcs/civilians/wizard_civilian.png",
+		1, 1, false, PIXEL_SIZE_WIZARD_CIV
+	)
+	npc.tint_color = Color.WHITE
+	_assign_unique_name(npc, zone_id, false, "Mage")
+	return npc
 
 
-## Spawn a bard NPC
+## Spawn a bard NPC - female
 static func spawn_bard(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
-	return spawn_civilian(parent, pos,
-		"res://Sprite folders grab bag/bard_civilian.png",
-		1, 1, PIXEL_SIZE_BARD, _generate_npc_name("female", zone_id), Color.WHITE)
+	var npc := spawn_civilian(
+		parent, pos,
+		"res://assets/sprites/npcs/civilians/bard_civilian.png",
+		1, 1, false, PIXEL_SIZE_BARD
+	)
+	npc.tint_color = Color.WHITE
+	_assign_unique_name(npc, zone_id, true, "Bard")
+	return npc
 
 
-## Spawn a merchant NPC
-static func spawn_merchant(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
-	return spawn_civilian(parent, pos,
-		"res://Sprite folders grab bag/merchant_civilian.png",
-		1, 1, PIXEL_SIZE_MERCHANT, _generate_npc_name("male", zone_id), Color.WHITE)
+## Spawn a merchant NPC - male
+static func spawn_merchant_civilian(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
+	var npc := spawn_civilian(
+		parent, pos,
+		"res://assets/sprites/npcs/merchants/merchant_civilian.png",
+		1, 1, false, PIXEL_SIZE_MERCHANT
+	)
+	npc.tint_color = Color.WHITE
+	_assign_unique_name(npc, zone_id, false, "Merchant")
+	return npc
 
 
-## Spawn a bandit (type 2) - can be used for reformed bandits in towns
+## Spawn a bandit civilian (reformed bandits in towns) - male
 static func spawn_bandit_civilian(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
-	var sprite: String = "res://Sprite folders grab bag/bandit_2.png" if randf() < 0.5 else "res://Sprite folders grab bag/bandit_3.png"
-	return spawn_civilian(parent, pos,
+	var sprite: String = "res://assets/sprites/npcs/combat/thief.png" if randf() < 0.5 else "res://assets/sprites/npcs/combat/bandit_3.png"
+	var npc := spawn_civilian(
+		parent, pos,
 		sprite,
-		1, 1, PIXEL_SIZE_BANDIT, _generate_npc_name("male", zone_id), Color.WHITE)
+		1, 1, false, PIXEL_SIZE_BANDIT
+	)
+	npc.tint_color = Color.WHITE
+	_assign_unique_name(npc, zone_id, false)
+	return npc
 
 
 ## Spawn any of the newer reference sprites randomly
@@ -979,7 +1650,7 @@ static func spawn_random_newest(parent: Node, pos: Vector3, zone_id: String = ""
 	elif roll < 0.8:
 		return spawn_bard(parent, pos, zone_id)
 	elif roll < 0.9:
-		return spawn_merchant(parent, pos, zone_id)
+		return spawn_merchant_civilian(parent, pos, zone_id)
 	else:
 		return spawn_bandit_civilian(parent, pos, zone_id)
 
@@ -993,3 +1664,258 @@ static func spawn_truly_random(parent: Node, pos: Vector3, zone_id: String = "")
 		return spawn_random_new(parent, pos, zone_id)      # Newer reference sprites
 	else:
 		return spawn_random_newest(parent, pos, zone_id)   # Newest reference sprites
+
+
+## Spawn a random FEMALE civilian from all available female sprites
+static func spawn_random_female(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
+	var roll: float = randf()
+	if roll < 0.12:
+		return spawn_woman(parent, pos, zone_id)
+	elif roll < 0.24:
+		return spawn_barmaid(parent, pos, zone_id)
+	elif roll < 0.36:
+		return spawn_lady_in_red(parent, pos, zone_id)
+	elif roll < 0.48:
+		return spawn_pink_lady(parent, pos, zone_id)
+	elif roll < 0.56:
+		return spawn_magic_shop_worker(parent, pos, zone_id)
+	elif roll < 0.68:
+		return spawn_seductress(parent, pos, zone_id)
+	elif roll < 0.80:
+		return spawn_blue_dress_lady(parent, pos, zone_id)
+	elif roll < 0.88:
+		return spawn_female_noble(parent, pos, zone_id)
+	elif roll < 0.94:
+		return spawn_female_gladiator(parent, pos, zone_id)
+	elif roll < 0.97:
+		return spawn_female_hunter(parent, pos, zone_id)
+	else:
+		return spawn_bard(parent, pos, zone_id)
+
+
+## Spawn a random MALE civilian from all available male sprites
+static func spawn_random_male(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
+	var roll: float = randf()
+	if roll < 0.18:
+		return spawn_man(parent, pos, zone_id)
+	elif roll < 0.30:
+		return spawn_wizard(parent, pos, zone_id)
+	elif roll < 0.40:
+		return spawn_guy_green_vest(parent, pos, zone_id)
+	elif roll < 0.48:
+		return spawn_male_noble(parent, pos, zone_id)
+	elif roll < 0.56:
+		return spawn_male_gladiator(parent, pos, zone_id)
+	elif roll < 0.64:
+		return spawn_guard_civilian(parent, pos, zone_id)
+	elif roll < 0.72:
+		return spawn_wizard_wild(parent, pos, zone_id)
+	elif roll < 0.78:
+		return spawn_wizard_civilian(parent, pos, zone_id)
+	elif roll < 0.84:
+		return spawn_merchant_civilian(parent, pos, zone_id)
+	elif roll < 0.92:
+		return spawn_monk_random(parent, pos, zone_id)
+	else:
+		return spawn_bandit_civilian(parent, pos, zone_id)
+
+
+## Spawn a random civilian with proper gender (50/50 male/female)
+static func spawn_gendered_random(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
+	if randf() < 0.5:
+		return spawn_random_female(parent, pos, zone_id)
+	else:
+		return spawn_random_male(parent, pos, zone_id)
+
+
+## Spawn a random WORKING CLASS female (no nobles, gladiators, seductresses)
+## For logging camps, villages, and rural areas
+static func spawn_worker_female(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
+	var roll: float = randf()
+	if roll < 0.25:
+		return spawn_woman(parent, pos, zone_id)
+	elif roll < 0.50:
+		return spawn_barmaid(parent, pos, zone_id)
+	elif roll < 0.70:
+		return spawn_pink_lady(parent, pos, zone_id)
+	elif roll < 0.85:
+		return spawn_female_hunter(parent, pos, zone_id)
+	else:
+		return spawn_lady_in_red(parent, pos, zone_id)
+
+
+## Spawn a random WORKING CLASS male (no nobles, gladiators, wizards)
+## For logging camps, villages, and rural areas
+static func spawn_worker_male(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
+	var roll: float = randf()
+	if roll < 0.35:
+		return spawn_man(parent, pos, zone_id)
+	elif roll < 0.55:
+		return spawn_guy_green_vest(parent, pos, zone_id)
+	elif roll < 0.70:
+		return spawn_guard_civilian(parent, pos, zone_id)
+	elif roll < 0.85:
+		return spawn_merchant_civilian(parent, pos, zone_id)
+	else:
+		return spawn_bandit_civilian(parent, pos, zone_id)
+
+
+## Spawn a random WORKING CLASS civilian (50/50 male/female)
+## Excludes nobles, gladiators, wizards, seductresses - for rural/working areas
+static func spawn_worker_random(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
+	if randf() < 0.5:
+		return spawn_worker_female(parent, pos, zone_id)
+	else:
+		return spawn_worker_male(parent, pos, zone_id)
+
+
+# =============================================================================
+# MONK/PRIEST NPC SPAWNING METHODS
+# =============================================================================
+
+## Pixel size for monk sprites - 96px frame, 2.46m target
+const PIXEL_SIZE_MONK := 0.0256
+
+## Spawn a temple monk (tan robes variant)
+static func spawn_monk_tan(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
+	# Check ActorRegistry for Zoo patches first
+	var registry_config: Variant = _get_registry_sprite_config(parent, "monk_tan")
+	var sprite_path: String = "res://assets/sprites/npcs/temple/monk_1.png"
+	var h_frames: int = 1
+	var v_frames: int = 1
+	var pixel_size: float = PIXEL_SIZE_MONK
+
+	if registry_config != null:
+		sprite_path = registry_config["sprite_path"]
+		h_frames = registry_config["h_frames"]
+		v_frames = registry_config["v_frames"]
+		pixel_size = registry_config["pixel_size"]
+
+	var npc := spawn_civilian(parent, pos, sprite_path, h_frames, v_frames, false, pixel_size)
+	npc.tint_color = Color.WHITE
+	_assign_unique_name(npc, zone_id, false, "Monk")
+	return npc
+
+
+## Spawn a temple monk (brown robes variant)
+static func spawn_monk_brown(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
+	# Check ActorRegistry for Zoo patches first
+	var registry_config: Variant = _get_registry_sprite_config(parent, "monk_brown")
+	var sprite_path: String = "res://assets/sprites/npcs/temple/monk_2.png"
+	var h_frames: int = 1
+	var v_frames: int = 1
+	var pixel_size: float = PIXEL_SIZE_MONK
+
+	if registry_config != null:
+		sprite_path = registry_config["sprite_path"]
+		h_frames = registry_config["h_frames"]
+		v_frames = registry_config["v_frames"]
+		pixel_size = registry_config["pixel_size"]
+
+	var npc := spawn_civilian(parent, pos, sprite_path, h_frames, v_frames, false, pixel_size)
+	npc.tint_color = Color.WHITE
+	_assign_unique_name(npc, zone_id, false, "Monk")
+	return npc
+
+
+## Spawn a temple monk (purple robes variant - more mystical)
+static func spawn_monk_purple(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
+	# Check ActorRegistry for Zoo patches first
+	var registry_config: Variant = _get_registry_sprite_config(parent, "monk_purple")
+	var sprite_path: String = "res://assets/sprites/npcs/temple/monk_3_purple.png"
+	var h_frames: int = 1
+	var v_frames: int = 1
+	var pixel_size: float = PIXEL_SIZE_MONK
+
+	if registry_config != null:
+		sprite_path = registry_config["sprite_path"]
+		h_frames = registry_config["h_frames"]
+		v_frames = registry_config["v_frames"]
+		pixel_size = registry_config["pixel_size"]
+
+	var npc := spawn_civilian(parent, pos, sprite_path, h_frames, v_frames, false, pixel_size)
+	npc.tint_color = Color.WHITE
+	_assign_unique_name(npc, zone_id, false, "Priest")
+	return npc
+
+
+## Spawn a random monk (any of the three variants)
+static func spawn_monk_random(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
+	var roll: float = randf()
+	if roll < 0.4:
+		return spawn_monk_tan(parent, pos, zone_id)
+	elif roll < 0.8:
+		return spawn_monk_brown(parent, pos, zone_id)
+	else:
+		return spawn_monk_purple(parent, pos, zone_id)
+
+
+# =============================================================================
+# INNKEEPER NPC SPAWNING METHODS
+# =============================================================================
+
+## Pixel size for innkeeper sprites - 96px frame, 2.46m target
+const PIXEL_SIZE_INNKEEPER := 0.0256
+
+## Spawn a male innkeeper (stationary - stays behind counter)
+static func spawn_innkeeper_male(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
+	# Check ActorRegistry for Zoo patches first
+	var registry_config: Variant = _get_registry_sprite_config(parent, "innkeeper_male")
+	var sprite_path: String = "res://assets/sprites/npcs/merchants/Innkeeper_man.png"
+	var h_frames: int = 1
+	var v_frames: int = 1
+	var pixel_size: float = PIXEL_SIZE_INNKEEPER
+
+	if registry_config != null:
+		sprite_path = registry_config["sprite_path"]
+		h_frames = registry_config["h_frames"]
+		v_frames = registry_config["v_frames"]
+		pixel_size = registry_config["pixel_size"]
+
+	var npc := CivilianNPC.new()
+	npc.position = pos
+	npc.enable_wandering = false  # Innkeepers stay put
+	npc.sprite_texture = load(sprite_path)
+	npc.sprite_h_frames = h_frames
+	npc.sprite_v_frames = v_frames
+	npc.sprite_pixel_size = pixel_size
+	npc.tint_color = Color.WHITE
+	parent.add_child(npc)
+	_assign_unique_name(npc, zone_id, false, "Innkeeper")
+	return npc
+
+
+## Spawn a female innkeeper (stationary - stays behind counter)
+static func spawn_innkeeper_female(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
+	# Check ActorRegistry for Zoo patches first
+	var registry_config: Variant = _get_registry_sprite_config(parent, "innkeeper_female")
+	var sprite_path: String = "res://assets/sprites/npcs/merchants/Innkeeper_woman.png"
+	var h_frames: int = 1
+	var v_frames: int = 1
+	var pixel_size: float = PIXEL_SIZE_INNKEEPER
+
+	if registry_config != null:
+		sprite_path = registry_config["sprite_path"]
+		h_frames = registry_config["h_frames"]
+		v_frames = registry_config["v_frames"]
+		pixel_size = registry_config["pixel_size"]
+
+	var npc := CivilianNPC.new()
+	npc.position = pos
+	npc.enable_wandering = false  # Innkeepers stay put
+	npc.sprite_texture = load(sprite_path)
+	npc.sprite_h_frames = h_frames
+	npc.sprite_v_frames = v_frames
+	npc.sprite_pixel_size = pixel_size
+	npc.tint_color = Color.WHITE
+	parent.add_child(npc)
+	_assign_unique_name(npc, zone_id, true, "Innkeeper")
+	return npc
+
+
+## Spawn a random innkeeper (male or female)
+static func spawn_innkeeper_random(parent: Node, pos: Vector3, zone_id: String = "") -> CivilianNPC:
+	if randf() < 0.5:
+		return spawn_innkeeper_male(parent, pos, zone_id)
+	else:
+		return spawn_innkeeper_female(parent, pos, zone_id)

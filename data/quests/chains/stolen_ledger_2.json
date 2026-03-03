@@ -1,0 +1,32 @@
+{
+	"id": "stolen_ledger_2",
+	"title": "Recover the Ledger",
+	"description": "The bandits abandoned a chest nearby. Find it and retrieve the trade ledger.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "merchants_guild",
+	"objectives": [
+		{
+			"id": "get_ledger",
+			"description": "Retrieve the trade ledger",
+			"type": "collect",
+			"target": "trade_ledger",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 0,
+		"xp": 80,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": ["stolen_ledger_1"],
+	"next_quest": "stolen_ledger_3",
+	"quest_items": ["trade_ledger"]
+}

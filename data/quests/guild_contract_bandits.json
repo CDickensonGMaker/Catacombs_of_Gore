@@ -1,0 +1,54 @@
+{
+	"id": "guild_contract_bandits",
+	"title": "Bandit Elimination Contract",
+	"description": "Now that you've proven yourself, Guildmaster Vorn has a proper contract for you. A band of bandits has set up camp near the road to Millbrook, ambushing merchants. Eliminate their leader and scatter the gang.",
+	"is_main_quest": false,
+	"quest_source": "faction",
+	"giver_npc_id": "guildmaster_vorn_dalhurst",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "dalhurst",
+	"objectives": [
+		{
+			"id": "find_camp",
+			"description": "Locate the bandit camp south of Dalhurst",
+			"type": "reach",
+			"target": "bandit_camp_south",
+			"required_count": 1
+		},
+		{
+			"id": "kill_bandits",
+			"description": "Eliminate the bandits",
+			"type": "kill",
+			"target": "human_bandit",
+			"required_count": 8
+		},
+		{
+			"id": "kill_leader",
+			"description": "Defeat the Bandit Captain",
+			"type": "kill",
+			"target": "bandit_captain",
+			"required_count": 1
+		},
+		{
+			"id": "return_contract",
+			"description": "Report completion to Guildmaster Vorn",
+			"type": "talk",
+			"target": "guildmaster_vorn_dalhurst",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "guildmaster_vorn_dalhurst",
+	"turn_in_zone": "dalhurst",
+	"rewards": {
+		"gold": 200,
+		"xp": 750,
+		"items": [],
+		"faction_reputation": {
+			"adventurers_guild": 30,
+			"human_empire": 10
+		}
+	},
+	"prerequisites": ["guild_initiation"],
+	"next_quest": ""
+}

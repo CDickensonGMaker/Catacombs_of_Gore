@@ -6,10 +6,6 @@
 [ext_resource type="Script" path="res://scripts/dialogue/dialogue_condition.gd" id="4_cond"]
 [ext_resource type="Script" path="res://scripts/dialogue/dialogue_action.gd" id="5_action"]
 
-# ============================================================================
-# CHOICES
-# ============================================================================
-
 [sub_resource type="Resource" id="choice_goodbye"]
 script = ExtResource("3_choice")
 text = "I should go. Thank you for your words."
@@ -64,7 +60,6 @@ show_when_unavailable = false
 unavailable_reason = ""
 actions = []
 
-# Action to set the blessing flag
 [sub_resource type="Resource" id="action_set_blessed"]
 script = ExtResource("5_action")
 type = 7
@@ -74,7 +69,6 @@ param_float = 0.0
 success_node_id = ""
 failure_node_id = ""
 
-# Condition: already blessed
 [sub_resource type="Resource" id="cond_already_blessed"]
 script = ExtResource("4_cond")
 type = 5
@@ -83,7 +77,6 @@ param_int = 0
 param_float = 0.0
 invert = false
 
-# Condition: not blessed
 [sub_resource type="Resource" id="cond_not_blessed"]
 script = ExtResource("4_cond")
 type = 5
@@ -145,10 +138,6 @@ conditions = []
 show_when_unavailable = false
 unavailable_reason = ""
 actions = []
-
-# ============================================================================
-# NODES
-# ============================================================================
 
 [sub_resource type="Resource" id="node_start"]
 script = ExtResource("2_node")
@@ -269,10 +258,6 @@ choices = []
 is_end_node = true
 auto_continue_to = ""
 portrait_id = "priest_farewell"
-
-# ============================================================================
-# RESOURCE
-# ============================================================================
 
 [resource]
 script = ExtResource("1_data")

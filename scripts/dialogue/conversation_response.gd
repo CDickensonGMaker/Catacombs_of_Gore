@@ -26,6 +26,9 @@ extends Resource
 @export var response_id: String = ""
 ## If true, this response is automatically logged to the journal when delivered
 @export var auto_log_to_journal: bool = false
+## Topics this response unlocks for the player (Morrowind-style topic discovery)
+## These topic IDs become available to ask other NPCs after hearing this response
+@export var unlock_topics: Array[String] = []
 
 
 # =============================================================================

@@ -1,0 +1,34 @@
+{
+	"id": "market_theft_3",
+	"title": "Return the Stolen Goods",
+	"description": "You've recovered the stolen goods. Return them to the merchant in Millbrook.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "merchants_guild",
+	"objectives": [
+		{
+			"id": "return_goods",
+			"description": "Return the goods to the merchant",
+			"type": "talk",
+			"target": "millbrook_merchant",
+			"target_zone": "millbrook",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "millbrook_merchant",
+	"turn_in_zone": "millbrook",
+	"rewards": {
+		"gold": 100,
+		"xp": 200,
+		"items": [],
+		"faction_reputation": {
+			"merchants_guild": 20
+		}
+	},
+	"prerequisites": ["market_theft_2"],
+	"next_quest": ""
+}

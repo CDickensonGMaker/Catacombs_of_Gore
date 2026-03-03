@@ -1,4 +1,15 @@
 ## spell_projectile.gd - Projectile for spell effects
+##
+## TODO: [REFACTOR] This class duplicates significant logic from ProjectileBase.
+## Both classes implement: collision handling, homing, chaining, piercing, AOE.
+##
+## Recommended refactoring approach:
+## 1. Make SpellProjectile extend ProjectileBase
+## 2. Add adapter method to convert SpellData to ProjectileData
+## 3. Override initialize() to handle SpellData-specific initialization
+## 4. Use CombatManager.apply_spell_damage() for damage instead of ProjectileData.roll_damage()
+##
+## This would reduce ~150 lines of duplicated code and ensure consistency.
 class_name SpellProjectile
 extends Area3D
 
@@ -96,8 +107,8 @@ func _handle_hit(target: Node) -> void:
 	if target in hit_targets:
 		return
 
-	# Check if valid target (enemies, player, or world geometry)
-	var is_valid_combat_target: bool = target.is_in_group("enemies") or target.is_in_group("player")
+	# Check if valid target (enemies, player, attackable NPCs, or world geometry)
+	var is_valid_combat_target: bool = target.is_in_group("enemies") or target.is_in_group("player") or target.is_in_group("attackable")
 
 	if not is_valid_combat_target:
 		# Hit world geometry - trigger explosion if AOE spell, then stop

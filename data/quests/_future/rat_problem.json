@@ -1,0 +1,50 @@
+{
+	"id": "rat_problem",
+	"title": "The Rat Problem",
+	"description": "Ingrid the Innkeep has a problem. Giant rats have infested the cellar of her establishment, ruining food stores and scaring off customers. She needs someone to clear out the vermin and find where they're coming from.",
+	"is_main_quest": false,
+	"quest_source": "npc",
+	"giver_npc_id": "innkeeper_aberdeen",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "aberdeen",
+	"objectives": [
+		{
+			"id": "enter_cellar",
+			"description": "Enter the inn's cellar",
+			"type": "reach",
+			"target": "aberdeen_inn_cellar",
+			"required_count": 1
+		},
+		{
+			"id": "kill_rats",
+			"description": "Kill the giant rats",
+			"type": "kill",
+			"target": "giant_rat",
+			"required_count": 6
+		},
+		{
+			"id": "find_nest",
+			"description": "Find the rat nest",
+			"type": "interact",
+			"target": "rat_nest",
+			"required_count": 1
+		},
+		{
+			"id": "block_hole",
+			"description": "Block the hole they came through",
+			"type": "interact",
+			"target": "cellar_hole",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "innkeeper_aberdeen",
+	"turn_in_zone": "aberdeen",
+	"rewards": {
+		"gold": 40,
+		"xp": 150,
+		"items": ["free_meal_voucher"]
+	},
+	"prerequisites": [],
+	"next_quest": null
+}

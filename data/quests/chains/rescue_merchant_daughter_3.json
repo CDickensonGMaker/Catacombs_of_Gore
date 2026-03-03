@@ -1,0 +1,34 @@
+{
+	"id": "rescue_merchant_daughter_3",
+	"title": "Return to the Merchant",
+	"description": "You've rescued the merchant's daughter. Return to Dalhurst and report the good news.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "merchants_guild",
+	"objectives": [
+		{
+			"id": "return",
+			"description": "Return to the merchant in Dalhurst",
+			"type": "talk",
+			"target": "dalhurst_merchant",
+			"target_zone": "dalhurst",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "dalhurst_merchant",
+	"turn_in_zone": "dalhurst",
+	"rewards": {
+		"gold": 300,
+		"xp": 400,
+		"items": ["gold_ring"],
+		"faction_reputation": {
+			"merchants_guild": 30
+		}
+	},
+	"prerequisites": ["rescue_merchant_daughter_2"],
+	"next_quest": ""
+}

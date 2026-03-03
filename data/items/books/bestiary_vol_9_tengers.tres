@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "bestiary_vol_9_tengers"
+display_name = "Bestiary Vol. IX: The Tenger Horde"
+description = "A military intelligence report on the nomadic Tenger clans from the eastern steppes. Details their fierce warriors, skilled archers, mounted cavalry, shamanic magic users, and the terrifying berserkers. Essential reading for border defense."
+item_type = 5
+is_stackable = true
+max_stack = 5
+unlocks_bestiary = Array[String](["tenger_warrior", "tenger_archer", "tenger_raider", "tenger_shaman", "tenger_infantry", "tenger_berserker", "tenger_cavalry", "tenger_warlord"])
+book_tier = 9
+base_value = 500
+weight = 0.7

@@ -135,9 +135,9 @@ func _get_texture_for_prop() -> String:
 			# Use grass or ground texture
 			return ""  # Solid color for now
 		"rock", "boulder", "cliff":
-			return "res://Sprite folders grab bag/stonewall.png"
+			return "res://assets/textures/environment/walls/stonewall.png"
 		"stump", "log":
-			return "res://Sprite folders grab bag/wood.png"
+			return "res://assets/textures/environment/walls/wood.png"
 		"statue":
 			# Randomly pick one of the statue textures
 			return STATUE_TEXTURES[randi() % STATUE_TEXTURES.size()]

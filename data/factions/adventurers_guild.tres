@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="FactionData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/faction_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "adventurers_guild"
+display_name = "Adventurer's Guild"
+description = "A loose confederation of mercenaries, treasure hunters, and monster slayers who take contracts for coin. Guild halls exist in most towns, offering bounties, contracts, and camaraderie. Members range from noble heroes to desperate sellswords, united only by their willingness to risk life and limb for gold."
+parent_faction = ""
+allies = ["human_empire", "town_guard", "dwarves"]
+enemies = ["goblins", "tengers", "cultists"]
+neutrals = ["thieves_guild", "elves_pro_human", "elves_anti_human"]
+alignment = 30
+ranks = [{"name": "Outcast", "min_reputation": -100, "benefits": []}, {"name": "Blacklisted", "min_reputation": -50, "benefits": []}, {"name": "Unknown", "min_reputation": -10, "benefits": []}, {"name": "Initiate", "min_reputation": 0, "benefits": ["bounty_access"]}, {"name": "Adventurer", "min_reputation": 25, "benefits": ["bounty_access", "guild_discount"]}, {"name": "Veteran", "min_reputation": 50, "benefits": ["bounty_access", "guild_discount", "priority_contracts"]}, {"name": "Champion", "min_reputation": 75, "benefits": ["bounty_access", "guild_discount", "priority_contracts", "guild_lodging"]}, {"name": "Guildmaster's Hand", "min_reputation": 90, "benefits": ["bounty_access", "guild_discount", "priority_contracts", "guild_lodging", "guild_leadership"]}]
+default_reputation = 0
+joinable = true
+join_threshold = 10
+is_hidden = false
+faction_color = Color(0.6, 0.4, 0.2, 1.0)

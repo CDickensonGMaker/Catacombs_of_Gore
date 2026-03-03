@@ -8,7 +8,6 @@
 extends Node3D
 
 const ZONE_ID := "bandit_hideout_exterior"
-const ZONE_SIZE := 45.0  # 45x45 unit zone
 
 var nav_region: NavigationRegion3D
 
@@ -23,9 +22,12 @@ func _ready() -> void:
 	_spawn_chests_from_markers()
 	_spawn_doors_from_markers()
 	_setup_navigation()
-	_create_invisible_border_walls()
 	_setup_cell_streaming()
-	DayNightCycle.add_to_level(self)
+	# Only setup day/night lighting when this is the main scene (has Player node)
+	# When loaded as a streamed cell, CellStreamer strips lighting to prevent doubling
+	var is_main_scene: bool = get_node_or_null("Player") != null
+	if is_main_scene:
+		DayNightCycle.add_to_level(self)
 	print("[BanditHideoutExterior] Bandit camp loaded")
 
 
@@ -65,7 +67,6 @@ func _spawn_enemies_from_markers() -> void:
 		push_warning("[BanditHideoutExterior] EnemySpawns node not found")
 		return
 
-	var bandit_sprite: Texture2D = load("res://assets/sprites/enemies/human_bandit.png")
 	var enemies_container := Node3D.new()
 	enemies_container.name = "Enemies"
 	add_child(enemies_container)
@@ -73,12 +74,40 @@ func _spawn_enemies_from_markers() -> void:
 	for marker in enemy_spawns.get_children():
 		if marker is Marker3D:
 			var enemy_data_path: String = marker.get_meta("enemy_data", "res://data/enemies/human_bandit.tres")
+
+			# Extract enemy type ID from path (e.g., "human_bandit" from ".../human_bandit.tres")
+			var enemy_type: String = enemy_data_path.get_file().get_basename()
+
+			# Check ActorRegistry first for sprite config (includes zoo patches)
+			var sprite_config: Dictionary = ActorRegistry.get_sprite_config(enemy_type)
+
+			var sprite_path: String
+			var h_frames: int
+			var v_frames: int
+
+			if not sprite_config.is_empty():
+				# Use ActorRegistry values (includes zoo patches)
+				sprite_path = sprite_config.get("sprite_path", "")
+				h_frames = sprite_config.get("h_frames", 4)
+				v_frames = sprite_config.get("v_frames", 1)
+			else:
+				# Fall back to defaults
+				sprite_path = "res://assets/sprites/enemies/human_bandit.png"
+				h_frames = 4
+				v_frames = 1
+
+			var sprite_texture: Texture2D = load(sprite_path)
+			if not sprite_texture:
+				push_error("[BanditHideoutExterior] Failed to load sprite: %s" % sprite_path)
+				continue
+
 			EnemyBase.spawn_billboard_enemy(
 				enemies_container,
 				marker.global_position,
 				enemy_data_path,
-				bandit_sprite,
-				4, 3
+				sprite_texture,
+				h_frames,
+				v_frames
 			)
 
 	print("[BanditHideoutExterior] Spawned enemies from %d markers" % enemy_spawns.get_child_count())
@@ -177,44 +206,6 @@ func _bake_navigation() -> void:
 	if nav_region and nav_region.navigation_mesh:
 		nav_region.bake_navigation_mesh()
 		print("[BanditHideoutExterior] Navigation mesh baked!")
-
-
-## Create invisible border walls to keep player in the zone
-func _create_invisible_border_walls() -> void:
-	var distance := ZONE_SIZE / 2.0
-	var wall_height := 4.0
-	var wall_thickness := 1.0
-
-	# Full walls on east and west (no exits)
-	_create_border_wall("EastBorder", Vector3(distance, wall_height / 2.0, 0), Vector3(wall_thickness, wall_height, distance * 2))
-	_create_border_wall("WestBorder", Vector3(-distance, wall_height / 2.0, 0), Vector3(wall_thickness, wall_height, distance * 2))
-
-	# North and south walls with gaps for exits
-	var gap_half := 5.0
-	var section_length := distance - gap_half
-
-	# North wall sections (gap for cave entrance)
-	_create_border_wall("NorthWestBorder", Vector3(-distance + section_length / 2.0, wall_height / 2.0, -distance), Vector3(section_length, wall_height, wall_thickness))
-	_create_border_wall("NorthEastBorder", Vector3(distance - section_length / 2.0, wall_height / 2.0, -distance), Vector3(section_length, wall_height, wall_thickness))
-
-	# South wall sections (gap for path to Thornfield)
-	_create_border_wall("SouthWestBorder", Vector3(-distance + section_length / 2.0, wall_height / 2.0, distance), Vector3(section_length, wall_height, wall_thickness))
-	_create_border_wall("SouthEastBorder", Vector3(distance - section_length / 2.0, wall_height / 2.0, distance), Vector3(section_length, wall_height, wall_thickness))
-
-
-func _create_border_wall(wall_name: String, position: Vector3, size: Vector3) -> void:
-	var wall := StaticBody3D.new()
-	wall.name = wall_name
-	wall.collision_layer = 1
-	wall.collision_mask = 0
-	add_child(wall)
-
-	var col := CollisionShape3D.new()
-	var box := BoxShape3D.new()
-	box.size = size
-	col.shape = box
-	col.position = position
-	wall.add_child(col)
 
 
 ## Setup cell streaming if we're the main scene (has Player/HUD)

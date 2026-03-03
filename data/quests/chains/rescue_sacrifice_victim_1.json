@@ -1,0 +1,32 @@
+{
+	"id": "rescue_sacrifice_victim_1",
+	"title": "The Ritual Sacrifice",
+	"description": "Cultists have kidnapped a young woman for their dark rituals. A priest in Millbrook begs you to save her before the next full moon. They've taken her to a ruined temple to the north.",
+	"is_main_quest": false,
+	"quest_source": "npc",
+	"giver_npc_id": "millbrook_priest",
+	"giver_npc_type": "priest",
+	"giver_region": "millbrook",
+	"faction": "temple_of_three",
+	"objectives": [
+		{
+			"id": "find_temple",
+			"description": "Find the cultist temple north of Millbrook",
+			"type": "reach",
+			"target": "cultist_temple_north",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 0,
+		"xp": 80,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": [],
+	"next_quest": "rescue_sacrifice_victim_2",
+	"spawn_on_accept": []
+}

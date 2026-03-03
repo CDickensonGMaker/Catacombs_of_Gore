@@ -3,6 +3,9 @@
 class_name QuestGiver
 extends StaticBody3D
 
+## Shop UI script for merchant functionality
+const ShopUIScript = preload("res://scripts/ui/shop_ui.gd")
+
 @export var npc_id: String = "quest_giver_01"
 @export var display_name: String = "Mysterious Stranger"
 
@@ -10,6 +13,11 @@ extends StaticBody3D
 var npc_name: String:
 	get: return display_name
 	set(value): display_name = value
+
+## Alias for ShopUI compatibility - returns display_name
+var merchant_name: String:
+	get:
+		return display_name
 
 ## NPC type and region for central turn-in system (NPC_TYPE_IN_REGION)
 var npc_type: String = "quest_giver"  # Can be overridden for specific NPC types
@@ -37,6 +45,9 @@ var npc_type: String = "quest_giver"  # Can be overridden for specific NPC types
 ## Shop inventory: Array of {item_id, price, quantity, quality}
 ## Generated automatically when has_shop is true
 var shop_inventory: Array[Dictionary] = []
+
+## Shop UI instance (used when opening shop)
+var shop_ui: Control = null
 
 ## Optional pre-quest dialogue (shown before quest offer when quest is NOT_STARTED)
 ## If set, uses DialogueManager instead of ConversationSystem for this initial dialogue
@@ -953,3 +964,123 @@ func _setup_shop_inventory() -> void:
 	print("[QuestGiver] %s shop initialized with %d items (type: %s, tier: %d)" % [
 		display_name, shop_inventory.size(), shop_type, shop_tier
 	])
+
+
+## Open the shop UI (called by ConversationSystem when player selects TRADE topic)
+func _open_shop_ui() -> void:
+	if not has_shop:
+		push_warning("[QuestGiver] %s has no shop to open" % display_name)
+		return
+
+	# Clean up existing shop UI if any
+	if shop_ui and is_instance_valid(shop_ui):
+		shop_ui.queue_free()
+
+	# Create the UI
+	shop_ui = Control.new()
+	shop_ui.set_script(ShopUIScript)
+	shop_ui.name = "ShopUI"
+
+	# Pass merchant reference (shop_ui expects a 'merchant' property)
+	shop_ui.set("merchant", self)
+
+	# Add to scene tree via canvas layer
+	var canvas := CanvasLayer.new()
+	canvas.name = "ShopUICanvas"
+	canvas.layer = 100
+	get_tree().current_scene.add_child(canvas)
+	canvas.add_child(shop_ui)
+
+	# Connect close signal
+	if shop_ui.has_signal("ui_closed"):
+		shop_ui.ui_closed.connect(_on_shop_ui_closed.bind(canvas))
+
+	# Enter menu mode and pause
+	GameManager.enter_menu()
+	get_tree().paused = true
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+
+	# Open the UI
+	if shop_ui.has_method("open"):
+		shop_ui.open(self)
+
+	print("[QuestGiver] %s opened shop UI" % display_name)
+
+
+## Called when shop UI is closed
+func _on_shop_ui_closed(canvas: CanvasLayer) -> void:
+	# Exit menu mode and unpause
+	GameManager.exit_menu()
+	get_tree().paused = false
+	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+
+	# Clean up canvas
+	if canvas and is_instance_valid(canvas):
+		canvas.queue_free()
+
+	shop_ui = null
+	print("[QuestGiver] %s closed shop UI" % display_name)
+
+
+## ============================================================================
+## SHOP PRICE CALCULATION METHODS (Required by ShopUI)
+## ============================================================================
+
+## Get Speech-based sell price modifier (player selling to merchant)
+## Higher Speech = better sell prices
+func get_speech_sell_modifier() -> float:
+	var speech: int = 0
+	var persuasion: int = 0
+	var negotiation: int = 0
+	if GameManager.player_data:
+		speech = GameManager.player_data.get_effective_stat(Enums.Stat.SPEECH)
+		persuasion = GameManager.player_data.get_skill(Enums.Skill.PERSUASION)
+		negotiation = GameManager.player_data.get_skill(Enums.Skill.NEGOTIATION)
+
+	# Base: 50% of value, +1% per 2 Speech points, +1% per Negotiation level
+	# Max bonus: +25% from Speech (50 points) + 10% from Negotiation (10 levels) = 85% max
+	var speech_bonus: float = minf(speech * 0.005, 0.25)
+	var negotiation_bonus: float = negotiation * 0.01
+	var persuasion_bonus: float = persuasion * 0.005
+	return 0.5 + speech_bonus + negotiation_bonus + persuasion_bonus
+
+
+## Get Speech-based buy price modifier (player buying from merchant)
+## Higher Speech = lower buy prices
+func get_speech_buy_modifier() -> float:
+	var speech: int = 0
+	var persuasion: int = 0
+	var negotiation: int = 0
+	if GameManager.player_data:
+		speech = GameManager.player_data.get_effective_stat(Enums.Stat.SPEECH)
+		persuasion = GameManager.player_data.get_skill(Enums.Skill.PERSUASION)
+		negotiation = GameManager.player_data.get_skill(Enums.Skill.NEGOTIATION)
+
+	# Base: 150% of value (50% markup), -1% per 2 Speech points, -1% per Negotiation level
+	# Min: 100% (no markup) at very high Speech/Negotiation
+	var speech_discount: float = minf(speech * 0.005, 0.25)
+	var negotiation_discount: float = negotiation * 0.01
+	var persuasion_discount: float = persuasion * 0.005
+	return maxf(1.5 - speech_discount - negotiation_discount - persuasion_discount, 1.0)
+
+
+## Get base sell price for an inventory item (before Speech modifier)
+func get_sell_price(inventory_index: int) -> int:
+	if inventory_index < 0 or inventory_index >= InventoryManager.inventory.size():
+		return 0
+
+	var inv_item: Dictionary = InventoryManager.inventory[inventory_index]
+	var base_value: int = InventoryManager.get_item_value(inv_item.item_id, inv_item.quality)
+	return base_value
+
+
+## Get sell price with Speech skill modifier applied
+func get_sell_price_with_speech(inventory_index: int) -> int:
+	return int(get_sell_price(inventory_index) * get_speech_sell_modifier())
+
+
+## Get buy price with Speech skill modifier applied
+func get_buy_price_with_speech(shop_index: int) -> int:
+	if shop_index < 0 or shop_index >= shop_inventory.size():
+		return 0
+	return int(shop_inventory[shop_index].price * get_speech_buy_modifier())

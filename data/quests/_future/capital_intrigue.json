@@ -1,0 +1,50 @@
+{
+	"id": "capital_intrigue",
+	"title": "Turmoil in the Capital",
+	"description": "You've arrived in Falkenhaften to find the capital in chaos. The King has been missing for nearly fifty years, and now a mysterious elven woman has appeared claiming to be his long-lost lover, accompanied by a young man she says is the true heir to the throne. The secret society contact asks you to investigate her claims - something doesn't add up.",
+	"is_main_quest": true,
+	"quest_source": "story",
+	"giver_npc_id": "secret_society_contact",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "falkenhaften",
+	"objectives": [
+		{
+			"id": "meet_contact",
+			"description": "Meet with your contact in the Hidden Quarter",
+			"type": "talk",
+			"target": "secret_society_contact",
+			"required_count": 1
+		},
+		{
+			"id": "gather_rumors",
+			"description": "Gather information about the elven claimant",
+			"type": "talk",
+			"target": "capital_informant",
+			"required_count": 3
+		},
+		{
+			"id": "investigate_heir",
+			"description": "Observe the supposed heir at the palace",
+			"type": "reach",
+			"target": "falkenhaften_palace_exterior",
+			"required_count": 1
+		},
+		{
+			"id": "report_findings",
+			"description": "Report your findings to your contact",
+			"type": "talk",
+			"target": "secret_society_contact",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "secret_society_contact",
+	"turn_in_zone": "falkenhaften",
+	"rewards": {
+		"gold": 150,
+		"xp": 400,
+		"items": []
+	},
+	"prerequisites": ["keepers_letter_delivery"],
+	"next_quest": "the_false_queen"
+}

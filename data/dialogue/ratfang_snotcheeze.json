@@ -1,0 +1,56 @@
+{
+  "id": "ratfang_snotcheeze_encounter",
+  "display_name": "Ratfang Snotcheeze - Assassin Encounter",
+  "description": "Pre-battle dialogue with the assassin Ratfang Snotcheeze",
+  "start_node": "start",
+  "nodes": [
+    {
+      "id": "start",
+      "speaker": "",
+      "text": "*A hooded rat-man steps from the shadows, dagger gleaming in the dim light*",
+      "auto_continue": "taunt_1",
+      "is_end": false,
+      "choices": []
+    },
+    {
+      "id": "taunt_1",
+      "speaker": "Ratfang Snotcheeze",
+      "text": "Well, well... you must be the one. They said you'd be trouble, but you don't look like much to me.",
+      "auto_continue": "taunt_2",
+      "is_end": false,
+      "choices": []
+    },
+    {
+      "id": "taunt_2",
+      "speaker": "Ratfang Snotcheeze",
+      "text": "Name's Ratfang Snotcheeze, and I've been paid handsomely to make sure you never reach your destination.",
+      "auto_continue": "taunt_3",
+      "is_end": false,
+      "choices": []
+    },
+    {
+      "id": "taunt_3",
+      "speaker": "Ratfang Snotcheeze",
+      "text": "Nothing personal, understand. Just business.",
+      "auto_continue": "taunt_4",
+      "is_end": false,
+      "choices": []
+    },
+    {
+      "id": "taunt_4",
+      "speaker": "Ratfang Snotcheeze",
+      "text": "*He grins, revealing yellowed fangs*",
+      "auto_continue": "final",
+      "is_end": false,
+      "choices": []
+    },
+    {
+      "id": "final",
+      "speaker": "Ratfang Snotcheeze",
+      "text": "Now hold still - this'll only hurt... a lot.",
+      "is_end": true,
+      "auto_continue": "",
+      "choices": []
+    }
+  ]
+}

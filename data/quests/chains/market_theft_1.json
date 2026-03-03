@@ -1,0 +1,32 @@
+{
+	"id": "market_theft_1",
+	"title": "Theft at the Market",
+	"description": "A merchant's valuable goods were stolen from the market. He suspects one of the locals but needs proof. Question witnesses to find the truth.",
+	"is_main_quest": false,
+	"quest_source": "npc",
+	"giver_npc_id": "millbrook_merchant",
+	"giver_npc_type": "merchant",
+	"giver_region": "millbrook",
+	"faction": "merchants_guild",
+	"objectives": [
+		{
+			"id": "question_witness1",
+			"description": "Question the first witness",
+			"type": "talk",
+			"target": "millbrook_civilian",
+			"target_zone": "millbrook",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 0,
+		"xp": 50,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": [],
+	"next_quest": "market_theft_2"
+}

@@ -1,0 +1,31 @@
+{
+	"id": "bandit_justice_1",
+	"title": "Bandit Justice",
+	"description": "The guard captain wants a bandit camp north of the moor scouted. They've been raiding caravans and the empire has had enough.",
+	"is_main_quest": false,
+	"quest_source": "npc",
+	"giver_npc_id": "elder_moor_guard",
+	"giver_npc_type": "guard",
+	"giver_region": "elder_moor",
+	"faction": "human_empire",
+	"objectives": [
+		{
+			"id": "scout_camp",
+			"description": "Scout the bandit camp location",
+			"type": "reach",
+			"target": "bandit_camp_north",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 25,
+		"xp": 75,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": [],
+	"next_quest": "bandit_justice_2"
+}

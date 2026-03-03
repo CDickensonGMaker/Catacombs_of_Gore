@@ -3,10 +3,6 @@
 [ext_resource type="Script" path="res://scripts/dialogue/conversation_response_pool.gd" id="1_pool"]
 [ext_resource type="Script" path="res://scripts/dialogue/conversation_response.gd" id="2_resp"]
 
-# =============================================================================
-# INN DIRECTIONS
-# =============================================================================
-
 [sub_resource type="Resource" id="dir_inn_1"]
 script = ExtResource("2_resp")
 text = "The inn? Head down the main road, you'll see it on your right. Can't miss the sign."
@@ -45,10 +41,6 @@ weight = 0.9
 actions = []
 conditions = []
 response_id = "dir_inn_3"
-
-# =============================================================================
-# BLACKSMITH DIRECTIONS
-# =============================================================================
 
 [sub_resource type="Resource" id="dir_smith_1"]
 script = ExtResource("2_resp")
@@ -89,10 +81,6 @@ actions = []
 conditions = []
 response_id = "dir_smith_3"
 
-# =============================================================================
-# GENERAL STORE DIRECTIONS
-# =============================================================================
-
 [sub_resource type="Resource" id="dir_store_1"]
 script = ExtResource("2_resp")
 text = "The general store is on the main road, across from the well. Open 'til sundown."
@@ -131,10 +119,6 @@ weight = 0.9
 actions = []
 conditions = []
 response_id = "dir_store_3"
-
-# =============================================================================
-# EXIT/GATE DIRECTIONS
-# =============================================================================
 
 [sub_resource type="Resource" id="dir_exit_1"]
 script = ExtResource("2_resp")
@@ -175,10 +159,6 @@ actions = []
 conditions = []
 response_id = "dir_exit_3"
 
-# =============================================================================
-# TEMPLE DIRECTIONS
-# =============================================================================
-
 [sub_resource type="Resource" id="dir_temple_1"]
 script = ExtResource("2_resp")
 text = "The temple is on the hill at the south side of town. Follow the stone steps."
@@ -217,10 +197,6 @@ weight = 0.9
 actions = []
 conditions = []
 response_id = "dir_temple_3"
-
-# =============================================================================
-# GUILD HALL DIRECTIONS
-# =============================================================================
 
 [sub_resource type="Resource" id="dir_guild_1"]
 script = ExtResource("2_resp")
@@ -261,10 +237,6 @@ actions = []
 conditions = []
 response_id = "dir_guild_3"
 
-# =============================================================================
-# DUNGEON ENTRANCE DIRECTIONS
-# =============================================================================
-
 [sub_resource type="Resource" id="dir_dungeon_1"]
 script = ExtResource("2_resp")
 text = "The old catacombs? There's an entrance in the ruins outside the east gate. Watch yourself."
@@ -303,10 +275,6 @@ weight = 0.8
 actions = []
 conditions = []
 response_id = "dir_dungeon_3"
-
-# =============================================================================
-# DOCKS / WATER ACCESS DIRECTIONS
-# =============================================================================
 
 [sub_resource type="Resource" id="dir_docks_1"]
 script = ExtResource("2_resp")
@@ -347,10 +315,6 @@ actions = []
 conditions = []
 response_id = "dir_docks_3"
 
-# =============================================================================
-# OLD WATCHTOWER DIRECTIONS
-# =============================================================================
-
 [sub_resource type="Resource" id="dir_watchtower_1"]
 script = ExtResource("2_resp")
 text = "The Old Watchtower? It's on the hill west of town. Abandoned years ago, but the path's still clear."
@@ -376,10 +340,6 @@ weight = 1.0
 actions = []
 conditions = []
 response_id = "dir_watchtower_2"
-
-# =============================================================================
-# EAST/WEST ROAD EXIT DIRECTIONS
-# =============================================================================
 
 [sub_resource type="Resource" id="dir_road_east_1"]
 script = ExtResource("2_resp")
@@ -419,10 +379,6 @@ weight = 0.9
 actions = []
 conditions = []
 response_id = "dir_road_both_1"
-
-# =============================================================================
-# GUARD-SPECIFIC DETAILED DIRECTIONS
-# =============================================================================
 
 [sub_resource type="Resource" id="dir_guard_inn"]
 script = ExtResource("2_resp")
@@ -489,10 +445,6 @@ actions = []
 conditions = []
 response_id = "dir_guard_gates"
 
-# =============================================================================
-# GRUMPY VARIANTS FOR EXISTING LOCATIONS
-# =============================================================================
-
 [sub_resource type="Resource" id="dir_inn_grumpy"]
 script = ExtResource("2_resp")
 text = "The inn? Down the road. Now leave me be."
@@ -518,10 +470,6 @@ weight = 0.9
 actions = []
 conditions = []
 response_id = "dir_smith_grumpy"
-
-# =============================================================================
-# GENERIC/UNHELPFUL DIRECTIONS
-# =============================================================================
 
 [sub_resource type="Resource" id="dir_generic_1"]
 script = ExtResource("2_resp")

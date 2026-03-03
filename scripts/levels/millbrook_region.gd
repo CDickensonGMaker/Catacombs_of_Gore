@@ -42,7 +42,11 @@ func _bake_navigation() -> void:
 
 
 func _setup_day_night_cycle() -> void:
-	DayNightCycle.add_to_level(self)
+	# Only setup day/night lighting when this is the main scene (has Player node)
+	# When loaded as a streamed cell, CellStreamer strips lighting to prevent doubling
+	var is_main_scene: bool = get_node_or_null("Player") != null
+	if is_main_scene:
+		DayNightCycle.add_to_level(self)
 
 
 func _setup_spawn_point_metadata() -> void:
@@ -68,9 +72,20 @@ func _spawn_enemies() -> void:
 
 func _spawn_enemy_at_marker(marker: Marker3D) -> void:
 	var enemy_data_path: String = marker.get_meta("enemy_data", "res://data/enemies/wolf.tres")
+	var enemy_type: String = marker.get_meta("enemy_type", "wolf")
+
+	# Default values from marker metadata
 	var sprite_path: String = marker.get_meta("sprite_path", "res://assets/sprites/enemies/wolf.png")
 	var h_frames: int = marker.get_meta("h_frames", 4)
 	var v_frames: int = marker.get_meta("v_frames", 4)
+
+	# Check ActorRegistry for Zoo patches
+	if ActorRegistry:
+		var sprite_config: Dictionary = ActorRegistry.get_sprite_config(enemy_type)
+		if not sprite_config.is_empty():
+			sprite_path = sprite_config.get("sprite_path", sprite_path)
+			h_frames = sprite_config.get("h_frames", h_frames)
+			v_frames = sprite_config.get("v_frames", v_frames)
 
 	var sprite_texture: Texture2D = load(sprite_path)
 	if not sprite_texture:

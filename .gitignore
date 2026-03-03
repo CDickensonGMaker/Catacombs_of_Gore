@@ -43,3 +43,9 @@ reference/
 
 # Generated files that can be recreated
 *.uid
+
+# Build artifacts
+*.exe
+*.pck
+*.console.exe
+*.7z

@@ -78,9 +78,14 @@ func _process(delta: float) -> void:
 ## Report a crime
 ## crime_type: The type of crime committed
 ## region_id: The region where the crime occurred
-## witnesses: Array of witness nodes (NPCs who saw the crime)
+## witnesses: Array of witness nodes (NPCs who saw the crime) - if empty, auto-finds nearby NPCs
+## crime_position: Optional position where crime occurred (for witness finding)
 ## Returns: true if crime was successfully reported (had witnesses)
-func report_crime(crime_type: CrimeType, region_id: String, witnesses: Array = []) -> bool:
+func report_crime(crime_type: CrimeType, region_id: String, witnesses: Array = [], crime_position: Vector3 = Vector3.ZERO) -> bool:
+	# If no witnesses provided, try to find nearby NPCs
+	if witnesses.is_empty():
+		witnesses = _find_nearby_witnesses(crime_position)
+
 	# No witnesses = no crime reported
 	if witnesses.is_empty():
 		print("[CrimeManager] Crime committed but no witnesses")
@@ -94,11 +99,12 @@ func report_crime(crime_type: CrimeType, region_id: String, witnesses: Array = [
 	bounties[region_id] = current_bounty + bounty_value
 	last_crimes[region_id] = crime_type
 
-	print("[CrimeManager] Crime reported: %s in %s (+%d bounty, total: %d)" % [
+	print("[CrimeManager] Crime reported: %s in %s (+%d bounty, total: %d) - %d witnesses" % [
 		CRIME_NAMES.get(crime_type, "Unknown"),
 		region_id,
 		bounty_value,
-		bounties[region_id]
+		bounties[region_id],
+		witnesses.size()
 	])
 
 	# Emit signal for UI updates
@@ -108,7 +114,96 @@ func report_crime(crime_type: CrimeType, region_id: String, witnesses: Array = [
 	# Alert nearby guards
 	_alert_guards(region_id)
 
+	# Affect disposition with witnesses
+	_affect_witness_disposition(witnesses, crime_type)
+
+	# Show notification
+	_show_crime_notification(crime_type, witnesses.size())
+
 	return true
+
+
+## Find nearby NPCs who could witness a crime
+## Returns array of NPCs within witness range
+func _find_nearby_witnesses(crime_position: Vector3) -> Array:
+	var witnesses: Array = []
+	var witness_range: float = 20.0  # How far NPCs can see crimes
+
+	# If no position given, use player position
+	if crime_position == Vector3.ZERO:
+		var player: Node = get_tree().get_first_node_in_group("player")
+		if player and player is Node3D:
+			crime_position = (player as Node3D).global_position
+
+	if crime_position == Vector3.ZERO:
+		return witnesses
+
+	# Find all NPCs in range
+	var npcs: Array = get_tree().get_nodes_in_group("npcs")
+	for npc in npcs:
+		if not is_instance_valid(npc):
+			continue
+		if not npc is Node3D:
+			continue
+
+		# Skip dead NPCs
+		if npc.has_method("is_dead") and npc.is_dead():
+			continue
+
+		var distance: float = (npc as Node3D).global_position.distance_to(crime_position)
+		if distance <= witness_range:
+			witnesses.append(npc)
+
+	return witnesses
+
+
+## Reduce disposition with NPCs who witnessed the crime
+func _affect_witness_disposition(witnesses: Array, crime_type: CrimeType) -> void:
+	var disposition_penalty: int = 0
+	match crime_type:
+		CrimeType.ASSAULT:
+			disposition_penalty = -20
+		CrimeType.THEFT:
+			disposition_penalty = -10
+		CrimeType.MURDER:
+			disposition_penalty = -50
+		CrimeType.TRESPASSING:
+			disposition_penalty = -5
+		CrimeType.PICKPOCKET:
+			disposition_penalty = -10
+
+	for witness in witnesses:
+		if not is_instance_valid(witness):
+			continue
+
+		# Set a flag that this NPC saw the player commit a crime
+		var npc_id: String = ""
+		if "npc_id" in witness:
+			npc_id = witness.npc_id
+		elif witness.has_method("get_npc_id"):
+			npc_id = witness.get_npc_id()
+
+		if not npc_id.is_empty():
+			# Store witness info in ConversationSystem flags
+			ConversationSystem.set_flag(npc_id + "_witnessed_crime", true)
+			ConversationSystem.set_flag(npc_id + "_witnessed_" + CRIME_NAMES.get(crime_type, "crime").to_lower(), true)
+
+			# Reduce disposition
+			if witness.has_method("modify_disposition"):
+				witness.modify_disposition(disposition_penalty)
+			elif "base_disposition" in witness:
+				witness.base_disposition = maxi(0, witness.base_disposition + disposition_penalty)
+
+
+## Show notification about crime being witnessed
+func _show_crime_notification(crime_type: CrimeType, witness_count: int) -> void:
+	var hud: Node = get_tree().get_first_node_in_group("hud")
+	if hud and hud.has_method("show_notification"):
+		var crime_name: String = CRIME_NAMES.get(crime_type, "Crime")
+		if witness_count > 0:
+			hud.show_notification("%s witnessed! Bounty added." % crime_name)
+		else:
+			hud.show_notification("%s committed." % crime_name)
 
 
 ## Get current bounty in a region

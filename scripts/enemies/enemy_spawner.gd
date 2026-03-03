@@ -16,10 +16,10 @@ signal destroyed(destroyer: Node)
 ## Spawning configuration
 @export var spawn_interval_min: float = 20.0  ## Minimum seconds between spawns
 @export var spawn_interval_max: float = 30.0  ## Maximum seconds between spawns
-@export var max_spawned_enemies: int = 15  ## Max enemies alive from this spawner
+@export var max_spawned_enemies: int = 20  ## Max enemies alive from this spawner (increased for demo)
 @export var spawn_radius: float = 3.0     ## Radius around spawner to spawn enemies
-@export var spawn_count_min: int = 2  ## Minimum enemies to spawn at once
-@export var spawn_count_max: int = 3  ## Maximum enemies to spawn at once
+@export var spawn_count_min: int = 3  ## Minimum enemies to spawn at once (increased for demo)
+@export var spawn_count_max: int = 5  ## Maximum enemies to spawn at once (increased for demo)
 @export var enemy_scene: PackedScene      ## The enemy scene to spawn
 @export var enemy_data_path: String = "res://data/enemies/goblin_soldier.tres"
 

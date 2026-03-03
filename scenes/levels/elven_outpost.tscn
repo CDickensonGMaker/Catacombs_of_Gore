@@ -1,6 +1,6 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=5 format=3 uid="uid://datuiqahtphew"]
 
-[ext_resource type="Script" path="res://scripts/levels/elven_outpost.gd" id="1"]
+[ext_resource type="Script" uid="uid://dkys7d6ecxiai" path="res://scripts/levels/elven_outpost.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
 
@@ -12,7 +12,6 @@ ambient_light_color = Color(0.5, 0.65, 0.5, 1)
 ambient_light_energy = 0.6
 fog_enabled = true
 fog_light_color = Color(0.35, 0.5, 0.4, 1)
-fog_density = 0.01
 
 [node name="ElvenOutpost" type="Node3D"]
 script = ExtResource("1")
@@ -23,7 +22,6 @@ environment = SubResource("Environment_elven")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.866, -0.433, 0.25, 0, 0.5, 0.866, -0.5, -0.75, 0.433, 0, 20, 0)
 light_color = Color(0.9, 0.95, 0.85, 1)
-light_energy = 1.0
 shadow_enabled = true
 
 [node name="Player" parent="." instance=ExtResource("2")]

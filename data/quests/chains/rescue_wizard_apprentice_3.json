@@ -1,0 +1,34 @@
+{
+	"id": "rescue_wizard_apprentice_3",
+	"title": "Return the Apprentice",
+	"description": "You've freed the apprentice. Return to the wizard in Thornfield.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "mages_circle",
+	"objectives": [
+		{
+			"id": "return",
+			"description": "Return to the wizard in Thornfield",
+			"type": "talk",
+			"target": "thornfield_wizard",
+			"target_zone": "thornfield",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "thornfield_wizard",
+	"turn_in_zone": "thornfield",
+	"rewards": {
+		"gold": 275,
+		"xp": 380,
+		"items": ["minor_mana_potion", "minor_mana_potion"],
+		"faction_reputation": {
+			"mages_circle": 30
+		}
+	},
+	"prerequisites": ["rescue_wizard_apprentice_2"],
+	"next_quest": ""
+}

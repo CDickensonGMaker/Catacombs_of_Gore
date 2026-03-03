@@ -47,7 +47,11 @@ func _bake_navigation() -> void:
 
 ## Setup dynamic day/night lighting
 func _setup_day_night_cycle() -> void:
-	DayNightCycle.add_to_level(self)
+	# Only setup day/night lighting when this is the main scene (has Player node)
+	# When loaded as a streamed cell, CellStreamer strips lighting to prevent doubling
+	var is_main_scene: bool = get_node_or_null("Player") != null
+	if is_main_scene:
+		DayNightCycle.add_to_level(self)
 
 
 ## Add metadata to spawn points for proper identification

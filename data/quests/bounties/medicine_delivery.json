@@ -1,0 +1,38 @@
+{
+	"id": "bounty_medicine_delivery",
+	"title": "Medicine for Millbrook",
+	"description": "Sickness has spread in Millbrook and they desperately need medicine from Dalhurst. Someone must carry it through the dangerous roads.",
+	"is_main_quest": false,
+	"quest_source": "bounty",
+	"giver_npc_id": "bounty_board",
+	"giver_npc_type": "bounty_board",
+	"giver_region": "dalhurst",
+	"faction": "common_folk",
+	"objectives": [
+		{
+			"id": "deliver_medicine",
+			"description": "Deliver the medicine to the healer in Millbrook",
+			"type": "talk",
+			"target": "millbrook_healer",
+			"target_zone": "millbrook",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "millbrook_healer",
+	"turn_in_zone": "millbrook",
+	"starter_items": [
+		{"id": "medicine_bundle", "quantity": 1}
+	],
+	"rewards": {
+		"gold": 60,
+		"xp": 125,
+		"items": [],
+		"faction_reputation": {
+			"common_folk": 20
+		}
+	},
+	"cooldown_days": 5,
+	"prerequisites": [],
+	"next_quest": ""
+}

@@ -16,13 +16,13 @@ signal room_count_changed(count: int)
 
 ## Dungeon-wide spawn limits
 ## Target: 45-55% of rooms should have enemies (per design doc)
-@export var total_enemies_min: int = 15
-@export var total_enemies_max: int = 25
+@export var total_enemies_min: int = 25  # Increased for demo
+@export var total_enemies_max: int = 45  # Increased for demo
 @export var total_chests_min: int = 2
 @export var total_chests_max: int = 8
 @export var has_boss: bool = true
-@export var min_rooms_with_enemies: int = 3  # GUARANTEE at least this many rooms have enemies
-@export var max_enemies_per_room: int = 4  # Cap enemies per room for balance
+@export var min_rooms_with_enemies: int = 5  # GUARANTEE at least this many rooms have enemies (increased)
+@export var max_enemies_per_room: int = 6  # Cap enemies per room for balance (increased for demo)
 
 ## Organic cave generation settings
 @export var use_organic_caves: bool = false  # Use cellular automata caves instead of box rooms
@@ -506,8 +506,8 @@ func _seal_unused_doors() -> void:
 ## Adjacent rooms share walls, non-adjacent need corridor bridges
 func _create_corridors_where_needed() -> void:
 	# Load textures for corridors
-	var floor_texture: Texture2D = load("res://Sprite folders grab bag/stonefloor.png")
-	var wall_texture: Texture2D = load("res://Sprite folders grab bag/stonewall.png")
+	var floor_texture: Texture2D = load("res://assets/textures/environment/floors/stonefloor.png")
+	var wall_texture: Texture2D = load("res://assets/textures/environment/walls/stonewall.png")
 
 	var corridor_mat := StandardMaterial3D.new()
 	corridor_mat.albedo_color = Color(0.12, 0.1, 0.14)

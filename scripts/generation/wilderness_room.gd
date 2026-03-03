@@ -29,6 +29,13 @@ static var _tree_textures_swamp: Array[Texture2D] = []
 static var _tree_textures_plains: Array[Texture2D] = []
 static var _textures_initialized: bool = false
 
+## PERFORMANCE: General-purpose texture cache for any path
+static var _texture_cache: Dictionary = {}
+
+## Ancient statue spawn limit - only 15 can exist in the entire world
+static var _statues_spawned: int = 0
+const MAX_STATUES: int = 15
+
 ## Tile template scenes for biome-based tile selection
 ## Maps Biome enum to array of scene paths for hand-crafted tile variations
 const TILE_TEMPLATES: Dictionary = {
@@ -72,8 +79,8 @@ const MUSHROOM_3D_MODELS: Array[String] = [
 @export var max_ruins: int = 3
 @export var fireplace_chance: float = 0.15
 @export var traveling_merchant_chance: float = 0.04  # 4% chance per room (rare encounter)
-@export var enemy_count_min: int = 0  # Can have no enemies (exploration focus)
-@export var enemy_count_max: int = 2  # Reduced max for less combat density
+@export var enemy_count_min: int = 4  # Base enemies per wilderness cell (increased for danger)
+@export var enemy_count_max: int = 10  # Max base enemies per cell (scales with danger level)
 @export var cursed_totem_chance: float = 0.05  # 5% chance for cursed totem near ruins (reduced to prevent skeleton spam)
 
 ## Road visualization settings
@@ -100,6 +107,7 @@ var cursed_totems: Array[CursedTotem] = []  # Skeleton spawners near ruins
 var enemies: Array[Node3D] = []
 var props: Array[Node3D] = []
 var traveling_merchant: TravelingMerchant = null
+var spock_easter_egg: SpockEasterEgg = null  # Rare easter egg NPC
 var signposts: Array[Node3D] = []  # Direction signposts on road cells
 
 ## Whether this cell is a road cell
@@ -125,9 +133,9 @@ static func _init_texture_cache() -> void:
 
 	# Grass textures
 	var grass_paths: Array[String] = [
-		"res://Sprite folders grab bag/grassland_1.png",
-		"res://Sprite folders grab bag/grassland_2.png",
-		"res://Sprite folders grab bag/grassland_3.png"
+		"res://assets/sprites/environment/ground/grassland_1.png",
+		"res://assets/sprites/environment/ground/grassland_2.png",
+		"res://assets/sprites/environment/ground/grassland_3.png"
 	]
 	for path: String in grass_paths:
 		if ResourceLoader.exists(path):
@@ -135,8 +143,8 @@ static func _init_texture_cache() -> void:
 
 	# Forest tree textures (autumn trees)
 	var forest_tree_paths: Array[String] = [
-		"res://Sprite folders grab bag/autumntree.png",
-		"res://Sprite folders grab bag/autumntree2.png"
+		"res://assets/sprites/environment/trees/autumn_tree_1.png",
+		"res://assets/sprites/environment/trees/autumn_tree_2.png"
 	]
 	for path: String in forest_tree_paths:
 		if ResourceLoader.exists(path):
@@ -144,10 +152,10 @@ static func _init_texture_cache() -> void:
 
 	# Swamp tree textures
 	var swamp_tree_paths: Array[String] = [
-		"res://Sprite folders grab bag/swamp_tree1.png",
-		"res://Sprite folders grab bag/swamp_tree2.png",
-		"res://Sprite folders grab bag/swamp_downtree1.png",
-		"res://Sprite folders grab bag/swamp_downtree2.png"
+		"res://assets/sprites/environment/trees/swamp_tree1.png",
+		"res://assets/sprites/environment/trees/swamp_tree2.png",
+		"res://assets/sprites/environment/trees/swamp_fallen_1.png",
+		"res://assets/sprites/environment/trees/swamp_fallen_2.png"
 	]
 	for path: String in swamp_tree_paths:
 		if ResourceLoader.exists(path):
@@ -158,6 +166,17 @@ static func _init_texture_cache() -> void:
 
 	print("[WildernessRoom] Texture cache initialized: %d grass, %d forest trees, %d swamp trees" % [
 		_grass_textures.size(), _tree_textures_forest.size(), _tree_textures_swamp.size()])
+
+
+## PERFORMANCE: Get a cached texture by path (avoids repeated load() calls)
+static func _get_cached_texture(path: String) -> Texture2D:
+	if not _texture_cache.has(path):
+		if ResourceLoader.exists(path):
+			_texture_cache[path] = load(path)
+		else:
+			push_warning("[WildernessRoom] Texture not found: %s" % path)
+			return null
+	return _texture_cache[path]
 
 
 func _ready() -> void:
@@ -179,11 +198,46 @@ func generate(seed_value: int = 0, coords: Vector2i = Vector2i.ZERO) -> void:
 	rng = RandomNumberGenerator.new()
 	rng.seed = room_seed
 
+	# Check terrain type - don't generate land over water
+	if WorldGrid.is_in_bounds(coords):
+		var cell_info: WorldGrid.CellInfo = WorldGrid.get_cell(coords)
+		if cell_info:
+			# WATER cells: flat water surface only
+			if cell_info.terrain == WorldGrid.Terrain.WATER:
+				_create_water_cell()
+				room_generated.emit(self)
+				return
+			# COAST cells: sandy beach with water on water-adjacent edges
+			if cell_info.terrain == WorldGrid.Terrain.COAST:
+				_create_coast_cell(coords)
+				room_generated.emit(self)
+				return
+
+	# Check if this cell has a hand-crafted scene (scene_path set in WorldGrid)
+	# If so, skip procedural content spawning entirely - the hand-crafted scene handles everything
+	var cell_info: WorldGrid.CellInfo = WorldGrid.get_cell(coords)
+	var is_handcrafted: bool = cell_info != null and cell_info.scene_path != ""
+	if is_handcrafted:
+		print("[WildernessRoom] Skipping procedural content for hand-crafted cell %s (%s)" % [
+			coords, cell_info.location_name])
+		room_generated.emit(self)
+		return
+
+	# Check if this cell is covered by another scene's physical area
+	# (e.g., Elder Moor is 242x219 units at (0,0), so cells (1,0) and (0,1) fall within its bounds)
+	# If covered, we still generate terrain/trees but skip enemies/ruins/dungeons
+	var is_covered_by_handcrafted: bool = false
+	var coverage: Dictionary = WorldGrid.is_covered_by_scene(coords)
+	if coverage.get("covered", false):
+		is_covered_by_handcrafted = true
+		print("[WildernessRoom] Cell %s covered by %s - will generate terrain but skip enemies/ruins" % [
+			coords, coverage.get("by_location", "unknown")])
+
 	# Check if this is a road cell
 	is_road_cell = WorldGrid.is_road(coords)
 
-	print("[WildernessRoom] Generating room at %s with seed %d, biome: %s, is_road: %s, seamless: %s" % [
-		coords, room_seed, Biome.keys()[biome], is_road_cell, seamless_mode
+	print("[WildernessRoom] Generating room at %s with seed %d, biome: %s, is_road: %s, seamless: %s, covered: %s" % [
+		coords, room_seed, Biome.keys()[biome], is_road_cell, seamless_mode, is_covered_by_handcrafted
 	])
 
 	_setup_materials()
@@ -197,15 +251,21 @@ func generate(seed_value: int = 0, coords: Vector2i = Vector2i.ZERO) -> void:
 		_create_edges()
 
 	_create_spawn_points()  # Directional spawn points for cell transitions
-	_spawn_ruins()
-	_spawn_cursed_totems()  # Skeleton spawners near ruins
+
+	# ALWAYS spawn terrain/environment (trees, grass, props)
 	_spawn_environment()
-	_spawn_enemies()
-	_spawn_fireplace()
-	_spawn_traveling_merchant()
-	_spawn_signposts_if_road()  # Add signposts pointing to destinations
 	_create_boundary_props()
 	_create_edge_transitions()  # Blend terrain at edges with adjacent biomes
+
+	# SKIP enemies/ruins/dungeons if covered by hand-crafted zone
+	if not is_covered_by_handcrafted:
+		_spawn_ruins()
+		_spawn_cursed_totems()  # Skeleton spawners near ruins
+		_spawn_enemies()
+		_spawn_fireplace()
+		_spawn_traveling_merchant()
+		_spawn_spock_easter_egg()  # Rare Spock easter egg
+		_spawn_signposts_if_road()  # Add signposts pointing to destinations
 
 	room_generated.emit(self)
 
@@ -221,7 +281,7 @@ func _setup_materials() -> void:
 	# Ruin material uses stone wall texture
 	ruin_material = StandardMaterial3D.new()
 	ruin_material.roughness = 0.85
-	var stone_tex: Texture2D = load("res://Sprite folders grab bag/stonewall.png")
+	var stone_tex: Texture2D = load("res://assets/textures/environment/walls/stonewall.png")
 	if stone_tex:
 		ruin_material.albedo_texture = stone_tex
 		ruin_material.uv1_scale = Vector3(0.5, 0.5, 1.0)  # Tile the texture
@@ -284,19 +344,151 @@ func _is_adjacent_to_scene() -> bool:
 	return false
 
 
+## Create a water-only cell (deep water, no land)
+func _create_water_cell() -> void:
+	var water_mat := StandardMaterial3D.new()
+	water_mat.albedo_color = Color(0.15, 0.25, 0.40, 0.85)
+	water_mat.roughness = 0.2
+	water_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+
+	var water := MeshInstance3D.new()
+	water.name = "WaterSurface"
+	var plane := PlaneMesh.new()
+	plane.size = Vector2(room_size, room_size)
+	water.mesh = plane
+	water.material_override = water_mat
+	water.position = Vector3(0, -0.5, 0)
+	add_child(water)
+
+	# Create boundary walls (impassable water)
+	CellEdge.create_boundary_walls(self, grid_coords, room_size)
+	print("[WildernessRoom] Created water cell at %s" % grid_coords)
+
+
+## Create a coastal cell (sandy beach with water on water-adjacent edges)
+func _create_coast_cell(coords: Vector2i) -> void:
+	_setup_materials()
+
+	# Sandy ground material
+	var sand_mat := StandardMaterial3D.new()
+	sand_mat.albedo_color = Color(0.76, 0.70, 0.50)  # Sandy tan
+	sand_mat.roughness = 0.95
+
+	# Create sandy flat ground
+	var ground := CSGBox3D.new()
+	ground.name = "Ground"
+	ground.size = Vector3(room_size, 1.0, room_size)
+	ground.position = Vector3(0, 0, 0)
+	ground.material = sand_mat
+	ground.use_collision = true
+	add_child(ground)
+
+	# Water material for edges
+	var water_mat := StandardMaterial3D.new()
+	water_mat.albedo_color = Color(0.15, 0.25, 0.40, 0.85)
+	water_mat.roughness = 0.2
+	water_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+
+	# Check each direction for water adjacency and add water planes
+	var directions: Array[Vector2i] = [
+		Vector2i(-1, 0),  # West
+		Vector2i(1, 0),   # East
+		Vector2i(0, -1),  # North
+		Vector2i(0, 1)    # South
+	]
+
+	for dir: Vector2i in directions:
+		var adj: Vector2i = coords + dir
+		var adj_cell: WorldGrid.CellInfo = WorldGrid.get_cell(adj)
+		if adj_cell and adj_cell.terrain == WorldGrid.Terrain.WATER:
+			_add_water_edge(dir, water_mat)
+
+	# Spawn minimal vegetation (0-2 scraggly trees/palms)
+	var tree_count: int = rng.randi_range(0, 2)
+	for i in range(tree_count):
+		var pos := Vector3(
+			rng.randf_range(-room_size / 3.0, room_size / 3.0),
+			0.5,
+			rng.randf_range(-room_size / 3.0, room_size / 3.0)
+		)
+		_spawn_coastal_tree(pos)
+
+	# Create edges where needed
+	CellEdge.create_boundary_walls(self, grid_coords, room_size)
+	print("[WildernessRoom] Created coast cell at %s" % coords)
+
+
+## Add a water plane along a specific edge direction
+func _add_water_edge(dir: Vector2i, water_mat: StandardMaterial3D) -> void:
+	var water := MeshInstance3D.new()
+	water.name = "WaterEdge_%d_%d" % [dir.x, dir.y]
+
+	var plane := PlaneMesh.new()
+	var edge_width: float = 20.0  # Width of water extending into the cell
+	var half_size: float = room_size / 2.0
+
+	# Position and size water based on direction
+	if dir.x == -1:  # West edge
+		plane.size = Vector2(edge_width, room_size)
+		water.position = Vector3(-half_size + edge_width / 2.0, -0.5, 0)
+	elif dir.x == 1:  # East edge
+		plane.size = Vector2(edge_width, room_size)
+		water.position = Vector3(half_size - edge_width / 2.0, -0.5, 0)
+	elif dir.y == -1:  # North edge
+		plane.size = Vector2(room_size, edge_width)
+		water.position = Vector3(0, -0.5, -half_size + edge_width / 2.0)
+	elif dir.y == 1:  # South edge
+		plane.size = Vector2(room_size, edge_width)
+		water.position = Vector3(0, -0.5, half_size - edge_width / 2.0)
+
+	water.mesh = plane
+	water.material_override = water_mat
+	add_child(water)
+
+
+## Spawn a scraggly coastal tree/palm
+func _spawn_coastal_tree(pos: Vector3) -> void:
+	# Use existing tree textures but fewer/scraggly
+	if _tree_textures_forest.is_empty():
+		return
+
+	var tree_tex: Texture2D = _tree_textures_forest[rng.randi() % _tree_textures_forest.size()]
+	var tree := Sprite3D.new()
+	tree.name = "CoastalTree"
+	tree.texture = tree_tex
+	tree.pixel_size = 0.04
+	tree.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	tree.position = pos
+	tree.modulate = Color(0.8, 0.85, 0.7)  # Slightly faded coastal look
+	add_child(tree)
+
+
 ## Create flat ground (original method, used for roads)
 func _create_flat_ground() -> void:
 	var ground := CSGBox3D.new()
 	ground.name = "Ground"
 	# Use exact room size (no overlap) to prevent z-fighting with adjacent cells
 	ground.size = Vector3(room_size, 1.0, room_size)
-	ground.position = Vector3(0, -0.5, 0)
+
+	# Match terrain base level (y=0) to prevent step/cliff at cell transitions
+	var y_offset: float = 0.0
+	if _is_adjacent_to_scene():
+		y_offset = -0.05  # Slightly lower to avoid Z-fighting with scene floors
+	ground.position = Vector3(0, y_offset, 0)
 	ground.use_collision = true
 
-	# Simple solid color material - biome colors are set in _setup_materials()
+	# Use textured material with biome-appropriate floor texture
 	var simple_mat := StandardMaterial3D.new()
 	simple_mat.roughness = 0.95
-	simple_mat.albedo_color = ground_material.albedo_color
+
+	# Try to load floor texture, fall back to solid color if not found
+	var floor_tex: Texture2D = _get_floor_texture()
+	if floor_tex:
+		simple_mat.albedo_texture = floor_tex
+		simple_mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST  # PS1 style
+		simple_mat.uv1_scale = Vector3(10.0, 10.0, 1.0)  # Tile the texture across the ground
+	else:
+		simple_mat.albedo_color = ground_material.albedo_color
 
 	ground.material = simple_mat
 	add_child(ground)
@@ -304,11 +496,19 @@ func _create_flat_ground() -> void:
 
 ## Create terrain with Daggerfall-style discrete height levels
 func _create_heightmap_terrain() -> void:
-	# Create terrain material
+	# Create terrain material with floor texture
 	var terrain_mat := StandardMaterial3D.new()
 	terrain_mat.roughness = 0.95
-	terrain_mat.albedo_color = ground_material.albedo_color
 	terrain_mat.cull_mode = BaseMaterial3D.CULL_BACK
+
+	# Use floor texture for terrain
+	var floor_tex: Texture2D = _get_floor_texture()
+	if floor_tex:
+		terrain_mat.albedo_texture = floor_tex
+		terrain_mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST  # PS1 style
+		terrain_mat.uv1_scale = Vector3(10.0, 10.0, 1.0)  # Tile the texture
+	else:
+		terrain_mat.albedo_color = ground_material.albedo_color
 
 	# Calculate which edges need to blend to flat ground (y=0)
 	# This creates smooth transitions to roads, hand-crafted scenes, and boundaries
@@ -384,11 +584,18 @@ func _create_road_if_needed() -> void:
 	# Create road segments based on connections
 	var half_size: float = room_size / 2.0
 
-	# Road material - dirt/packed earth color
+	# Road material - use stone floor textures for cobblestone paths
 	var road_mat := StandardMaterial3D.new()
-	road_mat.albedo_color = Color(0.45, 0.35, 0.25)  # Brown dirt color
 	road_mat.roughness = 1.0
 	road_mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+
+	# Use stone floor texture for roads
+	var road_tex: Texture2D = _get_road_texture()
+	if road_tex:
+		road_mat.albedo_texture = road_tex
+		road_mat.uv1_scale = Vector3(4.0, 4.0, 1.0)  # Tile the texture
+	else:
+		road_mat.albedo_color = Color(0.45, 0.35, 0.25)  # Fallback brown dirt color
 
 	# North-South road segment
 	if north_road or south_road:
@@ -545,9 +752,19 @@ func _spawn_tree_prop(parent: Node3D, pos: Vector3) -> void:
 	tree.texture = tex
 	tree.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	tree.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
-	tree.pixel_size = rng.randf_range(0.03, 0.05)
+
+	# Occasionally spawn super tall ancient trees (10% chance) for depth and atmosphere
+	var is_giant: bool = rng.randf() < 0.10
+	if is_giant:
+		tree.name = "GiantTree"
+		tree.pixel_size = rng.randf_range(0.08, 0.12)  # Much taller trees
+		# Darker, older looking tint for ancient trees
+		tree.modulate = _get_biome_prop_tint() * Color(0.7, 0.75, 0.65)
+	else:
+		tree.pixel_size = rng.randf_range(0.03, 0.05)
+		tree.modulate = _get_biome_prop_tint()
+
 	tree.position = pos + Vector3(0, tex.get_height() * tree.pixel_size * 0.5, 0)
-	tree.modulate = _get_biome_prop_tint()
 	parent.add_child(tree)
 
 
@@ -556,34 +773,33 @@ func _spawn_special_prop(parent: Node3D, pos: Vector3) -> void:
 	var special_textures: Array[String] = []
 	var is_statue: bool = false
 
-	# Ancient statues can appear in any biome (rare landmark)
-	const STATUE_TEXTURE := "res://assets/sprites/decorations/ancient_statue.png"
-	var statue_chance: float = 0.15  # 15% of special props are statues
+	# Ancient 3D statue model (rare landmark) - DISABLED FOR NOW
+	# const STATUE_MODEL := "res://assets/models/decorations/ancient_statue.glb"
+	# var statue_chance: float = 0.03  # 3% of special props are 3D statues (rare)
+	# if _statues_spawned < MAX_STATUES and rng.randf() < statue_chance and ResourceLoader.exists(STATUE_MODEL):
+	#	_spawn_ancient_statue_3d(parent, pos)
+	#	_statues_spawned += 1
+	#	return
 
-	if rng.randf() < statue_chance and ResourceLoader.exists(STATUE_TEXTURE):
-		special_textures = [STATUE_TEXTURE]
-		is_statue = true
-	else:
+	if true:
 		match biome:
 			Biome.SWAMP:
 				# Swamp gets gravestones, flood patches, and dead things
 				special_textures = [
-					"res://Sprite folders grab bag/gravehead_1.png",
-					"res://Sprite folders grab bag/gravehead_2.png",
-					"res://Sprite folders grab bag/gravehead_3.png",
-					"res://Sprite folders grab bag/swamp_flood1.png",
-					"res://Sprite folders grab bag/swamp_flood2.png"
+					"res://assets/sprites/props/dungeon/gravehead_1.png",
+					"res://assets/sprites/props/dungeon/gravehead_2.png",
+					"res://assets/sprites/props/dungeon/gravehead_3.png",
+					"res://assets/textures/environment/floors/swamp_flood1.png",
+					"res://assets/textures/environment/floors/swamp_flood2.png"
 				]
 			Biome.ROCKY, Biome.HILLS:
 				# Rocky areas might have some fallen trees or rocks
 				special_textures = [
-					"res://Sprite folders grab bag/swamp_downtree1.png"
+					"res://assets/sprites/environment/trees/swamp_fallen_1.png"
 				]
 			Biome.FOREST, Biome.PLAINS:
-				# Forest and plains can have ancient statues as landmarks
-				if ResourceLoader.exists(STATUE_TEXTURE):
-					special_textures = [STATUE_TEXTURE]
-					is_statue = true
+				# Forest and plains statues - DISABLED FOR NOW
+				return
 			_:
 				return  # No special props for other biomes
 
@@ -595,21 +811,78 @@ func _spawn_special_prop(parent: Node3D, pos: Vector3) -> void:
 		return
 
 	var prop := Sprite3D.new()
-	prop.name = "AncientStatue" if is_statue else "SpecialProp"
+	prop.name = "SpecialProp"
 	prop.texture = load(tex_path)
 	prop.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	prop.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
-
-	# Statues are larger and have stone coloring
-	if is_statue:
-		prop.pixel_size = rng.randf_range(0.025, 0.04)  # Taller statues
-		prop.modulate = Color(0.85, 0.82, 0.78)  # Stone gray tint
-	else:
-		prop.pixel_size = rng.randf_range(0.02, 0.035)
-		prop.modulate = _get_biome_prop_tint()
+	prop.pixel_size = rng.randf_range(0.02, 0.035)
+	prop.modulate = _get_biome_prop_tint()
 
 	prop.position = pos + Vector3(0, prop.texture.get_height() * prop.pixel_size * 0.5, 0)
 	parent.add_child(prop)
+
+
+## Spawn a 3D ancient statue model as a rare landmark
+func _spawn_ancient_statue_3d(parent: Node3D, pos: Vector3) -> void:
+	const STATUE_MODEL := "res://assets/models/decorations/ancient_statue.glb"
+
+	var statue_scene: PackedScene = load(STATUE_MODEL) as PackedScene
+	if not statue_scene:
+		push_warning("[WildernessRoom] Failed to load ancient statue model")
+		return
+
+	var statue: Node3D = statue_scene.instantiate()
+	statue.name = "AncientStatue"
+
+	# Random scale variation (tall imposing statues)
+	var scale_factor: float = rng.randf_range(1.5, 2.5)
+	statue.scale = Vector3(scale_factor, scale_factor, scale_factor)
+
+	# Random rotation for variety
+	statue.rotation.y = rng.randf() * TAU
+
+	# Position on ground
+	statue.position = pos
+
+	# Apply weathered stone material look
+	_apply_stone_material(statue)
+
+	# Add collision so players can't walk through
+	var static_body := StaticBody3D.new()
+	static_body.name = "StatueCollision"
+	var collision_shape := CollisionShape3D.new()
+	var capsule := CapsuleShape3D.new()
+	capsule.radius = 0.6 * scale_factor
+	capsule.height = 2.5 * scale_factor
+	collision_shape.shape = capsule
+	collision_shape.position.y = capsule.height * 0.5
+	static_body.add_child(collision_shape)
+	statue.add_child(static_body)
+
+	parent.add_child(statue)
+
+
+## Apply weathered stone material to a 3D model
+func _apply_stone_material(node: Node3D) -> void:
+	# Create a weathered stone material
+	var stone_mat := StandardMaterial3D.new()
+	stone_mat.albedo_color = Color(0.6, 0.58, 0.55)  # Gray stone color
+	stone_mat.roughness = 0.9  # Very rough weathered surface
+	stone_mat.metallic = 0.0
+	# Add slight variation for weathering
+	stone_mat.albedo_color = stone_mat.albedo_color.lerp(Color(0.5, 0.52, 0.48), rng.randf() * 0.3)
+
+	# Apply to all mesh instances in the model
+	_apply_material_recursive(node, stone_mat)
+
+
+## Recursively apply material to all MeshInstance3D children
+func _apply_material_recursive(node: Node, mat: Material) -> void:
+	if node is MeshInstance3D:
+		var mesh_instance: MeshInstance3D = node as MeshInstance3D
+		mesh_instance.material_override = mat
+	for child in node.get_children():
+		_apply_material_recursive(child, mat)
 
 
 ## Get tint color for props based on biome
@@ -840,8 +1113,8 @@ func _spawn_ruins() -> void:
 			ruins.append(ruin)
 			placed_positions.append(pos)
 
-	# Always spawn one observation tower per cell (guaranteed)
-	_spawn_observation_tower(placed_positions)
+	# Observation towers DISABLED - buggy, players get stuck
+	# _spawn_observation_tower(placed_positions)
 
 
 ## Spawn a guaranteed observation tower with loot chest
@@ -1323,23 +1596,32 @@ func _create_decorative_mushroom_3d(pos: Vector3) -> Node3D:
 
 
 ## Get tree texture based on biome
+## PERFORMANCE: Uses static texture cache to avoid repeated load() calls
 func _get_tree_texture() -> Texture2D:
+	# Ensure cache is initialized
+	_init_texture_cache()
+
 	match biome:
 		Biome.FOREST:
-			# Randomly pick between autumn trees
-			if rng.randf() > 0.5:
-				return load("res://Sprite folders grab bag/autumntree.png")
-			else:
-				return load("res://Sprite folders grab bag/autumntree2.png")
+			# PERFORMANCE: Use cached textures instead of load()
+			if _tree_textures_forest.size() > 0:
+				return _tree_textures_forest[rng.randi() % _tree_textures_forest.size()]
+			return load("res://assets/sprites/environment/trees/autumn_tree_1.png")
 		Biome.SWAMP:
-			# Use autumn trees but could add dead tree sprites later
-			return load("res://Sprite folders grab bag/autumntree2.png")
+			# Use swamp trees from cache
+			if _tree_textures_swamp.size() > 0:
+				return _tree_textures_swamp[rng.randi() % _tree_textures_swamp.size()]
+			return load("res://assets/sprites/environment/trees/autumn_tree_2.png")
 		Biome.PLAINS:
-			# Sparse trees - use autumn tree
-			return load("res://Sprite folders grab bag/autumntree.png")
+			# Sparse trees - use forest tree from cache
+			if _tree_textures_forest.size() > 0:
+				return _tree_textures_forest[0]
+			return load("res://assets/sprites/environment/trees/autumn_tree_1.png")
 		_:
-			# Default to autumn tree
-			return load("res://Sprite folders grab bag/autumntree.png")
+			# Default to first forest tree
+			if _tree_textures_forest.size() > 0:
+				return _tree_textures_forest[0]
+			return load("res://assets/sprites/environment/trees/autumn_tree_1.png")
 
 
 ## Create a harvestable rock (requires pickaxe to mine for stone/iron)
@@ -1358,8 +1640,8 @@ func _create_rock() -> Node3D:
 
 ## Decorative bush textures (non-harvestable)
 const DECORATIVE_BUSH_TEXTURES: Array[String] = [
-	"res://Sprite folders grab bag/perro_bush1.png",
-	"res://Sprite folders grab bag/perro_bush2.png"
+	"res://assets/sprites/environment/trees/bush_1.png",
+	"res://assets/sprites/environment/trees/bush_2.png"
 ]
 
 
@@ -1384,8 +1666,9 @@ func _create_decorative_bush() -> Node3D:
 	bush.name = "DecorativeBush"
 
 	# Pick random decorative bush texture
+	# PERFORMANCE: Use cached texture instead of load()
 	var tex_path: String = DECORATIVE_BUSH_TEXTURES[rng.randi() % DECORATIVE_BUSH_TEXTURES.size()]
-	var bush_tex: Texture2D = load(tex_path)
+	var bush_tex: Texture2D = _get_cached_texture(tex_path)
 	if not bush_tex:
 		return bush  # Return empty node if texture fails
 
@@ -1417,9 +1700,9 @@ func _create_decorative_bush() -> Node3D:
 
 ## Grassland texture paths for decorative grass clumps
 const GRASSLAND_TEXTURES: Array[String] = [
-	"res://Sprite folders grab bag/grassland_1.png",
-	"res://Sprite folders grab bag/grassland_2.png",
-	"res://Sprite folders grab bag/grassland_3.png"
+	"res://assets/sprites/environment/ground/grassland_1.png",
+	"res://assets/sprites/environment/ground/grassland_2.png",
+	"res://assets/sprites/environment/ground/grassland_3.png"
 ]
 
 
@@ -1535,7 +1818,7 @@ func _apply_hillcross_material(node: Node) -> void:
 	mat.albedo_color = base_color
 
 	# Try to load stone texture for more detail
-	var stone_tex: Texture2D = load("res://Sprite folders grab bag/stonewall.png")
+	var stone_tex: Texture2D = load("res://assets/textures/environment/walls/stonewall.png")
 	if stone_tex:
 		mat.albedo_texture = stone_tex
 		mat.uv1_scale = Vector3(0.5, 0.5, 0.5)  # Tile texture appropriately
@@ -1555,7 +1838,7 @@ func _apply_material_to_meshes(node: Node, material: StandardMaterial3D) -> void
 
 
 ## Swamp tree textures
-const SWAMP_TREE_TEXTURE := "res://Sprite folders grab bag/swamp_tree1.png"
+const SWAMP_TREE_TEXTURE := "res://assets/sprites/environment/trees/swamp_tree1.png"
 
 
 ## Create a standing swamp tree - larger obstacle with collision
@@ -1603,8 +1886,8 @@ func _create_swamp_tree() -> Node3D:
 
 ## Fallen/down tree textures for swamp
 const FALLEN_TREE_TEXTURES: Array[String] = [
-	"res://Sprite folders grab bag/swamp_downtree1.png",
-	"res://Sprite folders grab bag/swamp_downtree2.png"
+	"res://assets/sprites/environment/trees/swamp_fallen_1.png",
+	"res://assets/sprites/environment/trees/swamp_fallen_2.png"
 ]
 
 
@@ -1620,37 +1903,16 @@ func _create_fallen_tree() -> Node3D:
 
 
 ## Get floor texture based on biome (randomly picks from available)
+## Uses only approved floor assets - NO plant/grass textures
 func _get_floor_texture() -> Texture2D:
-	var textures: Array[String] = []
-
-	match biome:
-		Biome.FOREST:
-			# Forest floor uses fallen leaves textures
-			textures = [
-				"res://Sprite folders grab bag/fullelaves.png",
-				"res://Sprite folders grab bag/half leaves.png"
-			]
-		Biome.SWAMP:
-			textures = [
-				"res://Sprite folders grab bag/swamp_flood1.png",
-				"res://Sprite folders grab bag/swamp_flood2.png"
-			]
-		Biome.PLAINS:
-			textures = [
-				"res://Sprite folders grab bag/plains_floor1.png",
-				"res://Sprite folders grab bag/plains_floor2.png",
-				"res://Sprite folders grab bag/plains_floor3.png"
-			]
-		Biome.HILLS, Biome.ROCKY:
-			textures = [
-				"res://Sprite folders grab bag/rockhill_floor1.png",
-				"res://Sprite folders grab bag/rockhill_floor2.png",
-				"res://Sprite folders grab bag/rockhill_floor3.png"
-			]
-		_:
-			textures = [
-				"res://Sprite folders grab bag/plains_floor1.png"
-			]
+	# Only use the 5 approved floor textures across all biomes
+	var textures: Array[String] = [
+		"res://assets/textures/environment/floors/plains_floor1.png",
+		"res://assets/textures/environment/floors/plains_floor2.png",
+		"res://assets/textures/environment/floors/plains_floor3.png",
+		"res://assets/textures/environment/floors/leaves_full.png",
+		"res://assets/textures/environment/floors/leaves_half.png"
+	]
 
 	if textures.is_empty():
 		return null
@@ -1659,11 +1921,59 @@ func _get_floor_texture() -> Texture2D:
 	return load(path)
 
 
+## Get road/cobblestone texture (randomly picks from stone floor textures)
+func _get_road_texture() -> Texture2D:
+	var textures: Array[String] = [
+		"res://assets/textures/environment/floors/stonefloor.png",
+		"res://assets/textures/environment/floors/stonefloor_2.png",
+		"res://assets/textures/environment/floors/stonefloor_3.png",
+		"res://assets/textures/environment/floors/stonefloor_4.png",
+		"res://assets/textures/environment/floors/stonefloor_5.png",
+	]
+
+	if textures.is_empty():
+		return null
+
+	var path: String = textures[rng.randi() % textures.size()]
+	if ResourceLoader.exists(path):
+		return load(path)
+	return null
+
+
+## Extract enemy type ID from data path for ActorRegistry lookup
+## e.g., "res://data/enemies/wolf.tres" -> "wolf"
+func _get_enemy_type_from_data_path(data_path: String) -> String:
+	if data_path.is_empty():
+		return ""
+	var filename: String = data_path.get_file()
+	return filename.get_basename()
+
+
 ## Spawn actual enemies using EnemyBase.spawn_billboard_enemy
+## Enemy count scales with danger level: base + (danger_level - 1) * 2
 func _spawn_enemies() -> void:
-	var count := rng.randi_range(enemy_count_min, enemy_count_max)
+	# Get danger level for scaling
+	var cell_info: WorldGrid.CellInfo = WorldGrid.get_cell(grid_coords)
+	var danger: int = 1
+	if cell_info:
+		danger = cell_info.danger_level
+
+	# Scale enemy count with danger: base count + danger bonus
+	# At danger 1: 4-10 enemies
+	# At danger 5: 8-14 enemies (4 bonus)
+	# At danger 10: 13-19 enemies (9 bonus)
+	var danger_bonus: int = (danger - 1)
+	var scaled_min: int = enemy_count_min + danger_bonus
+	var scaled_max: int = enemy_count_max + danger_bonus
+
+	# Cap at performance budget (max 20 per zone)
+	scaled_max = mini(scaled_max, 20)
+
+	var count := rng.randi_range(scaled_min, scaled_max)
 	var placed_positions: Array[Vector3] = []
-	var min_enemy_distance := 8.0  # Minimum distance between enemies
+	var min_enemy_distance := 6.0  # Reduced from 8 to allow more enemies
+
+	print("[WildernessRoom] Spawning %d enemies (danger %d, range %d-%d)" % [count, danger, scaled_min, scaled_max])
 
 	for i in range(count):
 		var attempts := 0
@@ -1703,25 +2013,33 @@ func _spawn_enemies() -> void:
 
 		var enemy: Node = null
 
-		# Get zone danger level for stat scaling
-		var cell_info: WorldGrid.CellInfo = WorldGrid.get_cell(grid_coords)
-		var current_zone_danger: int = 1
-		if cell_info:
-			current_zone_danger = cell_info.danger_level
-
 		# Check if this is a skeleton enemy - use specialized spawner with walk/attack sprites
 		if enemy_config.get("is_skeleton", false):
 			enemy = EnemyBase.spawn_skeleton_enemy(
 				self,
 				spawn_pos,
 				enemy_config.data_path,
-				current_zone_danger
+				danger  # Use danger level from start of function
 			)
 		else:
-			# Load sprite texture for regular enemies
-			var sprite_tex: Texture2D = load(enemy_config.sprite_path)
+			# Check ActorRegistry for patched sprite configuration
+			# This applies any Zoo patches automatically
+			var sprite_path: String = enemy_config.sprite_path
+			var h_frames: int = enemy_config.h_frames
+			var v_frames: int = enemy_config.v_frames
+
+			var enemy_type: String = _get_enemy_type_from_data_path(enemy_config.data_path)
+			if ActorRegistry and not enemy_type.is_empty():
+				var registry_config: Dictionary = ActorRegistry.get_sprite_config(enemy_type)
+				if not registry_config.is_empty():
+					sprite_path = registry_config.get("sprite_path", sprite_path)
+					h_frames = registry_config.get("h_frames", h_frames)
+					v_frames = registry_config.get("v_frames", v_frames)
+
+			# PERFORMANCE: Use cached texture instead of load()
+			var sprite_tex: Texture2D = _get_cached_texture(sprite_path)
 			if not sprite_tex:
-				push_warning("[WildernessRoom] Failed to load sprite: %s" % enemy_config.sprite_path)
+				push_warning("[WildernessRoom] Failed to load sprite: %s" % sprite_path)
 				continue
 
 			# Spawn regular billboard enemy with zone danger for stat scaling
@@ -1730,15 +2048,15 @@ func _spawn_enemies() -> void:
 				spawn_pos,
 				enemy_config.data_path,
 				sprite_tex,
-				enemy_config.h_frames,
-				enemy_config.v_frames,
-				current_zone_danger
+				h_frames,
+				v_frames,
+				danger
 			)
 
 		if enemy:
 			enemies.append(enemy)
 			placed_positions.append(pos)
-			print("[WildernessRoom] Spawned %s at %s (zone_danger: %d)" % [enemy_config.display_name, pos, current_zone_danger])
+			print("[WildernessRoom] Spawned %s at %s (zone_danger: %d)" % [enemy_config.display_name, pos, danger])
 
 	print("[WildernessRoom] Spawned %d enemies" % enemies.size())
 
@@ -1764,31 +2082,31 @@ func _get_enemy_config_for_biome() -> Dictionary:
 	var tier1_configs: Array[Dictionary] = [
 		{
 			"data_path": "res://data/enemies/wolf.tres",
-			"sprite_path": "res://Sprite folders grab bag/wolf_moving.png",
+			"sprite_path": "res://assets/sprites/enemies/beasts/wolf_moving.png",
 			"h_frames": 6, "v_frames": 1,
 			"display_name": "Wolf", "is_skeleton": false
 		},
 		{
 			"data_path": "res://data/enemies/giant_spider.tres",
-			"sprite_path": "res://Sprite folders grab bag/evilspider.png",
+			"sprite_path": "res://assets/sprites/enemies/beasts/spider.png",
 			"h_frames": 1, "v_frames": 1,
 			"display_name": "Giant Spider", "is_skeleton": false
 		},
 		{
 			"data_path": "res://data/enemies/human_bandit.tres",
-			"sprite_path": "res://Sprite folders grab bag/3x4humanbandit.png",
+			"sprite_path": "res://assets/sprites/enemies/humanoid/human_bandit_alt.png",
 			"h_frames": 4, "v_frames": 1,
 			"display_name": "Bandit", "is_skeleton": false
 		},
 		{
 			"data_path": "res://data/enemies/giant_rat.tres",
-			"sprite_path": "res://Sprite folders grab bag/rat_moving.png",
+			"sprite_path": "res://assets/sprites/enemies/beasts/rat_moving_forward.png",
 			"h_frames": 4, "v_frames": 1,
 			"display_name": "Giant Rat", "is_skeleton": false
 		},
 		{
 			"data_path": "res://data/enemies/bat.tres",
-			"sprite_path": "res://Sprite folders grab bag/bat_flying_attacking.png",
+			"sprite_path": "res://assets/sprites/enemies/beasts/bat.png",
 			"h_frames": 4, "v_frames": 1,
 			"display_name": "Bat", "is_skeleton": false,
 			"is_flying": true, "fly_height": 2.5
@@ -1799,19 +2117,19 @@ func _get_enemy_config_for_biome() -> Dictionary:
 	var tier2_configs: Array[Dictionary] = [
 		{
 			"data_path": "res://data/enemies/dire_wolf.tres",
-			"sprite_path": "res://Sprite folders grab bag/wolf_moving.png",
+			"sprite_path": "res://assets/sprites/enemies/beasts/wolf_moving.png",
 			"h_frames": 6, "v_frames": 1,
 			"display_name": "Dire Wolf", "is_skeleton": false
 		},
 		{
 			"data_path": "res://data/enemies/goblin_soldier.tres",
-			"sprite_path": "res://Sprite folders grab bag/goblin_sword.png",
+			"sprite_path": "res://assets/sprites/enemies/goblins/goblin_sword.png",
 			"h_frames": 4, "v_frames": 2,
 			"display_name": "Goblin Soldier", "is_skeleton": false
 		},
 		{
 			"data_path": "res://data/enemies/bandit_captain.tres",
-			"sprite_path": "res://Sprite folders grab bag/3x4humanbandit.png",
+			"sprite_path": "res://assets/sprites/enemies/humanoid/human_bandit_alt.png",
 			"h_frames": 4, "v_frames": 1,
 			"display_name": "Bandit Captain", "is_skeleton": false
 		}
@@ -1827,7 +2145,7 @@ func _get_enemy_config_for_biome() -> Dictionary:
 		},
 		{
 			"data_path": "res://data/enemies/troll.tres",
-			"sprite_path": "res://Sprite folders grab bag/troll.png",
+			"sprite_path": "res://assets/sprites/enemies/beasts/troll.png",
 			"h_frames": 1, "v_frames": 1,
 			"display_name": "Bridge Troll", "is_skeleton": false
 		}
@@ -1837,14 +2155,14 @@ func _get_enemy_config_for_biome() -> Dictionary:
 	var tier4_configs: Array[Dictionary] = [
 		{
 			"data_path": "res://data/enemies/wyvern.tres",
-			"sprite_path": "res://Sprite folders grab bag/wyvern.png",
+			"sprite_path": "res://assets/sprites/enemies/beasts/wyvern.png",
 			"h_frames": 6, "v_frames": 1,
 			"display_name": "Wyvern", "is_skeleton": false,
 			"is_flying": true, "fly_height": 4.0
 		},
 		{
 			"data_path": "res://data/enemies/basilisk.tres",
-			"sprite_path": "res://Sprite folders grab bag/baslisk.png",
+			"sprite_path": "res://assets/sprites/enemies/beasts/basilisk.png",
 			"h_frames": 4, "v_frames": 1,
 			"display_name": "Basilisk", "is_skeleton": false
 		},
@@ -1873,7 +2191,7 @@ func _get_enemy_config_for_biome() -> Dictionary:
 			# Swamps have more spiders and trolls
 			tier1_configs.append({
 				"data_path": "res://data/enemies/giant_spider.tres",
-				"sprite_path": "res://Sprite folders grab bag/evilspider.png",
+				"sprite_path": "res://assets/sprites/enemies/beasts/spider.png",
 				"h_frames": 1, "v_frames": 1,
 				"display_name": "Swamp Spider", "is_skeleton": false
 			})
@@ -1882,14 +2200,14 @@ func _get_enemy_config_for_biome() -> Dictionary:
 			if danger >= 7:
 				biome_configs.append({
 					"data_path": "res://data/enemies/wyvern.tres",
-					"sprite_path": "res://Sprite folders grab bag/wyvern.png",
+					"sprite_path": "res://assets/sprites/enemies/beasts/wyvern.png",
 					"h_frames": 6, "v_frames": 1,
 					"display_name": "Wyvern", "is_skeleton": false,
 					"is_flying": true, "fly_height": 4.0
 				})
 				biome_configs.append({
 					"data_path": "res://data/enemies/basilisk.tres",
-					"sprite_path": "res://Sprite folders grab bag/baslisk.png",
+					"sprite_path": "res://assets/sprites/enemies/beasts/basilisk.png",
 					"h_frames": 4, "v_frames": 1,
 					"display_name": "Basilisk", "is_skeleton": false
 				})
@@ -1988,6 +2306,34 @@ func _spawn_traveling_merchant() -> void:
 		])
 
 
+## Spawn Spock easter egg (ultra rare encounter)
+func _spawn_spock_easter_egg() -> void:
+	# Get player level and danger level
+	var player_level: int = 1
+	if GameManager and GameManager.player_data:
+		player_level = GameManager.player_data.level
+
+	var danger_level: int = int(get_danger_level())
+
+	# Check if Spock should spawn
+	if not SpockEasterEgg.should_spawn(player_level, danger_level):
+		return
+
+	var pos := _get_random_content_position()
+
+	# Spawn the Pointed-Eared Stranger
+	spock_easter_egg = SpockEasterEgg.spawn_spock(self, pos)
+	if spock_easter_egg:
+		# Add to compass POI group
+		spock_easter_egg.add_to_group("compass_poi")
+		spock_easter_egg.set_meta("poi_id", "spock_stranger_%d" % rng.randi())
+		spock_easter_egg.set_meta("poi_type", "npc")
+		spock_easter_egg.set_meta("poi_icon", "?")  # Mystery icon
+		spock_easter_egg.set_meta("poi_color", Color(0.4, 0.6, 1.0))  # Blue color
+		spock_easter_egg.set_meta("display_name", "Pointed-Eared Stranger")
+		print("[WildernessRoom] !!! RARE SPAWN: The Pointed-Eared Stranger has appeared at %s !!!" % pos)
+
+
 ## Create boundary props (trees/rocks at edges to indicate room boundary)
 func _create_boundary_props() -> void:
 	var half_size := room_size / 2.0
@@ -2062,13 +2408,29 @@ func _create_mountain_barriers() -> void:
 			continue
 
 		var adjacent_coords: Vector2i = grid_coords + dir_data["offset"]
+		var adjacent_cell: WorldGrid.CellInfo = WorldGrid.get_cell(adjacent_coords)
 
-		# Check if adjacent cell is impassable
-		if not WorldGrid.is_passable(adjacent_coords):
+		# Check what type of boundary to create based on terrain
+		if adjacent_cell:
+			if adjacent_cell.terrain == WorldGrid.Terrain.BLOCKED:
+				# Mountains/blocked terrain - spawn mountain wall
+				_spawn_mountain_wall(dir_data)
+				print("[WildernessRoom] Added mountain barrier on %s edge (adjacent cell %s is BLOCKED)" % [
+					["North", "South", "East", "West"][dir_data["dir"]],
+					adjacent_coords
+				])
+			elif adjacent_cell.terrain == WorldGrid.Terrain.WATER or adjacent_cell.terrain == WorldGrid.Terrain.COAST:
+				# Water/coast - spawn water boundary (visual only, collision handled by CellStreamer)
+				_spawn_water_boundary(dir_data)
+				print("[WildernessRoom] Added water boundary on %s edge (adjacent cell %s is water/coast)" % [
+					["North", "South", "East", "West"][dir_data["dir"]],
+					adjacent_coords
+				])
+		elif not WorldGrid.is_in_bounds(adjacent_coords):
+			# Out of bounds - treat as blocked
 			_spawn_mountain_wall(dir_data)
-			print("[WildernessRoom] Added mountain barrier on %s edge (adjacent cell %s is impassable)" % [
-				["North", "South", "East", "West"][dir_data["dir"]],
-				adjacent_coords
+			print("[WildernessRoom] Added mountain barrier on %s edge (out of bounds)" % [
+				["North", "South", "East", "West"][dir_data["dir"]]
 			])
 
 
@@ -2095,12 +2457,203 @@ func _spawn_mountain_wall(dir_data: Dictionary) -> void:
 		mountain.position = pos
 		add_child(mountain)
 
+	# Spawn rock and iron vein clusters along the mountain edge
+	_spawn_mountain_edge_rocks(dir_data)
+
+
+## Spawn water/coastal visuals along an edge bordering water
+func _spawn_water_boundary(dir_data: Dictionary) -> void:
+	var half_size := room_size / 2.0
+	var water_spacing := 8.0  # Space between water visual elements
+	var num_elements := int(room_size / water_spacing) + 1
+
+	for i in range(num_elements):
+		var offset := -half_size + i * water_spacing + rng.randf_range(-2, 2)
+		var pos: Vector3
+
+		if dir_data["axis"] == "x":
+			# North or South edge
+			var edge_z: float = dir_data["edge_z"]
+			pos = Vector3(offset, -0.3, edge_z + sign(edge_z) * -2.0)  # Slightly below ground at edge
+		else:
+			# East or West edge
+			var edge_x: float = dir_data["edge_x"]
+			pos = Vector3(edge_x + sign(edge_x) * -2.0, -0.3, offset)
+
+		# Create a simple water plane segment
+		var water := _create_water_segment()
+		water.position = pos
+		add_child(water)
+
+	# Spawn coastal rocks and driftwood along the water edge
+	_spawn_coastal_decorations(dir_data)
+
+
+## Create a single water segment for boundary visuals
+func _create_water_segment() -> Node3D:
+	var water := Node3D.new()
+	water.name = "WaterSegment"
+
+	# Create a flat water plane
+	var mesh_instance := MeshInstance3D.new()
+	var plane := PlaneMesh.new()
+	plane.size = Vector2(10.0, 8.0)
+	mesh_instance.mesh = plane
+
+	# Water material - dark blue/green tint
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color(0.15, 0.25, 0.35, 0.9)
+	mat.roughness = 0.2
+	mat.metallic = 0.1
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mesh_instance.material_override = mat
+
+	water.add_child(mesh_instance)
+
+	# Water doesn't need collision - CellStreamer's boundary walls handle that
+	return water
+
+
+## Spawn coastal decorations (rocks, driftwood) along water edges
+func _spawn_coastal_decorations(dir_data: Dictionary) -> void:
+	var half_size := room_size / 2.0
+	# Spawn 8-15 coastal decoration clusters
+	var num_clusters := rng.randi_range(8, 15)
+
+	for _c in range(num_clusters):
+		var offset := rng.randf_range(-half_size + 5.0, half_size - 5.0)
+		var base_pos: Vector3
+
+		if dir_data["axis"] == "x":
+			var edge_z: float = dir_data["edge_z"]
+			var depth_offset := rng.randf_range(3.0, 12.0)
+			base_pos = Vector3(offset, 0, edge_z + sign(edge_z) * -depth_offset)
+		else:
+			var edge_x: float = dir_data["edge_x"]
+			var depth_offset := rng.randf_range(3.0, 12.0)
+			base_pos = Vector3(edge_x + sign(edge_x) * -depth_offset, 0, offset)
+
+		# Spawn 2-4 decorations in this cluster
+		var cluster_size := rng.randi_range(2, 4)
+		for _d in range(cluster_size):
+			var scatter := Vector3(
+				rng.randf_range(-3.0, 3.0),
+				0,
+				rng.randf_range(-3.0, 3.0)
+			)
+			var deco_pos := base_pos + scatter
+			deco_pos.x = clampf(deco_pos.x, -half_size + 2.0, half_size - 2.0)
+			deco_pos.z = clampf(deco_pos.z, -half_size + 2.0, half_size - 2.0)
+
+			# 70% small coastal rock, 30% driftwood
+			if rng.randf() < 0.7:
+				var rock := _create_coastal_rock()
+				rock.position = deco_pos
+				add_child(rock)
+				props.append(rock)
+			else:
+				var wood := _create_driftwood()
+				wood.position = deco_pos
+				add_child(wood)
+				props.append(wood)
+
+
+## Create a small coastal rock
+func _create_coastal_rock() -> Node3D:
+	var rock := Node3D.new()
+	rock.name = "CoastalRock"
+
+	var mesh := MeshInstance3D.new()
+	var box := BoxMesh.new()
+	var size := rng.randf_range(0.4, 1.2)
+	box.size = Vector3(size, size * 0.6, size * 0.8)
+	mesh.mesh = box
+
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color(0.35, 0.35, 0.32)  # Gray coastal rock
+	mat.roughness = 0.95
+	mesh.material_override = mat
+	mesh.position.y = size * 0.3
+
+	rock.add_child(mesh)
+	rock.rotation_degrees.y = rng.randf_range(0, 360)
+	return rock
+
+
+## Create driftwood decoration
+func _create_driftwood() -> Node3D:
+	var wood := Node3D.new()
+	wood.name = "Driftwood"
+
+	var mesh := MeshInstance3D.new()
+	var cyl := CylinderMesh.new()
+	cyl.top_radius = rng.randf_range(0.08, 0.15)
+	cyl.bottom_radius = rng.randf_range(0.1, 0.2)
+	cyl.height = rng.randf_range(1.5, 3.0)
+	mesh.mesh = cyl
+
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color(0.28, 0.22, 0.18)  # Weathered wood
+	mat.roughness = 0.9
+	mesh.material_override = mat
+
+	# Lay the wood on its side
+	mesh.rotation_degrees.z = 90
+	mesh.position.y = 0.1
+
+	wood.add_child(mesh)
+	wood.rotation_degrees.y = rng.randf_range(0, 360)
+	return wood
+
 
 ## Rock textures for impassable mountain terrain
 const MOUNTAIN_ROCK_TEXTURES := [
-	"res://Sprite folders grab bag/impass_rock.png",
-	"res://Sprite folders grab bag/impass_rock2.png"
+	"res://assets/textures/environment/walls/impass_rock.png",
+	"res://assets/textures/environment/walls/impass_rock2.png"
 ]
+
+
+## Spawn clusters of rocks and iron veins along mountain edges
+func _spawn_mountain_edge_rocks(dir_data: Dictionary) -> void:
+	var half_size := room_size / 2.0
+	# Spawn 15-25 rock clusters along the mountain edge
+	var num_clusters := rng.randi_range(15, 25)
+
+	for _c in range(num_clusters):
+		# Random position along the edge
+		var offset := rng.randf_range(-half_size + 5.0, half_size - 5.0)
+		var base_pos: Vector3
+
+		if dir_data["axis"] == "x":
+			# North or South edge
+			var edge_z: float = dir_data["edge_z"]
+			# Spawn 8-20 units inside the room from the mountain wall
+			var depth_offset := rng.randf_range(8.0, 20.0)
+			base_pos = Vector3(offset, 0, edge_z + sign(edge_z) * -depth_offset)
+		else:
+			# East or West edge
+			var edge_x: float = dir_data["edge_x"]
+			var depth_offset := rng.randf_range(8.0, 20.0)
+			base_pos = Vector3(edge_x + sign(edge_x) * -depth_offset, 0, offset)
+
+		# Spawn a cluster of 3-7 rocks at this position
+		var cluster_size := rng.randi_range(3, 7)
+		for _r in range(cluster_size):
+			# Scatter within 3-5 units of cluster center
+			var scatter := Vector3(
+				rng.randf_range(-4.0, 4.0),
+				0,
+				rng.randf_range(-4.0, 4.0)
+			)
+			var rock_pos := base_pos + scatter
+
+			# Keep within room bounds
+			rock_pos.x = clampf(rock_pos.x, -half_size + 3.0, half_size - 3.0)
+			rock_pos.z = clampf(rock_pos.z, -half_size + 3.0, half_size - 3.0)
+
+			# 70% regular rock, 25% iron vein, 5% rich iron
+			var rock := HarvestableRock.spawn_random_rock(self, rock_pos, true)  # highlands=true for more iron
+			props.append(rock)
 
 
 ## Create a single 3D mountain/rock block
@@ -2162,15 +2715,68 @@ func _create_mountain_block() -> Node3D:
 	return mountain
 
 
-## Get random position in content area (avoiding edges)
+## Check if a position is on the road
+func _is_position_on_road(x: float, z: float) -> bool:
+	if not is_road_cell:
+		return false
+
+	var road_half_width: float = road_width / 2.0 + 4.0  # Wide buffer to keep content off road
+
+	# Check road directions
+	var north_road: bool = WorldGrid.is_road(grid_coords + Vector2i(0, -1))
+	var south_road: bool = WorldGrid.is_road(grid_coords + Vector2i(0, 1))
+	var east_road: bool = WorldGrid.is_road(grid_coords + Vector2i(1, 0))
+	var west_road: bool = WorldGrid.is_road(grid_coords + Vector2i(-1, 0))
+
+	# North-South road runs through center (X near 0)
+	if (north_road or south_road) and abs(x) < road_half_width:
+		return true
+
+	# East-West road runs through center (Z near 0)
+	if (east_road or west_road) and abs(z) < road_half_width:
+		return true
+
+	return false
+
+
+## Get random position in content area (avoiding edges and roads)
 ## Uses terrain heightmap for Y position
 func _get_random_content_position() -> Vector3:
 	var margin := 20.0  # Stay away from edges
 	var half_size := room_size / 2.0 - margin
-	var x: float = rng.randf_range(-half_size, half_size)
-	var z: float = rng.randf_range(-half_size, half_size)
-	var y: float = get_terrain_height_at(x, z)
-	return Vector3(x, y, z)
+	var max_attempts := 20
+
+	for i in range(max_attempts):
+		var x: float = rng.randf_range(-half_size, half_size)
+		var z: float = rng.randf_range(-half_size, half_size)
+
+		# Skip if on road
+		if _is_position_on_road(x, z):
+			continue
+
+		var y: float = get_terrain_height_at(x, z)
+		return Vector3(x, y, z)
+
+	# Fallback - force position away from center (where roads are)
+	var road_half_width: float = road_width / 2.0 + 6.0
+	var side: int = rng.randi() % 4
+	var fallback_x: float
+	var fallback_z: float
+	match side:
+		0:  # Northeast quadrant
+			fallback_x = rng.randf_range(road_half_width, half_size)
+			fallback_z = rng.randf_range(-half_size, -road_half_width)
+		1:  # Southeast quadrant
+			fallback_x = rng.randf_range(road_half_width, half_size)
+			fallback_z = rng.randf_range(road_half_width, half_size)
+		2:  # Southwest quadrant
+			fallback_x = rng.randf_range(-half_size, -road_half_width)
+			fallback_z = rng.randf_range(road_half_width, half_size)
+		_:  # Northwest quadrant
+			fallback_x = rng.randf_range(-half_size, -road_half_width)
+			fallback_z = rng.randf_range(-half_size, -road_half_width)
+	var fallback_y: float = get_terrain_height_at(fallback_x, fallback_z)
+	return Vector3(fallback_x, fallback_y, fallback_z)
 
 
 ## Get random position for props (can be closer to edges)
@@ -2179,61 +2785,37 @@ func _get_random_content_position() -> Vector3:
 func _get_random_prop_position() -> Vector3:
 	var margin := 10.0
 	var half_size := room_size / 2.0 - margin
-
-	# If not a road cell, use full area
-	if not is_road_cell:
-		var x: float = rng.randf_range(-half_size, half_size)
-		var z: float = rng.randf_range(-half_size, half_size)
-		var y: float = get_terrain_height_at(x, z)
-		return Vector3(x, y, z)
-
-	# On road cells, try to avoid the road area
-	var max_attempts := 10
-	var road_half_width: float = road_width / 2.0 + 2.0  # Add buffer
+	var max_attempts := 15
 
 	for i in range(max_attempts):
 		var x: float = rng.randf_range(-half_size, half_size)
 		var z: float = rng.randf_range(-half_size, half_size)
-		var pos := Vector3(x, 0, z)
 
-		# Check if position is on the road
-		var on_road := false
+		# Skip if on road
+		if _is_position_on_road(x, z):
+			continue
 
-		# Check road directions
-		var north_road := WorldGrid.is_road(grid_coords + Vector2i(0, 1))
-		var south_road := WorldGrid.is_road(grid_coords + Vector2i(0, -1))
-		var east_road := WorldGrid.is_road(grid_coords + Vector2i(1, 0))
-		var west_road := WorldGrid.is_road(grid_coords + Vector2i(-1, 0))
+		var y: float = get_terrain_height_at(x, z)
+		return Vector3(x, y, z)
 
-		# North-South road
-		if (north_road or south_road) and abs(pos.x) < road_half_width:
-			on_road = true
-
-		# East-West road
-		if (east_road or west_road) and abs(pos.z) < road_half_width:
-			on_road = true
-
-		if not on_road:
-			pos.y = get_terrain_height_at(x, z)
-			return pos
-
-	# Fallback - return position away from center with terrain height
+	# Fallback - force position away from center (where roads are)
+	var road_half_width: float = road_width / 2.0 + 6.0
 	var side: int = rng.randi() % 4
 	var fallback_x: float
 	var fallback_z: float
 	match side:
 		0:  # Northeast quadrant
-			fallback_x = rng.randf_range(road_half_width + 5, half_size)
-			fallback_z = rng.randf_range(-half_size, -road_half_width - 5)
+			fallback_x = rng.randf_range(road_half_width, half_size)
+			fallback_z = rng.randf_range(-half_size, -road_half_width)
 		1:  # Southeast quadrant
-			fallback_x = rng.randf_range(road_half_width + 5, half_size)
-			fallback_z = rng.randf_range(road_half_width + 5, half_size)
+			fallback_x = rng.randf_range(road_half_width, half_size)
+			fallback_z = rng.randf_range(road_half_width, half_size)
 		2:  # Southwest quadrant
-			fallback_x = rng.randf_range(-half_size, -road_half_width - 5)
-			fallback_z = rng.randf_range(road_half_width + 5, half_size)
+			fallback_x = rng.randf_range(-half_size, -road_half_width)
+			fallback_z = rng.randf_range(road_half_width, half_size)
 		_:  # Northwest quadrant
-			fallback_x = rng.randf_range(-half_size, -road_half_width - 5)
-			fallback_z = rng.randf_range(-half_size, -road_half_width - 5)
+			fallback_x = rng.randf_range(-half_size, -road_half_width)
+			fallback_z = rng.randf_range(-half_size, -road_half_width)
 	var fallback_y: float = get_terrain_height_at(fallback_x, fallback_z)
 	return Vector3(fallback_x, fallback_y, fallback_z)
 
@@ -2439,6 +3021,11 @@ func _clear_content() -> void:
 	if traveling_merchant and is_instance_valid(traveling_merchant):
 		traveling_merchant.queue_free()
 	traveling_merchant = null
+
+	# Clear Spock easter egg
+	if spock_easter_egg and is_instance_valid(spock_easter_egg):
+		spock_easter_egg.queue_free()
+	spock_easter_egg = null
 
 	# Clear signposts
 	for signpost: Node3D in signposts:

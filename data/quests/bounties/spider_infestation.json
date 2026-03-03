@@ -1,0 +1,34 @@
+{
+	"id": "bounty_spider_infestation",
+	"title": "Spider Infestation",
+	"description": "Giant spiders have infested caves near the town. Miners are refusing to work until the threat is dealt with.",
+	"is_main_quest": false,
+	"quest_source": "bounty",
+	"giver_npc_id": "bounty_board",
+	"giver_npc_type": "bounty_board",
+	"giver_region": "dalhurst",
+	"faction": "merchants_guild",
+	"objectives": [
+		{
+			"id": "kill_spiders",
+			"description": "Kill giant spiders in the caves",
+			"type": "kill",
+			"target": "giant_spider",
+			"required_count": 6
+		}
+	],
+	"turn_in_type": "bounty_board",
+	"turn_in_target": "bounty_board",
+	"turn_in_zone": "dalhurst",
+	"rewards": {
+		"gold": 80,
+		"xp": 220,
+		"items": [],
+		"faction_reputation": {
+			"merchants_guild": 15
+		}
+	},
+	"cooldown_days": 5,
+	"prerequisites": [],
+	"next_quest": ""
+}

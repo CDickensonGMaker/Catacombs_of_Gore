@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "bestiary_vol_8_monsters"
+display_name = "Bestiary Vol. VIII: Monsters of the Deep Wilds"
+description = "A rare tome documenting the massive creatures that lurk in the untamed wilderness. Covers the brutish ogres, the regenerating trolls, and the ancient tree ents that guard the oldest forests. Not for the faint of heart."
+item_type = 5
+is_stackable = true
+max_stack = 5
+unlocks_bestiary = Array[String](["ogre", "troll", "tree_ent"])
+book_tier = 8
+base_value = 400
+weight = 0.7

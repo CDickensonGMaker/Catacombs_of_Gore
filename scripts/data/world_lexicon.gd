@@ -9,15 +9,6 @@ extends RefCounted
 
 ## Region data with creatures that spawn there and specific directions to real locations
 const REGIONS := {
-	"kreigstan_forest": {
-		"name": "Kreigstan Wilds",
-		"creatures": ["wolf", "giant_rat", "giant_spider", "human_bandit"],
-		"directions": [
-			"Head into the forest east of Elder Moor - one or two cells out",
-			"Check the woods west of town, toward Dalhurst",
-			"Search the forest south of Elder Moor, before the swamps"
-		]
-	},
 	"southern_swamps": {
 		"name": "Southern Swamps",
 		"creatures": ["giant_rat", "giant_spider", "drowned_dead"],
@@ -45,22 +36,13 @@ const REGIONS := {
 			"Travel the eastern path past Aberdeen - takes about five cells"
 		]
 	},
-	"willow_dale_area": {
-		"name": "Willow Dale",
-		"creatures": ["giant_spider", "wolf", "skeleton_warrior"],
-		"directions": [
-			"Go northwest from Elder Moor - Willow Dale dungeon is three cells out",
-			"Head west then north - past the first forest cells",
-			"The old Willow Dale ruins northwest of town"
-		]
-	},
 	"undead_lands": {
 		"name": "Undead Lands",
 		"creatures": ["skeleton_warrior", "skeleton_shade", "drowned_dead", "cultist"],
 		"directions": [
-			"Far northwest, past Willow Dale - cursed lands begin there",
+			"Far northwest of Elder Moor lies cursed territory",
 			"Beyond the forests northwest of Elder Moor lies cursed territory",
-			"Travel northwest past Willow Dale dungeon - dangerous territory"
+			"Travel northwest from Elder Moor - dangerous territory"
 		]
 	},
 	"mountain_pass": {
@@ -119,13 +101,13 @@ const CREATURES := {
 const SETTLEMENTS := {
 	"village_elder_moor": {
 		"name": "Elder Moor",
-		"region": "kreigstan_forest",
-		"nearby_regions": ["kreigstan_forest", "southern_swamps", "willow_dale_area"]
+		"region": "southern_swamps",
+		"nearby_regions": ["southern_swamps", "dalhurst_plains"]
 	},
 	"city_dalhurst": {
 		"name": "Dalhurst",
 		"region": "dalhurst_plains",
-		"nearby_regions": ["dalhurst_plains", "kreigstan_forest"]
+		"nearby_regions": ["dalhurst_plains", "southern_swamps"]
 	},
 	"town_larton": {
 		"name": "Larton",
@@ -168,19 +150,48 @@ const SETTLEMENTS := {
 # NPC NAMES
 # =============================================================================
 
-## Names for randomly generated NPCs (25 per sex)
+## Names for randomly generated NPCs (75 male, 75 female)
+## NOTE: "Aleric" is RESERVED for story NPC (Aleric Vale in Dalhurst)
+## "Aldric" removed due to similarity to reserved name
 const MALE_NAMES := [
-	"Aldric", "Borin", "Cedric", "Dunstan", "Edmund", "Gareth", "Harald", "Osric",
+	# Original names (24 - Aldric removed to avoid confusion with Aleric Vale)
+	"Borin", "Cedric", "Dunstan", "Edmund", "Gareth", "Harald", "Osric",
 	"Godwin", "Leofric", "Wulfric", "Beorn", "Cynric", "Eadric", "Aelfric", "Thurstan",
 	"Grimwald", "Roderick", "Sigurd", "Torsten", "Ulrich", "Viktor", "Werner", "Yorick",
-	"Magnus"
+	"Magnus",
+	# New names - Norse/Germanic inspired (15)
+	"Arnulf", "Baldric", "Bjorn", "Brandr", "Egil", "Eirik", "Fenris", "Gunnar",
+	"Haldor", "Halvard", "Hrothgar", "Ivar", "Knut", "Leif", "Sten",
+	# New names - Anglo-Saxon inspired (12)
+	"Aethelstan", "Beowulf", "Cuthbert", "Edric", "Ealdred", "Oswine", "Penda",
+	"Sigebert", "Swithun", "Wilfrid", "Wulfstan", "Wystan",
+	# New names - Celtic/Gaelic inspired (10)
+	"Brennan", "Cormac", "Dermot", "Diarmuid", "Fergus", "Fionn", "Lorcan",
+	"Niall", "Oisin", "Ronan",
+	# New names - General medieval fantasy (13)
+	"Alaric", "Bertram", "Corwin", "Darian", "Emeric", "Florian", "Gideon",
+	"Kelwin", "Lothar", "Marius", "Severin", "Theron", "Vance"
 ]
 
 const FEMALE_NAMES := [
+	# Original 25 names
 	"Elara", "Mira", "Gwendolyn", "Isolde", "Rowena", "Thalia", "Wren", "Astrid",
 	"Brunhild", "Cordelia", "Dagny", "Edith", "Freya", "Gunhild", "Helga", "Ingrid",
 	"Sigrid", "Thyra", "Valdis", "Ylva", "Adelheid", "Britta", "Carina", "Dagmar",
-	"Solveig"
+	"Solveig",
+	# New names - Norse/Germanic inspired
+	"Agna", "Asta", "Bodil", "Eerika", "Embla", "Freja", "Gerda", "Greta",
+	"Gudrun", "Hilda", "Inga", "Liv", "Ragna", "Runa", "Sif", "Sigyn",
+	"Svea", "Thora", "Torhild", "Ulfhild",
+	# New names - Anglo-Saxon inspired
+	"Aelwen", "Alditha", "Cwenburh", "Eadburga", "Elfgifu", "Ethelflaed", "Godgifu",
+	"Hildegyth", "Leofwynn", "Mildred", "Osburgh", "Sunniva", "Wynflaed",
+	# New names - Celtic/Gaelic inspired
+	"Aisling", "Branwen", "Catriona", "Deirdre", "Enid", "Fionnuala", "Grainne",
+	"Maeve", "Niamh", "Orlaith", "Rhiannon", "Saoirse", "Siobhan",
+	# New names - General medieval fantasy
+	"Alys", "Beatrix", "Clarice", "Drusilla", "Elowen", "Jocelyn", "Margery",
+	"Rosalind", "Seraphina", "Vivienne", "Yseult"
 ]
 
 ## Tracks used names per zone to prevent duplicates
@@ -294,7 +305,7 @@ static func get_random_name(is_female: bool = false) -> String:
 
 
 ## Get a unique NPC name for a specific zone (no duplicates within same zone)
-## Returns empty string if all 25 names for that sex are used in the zone
+## Returns empty string if all names for that sex are used in the zone
 static func get_unique_name_for_zone(zone_id: String, is_female: bool = false) -> String:
 	# Initialize zone tracking if needed
 	if not _used_names_by_zone.has(zone_id):

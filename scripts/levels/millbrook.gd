@@ -5,6 +5,7 @@ extends Node3D
 
 const ZONE_ID := "millbrook"
 const ZONE_SIZE := 100.0  # Matches WorldGrid.CELL_SIZE
+const TOWN_AMBIENT_PATH := "res://assets/audio/Ambiance/towns/town_murmur_medieval_mix_60s_ps1_retro.wav"
 
 @onready var nav_region: NavigationRegion3D = $NavigationRegion3D
 
@@ -20,12 +21,16 @@ func _ready() -> void:
 			PlayerGPS.set_position(coords)
 		SaveManager.set_current_zone(ZONE_ID, "Mill Brook")
 		DayNightCycle.add_to_level(self)
+		# Play town ambient sound and village music
+		AudioManager.play_ambient(TOWN_AMBIENT_PATH)
+		AudioManager.play_zone_music("village")
 
 	_setup_spawn_points()
 	_spawn_merchants()
 	_spawn_npcs()
 	_spawn_fast_travel_shrine()
 	_spawn_rest_spot()
+	_spawn_locked_doors()
 	_setup_navigation()
 	_setup_cell_streaming()
 	print("[Mill Brook] Farming hamlet loaded")
@@ -160,6 +165,35 @@ func _spawn_rest_spot() -> void:
 
 	RestSpot.spawn_rest_spot(self, pos, "Mill Brook Bench")
 	print("[Mill Brook] Spawned rest spot")
+
+
+## Spawn locked doors from markers placed in the scene
+## Add a Node3D container called "LockedDoors" with Marker3D children
+## Set metadata on each marker: door_name (String), lock_dc (int)
+func _spawn_locked_doors() -> void:
+	var doors_container := get_node_or_null("LockedDoors")
+	if not doors_container:
+		return
+
+	var doors_spawned: int = 0
+	for marker in doors_container.get_children():
+		if not marker is Marker3D:
+			continue
+
+		var door_name: String = marker.get_meta("door_name", "Locked Door")
+		var lock_dc: int = marker.get_meta("lock_dc", 12)
+
+		var door := LockableDoor.spawn_door(
+			self,
+			marker.global_position,
+			door_name,
+			lock_dc
+		)
+		door.rotation = marker.rotation
+		doors_spawned += 1
+
+	if doors_spawned > 0:
+		print("[Mill Brook] Spawned %d locked doors from markers" % doors_spawned)
 
 
 ## Setup navigation mesh

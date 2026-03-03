@@ -1,0 +1,32 @@
+{
+	"id": "rescue_wizard_apprentice_1",
+	"title": "The Missing Apprentice",
+	"description": "A wizard's apprentice went missing while gathering herbs. The wizard suspects cultists captured him for his magical knowledge. They were last seen heading toward the southern temple ruins.",
+	"is_main_quest": false,
+	"quest_source": "npc",
+	"giver_npc_id": "thornfield_wizard",
+	"giver_npc_type": "merchant",
+	"giver_region": "thornfield",
+	"faction": "mages_circle",
+	"objectives": [
+		{
+			"id": "find_temple",
+			"description": "Find the cultist temple to the south",
+			"type": "reach",
+			"target": "cultist_temple_south",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 0,
+		"xp": 85,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": [],
+	"next_quest": "rescue_wizard_apprentice_2",
+	"spawn_on_accept": []
+}

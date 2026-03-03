@@ -34,7 +34,11 @@ func _ready() -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause"):
+	if not visible:
+		return
+
+	# Close on escape, pause, or tab menu key
+	if event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause") or event.is_action_pressed("menu"):
 		close()
 		get_viewport().set_input_as_handled()
 
@@ -50,15 +54,26 @@ func close() -> void:
 
 
 func _build_ui() -> void:
-	# Dark overlay
+	# Click-outside overlay - clicking this closes the UI
+	var click_outside := Button.new()
+	click_outside.set_anchors_preset(Control.PRESET_FULL_RECT)
+	click_outside.flat = true
+	click_outside.focus_mode = Control.FOCUS_NONE
+	click_outside.mouse_filter = Control.MOUSE_FILTER_STOP
+	click_outside.pressed.connect(close)
+	add_child(click_outside)
+
+	# Dark overlay (visual only)
 	var overlay := ColorRect.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	overlay.color = Color(0, 0, 0, 0.8)
+	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(overlay)
 
 	# Main panel - centered, smaller than full screen
 	var main_panel := PanelContainer.new()
 	main_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
+	main_panel.mouse_filter = Control.MOUSE_FILTER_STOP  # Block clicks from reaching overlay
 	main_panel.offset_left = 150
 	main_panel.offset_right = -150
 	main_panel.offset_top = 100

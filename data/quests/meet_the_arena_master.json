@@ -1,0 +1,21 @@
+{
+	"id": "meet_the_arena_master",
+	"title": "Blood and Glory",
+	"description": "Varn the Scarred told you about the Bloodsand Arena. Travel south to meet Gormund the Pitmaster.",
+	"is_main_quest": false,
+	"quest_source": "story",
+	"giver_npc_id": "varn_the_scarred",
+	"giver_region": "elder_moor",
+	"objectives": [
+		{
+			"id": "talk_arena_master",
+			"description": "Speak with Gormund the Pitmaster at the Bloodsand Arena",
+			"type": "talk",
+			"target": "arena_master_bloodsand",
+			"target_zone": "bloodsand_arena",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"rewards": { "gold": 25, "xp": 50 }
+}

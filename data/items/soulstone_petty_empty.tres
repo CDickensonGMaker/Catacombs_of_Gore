@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "soulstone_petty_empty"
+display_name = "Petty Soulstone (Empty)"
+description = "A small gem that can capture fragments of souls from slain enemies. Fills slowly as you defeat foes."
+item_type = 5
+stack_size = 10
+base_value = 100
+weight = 0.1

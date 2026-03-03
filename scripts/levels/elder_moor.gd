@@ -3,6 +3,11 @@
 ## Scene-based layout with runtime navigation baking and day/night cycle
 extends Node3D
 
+## Emitted when navigation mesh is fully baked and ready for use
+signal navigation_ready
+
+const IntroDialogueUIScript = preload("res://scripts/ui/intro_dialogue_ui.gd")
+
 const ZONE_ID := "elder_moor"
 const ZONE_SIZE := Vector2(242.0, 219.0)  # Actual scene dimensions (width, depth)
 const ZONE_SIZE_LEGACY := 242.0  # For backwards compatibility (use larger dimension)
@@ -113,6 +118,11 @@ func _bake_navigation() -> void:
 	if nav_region and nav_region.navigation_mesh:
 		nav_region.bake_navigation_mesh()
 		print("[Elder Moor] Navigation mesh baked")
+		# Wait for NavigationServer3D to synchronize (needs physics frames)
+		await get_tree().physics_frame
+		await get_tree().physics_frame
+		navigation_ready.emit()
+		print("[Elder Moor] Navigation ready signal emitted")
 
 
 ## Setup dynamic day/night lighting
@@ -627,6 +637,7 @@ func _check_intro_dialogue() -> void:
 
 
 ## Build and display the intro dialogue based on player race and career
+## Uses centered IntroDialogueUI instead of standard DialogueBox
 func _show_intro_dialogue() -> void:
 	# Double-check flag hasn't been set in the meantime
 	if DialogueManager.has_flag("intro_shown"):
@@ -651,11 +662,29 @@ func _show_intro_dialogue() -> void:
 	# Set the flag BEFORE showing dialogue to prevent double-showing
 	DialogueManager.set_flag("intro_shown")
 
-	# Start the dialogue
-	if not DialogueManager.start_dialogue(intro_dialogue, ""):
-		push_error("[Elder Moor] Failed to start intro dialogue")
-	else:
-		print("[Elder Moor] Showing intro dialogue for %s %s" % [
-			Enums.Race.keys()[player_race],
-			Enums.Career.keys()[player_career]
-		])
+	# Get the intro text from the dialogue node
+	var intro_text: String = ""
+	if intro_dialogue.nodes.size() > 0:
+		intro_text = intro_dialogue.nodes[0].text
+
+	if intro_text.is_empty():
+		push_error("[Elder Moor] Intro dialogue has no text")
+		return
+
+	# Create and show the centered intro UI
+	var intro_ui: Node = IntroDialogueUIScript.new()
+	add_child(intro_ui)
+	intro_ui.dialogue_finished.connect(_on_intro_dialogue_finished.bind(intro_ui))
+	intro_ui.show_intro(intro_text)
+
+	print("[Elder Moor] Showing intro dialogue for %s %s" % [
+		Enums.Race.keys()[player_race],
+		Enums.Career.keys()[player_career]
+	])
+
+
+## Called when intro dialogue is dismissed
+func _on_intro_dialogue_finished(intro_ui: Node) -> void:
+	if intro_ui:
+		intro_ui.queue_free()
+	print("[Elder Moor] Intro dialogue finished")

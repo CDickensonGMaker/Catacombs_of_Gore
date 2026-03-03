@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "soul_essence"
+display_name = "Soul Essence"
+description = "A crystallized fragment of spiritual energy harvested from undead or magical creatures. Pulses with an eerie inner light and is essential for enchanting weapons."
+item_type = 1
+is_stackable = true
+max_stack = 10
+shop_bundle_size = 1
+consumable_effect = 0
+effect_value = Array[int]([0, 0, 0])
+effect_duration = 0.0
+effect_percent = 0.0
+teaches_spell_id = ""
+requires_literacy = false
+literacy_dc = 10
+repair_amount = 0
+repairs_quality = false
+base_value = 120
+weight = 0.1
+icon_path = ""
+mesh_path = ""
+use_sound = ""

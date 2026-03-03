@@ -19,10 +19,10 @@ const PIXEL_SIZE := 0.011  ## Size of each pixel in world units (27% smaller tha
 
 ## Light settings
 const LIGHT_COLOR := Color(1.0, 0.7, 0.3)
-const LIGHT_RANGE := 8.0
-const LIGHT_ENERGY_BASE := 1.5
-const LIGHT_ENERGY_MIN := 1.3
-const LIGHT_ENERGY_MAX := 1.7
+const LIGHT_RANGE := 13.0  ## Increased 62%
+const LIGHT_ENERGY_BASE := 2.5  ## Increased 67%
+const LIGHT_ENERGY_MIN := 2.2  ## Increased 69%
+const LIGHT_ENERGY_MAX := 2.8  ## Increased 65%
 const LIGHT_ATTENUATION := 1.2
 const FLICKER_SPEED := 8.0  ## How fast the light flickers
 

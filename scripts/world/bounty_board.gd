@@ -121,7 +121,7 @@ func _create_visual() -> void:
 	add_child(mesh_instance)
 
 	# Add wanted posters texture on the front of the board
-	var poster_tex: Texture2D = load("res://Sprite folders grab bag/bountyboard_asset.png")
+	var poster_tex: Texture2D = load("res://assets/sprites/props/signs/bounty_board.png")
 	if poster_tex:
 		var poster_sprite := Sprite3D.new()
 		poster_sprite.name = "BountyPosters"

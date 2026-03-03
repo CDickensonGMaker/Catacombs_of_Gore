@@ -1,0 +1,34 @@
+{
+	"id": "bounty_dire_wolf_pack",
+	"title": "Dire Wolf Pack",
+	"description": "A pack of dire wolves has been terrorizing the deep forest. These massive beasts are far more dangerous than ordinary wolves. Hunters are wanted to put them down.",
+	"is_main_quest": false,
+	"quest_source": "bounty",
+	"giver_npc_id": "bounty_board",
+	"giver_npc_type": "bounty_board",
+	"giver_region": "elder_moor",
+	"faction": "hunters_guild",
+	"objectives": [
+		{
+			"id": "kill_dire_wolves",
+			"description": "Kill dire wolves in the forest",
+			"type": "kill",
+			"target": "dire_wolf",
+			"required_count": 2
+		}
+	],
+	"turn_in_type": "bounty_board",
+	"turn_in_target": "bounty_board",
+	"turn_in_zone": "elder_moor",
+	"rewards": {
+		"gold": 120,
+		"xp": 300,
+		"items": [],
+		"faction_reputation": {
+			"hunters_guild": 20
+		}
+	},
+	"cooldown_days": 5,
+	"prerequisites": [],
+	"next_quest": ""
+}

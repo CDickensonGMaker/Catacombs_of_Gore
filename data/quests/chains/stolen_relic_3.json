@@ -1,0 +1,34 @@
+{
+	"id": "stolen_relic_3",
+	"title": "Return the Relic",
+	"description": "You've recovered the sacred relic. Return it to the priest in Dalhurst.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "temple_of_three",
+	"objectives": [
+		{
+			"id": "return",
+			"description": "Return the relic to the priest",
+			"type": "talk",
+			"target": "dalhurst_priest",
+			"target_zone": "dalhurst",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "dalhurst_priest",
+	"turn_in_zone": "dalhurst",
+	"rewards": {
+		"gold": 200,
+		"xp": 300,
+		"items": [],
+		"faction_reputation": {
+			"temple_of_three": 35
+		}
+	},
+	"prerequisites": ["stolen_relic_2"],
+	"next_quest": ""
+}

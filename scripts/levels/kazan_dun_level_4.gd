@@ -70,13 +70,13 @@ func _spawn_fire_bats() -> void:
 	spawn_enemy_in_room(
 		"kd_forge_main",
 		"res://data/enemies/fire_bat.tres",
-		"res://Sprite folders grab bag/bat_flying_on_fire.png",
+		"res://assets/sprites/enemies/beasts/bat_fire.png",
 		Vector3(-3, 3, 2)
 	)
 	spawn_enemy_in_room(
 		"kd_forge_main",
 		"res://data/enemies/fire_bat.tres",
-		"res://Sprite folders grab bag/bat_flying_on_fire.png",
+		"res://assets/sprites/enemies/beasts/bat_fire.png",
 		Vector3(4, 2.5, -3)
 	)
 
@@ -84,7 +84,7 @@ func _spawn_fire_bats() -> void:
 	spawn_enemy_in_room(
 		"kd_mine_shaft",
 		"res://data/enemies/fire_bat.tres",
-		"res://Sprite folders grab bag/bat_flying_on_fire.png",
+		"res://assets/sprites/enemies/beasts/bat_fire.png",
 		Vector3(0, 4, 0)
 	)
 

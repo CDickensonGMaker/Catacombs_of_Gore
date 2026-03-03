@@ -9,7 +9,7 @@ extends Resource
 @export var description: String = ""
 
 ## Category for UI organization
-@export_enum("Weapon", "Armor", "Consumable", "Tool", "Material") var category: String = "Weapon"
+@export_enum("Weapon", "Armor", "Alchemy", "Consumable", "Tool", "Material", "Food") var category: String = "Weapon"
 
 ## Required materials - Dictionary of item_id -> quantity
 @export var materials: Dictionary = {}
@@ -128,6 +128,15 @@ func craft() -> Dictionary:
 
 	# Add crafted item
 	InventoryManager.add_item(output_item_id, output_quantity, quality)
+
+	# Play appropriate crafting sound based on category
+	if AudioManager:
+		if category == "Food":
+			AudioManager.play_cooking_sound(true)  # Sizzle for food
+		elif category == "Consumable":
+			AudioManager.play_alchemy_sound(true)  # Potion sound
+		else:
+			AudioManager.play_crafting_sound()  # Blacksmith sound
 
 	return {
 		"success": true,

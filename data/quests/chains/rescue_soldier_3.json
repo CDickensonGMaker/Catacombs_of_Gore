@@ -1,0 +1,34 @@
+{
+	"id": "rescue_soldier_3",
+	"title": "Report to the Guard Captain",
+	"description": "The soldier is safe. Return to Thornfield and report to the guard captain.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "human_empire",
+	"objectives": [
+		{
+			"id": "report",
+			"description": "Report to the guard captain in Thornfield",
+			"type": "talk",
+			"target": "thornfield_guard_captain",
+			"target_zone": "thornfield",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "thornfield_guard_captain",
+	"turn_in_zone": "thornfield",
+	"rewards": {
+		"gold": 250,
+		"xp": 400,
+		"items": ["iron_sword"],
+		"faction_reputation": {
+			"human_empire": 30
+		}
+	},
+	"prerequisites": ["rescue_soldier_2"],
+	"next_quest": ""
+}

@@ -1,0 +1,34 @@
+{
+	"id": "rescue_sacrifice_victim_3",
+	"title": "Return the Rescued",
+	"description": "You've saved the woman from a grisly fate. Return to the priest in Millbrook with the good news.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "temple_of_three",
+	"objectives": [
+		{
+			"id": "return",
+			"description": "Return to the priest in Millbrook",
+			"type": "talk",
+			"target": "millbrook_priest",
+			"target_zone": "millbrook",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "millbrook_priest",
+	"turn_in_zone": "millbrook",
+	"rewards": {
+		"gold": 250,
+		"xp": 350,
+		"items": ["temple_blessing_scroll"],
+		"faction_reputation": {
+			"temple_of_three": 40
+		}
+	},
+	"prerequisites": ["rescue_sacrifice_victim_2"],
+	"next_quest": ""
+}

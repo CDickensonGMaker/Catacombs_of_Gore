@@ -1,0 +1,35 @@
+{
+	"id": "lost_locket_3",
+	"title": "Return the Locket",
+	"description": "You found the precious locket. Return it to the grieving widow in Millbrook.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "common_folk",
+	"objectives": [
+		{
+			"id": "return_locket",
+			"description": "Return the locket to the widow",
+			"type": "talk",
+			"target": "millbrook_civilian",
+			"target_zone": "millbrook",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "millbrook_civilian",
+	"turn_in_zone": "millbrook",
+	"rewards": {
+		"gold": 75,
+		"xp": 175,
+		"items": [],
+		"faction_reputation": {
+			"common_folk": 20
+		}
+	},
+	"prerequisites": ["lost_locket_2"],
+	"next_quest": "",
+	"quest_items": ["silver_necklace"]
+}

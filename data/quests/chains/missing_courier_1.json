@@ -1,0 +1,32 @@
+{
+	"id": "missing_courier_1",
+	"title": "The Missing Courier",
+	"description": "A courier carrying important documents never arrived. The merchant who hired him fears the worst. Ask around at the inn - someone might have seen something.",
+	"is_main_quest": false,
+	"quest_source": "npc",
+	"giver_npc_id": "dalhurst_merchant",
+	"giver_npc_type": "merchant",
+	"giver_region": "dalhurst",
+	"faction": "merchants_guild",
+	"objectives": [
+		{
+			"id": "ask_innkeeper",
+			"description": "Ask the innkeeper about the courier",
+			"type": "talk",
+			"target": "dalhurst_innkeeper",
+			"target_zone": "dalhurst",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 0,
+		"xp": 50,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": [],
+	"next_quest": "missing_courier_2"
+}

@@ -1,0 +1,53 @@
+{
+	"id": "temple_undead_menace",
+	"title": "Cleanse the Restless Dead",
+	"description": "Priest of Morthane at the Temple of the Three Gods is troubled by reports of undead rising in the old cemetery outside town. As the priest of Death and Rebirth, he takes personal offense at the unnatural corruption of the cycle. Help him restore balance.",
+	"is_main_quest": false,
+	"quest_source": "npc",
+	"giver_npc_id": "priest_morthane_dalhurst",
+	"giver_npc_type": "civilian",
+	"giver_region": "dalhurst",
+	"objectives": [
+		{
+			"id": "travel_cemetery",
+			"description": "Travel to the old cemetery north of Dalhurst",
+			"type": "reach",
+			"target": "dalhurst_cemetery",
+			"required_count": 1
+		},
+		{
+			"id": "destroy_undead",
+			"description": "Destroy the risen dead",
+			"type": "kill",
+			"target": "skeleton",
+			"required_count": 10
+		},
+		{
+			"id": "find_source",
+			"description": "Find and destroy the source of the corruption",
+			"type": "interact",
+			"target": "necromantic_totem",
+			"required_count": 1
+		},
+		{
+			"id": "return_priest",
+			"description": "Report to Priest of Morthane",
+			"type": "talk",
+			"target": "priest_morthane_dalhurst",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "priest_morthane_dalhurst",
+	"turn_in_zone": "dalhurst",
+	"rewards": {
+		"gold": 100,
+		"xp": 500,
+		"items": ["morthane_amulet"],
+		"faction_reputation": {
+			"church_of_three": 40
+		}
+	},
+	"prerequisites": [],
+	"next_quest": ""
+}

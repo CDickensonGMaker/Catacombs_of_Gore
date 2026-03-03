@@ -1,0 +1,43 @@
+{
+	"id": "tenger_scouts",
+	"title": "Scouts from the South",
+	"description": "Reports have come in of strange, savage warriors spotted south of the mountain range. These Tenger scouts are likely the vanguard of a larger force. The local garrison needs someone to track down these scouts and learn what they can about the Tenger's intentions - whether they come seeking war or something else.",
+	"is_main_quest": false,
+	"quest_source": "npc",
+	"giver_npc_id": "garrison_commander",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "southern_outpost",
+	"objectives": [
+		{
+			"id": "track_scouts",
+			"description": "Track the Tenger scouts in the southern foothills",
+			"type": "reach",
+			"target": "tenger_scout_camp",
+			"required_count": 1
+		},
+		{
+			"id": "observe_or_fight",
+			"description": "Observe the scouts or engage them",
+			"type": "interact",
+			"target": "tenger_scouts",
+			"required_count": 1
+		},
+		{
+			"id": "gather_intel",
+			"description": "Gather intelligence about the Tenger horde",
+			"type": "collect",
+			"target": "tenger_battle_plans",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "garrison_commander",
+	"turn_in_zone": "southern_outpost",
+	"rewards": {
+		"gold": 125,
+		"xp": 350,
+		"items": []
+	},
+	"prerequisites": [],
+	"next_quest": null
+}

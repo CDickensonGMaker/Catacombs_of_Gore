@@ -1,0 +1,149 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/data/enemy_attack_data.gd" id="2"]
+
+[sub_resource type="Resource" id="1"]
+script = ExtResource("2")
+id = "boss_cleave"
+display_name = "Brutal Cleave"
+damage = Array[int]([18, 28, 0])
+damage_type = 0
+windup_time = 0.6
+active_time = 0.35
+recovery_time = 0.4
+cooldown = 2.5
+range_distance = 3.0
+is_ranged = false
+is_aoe = true
+aoe_radius = 2.5
+projectile_speed = 15.0
+inflicts_condition = 0
+condition_chance = 0.0
+condition_duration = 0.0
+stagger_power = 1.5
+knockback_force = 5.0
+weight = 1.0
+min_range = 0.0
+max_range = 3.2
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[sub_resource type="Resource" id="2"]
+script = ExtResource("2")
+id = "boss_thrust"
+display_name = "Devastating Thrust"
+damage = Array[int]([14, 22, 0])
+damage_type = 0
+windup_time = 0.35
+active_time = 0.2
+recovery_time = 0.3
+cooldown = 1.8
+range_distance = 3.2
+is_ranged = false
+is_aoe = false
+aoe_radius = 0.0
+projectile_speed = 15.0
+inflicts_condition = 1
+condition_chance = 0.3
+condition_duration = 4.0
+stagger_power = 1.0
+knockback_force = 3.0
+weight = 0.8
+min_range = 0.0
+max_range = 3.5
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[sub_resource type="Resource" id="3"]
+script = ExtResource("2")
+id = "boss_slam"
+display_name = "Ground Slam"
+damage = Array[int]([10, 16, 0])
+damage_type = 0
+windup_time = 0.5
+active_time = 0.15
+recovery_time = 0.35
+cooldown = 4.0
+range_distance = 2.5
+is_ranged = false
+is_aoe = true
+aoe_radius = 3.0
+projectile_speed = 15.0
+inflicts_condition = 0
+condition_chance = 0.0
+condition_duration = 0.0
+stagger_power = 2.5
+knockback_force = 8.0
+weight = 0.5
+min_range = 0.0
+max_range = 2.8
+requires_los = true
+animation_name = "attack"
+sound_effect = ""
+
+[resource]
+script = ExtResource("1")
+id = "bandit_boss"
+display_name = "Bandit Boss"
+description = "A brutal warlord who commands the bandit camps. Scarred, ruthless, and feared by all who cross his path."
+level = 18
+min_level = 14
+max_level = 30
+max_hp = 280
+armor_value = 35
+movement_speed = 4.0
+turn_speed = 5.0
+grit = 16
+agility = 8
+will = 10
+knowledge = 4
+bravery = 12
+behavior = 0
+faction = 6
+aggro_range = 18.0
+attack_range = 3.2
+preferred_distance = 2.5
+flee_hp_threshold = 0.05
+is_boss = true
+attacks = Array[ExtResource("2")]([SubResource("1"), SubResource("2"), SubResource("3")])
+can_block = true
+block_chance = 0.45
+stagger_resistance = 0.7
+fire_resistance = 0.0
+frost_resistance = 0.0
+lightning_resistance = 0.0
+poison_resistance = 0.15
+necrotic_resistance = 0.0
+physical_resistance = 0.25
+fire_weakness = 0.0
+frost_weakness = 0.0
+lightning_weakness = 0.0
+holy_weakness = 0.0
+causes_horror = false
+horror_difficulty = 10
+loot_table_av = 12
+gold_drop = Array[int]([200, 400])
+guaranteed_drops = Array[String](["bandit_orders"])
+drop_table = {
+"health_potion": 0.7,
+"fine_longsword": 0.5,
+"plate_armor": 0.3,
+"repair_kit": 0.4,
+"gold_ring": 0.25
+}
+xp_reward = 600
+scene_path = ""
+icon_path = "res://assets/sprites/enemies/human_bandit.png"
+scale = 1.25
+sprite_path = "res://assets/sprites/enemies/humanoid/human_bandit_alt.png"
+attack_sprite_path = ""
+sprite_hframes = 4
+sprite_vframes = 1
+sprite_pixel_size = 0.04
+idle_sounds = Array[String]([])
+attack_sounds = Array[String]([])
+hurt_sounds = Array[String]([])
+death_sounds = Array[String]([])

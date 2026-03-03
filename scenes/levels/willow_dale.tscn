@@ -1,9 +1,11 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3 uid="uid://coiq8g1vpp7jq"]
 
-[ext_resource type="Script" path="res://scripts/levels/willow_dale.gd" id="1"]
-[ext_resource type="PackedScene" uid="uid://player_scene" path="res://scenes/player/player.tscn" id="2"]
+[ext_resource type="Script" uid="uid://wus2eng818nn" path="res://scripts/levels/willow_dale.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/world/zone_door_instance.tscn" id="4"]
+[ext_resource type="PackedScene" uid="uid://dusd3eb2bqx0y" path="res://scenes/levels/willow_dale_UPDATED.glb" id="6_1df61"]
+[ext_resource type="Texture2D" uid="uid://cpil7cxqwjepn" path="res://assets/textures/environment/walls/monastary walls.png" id="6_floor"]
 
 [sub_resource type="Environment" id="Environment_willow"]
 background_mode = 2
@@ -15,26 +17,11 @@ fog_light_color = Color(0.35, 0.45, 0.4, 1)
 fog_density = 0.008
 fog_aerial_perspective = 0.3
 
-[sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
-sky_top_color = Color(0.4, 0.55, 0.65, 1)
-sky_horizon_color = Color(0.55, 0.65, 0.7, 1)
-ground_bottom_color = Color(0.25, 0.35, 0.3, 1)
-ground_horizon_color = Color(0.4, 0.5, 0.45, 1)
-
-[sub_resource type="Sky" id="sky"]
-sky_material = SubResource("sky_mat")
-
 [sub_resource type="StandardMaterial3D" id="mat_ground"]
-albedo_color = Color(0.3, 0.4, 0.3, 1)
+albedo_texture = ExtResource("6_floor")
 roughness = 0.95
-
-[sub_resource type="StandardMaterial3D" id="mat_road"]
-albedo_color = Color(0.45, 0.4, 0.35, 1)
-roughness = 0.9
-
-[sub_resource type="StandardMaterial3D" id="mat_grass"]
-albedo_color = Color(0.25, 0.45, 0.25, 1)
-roughness = 0.95
+uv1_scale = Vector3(10, 10, 1)
+texture_filter = 0
 
 [node name="WillowDale" type="Node3D"]
 script = ExtResource("1")
@@ -54,24 +41,8 @@ shadow_bias = 0.02
 [node name="Ground" type="CSGBox3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 use_collision = true
-size = Vector3(200, 1, 200)
+size = Vector3(100, 1, 100)
 material = SubResource("mat_ground")
-
-[node name="RoadSouth" type="CSGBox3D" parent="Terrain"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 50)
-use_collision = true
-size = Vector3(8, 0.1, 100)
-material = SubResource("mat_road")
-
-[node name="GrassyMeadow_W" type="CSGBox3D" parent="Terrain"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40, 0.02, 0)
-size = Vector3(40, 0.05, 60)
-material = SubResource("mat_grass")
-
-[node name="GrassyMeadow_E" type="CSGBox3D" parent="Terrain"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 0.02, -20)
-size = Vector3(35, 0.05, 50)
-material = SubResource("mat_grass")
 
 [node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
 
@@ -79,21 +50,22 @@ material = SubResource("mat_grass")
 
 [node name="SouthToCrossroads" parent="Doors" instance=ExtResource("4")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 95)
-target_scene = "res://scenes/regions/crossroads.tscn"
+target_scene = "res://scenes/levels/cultist_ruins_corner.tscn"
 spawn_point_id = "from_willow_dale"
-door_name = "Road to the Crossroads"
+door_name = "Road to the Ruined Crossroads"
 show_frame = false
 
 [node name="SpawnPoints" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 32.7068)
 
 [node name="DefaultSpawn" type="Node3D" parent="SpawnPoints" groups=["default_spawn", "spawn_points"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 46.82424)
 
 [node name="from_crossroads" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 85)
 
 [node name="from_fast_travel" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.1, 46.75456)
 
 [node name="EnemySpawns" type="Node3D" parent="."]
 
@@ -103,3 +75,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.1, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
 
 [node name="HUD" parent="." instance=ExtResource("3")]
+
+[node name="willow_dale_UPDATED" parent="." instance=ExtResource("6_1df61")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.437111, -0.560727, 2.1663027)

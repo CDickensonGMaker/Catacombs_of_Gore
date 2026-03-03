@@ -9,6 +9,7 @@ extends Node3D
 
 const ZONE_ID := "thornfield"
 const ZONE_SIZE := 100.0  # Matches WorldGrid.CELL_SIZE
+const TOWN_AMBIENT_PATH := "res://assets/audio/Ambiance/towns/town_murmur_medieval_mix_60s_ps1_retro.wav"
 
 @onready var nav_region: NavigationRegion3D = $NavigationRegion3D
 
@@ -30,11 +31,16 @@ func _ready() -> void:
 		# Day/night only needed when we're the main scene
 		DayNightCycle.force_takeover(self)
 
+		# Play town ambient sound and village music
+		AudioManager.play_ambient(TOWN_AMBIENT_PATH)
+		AudioManager.play_zone_music("village")
+
 	# Apply materials to CSG nodes (they default to white in .tscn)
 	_apply_materials()
 	_spawn_npcs()
 	_spawn_interactables()
 	_spawn_doors()
+	_spawn_locked_doors()
 	_setup_spawn_point_metadata()
 	_setup_navigation()
 	_setup_cell_streaming()
@@ -46,9 +52,17 @@ func _ready() -> void:
 func _apply_materials() -> void:
 	# Create materials for forest hamlet theme
 	var ground_mat := StandardMaterial3D.new()
-	ground_mat.albedo_color = Color(0.28, 0.35, 0.22)  # Forest grass green
 	ground_mat.roughness = 0.9
 	ground_mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+
+	# Apply fallen leaves texture to ground (same as Elder Moor)
+	var leaves_tex: Texture2D = load("res://assets/sprites/environment/ground/leaves_full.png")
+	if leaves_tex:
+		ground_mat.albedo_texture = leaves_tex
+		ground_mat.albedo_color = Color(0.85, 0.75, 0.6)  # Warm autumn tint
+		ground_mat.uv1_scale = Vector3(10.0, 10.0, 1.0)  # Tile across 100x100 ground
+	else:
+		ground_mat.albedo_color = Color(0.28, 0.35, 0.22)  # Fallback forest grass green
 
 	var road_mat := StandardMaterial3D.new()
 	road_mat.albedo_color = Color(0.42, 0.38, 0.32)  # Dirt path brown
@@ -301,13 +315,14 @@ func _spawn_npcs() -> void:
 		marek.faction_id = "human_empire"
 
 	# Elder Vorn - Town Leader (talk target for Tharin's quest chain)
-	var elder_vorn := QuestGiver.spawn_quest_giver(
+	# IMPORTANT: npc_id must be "elder_vorn_thornfield" to match tharins_message.json quest target
+	# Uses ActorRegistry to get sprite config (supports Zoo patches)
+	var elder_vorn := QuestGiver.spawn_from_registry(
 		npcs,
 		Vector3(0, 0, 5),  # Near town center
 		"Elder Vorn",
-		"elder_vorn_thornfield",
-		null,  # use default sprite
-		8, 2,
+		"elder_vorn_thornfield",  # Must match quest objective target in tharins_message.json
+		"elder_vorn_thornfield",  # Actor ID in ZooRegistry
 		[],  # No quests to give, just receives messages
 		true  # is_talk_target
 	)
@@ -321,7 +336,7 @@ func _spawn_npcs() -> void:
 	elder_profile.base_disposition = 60
 	elder_profile.speech_style = "formal"
 	elder_vorn.npc_profile = elder_profile
-	print("[Thornfield] Spawned Elder Vorn (town leader)")
+	print("[Thornfield] Spawned Elder Vorn (town leader) - npc_id: elder_vorn_thornfield")
 
 	# Woodcutter 1 (green vest guy - fits woodcutter theme)
 	var woodcutter1_pos: Marker3D = npc_spawn_points.get_node_or_null("Civilian_Woodcutter1")
@@ -408,6 +423,35 @@ func _spawn_doors() -> void:
 	# Cell boundary transitions are handled by CellStreamer
 
 	print("[Thornfield] Spawned interior doors")
+
+
+## Spawn locked doors from markers placed in the scene
+## Add a Node3D container called "LockedDoors" with Marker3D children
+## Set metadata on each marker: door_name (String), lock_dc (int)
+func _spawn_locked_doors() -> void:
+	var doors_container := get_node_or_null("LockedDoors")
+	if not doors_container:
+		return
+
+	var doors_spawned: int = 0
+	for marker in doors_container.get_children():
+		if not marker is Marker3D:
+			continue
+
+		var door_name: String = marker.get_meta("door_name", "Locked Door")
+		var lock_dc: int = marker.get_meta("lock_dc", 12)
+
+		var door := LockableDoor.spawn_door(
+			self,
+			marker.global_position,
+			door_name,
+			lock_dc
+		)
+		door.rotation = marker.rotation
+		doors_spawned += 1
+
+	if doors_spawned > 0:
+		print("[Thornfield] Spawned %d locked doors from markers" % doors_spawned)
 
 
 

@@ -1,0 +1,31 @@
+{
+	"id": "road_safety_1",
+	"title": "Road Safety",
+	"description": "Bandits have established an outpost that overlooks the eastern road. Merchants are being robbed daily. Find their outpost.",
+	"is_main_quest": false,
+	"quest_source": "npc",
+	"giver_npc_id": "thornfield_guard_captain",
+	"giver_npc_type": "guard",
+	"giver_region": "thornfield",
+	"faction": "human_empire",
+	"objectives": [
+		{
+			"id": "find_outpost",
+			"description": "Find the bandit outpost",
+			"type": "reach",
+			"target": "bandit_camp_east",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 25,
+		"xp": 75,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": [],
+	"next_quest": "road_safety_2"
+}

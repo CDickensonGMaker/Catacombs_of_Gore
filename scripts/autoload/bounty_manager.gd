@@ -113,8 +113,24 @@ func generate_bounty_for_npc(npc_id: String, npc_name: String) -> Bounty:
 	# Get a random nearby region for variety in bounties
 	var region: String = WorldLexicon.get_random_nearby_region(current_settlement)
 
-	# Get random creature for this region
+	# Pre-generate bounty details for deduplication checks
 	var creature: String = WorldLexicon.get_random_creature_for_region(region)
+	var bounty_key: String = "%s_%s" % [creature, region]
+
+	# CHECK 1: Don't offer if player already has this bounty type active
+	for active_bounty_id: String in bounties:
+		var active_bounty: Bounty = bounties[active_bounty_id]
+		if active_bounty.is_accepted and not active_bounty.is_turned_in:
+			var active_key: String = "%s_%s" % [active_bounty.target_creature, active_bounty.region]
+			if active_key == bounty_key:
+				return null  # Already have this bounty active
+
+	# CHECK 2: Don't offer recently completed bounties
+	for completed_id: String in completed_bounty_ids:
+		if completed_id.contains(creature) and completed_id.contains(region):
+			return null  # Recently completed this type
+
+	# Get creature tier (creature already generated above for deduplication)
 	var creature_tier: int = WorldLexicon.get_creature_tier(creature)
 
 	# Calculate target count and rewards based on tier

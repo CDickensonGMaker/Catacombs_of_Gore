@@ -6,7 +6,7 @@
 [ext_resource type="PackedScene" path="res://scenes/world/zone_door_instance.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/rooms/kazan_dun/kd_feast_hall.tscn" id="5"]
 [ext_resource type="PackedScene" path="res://scenes/rooms/kazan_dun/kd_council_chamber.tscn" id="6"]
-[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://Sprite folders grab bag/stonewall.png" id="6_gl53g"]
+[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://assets/textures/environment/walls/stonewall.png" id="6_gl53g"]
 [ext_resource type="PackedScene" path="res://scenes/rooms/kazan_dun/kd_kitchen.tscn" id="7"]
 [ext_resource type="PackedScene" path="res://scenes/rooms/kazan_dun/kd_great_hall_corridor.tscn" id="8"]
 

@@ -1,6 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://sunken_crypt_scene"]
+[gd_scene load_steps=4 format=3 uid="uid://x8pocqed23sf"]
 
-[ext_resource type="Script" path="res://scripts/levels/sunken_crypt.gd" id="1"]
+[ext_resource type="Script" uid="uid://cpvsp5n3m3apl" path="res://scripts/levels/sunken_crypt.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
 

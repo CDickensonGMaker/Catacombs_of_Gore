@@ -1,0 +1,31 @@
+{
+	"id": "rescue_woodsman_1",
+	"title": "The Kidnapped Woodsman",
+	"description": "A woodsman has been captured by bandits near the eastern camp. His family is desperate. Locate their hideout.",
+	"is_main_quest": false,
+	"quest_source": "npc",
+	"giver_npc_id": "elder_moor_civilian",
+	"giver_npc_type": "civilian",
+	"giver_region": "elder_moor",
+	"faction": "common_folk",
+	"objectives": [
+		{
+			"id": "find_hideout",
+			"description": "Locate the bandit hideout east of Thornfield",
+			"type": "reach",
+			"target": "bandit_camp_east",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 0,
+		"xp": 75,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": [],
+	"next_quest": "rescue_woodsman_2"
+}

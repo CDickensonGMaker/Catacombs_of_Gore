@@ -39,6 +39,8 @@ const REGION_COORDS: Dictionary = {
 	"bandits_hideout": Vector2i(1, -1),
 	"bandit_hideout": Vector2i(1, -1),
 	"bandit_hideout_exterior": Vector2i(1, -1),
+	# Bloodsand Arena - South of Elder Moor (0, 3)
+	"bloodsand_arena": Vector2i(0, 3),
 }
 
 
@@ -152,6 +154,7 @@ const LOCATION_SCENES: Dictionary = {
 	# Landmarks
 	"elder_moor": "res://scenes/levels/elder_moor.tscn",
 	"crossroads": "res://scenes/regions/crossroads.tscn",
+	"bloodsand_arena": "res://scenes/levels/bloodsand_arena.tscn",
 	# Dungeons
 	"willow_dale": "res://scenes/levels/willow_dale.tscn",
 	"bandit_hideout": "res://scenes/levels/bandit_hideout_exterior.tscn",
@@ -301,6 +304,21 @@ const LOCATIONS: Array = [
 		"type": "landmark",
 		"is_start": true,
 		"description": "Rolling moorland dotted with standing stones. Strange lights flicker here at night. Your journey begins here."
+	},
+	{
+		"id": "bloodsand_arena",
+		"name": "Bloodsand Arena",
+		"col": 12, "row": 11,
+		"type": "landmark",
+		"description": "A gladiatorial arena where warriors test their mettle in bloody combat. Fame and fortune await the victorious."
+	},
+	{
+		"id": "sunken_crypts",
+		"name": "Sunken Crypts",
+		"col": 9, "row": 10,
+		"type": "dungeon",
+		"dungeon_levels": 1,
+		"description": "Ancient burial chambers half-submerged in murky water. The dead do not rest easy here."
 	},
 	{
 		"id": "millbrook",
@@ -555,8 +573,8 @@ static func get_region_name(coords: Vector2i) -> String:
 static func get_background_asset(coords: Vector2i) -> String:
 	var cell := get_cell(coords)
 	if cell and cell.background_asset != "":
-		return "res://Sprite folders grab bag/" + cell.background_asset
-	return "res://Sprite folders grab bag/" + BG_PLAINS
+		return "res://assets/sprites/environment/backgrounds/" + cell.background_asset
+	return "res://assets/sprites/environment/backgrounds/" + BG_PLAINS
 
 
 ## Mark a cell as discovered

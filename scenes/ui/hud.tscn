@@ -23,6 +23,7 @@ bg_color = Color(0.2, 0.4, 0.9, 1)
 bg_color = Color(0.1, 0.15, 0.35, 1)
 
 [node name="HUD" type="CanvasLayer" groups=["hud"]]
+layer = 2
 script = ExtResource("1")
 health_bar = NodePath("TopLeft/HealthBar")
 health_label = NodePath("TopLeft/HealthLabel")

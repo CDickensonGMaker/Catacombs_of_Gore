@@ -11,13 +11,18 @@ signal encounter_avoided()
 # =============================================================================
 
 ## Time between encounter checks (in game seconds, 60 = 1 game hour)
-const ENCOUNTER_CHECK_INTERVAL := 60.0
+const ENCOUNTER_CHECK_INTERVAL := 30.0  # Check every 30 seconds for more frequent encounters
 
-## Base encounter chance (4% = 1-in-25)
-const BASE_ENCOUNTER_CHANCE := 0.04
+## Base encounter chance (15% = ~1-in-7, significantly increased for dangerous wilderness)
+const BASE_ENCOUNTER_CHANCE := 0.15
 
 ## Minimum time between forced encounters (prevent spam)
-const MIN_ENCOUNTER_COOLDOWN := 30.0
+const MIN_ENCOUNTER_COOLDOWN := 15.0  # Reduced for more action
+
+## Horde event configuration - rare but devastating
+const HORDE_CHANCE := 0.12  # 12% of encounters are hordes
+const HORDE_COUNT_MIN := 8
+const HORDE_COUNT_MAX := 15
 
 # =============================================================================
 # DANGER MODIFIERS
@@ -58,116 +63,126 @@ const WEATHER_DANGER: Dictionary = {
 # =============================================================================
 
 ## Encounter tables by biome - each entry is {enemy_type, weight, min_count, max_count}
+## Counts significantly increased for more dangerous wilderness
 const ENCOUNTER_TABLES: Dictionary = {
 	"plains": [
-		{"enemy_type": "wolf", "weight": 30, "min": 1, "max": 3},
-		{"enemy_type": "human_bandit", "weight": 25, "min": 1, "max": 4},
-		{"enemy_type": "wild_boar", "weight": 20, "min": 1, "max": 2},
-		{"enemy_type": "goblin", "weight": 15, "min": 2, "max": 5},
+		{"enemy_type": "wolf", "weight": 30, "min": 3, "max": 6},
+		{"enemy_type": "human_bandit", "weight": 25, "min": 3, "max": 7},
+		{"enemy_type": "wild_boar", "weight": 20, "min": 2, "max": 4},
+		{"enemy_type": "goblin", "weight": 15, "min": 4, "max": 8},
 		{"enemy_type": "merchant_caravan", "weight": 10, "min": 1, "max": 1}  # Friendly
 	],
 	"forest": [
-		{"enemy_type": "wolf", "weight": 35, "min": 2, "max": 4},
-		{"enemy_type": "giant_spider", "weight": 25, "min": 1, "max": 3},
-		{"enemy_type": "human_bandit", "weight": 20, "min": 2, "max": 5},
-		{"enemy_type": "goblin", "weight": 15, "min": 3, "max": 6},
-		{"enemy_type": "bear", "weight": 5, "min": 1, "max": 1}
+		{"enemy_type": "wolf", "weight": 35, "min": 4, "max": 7},
+		{"enemy_type": "giant_spider", "weight": 25, "min": 3, "max": 6},
+		{"enemy_type": "human_bandit", "weight": 20, "min": 4, "max": 8},
+		{"enemy_type": "goblin", "weight": 15, "min": 5, "max": 10},
+		{"enemy_type": "bear", "weight": 5, "min": 1, "max": 2}
 	],
 	"swamp": [
-		{"enemy_type": "giant_spider", "weight": 30, "min": 2, "max": 4},
-		{"enemy_type": "skeleton", "weight": 25, "min": 2, "max": 5},
-		{"enemy_type": "zombie", "weight": 20, "min": 1, "max": 3},
-		{"enemy_type": "wolf", "weight": 15, "min": 1, "max": 2},
-		{"enemy_type": "will_o_wisp", "weight": 10, "min": 1, "max": 2}
+		{"enemy_type": "giant_spider", "weight": 30, "min": 4, "max": 7},
+		{"enemy_type": "skeleton", "weight": 25, "min": 4, "max": 8},
+		{"enemy_type": "zombie", "weight": 20, "min": 3, "max": 6},
+		{"enemy_type": "wolf", "weight": 15, "min": 2, "max": 4},
+		{"enemy_type": "will_o_wisp", "weight": 10, "min": 2, "max": 4}
 	],
 	"hills": [
-		{"enemy_type": "wolf", "weight": 30, "min": 2, "max": 4},
-		{"enemy_type": "human_bandit", "weight": 30, "min": 2, "max": 5},
-		{"enemy_type": "goblin", "weight": 25, "min": 3, "max": 6},
-		{"enemy_type": "orc", "weight": 15, "min": 1, "max": 3}
+		{"enemy_type": "wolf", "weight": 30, "min": 4, "max": 7},
+		{"enemy_type": "human_bandit", "weight": 30, "min": 4, "max": 8},
+		{"enemy_type": "goblin", "weight": 25, "min": 5, "max": 10},
+		{"enemy_type": "orc", "weight": 15, "min": 2, "max": 5}
 	],
 	"rocky": [
-		{"enemy_type": "human_bandit", "weight": 35, "min": 2, "max": 5},
-		{"enemy_type": "orc", "weight": 25, "min": 2, "max": 4},
-		{"enemy_type": "goblin", "weight": 25, "min": 3, "max": 6},
-		{"enemy_type": "troll", "weight": 10, "min": 1, "max": 1},
-		{"enemy_type": "giant", "weight": 5, "min": 1, "max": 1}
+		{"enemy_type": "human_bandit", "weight": 35, "min": 4, "max": 8},
+		{"enemy_type": "orc", "weight": 25, "min": 3, "max": 6},
+		{"enemy_type": "goblin", "weight": 25, "min": 5, "max": 10},
+		{"enemy_type": "troll", "weight": 10, "min": 1, "max": 2},
+		{"enemy_type": "giant", "weight": 5, "min": 1, "max": 2}
 	],
 	"mountains": [
-		{"enemy_type": "orc", "weight": 35, "min": 2, "max": 5},
-		{"enemy_type": "troll", "weight": 25, "min": 1, "max": 2},
-		{"enemy_type": "goblin", "weight": 20, "min": 3, "max": 6},
-		{"enemy_type": "giant", "weight": 10, "min": 1, "max": 1},
-		{"enemy_type": "harpy", "weight": 10, "min": 2, "max": 4}
+		{"enemy_type": "orc", "weight": 35, "min": 4, "max": 8},
+		{"enemy_type": "troll", "weight": 25, "min": 2, "max": 4},
+		{"enemy_type": "goblin", "weight": 20, "min": 5, "max": 10},
+		{"enemy_type": "giant", "weight": 10, "min": 1, "max": 2},
+		{"enemy_type": "harpy", "weight": 10, "min": 3, "max": 6}
 	],
 	"desert": [
-		{"enemy_type": "human_bandit", "weight": 40, "min": 2, "max": 6},
-		{"enemy_type": "giant_scorpion", "weight": 30, "min": 1, "max": 3},
-		{"enemy_type": "snake", "weight": 20, "min": 2, "max": 4},
-		{"enemy_type": "sand_wurm", "weight": 10, "min": 1, "max": 1}
+		{"enemy_type": "human_bandit", "weight": 40, "min": 4, "max": 10},
+		{"enemy_type": "giant_scorpion", "weight": 30, "min": 2, "max": 5},
+		{"enemy_type": "snake", "weight": 20, "min": 4, "max": 7},
+		{"enemy_type": "sand_wurm", "weight": 10, "min": 1, "max": 2}
 	],
 	"undead": [
-		{"enemy_type": "skeleton", "weight": 35, "min": 3, "max": 6},
-		{"enemy_type": "zombie", "weight": 30, "min": 2, "max": 5},
-		{"enemy_type": "ghost", "weight": 20, "min": 1, "max": 3},
-		{"enemy_type": "vampire", "weight": 10, "min": 1, "max": 1},
+		{"enemy_type": "skeleton", "weight": 35, "min": 5, "max": 10},
+		{"enemy_type": "zombie", "weight": 30, "min": 4, "max": 8},
+		{"enemy_type": "ghost", "weight": 20, "min": 2, "max": 5},
+		{"enemy_type": "vampire", "weight": 10, "min": 1, "max": 2},
 		{"enemy_type": "lich", "weight": 5, "min": 1, "max": 1}
 	]
 }
 
 ## Default encounter table for unmapped biomes
 const DEFAULT_ENCOUNTERS: Array = [
-	{"enemy_type": "wolf", "weight": 40, "min": 1, "max": 3},
-	{"enemy_type": "human_bandit", "weight": 35, "min": 1, "max": 4},
-	{"enemy_type": "goblin", "weight": 25, "min": 2, "max": 4}
+	{"enemy_type": "wolf", "weight": 40, "min": 3, "max": 6},
+	{"enemy_type": "human_bandit", "weight": 35, "min": 3, "max": 7},
+	{"enemy_type": "goblin", "weight": 25, "min": 4, "max": 8}
 ]
 
 ## Enemy spawning config - maps enemy_type to spawn data
+## NOTE: Sprite settings can be overridden by ActorRegistry (Zoo patches)
+## The "enemy_type" field maps to ZooRegistry actor IDs for patch lookup
 const ENEMY_SPAWN_CONFIG: Dictionary = {
 	"wolf": {
+		"enemy_type": "wolf",
 		"data_path": "res://data/enemies/wolf.tres",
-		"sprite_path": "res://Sprite folders grab bag/wolf_moving.png",
+		"sprite_path": "res://assets/sprites/enemies/beasts/wolf_moving.png",
 		"h_frames": 6,
 		"v_frames": 1,
 		"is_skeleton": false
 	},
 	"giant_spider": {
+		"enemy_type": "giant_spider",
 		"data_path": "res://data/enemies/giant_spider.tres",
-		"sprite_path": "res://Sprite folders grab bag/evilspider.png",
+		"sprite_path": "res://assets/sprites/enemies/beasts/spider.png",
 		"h_frames": 1,
 		"v_frames": 1,
 		"is_skeleton": false
 	},
 	"skeleton": {
+		"enemy_type": "skeleton",
 		"data_path": "res://data/enemies/skeleton.tres",
 		"is_skeleton": true
 	},
 	"goblin": {
+		"enemy_type": "goblin_soldier",
 		"data_path": "res://data/enemies/goblin_soldier.tres",
-		"sprite_path": "res://Sprite folders grab bag/goblin_idle.png",
-		"h_frames": 6,
-		"v_frames": 1,
+		"sprite_path": "res://assets/sprites/enemies/goblins/goblin_sword.png",
+		"h_frames": 4,
+		"v_frames": 4,
 		"is_skeleton": false
 	},
 	"human_bandit": {
+		"enemy_type": "human_bandit",
 		"data_path": "res://data/enemies/human_bandit.tres",
-		"sprite_path": "res://Sprite folders grab bag/bandit_idle.png",
-		"h_frames": 6,
+		"sprite_path": "res://assets/sprites/enemies/human_bandit.png",
+		"h_frames": 1,
 		"v_frames": 1,
 		"is_skeleton": false
 	},
 	"zombie": {
+		"enemy_type": "zombie",
 		"data_path": "res://data/enemies/zombie.tres",
-		"sprite_path": "res://Sprite folders grab bag/zombie_idle.png",
-		"h_frames": 6,
-		"v_frames": 1,
+		"sprite_path": "res://assets/sprites/enemies/undead/swampy_undead.png",
+		"h_frames": 4,
+		"v_frames": 4,
 		"is_skeleton": false
 	},
 	"orc": {
+		"enemy_type": "orc",
 		"data_path": "res://data/enemies/orc.tres",
-		"sprite_path": "res://Sprite folders grab bag/orc_idle.png",
-		"h_frames": 6,
-		"v_frames": 1,
+		"sprite_path": "res://assets/sprites/enemies/humanoid/human_bandit_alt.png",
+		"h_frames": 3,
+		"v_frames": 4,
 		"is_skeleton": false
 	}
 }
@@ -176,6 +191,26 @@ const ENEMY_SPAWN_CONFIG: Dictionary = {
 const SPAWN_DISTANCE_MIN := 15.0
 const SPAWN_DISTANCE_MAX := 25.0
 const SPAWN_SPREAD := 5.0  # Spread between multiple enemies
+
+# =============================================================================
+# SPECIAL ENCOUNTERS (One-time, level-gated)
+# =============================================================================
+
+## Special encounters config - triggered once per playthrough based on player level
+## Each entry: { id, min_level, chance, enemy_data_path, dialogue_path }
+const SPECIAL_ENCOUNTERS: Array[Dictionary] = [
+	{
+		"id": "ratfang_snotcheeze",
+		"min_level": 15,
+		"chance": 0.80,  # 80% chance to trigger
+		"enemy_data_path": "res://data/enemies/ratfang_snotcheeze.tres",
+		"dialogue_path": "res://data/dialogue/ratfang_snotcheeze.json",
+		"description": "Ratfang Snotcheeze - rat assassin hunting the player"
+	}
+]
+
+## Preload AssassinEncounter script for spawning
+const AssassinEncounterScript = preload("res://scripts/encounters/assassin_encounter.gd")
 
 # =============================================================================
 # STATE
@@ -203,6 +238,9 @@ var _last_check_hex: Vector2i = Vector2i.ZERO
 var encounters_triggered: int = 0
 var encounters_avoided: int = 0
 
+## Special encounters that have been triggered (persisted across saves)
+var _triggered_special_encounters: Array[String] = []
+
 
 func _ready() -> void:
 	_rng = RandomNumberGenerator.new()
@@ -223,7 +261,7 @@ func _connect_signals() -> void:
 
 
 ## Called when player enters a new cell - force encounter check
-func _on_cell_changed(old_cell: Vector2i, new_cell: Vector2i) -> void:
+func _on_cell_changed(_old_cell: Vector2i, new_cell: Vector2i) -> void:
 	# Update last check coords and force an encounter check when entering a new cell
 	_last_check_hex = new_cell
 	force_check()
@@ -305,6 +343,22 @@ func is_in_safe_zone() -> bool:
 	return false
 
 
+## Check if hex is in a hand-crafted zone (has scene_path) or covered by one
+func _is_in_handcrafted_zone(hex: Vector2i) -> bool:
+	var cell: WorldGrid.CellInfo = WorldGrid.get_cell(hex)
+
+	# Cell itself has a hand-crafted scene
+	if cell and cell.scene_path != "":
+		return true
+
+	# Cell is covered by another scene's physical area (e.g., Elder Moor spans multiple cells)
+	var coverage: Dictionary = WorldGrid.is_covered_by_scene(hex)
+	if coverage.get("covered", false):
+		return true
+
+	return false
+
+
 # =============================================================================
 # INTERNAL LOGIC
 # =============================================================================
@@ -319,6 +373,14 @@ func _check_for_encounter() -> void:
 	# Don't check in safe zones
 	if is_in_safe_zone():
 		return
+
+	# Don't spawn encounters in hand-crafted zones or cells covered by them
+	if _is_in_handcrafted_zone(hex):
+		return
+
+	# Check for special encounters first (one-time, level-gated)
+	if _check_special_encounters():
+		return  # Special encounter triggered, skip regular roll
 
 	# Calculate encounter chance
 	var danger_level: float = _calculate_danger_level(hex)
@@ -396,6 +458,105 @@ func _get_weather_danger_modifier() -> float:
 	return 1.0
 
 
+# =============================================================================
+# SPECIAL ENCOUNTERS (One-time assassin/bounty encounters)
+# =============================================================================
+
+## Check for special encounters based on player level
+## Returns true if a special encounter was triggered
+func _check_special_encounters() -> bool:
+	if not _player:
+		return false
+
+	# Get player level from GameManager
+	var player_level: int = 1
+	if GameManager and GameManager.player_data:
+		player_level = GameManager.player_data.level
+
+	# Check each special encounter
+	for encounter: Dictionary in SPECIAL_ENCOUNTERS:
+		var encounter_id: String = encounter.get("id", "")
+
+		# Skip if already triggered
+		if encounter_id in _triggered_special_encounters:
+			continue
+
+		# Check level requirement
+		var min_level: int = encounter.get("min_level", 1)
+		if player_level < min_level:
+			continue
+
+		# Roll for encounter
+		var chance: float = encounter.get("chance", 0.5)
+		var roll: float = _rng.randf()
+
+		print("[EncounterManager] Special encounter check: %s (level %d >= %d) - chance: %.0f%%, roll: %.2f" % [
+			encounter_id, player_level, min_level, chance * 100, roll
+		])
+
+		if roll < chance:
+			_trigger_special_encounter(encounter)
+			return true
+
+	return false
+
+
+## Trigger a special encounter (assassin with dialogue)
+func _trigger_special_encounter(encounter: Dictionary) -> void:
+	var encounter_id: String = encounter.get("id", "")
+
+	# Mark as triggered (won't spawn again)
+	_triggered_special_encounters.append(encounter_id)
+
+	# Set cooldown to prevent regular encounters interfering
+	_cooldown_timer = MIN_ENCOUNTER_COOLDOWN * 2
+
+	# Get spawn position
+	var spawn_pos: Vector3 = _calculate_spawn_position()
+
+	# Create AssassinEncounter instance
+	var parent: Node3D = _get_spawn_parent()
+	if not parent:
+		push_warning("[EncounterManager] No spawn parent for special encounter")
+		return
+
+	var assassin_encounter: Node = AssassinEncounterScript.spawn_encounter(
+		parent,
+		spawn_pos,
+		encounter.get("enemy_data_path", ""),
+		encounter.get("dialogue_path", "")
+	)
+
+	if assassin_encounter:
+		# Trigger the encounter after a short delay (let player see them approach)
+		var tree: SceneTree = get_tree()
+		if tree:
+			await tree.create_timer(0.5).timeout
+			if is_instance_valid(assassin_encounter) and assassin_encounter.has_method("trigger_encounter"):
+				assassin_encounter.trigger_encounter(_player)
+
+		print("[EncounterManager] SPECIAL ENCOUNTER TRIGGERED: %s" % encounter_id)
+
+		# Alert the player
+		var hud: Node = get_tree().get_first_node_in_group("hud")
+		if hud and hud.has_method("show_notification"):
+			hud.show_notification("You are being hunted!", Color(1.0, 0.2, 0.2))
+
+
+## Check if a special encounter has been triggered
+func has_triggered_special_encounter(encounter_id: String) -> bool:
+	return encounter_id in _triggered_special_encounters
+
+
+## Force trigger a special encounter by ID (for debug/testing)
+func force_special_encounter(encounter_id: String) -> void:
+	for encounter: Dictionary in SPECIAL_ENCOUNTERS:
+		if encounter.get("id", "") == encounter_id:
+			_trigger_special_encounter(encounter)
+			return
+	push_warning("[EncounterManager] Unknown special encounter: %s" % encounter_id)
+
+
 ## Trigger an encounter
 func _trigger_encounter(hex: Vector2i) -> void:
 	# Set cooldown
@@ -414,8 +575,18 @@ func _trigger_encounter(hex: Vector2i) -> void:
 	if selected.is_empty():
 		return
 
-	# Determine count
-	var count: int = _rng.randi_range(selected.get("min", 1), selected.get("max", 1))
+	# Check for HORDE event - rare but devastating large groups
+	var is_horde: bool = _rng.randf() < HORDE_CHANCE
+	var count: int
+
+	if is_horde:
+		# Horde event - large group
+		count = _rng.randi_range(HORDE_COUNT_MIN, HORDE_COUNT_MAX)
+		# Longer cooldown after horde to give player breathing room
+		_cooldown_timer = MIN_ENCOUNTER_COOLDOWN * 2.0
+	else:
+		# Normal encounter
+		count = _rng.randi_range(selected.get("min", 1), selected.get("max", 1))
 
 	# Build encounter data
 	var encounter_data: Dictionary = {
@@ -424,13 +595,20 @@ func _trigger_encounter(hex: Vector2i) -> void:
 		"hex": hex,
 		"biome": biome_name,
 		"is_road": cell.is_road if cell else false,
-		"danger_level": _calculate_danger_level(hex)
+		"danger_level": _calculate_danger_level(hex),
+		"is_horde": is_horde
 	}
 
 	encounters_triggered += 1
-	print("[EncounterManager] ENCOUNTER TRIGGERED: %d x %s at hex %s" % [
-		count, encounter_data.enemy_type, hex
-	])
+
+	if is_horde:
+		print("[EncounterManager] HORDE ATTACK! %d x %s at hex %s" % [
+			count, encounter_data.enemy_type, hex
+		])
+	else:
+		print("[EncounterManager] ENCOUNTER TRIGGERED: %d x %s at hex %s" % [
+			count, encounter_data.enemy_type, hex
+		])
 
 	encounter_triggered.emit(encounter_data)
 
@@ -438,8 +616,8 @@ func _trigger_encounter(hex: Vector2i) -> void:
 	var spawned_enemies: Array[Node] = _spawn_encounter_enemies(encounter_data)
 	if not spawned_enemies.is_empty():
 		encounter_spawned.emit(spawned_enemies)
-		# Alert the player
-		_alert_player_to_encounter(spawned_enemies[0])
+		# Alert the player (special message for hordes)
+		_alert_player_to_encounter(spawned_enemies[0], is_horde)
 
 
 ## Weighted random selection from encounter table
@@ -559,6 +737,7 @@ func _get_player_camera() -> Camera3D:
 
 
 ## Spawn a single enemy
+## Uses ActorRegistry for sprite configuration when available (to apply Zoo patches)
 func _spawn_single_enemy(parent: Node3D, pos: Vector3, config: Dictionary) -> Node:
 	var enemy: Node = null
 
@@ -571,8 +750,22 @@ func _spawn_single_enemy(parent: Node3D, pos: Vector3, config: Dictionary) -> No
 				config.get("data_path", "")
 			)
 	else:
-		# Load sprite texture
+		# Try to get sprite config from ActorRegistry (includes Zoo patches)
+		var enemy_type: String = config.get("enemy_type", "")
 		var sprite_path: String = config.get("sprite_path", "")
+		var h_frames: int = config.get("h_frames", 1)
+		var v_frames: int = config.get("v_frames", 1)
+
+		# Check ActorRegistry for patched sprite configuration
+		if ActorRegistry and not enemy_type.is_empty():
+			var registry_config: Dictionary = ActorRegistry.get_sprite_config(enemy_type)
+			if not registry_config.is_empty():
+				# Use registry values (which may include Zoo patches)
+				sprite_path = registry_config.get("sprite_path", sprite_path)
+				h_frames = registry_config.get("h_frames", h_frames)
+				v_frames = registry_config.get("v_frames", v_frames)
+
+		# Validate sprite exists
 		if not ResourceLoader.exists(sprite_path):
 			push_warning("[EncounterManager] Sprite not found: %s" % sprite_path)
 			return null
@@ -588,8 +781,8 @@ func _spawn_single_enemy(parent: Node3D, pos: Vector3, config: Dictionary) -> No
 				pos,
 				config.get("data_path", ""),
 				sprite_tex,
-				config.get("h_frames", 1),
-				config.get("v_frames", 1)
+				h_frames,
+				v_frames
 			)
 
 	# Tag as encounter spawn for potential special handling
@@ -600,15 +793,15 @@ func _spawn_single_enemy(parent: Node3D, pos: Vector3, config: Dictionary) -> No
 
 
 ## Alert player to the encounter (sound, UI notification)
-func _alert_player_to_encounter(first_enemy: Node) -> void:
+func _alert_player_to_encounter(first_enemy: Node, is_horde: bool = false) -> void:
 	# Play alert sound
 	if AudioManager:
-		AudioManager.play_sfx("enemy_alert")
+		if is_horde:
+			AudioManager.play_sfx("enemy_roar")  # More dramatic sound for hordes
+		else:
+			AudioManager.play_sfx("enemy_alert")
 
-	# Show notification
-	var hud: Node = get_tree().get_first_node_in_group("hud")
-	if hud and hud.has_method("show_notification"):
-		hud.show_notification("Enemies nearby!", Color(1.0, 0.3, 0.3))
+	# No warning notifications - enemies should ambush without warning
 
 	# Optional: Make first enemy roar or give audio cue
 	if first_enemy and first_enemy.has_method("play_alert_sound"):
@@ -623,7 +816,8 @@ func _alert_player_to_encounter(first_enemy: Node) -> void:
 func to_dict() -> Dictionary:
 	return {
 		"encounters_triggered": encounters_triggered,
-		"encounters_avoided": encounters_avoided
+		"encounters_avoided": encounters_avoided,
+		"triggered_special_encounters": _triggered_special_encounters.duplicate()
 	}
 
 
@@ -631,6 +825,13 @@ func to_dict() -> Dictionary:
 func from_dict(data: Dictionary) -> void:
 	encounters_triggered = data.get("encounters_triggered", 0)
 	encounters_avoided = data.get("encounters_avoided", 0)
+
+	# Restore triggered special encounters
+	_triggered_special_encounters.clear()
+	var saved_special: Array = data.get("triggered_special_encounters", [])
+	for encounter_id: Variant in saved_special:
+		if encounter_id is String:
+			_triggered_special_encounters.append(encounter_id)
 
 
 ## Reset for new game
@@ -640,3 +841,4 @@ func reset_for_new_game() -> void:
 	encounters_avoided = 0
 	_encounter_timer = 0.0
 	_cooldown_timer = 0.0
+	_triggered_special_encounters.clear()

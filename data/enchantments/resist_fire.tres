@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="EnchantmentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enchantment_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "resist_fire"
+display_name = "Resist Fire"
+description = "Grants resistance to fire damage."
+enchantment_type = 1
+effect_value = 15
+damage_type = 1
+stat_type = 0
+inflicts_condition = 0
+proc_chance = 0.0
+condition_duration = 0.0
+min_soulstone_tier = 1
+required_arcana = 1
+gold_cost = 150
+applicable_slots = ["armor", "ring", "amulet", "shield"]
+glow_color = Color(1, 0.6, 0.3, 1)

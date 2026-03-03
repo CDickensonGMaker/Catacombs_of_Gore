@@ -444,7 +444,10 @@ func _find_target(max_range: float, allies: bool) -> Node:
 	if not owner_entity:
 		return null
 	if allies:
-		# TODO: Find ally
+		# TODO: Find ally - ally targeting not yet implemented
+		# Implementation: Query "allies" or "party_members" group.
+		# Find closest ally within max_range that is below max HP.
+		# For now, return self (healing/buffing self).
 		return owner_entity
 	else:
 		return CombatManager.get_closest_enemy(owner_entity.global_position, max_range)

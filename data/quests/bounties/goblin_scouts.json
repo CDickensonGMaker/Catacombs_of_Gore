@@ -1,0 +1,34 @@
+{
+	"id": "bounty_goblin_scouts",
+	"title": "Goblin Scouts",
+	"description": "Goblin scouts have been spotted at the forest edges. The militia is offering a bounty to prevent a larger incursion.",
+	"is_main_quest": false,
+	"quest_source": "bounty",
+	"giver_npc_id": "bounty_board",
+	"giver_npc_type": "bounty_board",
+	"giver_region": "dalhurst",
+	"faction": "human_empire",
+	"objectives": [
+		{
+			"id": "kill_goblins",
+			"description": "Kill goblin scouts in the forest",
+			"type": "kill",
+			"target": "goblin_soldier",
+			"required_count": 4
+		}
+	],
+	"turn_in_type": "bounty_board",
+	"turn_in_target": "bounty_board",
+	"turn_in_zone": "dalhurst",
+	"rewards": {
+		"gold": 60,
+		"xp": 180,
+		"items": [],
+		"faction_reputation": {
+			"human_empire": 10
+		}
+	},
+	"cooldown_days": 5,
+	"prerequisites": [],
+	"next_quest": ""
+}

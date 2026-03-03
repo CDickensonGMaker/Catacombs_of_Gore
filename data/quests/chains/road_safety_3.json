@@ -1,0 +1,35 @@
+{
+	"id": "road_safety_3",
+	"title": "Collect Your Bounty",
+	"description": "The road is safe once more. Return to Thornfield and collect your reward.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "human_empire",
+	"objectives": [
+		{
+			"id": "report",
+			"description": "Collect your bounty from the guard captain",
+			"type": "talk",
+			"target": "thornfield_guard_captain",
+			"target_zone": "thornfield",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "thornfield_guard_captain",
+	"turn_in_zone": "thornfield",
+	"rewards": {
+		"gold": 300,
+		"xp": 450,
+		"items": [],
+		"faction_reputation": {
+			"human_empire": 30,
+			"merchants_guild": 15
+		}
+	},
+	"prerequisites": ["road_safety_2"],
+	"next_quest": ""
+}

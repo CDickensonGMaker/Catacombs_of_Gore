@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "bestiary_vol_5_bandits"
+display_name = "Bestiary Vol. V: Brigands and Bandits"
+description = "A bounty hunter's reference to the criminal element. Profiles common highwaymen, their captains, and the ruthless bosses who lead bandit gangs. Includes known hideout patterns and typical combat tactics."
+item_type = 5
+is_stackable = true
+max_stack = 5
+unlocks_bestiary = Array[String](["human_bandit", "bandit_captain", "bandit_leader", "bandit_boss"])
+book_tier = 5
+base_value = 200
+weight = 0.6

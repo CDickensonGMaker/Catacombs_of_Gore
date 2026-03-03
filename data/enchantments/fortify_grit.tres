@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="EnchantmentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enchantment_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "fortify_grit"
+display_name = "Fortify Grit"
+description = "Increases Grit stat while worn."
+enchantment_type = 2
+effect_value = 2
+damage_type = 0
+stat_type = 0
+inflicts_condition = 0
+proc_chance = 0.0
+condition_duration = 0.0
+min_soulstone_tier = 2
+required_arcana = 2
+gold_cost = 200
+applicable_slots = ["ring", "amulet", "armor"]
+glow_color = Color(0.9, 0.6, 0.3, 1)

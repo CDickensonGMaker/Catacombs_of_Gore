@@ -1,0 +1,47 @@
+{
+	"id": "missing_courier_2",
+	"title": "Find the Courier",
+	"description": "The innkeeper said the courier headed toward the Old Watchtower. Search the area for any sign of him.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "merchants_guild",
+	"objectives": [
+		{
+			"id": "find_body",
+			"description": "Search near the Old Watchtower",
+			"type": "reach",
+			"target": "old_watchtower",
+			"required_count": 1
+		},
+		{
+			"id": "collect_letter",
+			"description": "Retrieve the courier's letter",
+			"type": "collect",
+			"target": "sealed_letter",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 0,
+		"xp": 100,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": ["missing_courier_1"],
+	"next_quest": "missing_courier_3",
+	"spawn_on_accept": [
+		{
+			"type": "chest",
+			"location": "old_watchtower",
+			"coords": [120, 0, 180],
+			"contains": ["sealed_letter"],
+			"loot_tier": "common"
+		}
+	]
+}

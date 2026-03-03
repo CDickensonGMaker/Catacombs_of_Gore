@@ -1,0 +1,38 @@
+{
+	"id": "bounty_urgent_dispatch",
+	"title": "Urgent Dispatch",
+	"description": "The guard captain needs an urgent message delivered to Thornfield. The roads are dangerous - a capable fighter is needed to ensure it arrives safely.",
+	"is_main_quest": false,
+	"quest_source": "bounty",
+	"giver_npc_id": "bounty_board",
+	"giver_npc_type": "bounty_board",
+	"giver_region": "elder_moor",
+	"faction": "human_empire",
+	"objectives": [
+		{
+			"id": "deliver_dispatch",
+			"description": "Deliver the sealed dispatch to Thornfield's guard captain",
+			"type": "talk",
+			"target": "thornfield_guard_captain",
+			"target_zone": "thornfield",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "thornfield_guard_captain",
+	"turn_in_zone": "thornfield",
+	"starter_items": [
+		{"id": "sealed_dispatch", "quantity": 1}
+	],
+	"rewards": {
+		"gold": 75,
+		"xp": 150,
+		"items": [],
+		"faction_reputation": {
+			"human_empire": 15
+		}
+	},
+	"cooldown_days": 5,
+	"prerequisites": [],
+	"next_quest": ""
+}

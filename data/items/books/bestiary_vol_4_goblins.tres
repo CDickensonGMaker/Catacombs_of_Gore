@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "bestiary_vol_4_goblins"
+display_name = "Bestiary Vol. IV: The Goblin Menace"
+description = "A comprehensive military manual on goblin combat tactics. Details the hierarchy from common soldiers to cunning leaders, the threat of goblin archers and mages, and the dangerous warbosses who unite the tribes."
+item_type = 5
+is_stackable = true
+max_stack = 5
+unlocks_bestiary = Array[String](["goblin_soldier", "goblin_archer", "goblin_mage", "goblin_leader", "goblin_warboss"])
+book_tier = 4
+base_value = 150
+weight = 0.6

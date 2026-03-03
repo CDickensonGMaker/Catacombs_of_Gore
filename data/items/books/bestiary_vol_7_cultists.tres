@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "bestiary_vol_7_cultists"
+display_name = "Bestiary Vol. VII: Cultists and Heretics"
+description = "A secret inquisitorial document detailing the dark cults that plague the realm. Profiles common cultist fanatics and their charismatic leaders. Contains warnings about blood magic and forbidden rituals."
+item_type = 5
+is_stackable = true
+max_stack = 5
+unlocks_bestiary = Array[String](["cultist", "cult_leader"])
+book_tier = 7
+base_value = 300
+weight = 0.6

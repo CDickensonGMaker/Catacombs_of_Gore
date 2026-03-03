@@ -107,10 +107,10 @@ drop_table = {
 }
 xp_reward = 250
 scene_path = ""
-icon_path = "res://Sprite folders grab bag/wyvern.png"
+icon_path = "res://assets/sprites/enemies/beasts/wyvern.png"
 scale = 1.5
-sprite_path = "res://Sprite folders grab bag/wyvern.png"
-attack_sprite_path = "res://Sprite folders grab bag/wyvern_attack.png"
+sprite_path = "res://assets/sprites/enemies/beasts/wyvern.png"
+attack_sprite_path = "res://assets/sprites/enemies/beasts/wyvern_attack.png"
 sprite_hframes = 6
 sprite_vframes = 1
 attack_hframes = 5

@@ -152,8 +152,8 @@ func _on_body_entered(body: Node3D) -> void:
 	if body in hit_targets:
 		return
 
-	# Only hit valid targets
-	if not body.is_in_group("enemies") and not body.is_in_group("player"):
+	# Only hit valid targets (enemies, player, or attackable NPCs)
+	if not body.is_in_group("enemies") and not body.is_in_group("player") and not body.is_in_group("attackable"):
 		return
 
 	hit_targets.append(body)

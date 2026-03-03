@@ -8,9 +8,14 @@ signal fast_travel_requested(zone_id: String, spawn_id: String)
 signal location_selected(zone_id: String)
 
 ## Map settings
-const CELL_SIZE := 18  ## Pixels per grid cell (smaller = more zoomed out)
+const MIN_CELL_SIZE := 12  ## Minimum pixels per grid cell
 const MAP_PADDING := 10
+const HEADER_HEIGHT := 46  ## Space for title and location labels
+const FOOTER_HEIGHT := 22  ## Space for legend
 const PLAYER_ICON_SIZE := 12.0
+
+## Dynamic cell size (calculated to fill container)
+var cell_size: float = 18.0
 
 ## Colors
 const COLOR_BG := Color(0.05, 0.04, 0.06, 0.98)
@@ -28,6 +33,7 @@ const COLOR_SELECTED := Color(1.0, 0.9, 0.5, 0.8)
 const COLOR_TOWN := Color(0.7, 0.6, 0.4)
 const COLOR_DUNGEON := Color(0.7, 0.3, 0.3)
 const COLOR_LANDMARK := Color(0.6, 0.7, 0.5)
+const COLOR_UNDISCOVERED := Color(0.5, 0.4, 0.4, 0.6)  # Dim gray for mystery locations
 
 ## Components
 var background: ColorRect
@@ -53,22 +59,45 @@ var player_coords: Vector2i = Vector2i(7, 4)  # Default to Elder Moor
 var grid_size: Vector2
 var grid_offset: Vector2
 
-
 func _ready() -> void:
-	# Calculate sizes - use full rect to fill container, don't force overflow
-	grid_size = Vector2(WorldData.GRID_COLS * CELL_SIZE, WorldData.GRID_ROWS * CELL_SIZE)
-	# Don't set custom_minimum_size larger than typical panel - let it fit the container
 	set_anchors_preset(PRESET_FULL_RECT)
 
 	# Initialize WorldData
 	if WorldData.world_grid.is_empty():
 		WorldData.initialize()
 
+	# Re-sync discovered cells from PlayerGPS to WorldData
+	# This handles the case where WorldData.initialize() ran AFTER discovery was restored
+	if PlayerGPS:
+		for coords: Vector2i in PlayerGPS.discovered_cells:
+			var grid_coords: Vector2i = WorldData.region_to_grid(coords)
+			WorldData.discover_cell(grid_coords)
+
+	# Setup UI synchronously - parent should have size set by the time _ready runs
 	_setup_ui()
 	_update_player_position()
 
 
+func _calculate_cell_size() -> void:
+	# Calculate available space for the map grid
+	var available_width: float = size.x - (MAP_PADDING * 2)
+	var available_height: float = size.y - HEADER_HEIGHT - FOOTER_HEIGHT
+
+	# Calculate cell size to fit grid in available space
+	var cell_width: float = available_width / WorldData.GRID_COLS
+	var cell_height: float = available_height / WorldData.GRID_ROWS
+
+	# Use the smaller dimension to maintain square cells
+	cell_size = maxf(MIN_CELL_SIZE, minf(cell_width, cell_height))
+
+	# Update grid_size based on calculated cell_size
+	grid_size = Vector2(WorldData.GRID_COLS * cell_size, WorldData.GRID_ROWS * cell_size)
+
+
 func _setup_ui() -> void:
+	# Calculate cell size to fill available space
+	_calculate_cell_size()
+
 	# Background with border
 	var border := ColorRect.new()
 	border.name = "Border"
@@ -122,10 +151,12 @@ func _setup_ui() -> void:
 	coords_label.offset_left = -80
 	add_child(coords_label)
 
-	# Map canvas for drawing - centered within available space
+	# Map canvas for drawing - fill available space
 	map_canvas = Control.new()
 	map_canvas.name = "MapCanvas"
-	map_canvas.position = Vector2(MAP_PADDING, 46)
+	# Center the map canvas in available space
+	var canvas_x: float = (size.x - grid_size.x) / 2.0
+	map_canvas.position = Vector2(maxf(MAP_PADDING, canvas_x), HEADER_HEIGHT)
 	map_canvas.custom_minimum_size = grid_size
 	map_canvas.size = grid_size
 	map_canvas.draw.connect(_draw_map)
@@ -158,13 +189,15 @@ func _setup_ui() -> void:
 func _setup_compass_labels() -> void:
 	var compass_color := COLOR_GOLD
 	var font_size := 14
+	var map_x: float = map_canvas.position.x
+	var map_y: float = map_canvas.position.y
 
 	# N label at top of grid
 	var n_label := Label.new()
 	n_label.text = "N"
 	n_label.add_theme_color_override("font_color", compass_color)
 	n_label.add_theme_font_size_override("font_size", font_size)
-	n_label.position = Vector2(MAP_PADDING + grid_size.x / 2 - 4, 34)
+	n_label.position = Vector2(map_x + grid_size.x / 2 - 4, map_y - 14)
 	add_child(n_label)
 
 	# S label at bottom of grid
@@ -172,7 +205,7 @@ func _setup_compass_labels() -> void:
 	s_label.text = "S"
 	s_label.add_theme_color_override("font_color", compass_color)
 	s_label.add_theme_font_size_override("font_size", font_size)
-	s_label.position = Vector2(MAP_PADDING + grid_size.x / 2 - 4, 46 + grid_size.y + 2)
+	s_label.position = Vector2(map_x + grid_size.x / 2 - 4, map_y + grid_size.y + 2)
 	add_child(s_label)
 
 	# W label at left of grid
@@ -180,7 +213,7 @@ func _setup_compass_labels() -> void:
 	w_label.text = "W"
 	w_label.add_theme_color_override("font_color", compass_color)
 	w_label.add_theme_font_size_override("font_size", font_size)
-	w_label.position = Vector2(2, 46 + grid_size.y / 2 - 8)
+	w_label.position = Vector2(map_x - 14, map_y + grid_size.y / 2 - 8)
 	add_child(w_label)
 
 	# E label at right of grid
@@ -188,7 +221,7 @@ func _setup_compass_labels() -> void:
 	e_label.text = "E"
 	e_label.add_theme_color_override("font_color", compass_color)
 	e_label.add_theme_font_size_override("font_size", font_size)
-	e_label.position = Vector2(MAP_PADDING + grid_size.x + 4, 46 + grid_size.y / 2 - 8)
+	e_label.position = Vector2(map_x + grid_size.x + 4, map_y + grid_size.y / 2 - 8)
 	add_child(e_label)
 
 
@@ -369,11 +402,23 @@ func _draw_location_icon(coords: Vector2i) -> void:
 	var fog_disabled: bool = SceneManager and not SceneManager.fog_of_war_enabled
 	var is_discovered: bool = cell.discovered or is_dev or fog_disabled
 
-	if not is_discovered:
+	# Show mystery markers for dungeons and landmarks even when undiscovered
+	var show_mystery_marker: bool = (
+		not is_discovered and
+		(cell.location_type == WorldData.LocationType.DUNGEON or
+		 cell.location_type == WorldData.LocationType.LANDMARK)
+	)
+
+	if not is_discovered and not show_mystery_marker:
 		return
 
 	var center := _get_cell_center(coords)
-	var icon_size := CELL_SIZE * 0.6
+	var icon_size: float = cell_size * 0.6
+
+	# If showing mystery marker, draw "?" instead of full icon
+	if show_mystery_marker:
+		_draw_text_at(center, "?", COLOR_UNDISCOVERED)
+		return
 
 	# Choose color based on location type
 	var icon_color: Color
@@ -381,7 +426,7 @@ func _draw_location_icon(coords: Vector2i) -> void:
 		WorldData.LocationType.TOWN:
 			icon_color = COLOR_TOWN
 		WorldData.LocationType.DUNGEON:
-			# Show "?" for undiscovered dungeon
+			# Show "?" for undiscovered dungeon interior (cell discovered but dungeon not entered)
 			if not cell.dungeon_discovered and not is_dev and not fog_disabled:
 				_draw_text_at(center, "?", COLOR_DIM)
 				return
@@ -454,9 +499,9 @@ func _draw_text_at(pos: Vector2, text: String, color: Color) -> void:
 
 func _get_cell_rect(coords: Vector2i) -> Rect2:
 	# Row 0 = top, Row 16 = bottom (matching JSON grid layout)
-	var x: float = coords.x * CELL_SIZE
-	var y: float = coords.y * CELL_SIZE
-	return Rect2(x, y, CELL_SIZE, CELL_SIZE)
+	var x: float = coords.x * cell_size
+	var y: float = coords.y * cell_size
+	return Rect2(x, y, cell_size, cell_size)
 
 
 func _get_cell_center(coords: Vector2i) -> Vector2:
@@ -465,8 +510,8 @@ func _get_cell_center(coords: Vector2i) -> Vector2:
 
 
 func _screen_to_cell(pos: Vector2) -> Vector2i:
-	var col := int(pos.x / CELL_SIZE)
-	var row := int(pos.y / CELL_SIZE)
+	var col := int(pos.x / cell_size)
+	var row := int(pos.y / cell_size)
 
 	if col < 0 or col >= WorldData.GRID_COLS or row < 0 or row >= WorldData.GRID_ROWS:
 		return Vector2i(-1, -1)
@@ -508,19 +553,24 @@ func _update_tooltip(coords: Vector2i, mouse_pos: Vector2) -> void:
 	var text := ""
 
 	if is_discovered:
+		# Only show location name if it exists, otherwise show region name
 		if cell.location_name and not cell.location_name.is_empty():
-			text = cell.location_name + "\n"
-		text += cell.region_name
-		if cell.description and not cell.description.is_empty():
-			text += "\n" + cell.description
-		if coords == player_coords:
-			text += "\n[Current Location]"
+			text = cell.location_name
+		else:
+			text = cell.region_name
+	elif cell.location_type == WorldData.LocationType.DUNGEON:
+		text = "Unknown Dungeon"
+	elif cell.location_type == WorldData.LocationType.LANDMARK:
+		text = "Unknown Landmark"
 	elif not cell.is_passable:
 		text = "Impassable"
 	else:
 		text = "Undiscovered"
 
-	text += "\n(%d, %d)" % [coords.x, coords.y]
+	# Don't show tooltip for empty wilderness (just region name)
+	if text.is_empty():
+		tooltip_panel.visible = false
+		return
 
 	tooltip_label.text = text
 	tooltip_panel.reset_size()
@@ -570,7 +620,6 @@ func _on_cell_clicked(coords: Vector2i) -> void:
 	# Show travel dialog
 	travel_location_label.text = "Travel to %s?" % cell.location_name
 	travel_dialog.visible = true
-
 	map_canvas.queue_redraw()
 
 
@@ -625,12 +674,18 @@ func _update_player_position() -> void:
 
 
 func _process(_delta: float) -> void:
-	if visible:
-		_update_player_position()
-		map_canvas.queue_redraw()
+	if not visible:
+		return
+	_update_player_position()
+	map_canvas.queue_redraw()
 
 
 func refresh() -> void:
+	# Ensure WorldData has current discovery state
+	if PlayerGPS:
+		for coords: Vector2i in PlayerGPS.discovered_cells:
+			var grid_coords: Vector2i = WorldData.region_to_grid(coords)
+			WorldData.discover_cell(grid_coords)
 	_update_player_position()
 	map_canvas.queue_redraw()
 

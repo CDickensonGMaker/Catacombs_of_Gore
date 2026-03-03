@@ -84,6 +84,10 @@ var current_response: ConversationResponse = null  # Store current response for 
 var journal_flash_timer: float = 0.0  # Timer for "Added to Journal" flash
 var persuasion_result_timer: float = 0.0  # Timer for persuasion result display
 var is_showing_bribe_input: bool = false  # Whether bribe amount popup is showing
+var is_showing_farewell: bool = false  # Whether farewell message is being shown
+var farewell_timer: float = 0.0  # Timer before auto-closing after farewell
+var is_scripted_mode: bool = false  # Track scripted dialogue state
+var scripted_choices: Array = []  # Choices for scripted dialogue
 
 
 # =============================================================================
@@ -101,6 +105,10 @@ func _ready() -> void:
 	ConversationSystem.response_delivered.connect(_on_response_delivered)
 	ConversationSystem.memory_reminder.connect(_on_memory_reminder)
 	ConversationSystem.conversation_ended.connect(_on_conversation_ended)
+	ConversationSystem.farewell_delivered.connect(_on_farewell_delivered)
+	# Scripted dialogue signals
+	ConversationSystem.scripted_line_shown.connect(_on_scripted_line_shown)
+	ConversationSystem.scripted_dialogue_ended.connect(_on_scripted_dialogue_ended)
 
 
 func _process(delta: float) -> void:
@@ -108,12 +116,14 @@ func _process(delta: float) -> void:
 		return
 
 	# Check if player has moved - close dialogue if they start walking
-	var player := get_tree().get_first_node_in_group("player") as Node3D
-	if player and player_start_position != Vector3.ZERO:
-		var distance_moved: float = player.global_position.distance_to(player_start_position)
-		if distance_moved > MOVEMENT_CLOSE_THRESHOLD:
-			ConversationSystem.end_conversation()
-			return
+	# Skip this check for scripted dialogue (quest turn-ins, etc.) - let them complete
+	if not is_scripted_mode:
+		var player := get_tree().get_first_node_in_group("player") as Node3D
+		if player and player_start_position != Vector3.ZERO:
+			var distance_moved: float = player.global_position.distance_to(player_start_position)
+			if distance_moved > MOVEMENT_CLOSE_THRESHOLD:
+				ConversationSystem.end_conversation()
+				return
 
 	# Handle typewriter effect
 	if is_typing:
@@ -142,14 +152,49 @@ func _process(delta: float) -> void:
 		if persuasion_result_timer <= 0.0:
 			persuasion_result_label.visible = false
 
+	# Handle farewell timer - auto-close after showing farewell
+	if is_showing_farewell and farewell_timer > 0.0:
+		farewell_timer -= delta
+		if farewell_timer <= 0.0:
+			is_showing_farewell = false
+			ConversationSystem.end_conversation()
+
 
 func _input(event: InputEvent) -> void:
 	if not is_open:
 		return
 
-	# Handle escape to exit conversation - always process in _input
+	# During farewell, any key/click closes the conversation immediately
+	if is_showing_farewell:
+		if event is InputEventKey and event.pressed:
+			is_showing_farewell = false
+			ConversationSystem.end_conversation()
+			get_viewport().set_input_as_handled()
+			return
+		elif event is InputEventMouseButton and event.pressed:
+			is_showing_farewell = false
+			ConversationSystem.end_conversation()
+			get_viewport().set_input_as_handled()
+			return
+
+	# During scripted dialogue without choices, any key/click continues or closes
+	if is_scripted_mode and scripted_choices.is_empty():
+		if event is InputEventKey and event.pressed:
+			ConversationSystem.continue_scripted_dialogue()
+			get_viewport().set_input_as_handled()
+			return
+		elif event is InputEventMouseButton and event.pressed:
+			ConversationSystem.continue_scripted_dialogue()
+			get_viewport().set_input_as_handled()
+			return
+
+	# Handle escape to exit conversation/scripted dialogue - always process in _input
 	if event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause"):
-		ConversationSystem.end_conversation()
+		if is_scripted_mode:
+			# End the scripted dialogue
+			ConversationSystem.end_scripted_dialogue()
+		else:
+			ConversationSystem.end_conversation()
 		get_viewport().set_input_as_handled()
 		return
 
@@ -199,7 +244,7 @@ func _input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 			return
 
-	# Handle number keys for topic selection (1-8)
+	# Handle number keys for topic/choice selection (1-8)
 	# Process in _input to ensure it runs before GUI focus consumes the event
 	if event is InputEventKey and event.pressed and not is_typing and not is_showing_bounty_offer and not is_showing_quest_offer:
 		var key_num := -1
@@ -213,6 +258,13 @@ func _input(event: InputEvent) -> void:
 			KEY_7: key_num = 6
 			KEY_8: key_num = 7
 
+		# Handle scripted dialogue choices
+		if is_scripted_mode and key_num >= 0 and key_num < scripted_choices.size():
+			_on_scripted_choice_pressed(key_num)
+			get_viewport().set_input_as_handled()
+			return
+
+		# Handle normal topic selection
 		if key_num >= 0 and key_num < dynamic_topic_menu.size() and key_num < topic_buttons.size():
 			var btn: Button = topic_buttons[key_num]
 			if btn.visible and not btn.disabled:
@@ -635,6 +687,7 @@ func _show_ui() -> void:
 	# Note: GameManager.start_dialogue() handles is_in_dialogue flag
 	# Player controller checks this flag to block input
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	GameManager.set_menu_cursor()  # Use menu cursor for dialogue
 	call_deferred("_focus_first_topic")
 
 
@@ -656,6 +709,8 @@ func _hide_ui() -> void:
 	reminder_panel.visible = false
 	is_showing_bounty_offer = false
 	is_showing_quest_offer = false
+	is_showing_farewell = false
+	farewell_timer = 0.0
 	bounty_container.visible = false
 	topic_container.visible = true
 	journal_confirmation_label.visible = false
@@ -664,6 +719,7 @@ func _hide_ui() -> void:
 	persuasion_result_timer = 0.0
 	# Note: GameManager.end_dialogue() handles is_in_dialogue flag
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	GameManager.set_default_cursor()  # Restore default cursor
 
 
 func _start_typewriter(text: String) -> void:
@@ -694,6 +750,22 @@ func _build_dynamic_topic_menu(profile: NPCKnowledgeProfile) -> void:
 		btn.visible = false
 		btn.disabled = true
 
+	var menu_index := 0
+
+	# PRIORITY: Add quest turn-in option at the TOP if there's a pending turn-in
+	if current_context and not current_context.pending_quest_turnin.is_empty():
+		var turnin_info: Dictionary = current_context.pending_quest_turnin
+		var quest_title: String = turnin_info.get("quest_title", "Quest")
+		dynamic_topic_menu.append({
+			"key": menu_index + 1,
+			"type": ConversationTopic.TopicType.QUESTS,
+			"text": "Turn in: %s" % quest_title,
+			"is_custom": true,
+			"custom_id": "quest_turnin",
+			"is_quest_turnin": true
+		})
+		menu_index += 1
+
 	# Get topics from ConversationSystem
 	var topics_to_show: Array[ConversationTopic.TopicType] = available_topics.duplicate()
 
@@ -702,8 +774,12 @@ func _build_dynamic_topic_menu(profile: NPCKnowledgeProfile) -> void:
 	if profile and profile.has_method("get_custom_topics"):
 		custom_topics = profile.get_custom_topics()
 
+	# Add location-aware topics from WorldLexicon (regions, settlements, creatures)
+	var location_topics: Array[Dictionary] = ConversationSystem.get_location_custom_topics(profile)
+	for loc_topic: Dictionary in location_topics:
+		custom_topics.append(loc_topic)
+
 	# Build menu entries for standard topics
-	var menu_index := 0
 	for topic_type: ConversationTopic.TopicType in topics_to_show:
 		if menu_index >= MAX_TOPIC_BUTTONS:
 			break
@@ -726,7 +802,9 @@ func _build_dynamic_topic_menu(profile: NPCKnowledgeProfile) -> void:
 			"type": custom_topic.get("type", ConversationTopic.TopicType.PERSONAL),
 			"text": custom_topic.get("text", "..."),
 			"is_custom": true,
-			"custom_id": custom_topic.get("id", "")
+			"custom_id": custom_topic.get("id", ""),
+			"response": custom_topic.get("response", ""),  # Preserve response for location topics
+			"is_location_topic": custom_topic.get("is_location_topic", false)
 		})
 		menu_index += 1
 
@@ -750,8 +828,14 @@ func _update_topic_availability() -> void:
 			break
 		var btn: Button = topic_buttons[i]
 		var topic_data: Dictionary = dynamic_topic_menu[i]
-		var topic_type: ConversationTopic.TopicType = topic_data["type"]
 
+		# Quest turn-in and custom topics are always available
+		if topic_data.get("is_quest_turnin", false) or topic_data.get("is_custom", false):
+			btn.disabled = false
+			btn.visible = true
+			continue
+
+		var topic_type: ConversationTopic.TopicType = topic_data["type"]
 		# Check if this topic is available
 		var is_available: bool = topic_type in available_topics
 		btn.disabled = not is_available
@@ -764,8 +848,13 @@ func _set_topics_enabled(enabled: bool) -> void:
 			break
 		var btn: Button = topic_buttons[i]
 		var topic_data: Dictionary = dynamic_topic_menu[i]
-		var topic_type: ConversationTopic.TopicType = topic_data["type"]
 
+		# Quest turn-in and custom topics follow the enabled flag directly
+		if topic_data.get("is_quest_turnin", false) or topic_data.get("is_custom", false):
+			btn.disabled = not enabled
+			continue
+
+		var topic_type: ConversationTopic.TopicType = topic_data["type"]
 		# Only enable if both enabled flag is true AND topic is available
 		if enabled:
 			btn.disabled = topic_type not in available_topics
@@ -790,12 +879,21 @@ func _on_topic_pressed(index: int) -> void:
 	var topic_data: Dictionary = dynamic_topic_menu[index]
 	var topic_type: ConversationTopic.TopicType = topic_data["type"]
 
-	# Check if topic is available
-	if topic_type not in available_topics:
-		return
-
 	# Hide reminder when selecting new topic
 	reminder_panel.visible = false
+
+	# Handle quest turn-in specially - this completes the quest
+	if topic_data.get("is_quest_turnin", false):
+		ConversationSystem.complete_pending_quest_turnin()
+		# Rebuild the menu to remove the turn-in option
+		if current_context:
+			_build_dynamic_topic_menu(current_context.npc_profile)
+			_update_topic_availability()
+		return
+
+	# Check if topic is available (skip for custom topics which may not be in available_topics)
+	if not topic_data.get("is_custom", false) and topic_type not in available_topics:
+		return
 
 	# Handle custom topics differently
 	if topic_data.get("is_custom", false):
@@ -853,7 +951,9 @@ func _on_conversation_started(npc: Node, context: ConversationContext) -> void:
 	reminder_panel.visible = false
 	persuasion_result_label.visible = false
 
-	# Enable persuasion buttons
+	# Always show persuasion container and enable buttons
+	# Persuasion is always available - it's how you FIX bad reputation
+	persuasion_container.visible = true
 	_set_persuasion_enabled(true)
 
 	# Show UI
@@ -897,6 +997,11 @@ func _on_response_delivered(response: ConversationResponse, context: Conversatio
 		bounty_container.visible = false
 		hint_label.text = "[1-4] Select Topic  |  [J] Copy to Journal  |  [ESC] Exit"
 
+		# Rebuild the topic menu to include "Turn in" option if there's a pending turn-in
+		if not context.pending_quest_turnin.is_empty():
+			_build_dynamic_topic_menu(context.npc_profile)
+			_update_topic_availability()
+
 	# Start typewriter effect
 	_start_typewriter(final_text)
 
@@ -912,6 +1017,123 @@ func _on_memory_reminder(_response_id: String, original_text: String) -> void:
 
 func _on_conversation_ended(_npc: Node) -> void:
 	_hide_ui()
+
+
+func _on_farewell_delivered(farewell_text: String) -> void:
+	if not is_open:
+		return
+
+	# Show the farewell text in the response area
+	is_showing_farewell = true
+	response_text.text = farewell_text
+	response_text.visible_characters = -1
+
+	# Hide topic buttons during farewell
+	_set_topics_enabled(false)
+	for btn: Button in topic_buttons:
+		btn.visible = false
+
+	# Hide any open panels
+	reminder_panel.visible = false
+	bounty_container.visible = false
+	persuasion_container.visible = false
+
+	# Update hint to show how to close
+	hint_label.text = "[Any key] or [Click] to leave"
+
+	# Start a short timer then auto-close (player can also click/press any key)
+	farewell_timer = 1.5  # Auto-close after 1.5 seconds
+
+
+# =============================================================================
+# SCRIPTED DIALOGUE HANDLERS
+# =============================================================================
+
+func _on_scripted_line_shown(line: Dictionary, _index: int) -> void:
+	is_scripted_mode = true
+	scripted_choices = line.get("choices", [])
+
+	# Show the UI if not already open
+	if not is_open:
+		_show_ui()
+		is_open = true
+
+	# Set the speaker name
+	var speaker: String = line.get("speaker", "")
+	name_label.text = speaker.to_upper()
+
+	# Set the dialogue text
+	var text: String = line.get("text", "")
+	response_text.text = text
+	response_text.visible_characters = -1  # Show all immediately
+
+	# Hide normal topic buttons
+	for btn: Button in topic_buttons:
+		btn.visible = false
+	topic_container.visible = false
+	bounty_container.visible = false
+	persuasion_container.visible = false
+	reminder_panel.visible = false
+
+	# Show scripted choices if any, or show continue hint
+	if scripted_choices.is_empty():
+		# No choices - show "continue" or "end" hint
+		if line.get("is_end", false):
+			hint_label.text = "[Any key] or [Click] to close"
+		else:
+			hint_label.text = "[Any key] or [Click] to continue"
+	else:
+		# Show choices as temporary buttons
+		_show_scripted_choices(scripted_choices)
+		hint_label.text = "[1-%d] Select choice" % scripted_choices.size()
+
+
+func _show_scripted_choices(choices: Array) -> void:
+	# Repurpose topic buttons for scripted choices
+	for i in range(topic_buttons.size()):
+		var btn: Button = topic_buttons[i]
+		if i < choices.size():
+			var choice: Dictionary = choices[i]
+			btn.text = choice.get("text", "...")
+			btn.visible = true
+			# Disconnect any existing connections and reconnect for scripted choice
+			if btn.pressed.is_connected(_on_topic_pressed):
+				btn.pressed.disconnect(_on_topic_pressed)
+			if not btn.pressed.is_connected(_on_scripted_choice_pressed.bind(i)):
+				btn.pressed.connect(_on_scripted_choice_pressed.bind(i))
+		else:
+			btn.visible = false
+
+	topic_container.visible = true
+
+
+func _on_scripted_choice_pressed(choice_index: int) -> void:
+	if not is_scripted_mode:
+		return
+
+	# Restore topic button connections
+	_restore_topic_button_connections()
+
+	ConversationSystem.select_scripted_choice(choice_index)
+
+
+func _restore_topic_button_connections() -> void:
+	for i in range(topic_buttons.size()):
+		var btn: Button = topic_buttons[i]
+		# Disconnect scripted choice handler
+		if btn.pressed.is_connected(_on_scripted_choice_pressed.bind(i)):
+			btn.pressed.disconnect(_on_scripted_choice_pressed.bind(i))
+		# Reconnect topic handler
+		if not btn.pressed.is_connected(_on_topic_pressed):
+			btn.pressed.connect(_on_topic_pressed.bind(i))
+
+
+func _on_scripted_dialogue_ended() -> void:
+	is_scripted_mode = false
+	scripted_choices.clear()
+	_restore_topic_button_connections()
+	_hide_ui()
+	is_open = false
 
 
 # =============================================================================
@@ -1006,36 +1228,10 @@ func _on_decline_quest() -> void:
 # HELPERS
 # =============================================================================
 
-func _get_greeting(context: ConversationContext) -> String:
-	# Generate a contextual greeting based on disposition and time
-	var disposition := context.disposition
-	var time := context.time_of_day
-
-	# Time-based greetings
-	var time_greeting: String
-	match time:
-		"morning":
-			time_greeting = "Good morning"
-		"afternoon":
-			time_greeting = "Good afternoon"
-		"evening":
-			time_greeting = "Good evening"
-		"night":
-			time_greeting = "A late hour for visitors"
-		_:
-			time_greeting = "Greetings"
-
-	# Disposition-based tone
-	if disposition >= 75:
-		return "%s, friend! What can I do for you?" % time_greeting
-	elif disposition >= 60:
-		return "%s. What brings you here?" % time_greeting
-	elif disposition >= 40:
-		return "%s. What do you want?" % time_greeting
-	elif disposition >= 25:
-		return "What do you want?"
-	else:
-		return "Make it quick."
+func _get_greeting(_context: ConversationContext) -> String:
+	# Use ConversationSystem's pool-based greeting selection
+	# This provides personality-aware greetings from greetings.json
+	return ConversationSystem.get_greeting()
 
 
 # =============================================================================

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "bestiary_vol_6_undead"
+display_name = "Bestiary Vol. VI: The Walking Dead"
+description = "A temple-sanctioned guide to the restless dead. Covers skeleton warriors risen from ancient battlefields, the ghostly shades, waterlogged drowned dead, and the terrifying flaming skulls. Blessed by Morthane's priests."
+item_type = 5
+is_stackable = true
+max_stack = 5
+unlocks_bestiary = Array[String](["skeleton_warrior", "skeleton_shade", "drowned_dead", "flaming_skull"])
+book_tier = 6
+base_value = 250
+weight = 0.6

@@ -1,5 +1,8 @@
 ## boat_travel_data.gd - Resource class for boat travel route definitions
 ## Stores route information between ports including duration, cost, and encounter chances
+##
+## TODO: [FUTURE FEATURE] Boat travel system infrastructure is complete but not active.
+## No .tres data files exist for routes yet. See CLAUDE.md "Sea Travel & Encounters" section.
 @tool
 class_name BoatTravelData
 extends Resource

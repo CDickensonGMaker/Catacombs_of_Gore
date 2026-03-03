@@ -1,0 +1,53 @@
+{
+	"id": "guild_initiation",
+	"title": "Proving Ground",
+	"description": "Guildmaster Vorn of the Dalhurst Adventurer's Guild is willing to consider you for membership, but first you must prove yourself. Clear out a pack of wolves that has been terrorizing travelers on the road to Thornfield.",
+	"is_main_quest": false,
+	"quest_source": "faction",
+	"giver_npc_id": "guildmaster_vorn_dalhurst",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "dalhurst",
+	"objectives": [
+		{
+			"id": "travel_wolf_den",
+			"description": "Find the wolf den east of Dalhurst",
+			"type": "reach",
+			"target": "wolf_den_dalhurst",
+			"required_count": 1
+		},
+		{
+			"id": "kill_wolves",
+			"description": "Slay the wolves menacing the road",
+			"type": "kill",
+			"target": "wolf",
+			"required_count": 6
+		},
+		{
+			"id": "kill_alpha",
+			"description": "Defeat the Alpha Wolf",
+			"type": "kill",
+			"target": "alpha_wolf",
+			"required_count": 1
+		},
+		{
+			"id": "return_to_guild",
+			"description": "Return to Guildmaster Vorn with proof of your deed",
+			"type": "talk",
+			"target": "guildmaster_vorn_dalhurst",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "guildmaster_vorn_dalhurst",
+	"turn_in_zone": "dalhurst",
+	"rewards": {
+		"gold": 100,
+		"xp": 500,
+		"items": ["guild_token"],
+		"faction_reputation": {
+			"adventurers_guild": 50
+		}
+	},
+	"prerequisites": [],
+	"next_quest": "guild_contract_bandits"
+}

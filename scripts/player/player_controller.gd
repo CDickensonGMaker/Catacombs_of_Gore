@@ -4,11 +4,11 @@ extends CharacterBody3D
 class_name PlayerController
 
 const DEBUG := false
-const DEBUG_UNLIMITED_STAMINA := true  # For testing - disable stamina drain
+const DEBUG_UNLIMITED_STAMINA := false  # For testing - disable stamina drain
 
 # --- Movement tuning ---
-@export var walk_speed: float = 4.0
-@export var run_speed: float = 7.0
+@export var walk_speed: float = 5.5  # Base walk speed (increased for better feel)
+@export var run_speed: float = 8.0
 @export var acceleration: float = 18.0
 @export var gravity: float = 24.0
 @export var turn_speed: float = 10.0 # higher = snappier turning
@@ -22,6 +22,12 @@ var is_sprinting: bool = false
 var stamina_drain_accumulator: float = 0.0  # Accumulates fractional stamina drain
 var stamina_regen_accumulator: float = 0.0  # Accumulates fractional stamina regen
 
+# --- Footstep audio ---
+var footstep_timer: float = 0.0
+const FOOTSTEP_INTERVAL_WALK: float = 0.45  # Time between footsteps while walking
+const FOOTSTEP_INTERVAL_SPRINT: float = 0.3  # Time between footsteps while sprinting
+const FOOTSTEP_INTERVAL_CROUCH: float = 0.6  # Time between footsteps while crouching
+
 # --- Dodge tuning ---
 var dodge_stamina_cost: float = 20.0
 var base_iframe_duration: float = 0.3  # Seconds of invulnerability
@@ -32,6 +38,14 @@ var iframe_timer: float = 0.0
 var dodge_velocity: Vector3 = Vector3.ZERO
 var dodge_timer: float = 0.0
 var dodge_duration: float = 0.3  # How long the dodge movement lasts
+
+# --- Crouch & Stealth ---
+var is_crouching: bool = false
+var standing_height: float = 1.8  # Default collision height
+var crouch_height: float = 1.0  # Crouched collision height
+var crouch_speed_mult: float = 0.5  # Movement speed while crouching
+var current_visibility: float = 1.0  # 0=hidden, 1=visible
+var is_hidden: bool = false  # True when visibility < threshold
 
 # --- Combat tuning (light attack) ---
 @export var light_attack_damage: int = 10
@@ -74,6 +88,7 @@ func _ready() -> void:
 	floor_max_angle = deg_to_rad(50)  # Allow walking up steeper slopes
 	floor_stop_on_slope = true  # Prevent sliding down slopes when standing still
 	floor_block_on_wall = true  # Stop on walls when walking up slopes
+	safe_margin = 0.04  # Balance between seam handling and not clipping through thin geometry
 
 	# Make sure the hitbox starts off.
 	melee_hitbox.monitoring = false
@@ -115,10 +130,18 @@ func _unhandled_input(event: InputEvent) -> void:
 			InventoryManager.use_hotbar_slot(i)
 			break
 
+	# Wait menu (T key)
+	if event is InputEventKey and event.pressed and event.keycode == KEY_T:
+		WaitUI.open_wait_menu()
+
 func _physics_process(delta: float) -> void:
 	# Don't process if dead
 	if is_dead:
 		return
+
+	# --- Crouch toggle ---
+	if Input.is_action_just_pressed("crouch"):
+		_toggle_crouch()
 
 	# --- Dodge input ---
 	if Input.is_action_just_pressed("dodge"):
@@ -177,12 +200,21 @@ func _physics_process(delta: float) -> void:
 
 	# --- Choose speed (with sprint/stamina system) ---
 	var speed := walk_speed * GameManager.dev_speed_multiplier
-	var wants_to_sprint := Input.is_action_pressed("sprint") and desired_dir.length() > 0.001 and not is_overencumbered
+
+	# Apply crouch speed penalty
+	if is_crouching:
+		speed *= crouch_speed_mult
+
+	var wants_to_sprint := Input.is_action_pressed("sprint") and desired_dir.length() > 0.001 and not is_overencumbered and not is_crouching
 	var has_stamina := DEBUG_UNLIMITED_STAMINA or (GameManager.player_data and GameManager.player_data.current_stamina > 0)
 
 	if wants_to_sprint and has_stamina:
-		# Sprinting: 35% speed boost
-		speed = walk_speed * 1.35
+		# Sprinting: 20% base speed boost + Agility scaling
+		var sprint_bonus: float = 0.20  # Base 20% bonus
+		if GameManager.player_data:
+			var agility: int = GameManager.player_data.get_stat(Enums.Stat.AGILITY)
+			sprint_bonus += agility * 0.02  # +2% per Agility point
+		speed = walk_speed * (1.0 + sprint_bonus)
 		is_sprinting = true
 		time_since_sprint = 0.0
 
@@ -262,6 +294,9 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
+	# --- Footstep audio ---
+	_update_footsteps(delta, desired_dir.length() > 0.1)
+
 	# --- Mana regeneration ---
 	_regenerate_mana(delta)
 
@@ -276,6 +311,9 @@ func _physics_process(delta: float) -> void:
 
 	# --- Update interaction detection ---
 	_update_interaction()
+
+	# --- Update stealth visibility ---
+	_update_visibility()
 
 func _do_light_attack() -> void:
 	can_attack = false
@@ -324,6 +362,14 @@ func _do_light_attack() -> void:
 	if melee_hitbox is Hitbox:
 		melee_hitbox.set_owner_entity(self)
 		melee_hitbox.set_damage_values(damage, damage_type)
+
+		# Connect to hit_landed to play melee weapon sound (only for armed attacks)
+		if weapon:
+			# Disconnect any previous connection to avoid duplicates
+			if melee_hitbox.hit_landed.is_connected(_on_melee_hit_landed):
+				melee_hitbox.hit_landed.disconnect(_on_melee_hit_landed)
+			melee_hitbox.hit_landed.connect(_on_melee_hit_landed, CONNECT_ONE_SHOT)
+
 		melee_hitbox.activate()
 	else:
 		# Fallback for non-Hitbox Area3D
@@ -470,8 +516,13 @@ func _do_ranged_attack(weapon: WeaponData) -> void:
 	# Spawn projectile via CombatManager
 	CombatManager.spawn_projectile(projectile_data, self, spawn_pos, direction, null)
 
-	# Play fire sound event
-	AudioManager.play_sfx_3d("projectile_fire", spawn_pos)
+	# Play fire sound event - different sounds by weapon type
+	if weapon.weapon_type == Enums.WeaponType.BOW or weapon.weapon_type == Enums.WeaponType.CROSSBOW:
+		AudioManager.play_sfx_3d("res://assets/audio/sfx/weapons/bow_and_arrow_quick.wav", spawn_pos)
+	elif weapon.weapon_type == Enums.WeaponType.MUSKET:
+		AudioManager.play_sfx_3d("res://assets/audio/sfx/weapons/musket_bang.wav", spawn_pos)
+	else:
+		AudioManager.play_sfx_3d("projectile_fire", spawn_pos)
 
 	# Heavy recoil for musket - screen shake, knockback, and weapon kick
 	if weapon.weapon_type == Enums.WeaponType.MUSKET:
@@ -487,7 +538,7 @@ func _do_ranged_attack(weapon: WeaponData) -> void:
 	can_attack = true
 
 ## Handle weapon backfire (musket mechanic)
-func _handle_backfire(weapon: WeaponData) -> void:
+func _handle_backfire(_weapon: WeaponData) -> void:
 	if DEBUG:
 		print("[Player] Weapon backfired!")
 
@@ -706,7 +757,7 @@ func take_damage(amount: int, damage_type: Enums.DamageType, attacker: Node) -> 
 	var actual_damage := player_data.take_damage(amount)
 
 	# Degrade armor when taking hits (1 durability per 10 damage, minimum 1)
-	var degrade_amount: int = maxi(1, actual_damage / 10)
+	var degrade_amount: int = maxi(1, int(actual_damage / 10))
 	InventoryManager.degrade_armor(degrade_amount)
 
 	# Show damage feedback
@@ -719,6 +770,14 @@ func take_damage(amount: int, damage_type: Enums.DamageType, attacker: Node) -> 
 		_on_death()
 
 	return actual_damage
+
+## Called when melee hitbox lands a hit (for weapon sound effects)
+func _on_melee_hit_landed(target: Node) -> void:
+	# Play sword clank sound at the target's position
+	if target is Node3D:
+		AudioManager.play_melee_hit_sound_3d((target as Node3D).global_position)
+	else:
+		AudioManager.play_melee_hit_sound()
 
 ## Apply stagger effect
 func apply_stagger(power: float) -> void:
@@ -795,6 +854,51 @@ func _update_conditions(delta: float) -> void:
 			if DEBUG:
 				print("[Player] DOT damage: ", amount, " type: ", damage_type)
 
+## Update footstep audio based on movement
+func _update_footsteps(delta: float, is_moving: bool) -> void:
+	# Only play footsteps when on ground and moving
+	if not is_on_floor() or not is_moving:
+		footstep_timer = 0.0  # Reset timer when not moving
+		return
+
+	# Only play footsteps on grass terrain (forest, plains, hills)
+	if not _is_grass_terrain():
+		return
+
+	# Determine footstep interval based on movement state
+	var interval: float = FOOTSTEP_INTERVAL_WALK
+	if is_crouching:
+		interval = FOOTSTEP_INTERVAL_CROUCH
+	elif is_sprinting:
+		interval = FOOTSTEP_INTERVAL_SPRINT
+
+	# Update timer
+	footstep_timer += delta
+
+	# Play footstep when timer exceeds interval
+	if footstep_timer >= interval:
+		footstep_timer = 0.0
+		AudioManager.play_footstep()
+
+## Check if the player is on grass terrain (forest, plains, hills, swamp)
+func _is_grass_terrain() -> bool:
+	# Get current cell from PlayerGPS
+	if not PlayerGPS:
+		return false
+
+	var current_cell: Vector2i = PlayerGPS.current_cell
+	var cell_info: WorldGrid.CellInfo = WorldGrid.get_cell(current_cell)
+
+	if not cell_info:
+		return false
+
+	# Grass footsteps play on these biomes
+	match cell_info.biome:
+		WorldGrid.Biome.FOREST, WorldGrid.Biome.PLAINS, WorldGrid.Biome.HILLS, WorldGrid.Biome.SWAMP:
+			return true
+		_:
+			return false
+
 ## Regenerate mana over time
 func _regenerate_mana(delta: float) -> void:
 	var char_data := GameManager.player_data
@@ -841,3 +945,110 @@ func _on_death() -> void:
 
 	# Notify game manager
 	GameManager.on_player_death()
+
+## Toggle crouch state
+func _toggle_crouch() -> void:
+	if is_crouching:
+		_stand_up()
+	else:
+		_crouch_down()
+
+## Enter crouch state
+func _crouch_down() -> void:
+	is_crouching = true
+
+	# Adjust collision shape
+	var collision := get_node_or_null("CollisionShape3D") as CollisionShape3D
+	if collision and collision.shape is CapsuleShape3D:
+		var capsule := collision.shape as CapsuleShape3D
+		capsule.height = crouch_height
+
+	# Notify camera to lower
+	if camera_pivot and camera_pivot.has_method("set_crouch"):
+		camera_pivot.set_crouch(true)
+
+	if DEBUG:
+		print("[Player] Crouched")
+
+## Exit crouch state
+func _stand_up() -> void:
+	# Check if there's room to stand (raycast upward)
+	var space_state := get_world_3d().direct_space_state
+	var query := PhysicsRayQueryParameters3D.create(
+		global_position + Vector3.UP * crouch_height,
+		global_position + Vector3.UP * standing_height,
+		1  # World collision layer
+	)
+	query.exclude = [self]
+	var result := space_state.intersect_ray(query)
+
+	if result:
+		# Something above us, can't stand
+		if DEBUG:
+			print("[Player] Cannot stand - obstruction above")
+		return
+
+	is_crouching = false
+
+	# Restore collision shape
+	var collision := get_node_or_null("CollisionShape3D") as CollisionShape3D
+	if collision and collision.shape is CapsuleShape3D:
+		var capsule := collision.shape as CapsuleShape3D
+		capsule.height = standing_height
+
+	# Notify camera to raise
+	if camera_pivot and camera_pivot.has_method("set_crouch"):
+		camera_pivot.set_crouch(false)
+
+	if DEBUG:
+		print("[Player] Stood up")
+
+## Update visibility calculation for stealth
+func _update_visibility() -> void:
+	if not GameManager.player_data:
+		return
+
+	var stealth_skill: int = GameManager.player_data.get_skill(Enums.Skill.STEALTH)
+	var is_moving: bool = velocity.length() > 0.1
+	var light_level: float = _get_light_level()
+
+	current_visibility = StealthConstants.calculate_visibility(
+		is_crouching,
+		is_moving,
+		is_sprinting,
+		stealth_skill,
+		light_level
+	)
+
+	is_hidden = StealthConstants.is_hidden(current_visibility)
+
+## Get ambient light level at player position
+## Returns 0.0 (darkness) to 1.0 (bright)
+func _get_light_level() -> float:
+	# Check if player has torch equipped
+	if torch_light and torch_light.is_torch_equipped:
+		return 1.0  # Full brightness with torch
+
+	# Check time of day from GameManager if available
+	if GameManager and GameManager.has_method("get_time_of_day_light"):
+		return GameManager.get_time_of_day_light()
+
+	# Check for DirectionalLight in scene (sun)
+	var sun := get_tree().get_first_node_in_group("sun") as DirectionalLight3D
+	if sun and sun.visible:
+		return sun.light_energy
+
+	# Default to dim lighting (indoor/cave)
+	return 0.5
+
+## Get current visibility for enemies to use
+func get_visibility() -> float:
+	return current_visibility
+
+## Check if player is currently hidden
+func get_is_hidden() -> bool:
+	return is_hidden
+
+## Check if player is crouching
+func get_is_crouching() -> bool:
+	return is_crouching

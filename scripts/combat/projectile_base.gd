@@ -1,4 +1,7 @@
 ## projectile_base.gd - Base projectile with movement, collision, lifetime, damage, homing, trail/impact effects
+##
+## NOTE: SpellProjectile (scripts/combat/spell_projectile.gd) duplicates much of this logic.
+## See the TODO in that file for refactoring recommendations.
 class_name ProjectileBase
 extends Area3D
 
@@ -25,7 +28,7 @@ var hit_targets: Array[Node] = []
 
 ## Components (created dynamically)
 var collision_shape: CollisionShape3D
-var mesh_instance: MeshInstance3D
+var mesh_instance: Node3D  # Can be MeshInstance3D or loaded scene
 var trail: GPUParticles3D = null
 var travel_audio: AudioStreamPlayer3D = null
 
@@ -132,16 +135,17 @@ func _setup_visuals() -> void:
 			scene_instance.scale = projectile_data.scale
 			add_child(scene_instance)
 			mesh_instance = scene_instance
-		elif mesh_res is Mesh:
-			mesh_instance.mesh = mesh_res
+		elif mesh_res is Mesh and mesh_instance is MeshInstance3D:
+			(mesh_instance as MeshInstance3D).mesh = mesh_res
 			mesh_instance.scale = projectile_data.scale
 	else:
 		# Default sphere mesh
-		var sphere := SphereMesh.new()
-		sphere.radius = projectile_data.collision_radius
-		sphere.height = projectile_data.collision_radius * 2
-		mesh_instance.mesh = sphere
-		mesh_instance.scale = projectile_data.scale
+		if mesh_instance is MeshInstance3D:
+			var sphere := SphereMesh.new()
+			sphere.radius = projectile_data.collision_radius
+			sphere.height = projectile_data.collision_radius * 2
+			(mesh_instance as MeshInstance3D).mesh = sphere
+			mesh_instance.scale = projectile_data.scale
 
 	# Load material if specified (only for MeshInstance3D)
 	if mesh_instance is MeshInstance3D and not projectile_data.material_path.is_empty():
@@ -274,13 +278,17 @@ func _handle_collision(target: Node) -> void:
 	# Check if valid target type
 	var is_enemy := target.is_in_group("enemies")
 	var is_player := target.is_in_group("player")
-	var is_world := not is_enemy and not is_player
+	var is_attackable_npc := target.is_in_group("attackable")  # Civilian NPCs, guards, etc.
+	var is_world := not is_enemy and not is_player and not is_attackable_npc
 
 	if is_world:
 		if projectile_data.hits_world:
 			_on_hit_world()
 		return
 
+	# Attackable NPCs are treated as enemies for player projectiles
+	if is_attackable_npc and not projectile_data.hits_enemies:
+		return
 	if is_enemy and not projectile_data.hits_enemies:
 		return
 	if is_player and not projectile_data.hits_players:

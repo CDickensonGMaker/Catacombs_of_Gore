@@ -4,8 +4,9 @@
 extends Node3D
 
 # --- Camera Mode ---
+# Game is first-person only - third person disabled
 enum CameraMode { THIRD_PERSON, FIRST_PERSON }
-var current_mode: CameraMode = CameraMode.THIRD_PERSON
+var current_mode: CameraMode = CameraMode.FIRST_PERSON
 
 # --- Node References (set in scene) ---
 @export var spring_arm: NodePath
@@ -29,6 +30,22 @@ var current_mode: CameraMode = CameraMode.THIRD_PERSON
 # --- First Person Settings ---
 @export var first_person_height_offset: float = 0.2  # Offset from pivot (which is at 1.5)
 @export var first_person_fov: float = 80.0
+
+# --- Race-Based Height Offsets ---
+# These adjust eye height based on player race
+# Base pivot is at 1.5, so final eye height = 1.5 + offset
+const RACE_HEIGHT_OFFSETS: Dictionary = {
+	Enums.Race.HUMAN: 0.2,      # 1.7m eye height (standard)
+	Enums.Race.ELF: 0.3,        # 1.8m eye height (taller, graceful)
+	Enums.Race.HALFLING: -0.35, # 1.15m eye height (short folk)
+	Enums.Race.DWARF: -0.2      # 1.3m eye height (stocky but not tiny)
+}
+
+# --- Crouch Settings ---
+@export var crouch_height_offset: float = -0.6  # Lower camera when crouching
+var is_crouching: bool = false
+var target_height_offset: float = 0.0
+var crouch_lerp_speed: float = 10.0  # Speed of camera height transition
 
 # --- Internal State ---
 var yaw: float = 0.0   # radians
@@ -64,8 +81,32 @@ func _ready() -> void:
 	# Capture mouse for gameplay
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
-	# Initialize to third person
-	_apply_camera_mode()
+	# Set camera height based on player race
+	_apply_race_height()
+
+	# Initialize to first person (game is FPS only)
+	current_mode = CameraMode.FIRST_PERSON
+	_set_first_person()
+
+	# Initialize crouch height offset
+	target_height_offset = first_person_height_offset
+
+
+## Apply camera height offset based on player's race
+func _apply_race_height() -> void:
+	if GameManager and GameManager.player_data:
+		var race: Enums.Race = GameManager.player_data.race
+		if RACE_HEIGHT_OFFSETS.has(race):
+			first_person_height_offset = RACE_HEIGHT_OFFSETS[race]
+			print("[CameraPivot] Set eye height for race %s: offset %.2f" % [Enums.Race.keys()[race], first_person_height_offset])
+
+
+## Public method to update camera height when race changes (e.g., after character creation)
+func update_race_height() -> void:
+	_apply_race_height()
+	target_height_offset = first_person_height_offset
+	if _camera:
+		_camera.position.y = first_person_height_offset
 
 
 func _setup_fps_arms() -> void:
@@ -79,8 +120,8 @@ func _setup_fps_arms() -> void:
 	else:
 		add_child(_fps_arms)
 
-	# Start hidden (third person default)
-	_fps_arms.visible = false
+	# Start visible (game is first-person only)
+	_fps_arms.visible = true
 
 func _unhandled_input(event: InputEvent) -> void:
 	# Toggle mouse capture with Esc (ui_cancel)
@@ -92,10 +133,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 		return
 
-	# Toggle camera mode with V key
-	if event.is_action_pressed("toggle_camera_mode"):
-		_toggle_camera_mode()
-		return
+	# Camera mode toggle disabled - game is first-person only
+	# if event.is_action_pressed("toggle_camera_mode"):
+	# 	_toggle_camera_mode()
+	# 	return
 
 	# Mouse free-look (only when mouse is captured)
 	if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED and event is InputEventMouseMotion:
@@ -116,6 +157,9 @@ func _process(delta: float) -> void:
 	if rx != 0.0 or ry != 0.0:
 		# Multiply by delta so stick is "per second"
 		_apply_look(rx * delta, ry * delta, stick_sensitivity)
+
+	# Smoothly interpolate camera height for crouch
+	_update_crouch_height(delta)
 
 func _apply_look(dx: float, dy: float, sensitivity: float) -> void:
 	# dx/dy are "units" (mouse pixels or stick axis). sensitivity scales them into radians.
@@ -249,3 +293,20 @@ func get_fps_arms() -> FirstPersonArms:
 func set_yaw(new_yaw: float) -> void:
 	yaw = new_yaw
 	_clamp_and_apply()
+
+## Set crouch state - adjusts camera height
+func set_crouch(crouching: bool) -> void:
+	is_crouching = crouching
+	if crouching:
+		target_height_offset = first_person_height_offset + crouch_height_offset
+	else:
+		target_height_offset = first_person_height_offset
+
+## Update camera height smoothly for crouch transition
+func _update_crouch_height(delta: float) -> void:
+	if not _camera:
+		return
+
+	var current_height: float = _camera.position.y
+	var new_height: float = lerpf(current_height, target_height_offset, crouch_lerp_speed * delta)
+	_camera.position.y = new_height

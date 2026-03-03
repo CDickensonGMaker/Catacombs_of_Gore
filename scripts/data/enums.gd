@@ -20,9 +20,8 @@ enum Skill {
 	RANGED,
 	DODGE,
 	STEALTH,
-	ENDURANCE,
+	ENDURANCE,      # Stamina, fall damage reduction, jumping (merged with Acrobatics)
 	THIEVERY,       # Pickpocketing, trap support
-	ACROBATICS,
 	ATHLETICS,
 	# WILL-based
 	CONCENTRATION,  # Mana pool, spell casting, trap disarm main
@@ -30,15 +29,14 @@ enum Skill {
 	BRAVERY,
 	# SPEECH-based
 	PERSUASION,
-	DECEPTION,
+	DECEPTION,      # High risk/reward - consequences for failure
 	NEGOTIATION,    # Shop prices, quest rewards
 	# KNOWLEDGE-based
 	ARCANA_LORE,
 	HISTORY,
-	INTUITION,      # Initiative, ambush negation, detect hidden
+	INTUITION,      # Initiative, ambush negation, detect hidden, enemy radar (merged with Perception)
 	ENGINEERING,    # Crafting quality, repair, trap disarm bonus
-	INVESTIGATION,
-	PERCEPTION,
+	INVESTIGATION,  # Pressing NPCs for info, finding clues
 	RELIGION,
 	NATURE,
 	# VITALITY-based
@@ -150,7 +148,11 @@ enum Career {
 	SOLDIER,
 	MERCHANT,
 	PRIEST,
-	THIEF
+	THIEF,
+	NOBLE,
+	CULTIST,
+	ALCHEMIST,
+	BEGGAR
 }
 
 # Enemy AI Behaviors

@@ -24,6 +24,12 @@ func _ready() -> void:
 	# Register zone with SaveManager
 	SaveManager.set_current_zone(ZONE_ID, ZONE_DISPLAY_NAME)
 
+	# Play ruins ambient and dungeon music (only when main scene)
+	var is_main_scene: bool = get_node_or_null("Player") != null
+	if is_main_scene:
+		AudioManager.play_zone_ambiance("ruins")
+		AudioManager.play_zone_music("dungeon")
+
 	_create_materials()
 	_setup_navigation()
 
@@ -166,8 +172,7 @@ func _create_shrine_alcove() -> void:
 	_create_altar(pos + Vector3(0, 0, 2))
 
 	# Rest spot
-	var rest := RestSpot.spawn_rest_spot(self, pos + Vector3(0, 0.1, 0), "Overgrown Shrine")
-	rest.heal_percent = 0.5
+	RestSpot.spawn_rest_spot(self, pos + Vector3(0, 0.1, 0), "Overgrown Shrine")
 
 
 ## ===========================================================================
@@ -405,18 +410,27 @@ func _spawn_enemy(pos: Vector3, enemy_type: String) -> void:
 	var h_frames: int = 4
 	var v_frames: int = 4
 
+	# Default values by enemy type
 	match enemy_type:
 		"skeleton_shade":
 			data_path = "res://data/enemies/skeleton_shade.tres"
 			sprite_path = "res://assets/sprites/enemies/skeleton_shade.png"
 		"skeleton_warrior":
 			data_path = "res://data/enemies/skeleton_warrior.tres"
-			sprite_path = "res://Sprite folders grab bag/skeleton_warrior.png"
+			sprite_path = "res://assets/sprites/enemies/undead/skeleton_warrior.png"
 			h_frames = 8
 			v_frames = 12
 		_:
 			push_warning("[MosshallTombs] Unknown enemy type: %s" % enemy_type)
 			return
+
+	# Check ActorRegistry for Zoo patches (overrides hardcoded values)
+	if ActorRegistry:
+		var sprite_config: Dictionary = ActorRegistry.get_sprite_config(enemy_type)
+		if not sprite_config.is_empty():
+			sprite_path = sprite_config.get("sprite_path", sprite_path)
+			h_frames = sprite_config.get("h_frames", h_frames)
+			v_frames = sprite_config.get("v_frames", v_frames)
 
 	var sprite_texture: Texture2D = load(sprite_path)
 	if not sprite_texture:
@@ -438,7 +452,7 @@ func _spawn_enemy(pos: Vector3, enemy_type: String) -> void:
 
 func _spawn_boss(pos: Vector3) -> void:
 	# Tomb Guardian Spirit - stronger vampire variant
-	var sprite_texture: Texture2D = load("res://Sprite folders grab bag/vampirelord.png")
+	var sprite_texture: Texture2D = load("res://assets/sprites/enemies/undead/vampire_lord_alt.png")
 	if not sprite_texture:
 		push_warning("[MosshallTombs] Failed to load boss sprite")
 		return

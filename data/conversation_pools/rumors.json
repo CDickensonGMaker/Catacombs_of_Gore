@@ -723,6 +723,78 @@
       "weight": 0.9,
       "actions": [],
       "conditions": []
+    },
+    {
+      "response_id": "rumor_willow_dale_1",
+      "text": "The old watchtower at Willow Dale has been abandoned for decades. They say it was built by some secret order, back before the Empire. Nobody goes there anymore - the dead don't rest easy in that place.",
+      "topic_type": 1,
+      "personality_affinity": ["superstitious", "cautious"],
+      "min_disposition": 40,
+      "max_disposition": 100,
+      "required_knowledge": [],
+      "weight": 1.1,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "rumor_willow_dale_2",
+      "text": "Strange lights have been seen at Willow Dale lately. Purple fires burning where no one should be. Some folk claim to have heard chanting on the wind. Best stay away from there.",
+      "topic_type": 1,
+      "personality_affinity": ["nervous", "observant"],
+      "min_disposition": 35,
+      "max_disposition": 100,
+      "required_knowledge": [],
+      "weight": 1.2,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "rumor_keepers_1",
+      "text": "They say there's a secret society that watches over things. The Keepers, some call them. They've been around longer than the Empire - protecting us from threats most people don't even know exist.",
+      "topic_type": 1,
+      "personality_affinity": ["scholarly", "secretive"],
+      "min_disposition": 50,
+      "max_disposition": 100,
+      "required_knowledge": [],
+      "weight": 0.8,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "rumor_keepers_2",
+      "text": "That curiosity shop in Dalhurst - the one run by Aldric Vane - there's more to it than meets the eye. The man knows things. Old things. Dangerous things. Best to tread carefully around him.",
+      "topic_type": 1,
+      "personality_affinity": ["suspicious", "knowing"],
+      "min_disposition": 45,
+      "max_disposition": 100,
+      "required_knowledge": ["dalhurst"],
+      "weight": 0.9,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "rumor_darkness_1",
+      "text": "The wilderness has grown darker these past months. More creatures stirring in the shadows. Bandits getting bolder. Something's wrong, and it's not just the usual troubles.",
+      "topic_type": 1,
+      "personality_affinity": ["worried", "observant"],
+      "min_disposition": 40,
+      "max_disposition": 100,
+      "required_knowledge": [],
+      "weight": 1.0,
+      "actions": [],
+      "conditions": []
+    },
+    {
+      "response_id": "rumor_cultists_1",
+      "text": "Cultists have been spotted in the ruins around here. They worship something old - something that came before the gods we know. Don't let them catch you alone.",
+      "topic_type": 1,
+      "personality_affinity": ["cautious", "religious"],
+      "min_disposition": 45,
+      "max_disposition": 100,
+      "required_knowledge": [],
+      "weight": 1.1,
+      "actions": [],
+      "conditions": []
     }
   ]
 }

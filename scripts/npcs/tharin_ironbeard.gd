@@ -22,11 +22,6 @@ var npc_type: String = "quest_giver"
 var billboard: BillboardSprite
 var interaction_area: Area3D
 
-## Sprite configuration (dwarf - shorter and stockier)
-var sprite_h_frames: int = 5
-var sprite_v_frames: int = 1
-var sprite_pixel_size: float = 0.032  # Shorter than standard human
-
 ## Quest state
 var has_given_quest: bool = false
 var quest_id: String = "keepers_letter_delivery"
@@ -60,11 +55,18 @@ var dialogue_quest_complete := "Good work. Ye've proven yerself reliable. Come t
 var _player_near_exit: bool = false
 var _exit_dialogue_shown: bool = false
 
+## Health and combat
+var max_health: int = 80  # Dwarves are tough
+var current_health: int = 80
+var _is_dead: bool = false
+
 func _ready() -> void:
 	add_to_group("interactable")
 	add_to_group("npcs")
 	add_to_group("quest_givers")  # Important: enables QUESTS topic in ConversationSystem
+	add_to_group("attackable")
 
+	current_health = max_health
 	home_position = position
 	wander_target = position
 
@@ -81,18 +83,57 @@ func _ready() -> void:
 	for q_id: String in quest_ids:
 		if QuestManager.is_quest_active(q_id) or QuestManager.is_quest_completed(q_id):
 			has_given_quest = true
+			print("[TharinIronbeard] Quest '%s' already active/completed - has_given_quest = true" % q_id)
 			break
+
+	print("[TharinIronbeard] Initialized. has_given_quest: %s" % has_given_quest)
 
 	# Connect to ConversationSystem signals for quest handling
 	if not ConversationSystem.conversation_ended.is_connected(_on_conversation_ended):
 		ConversationSystem.conversation_ended.connect(_on_conversation_ended)
 
 
+## Distance threshold for exit detection (from world origin / town center)
+const EXIT_DISTANCE_THRESHOLD := 40.0
+
+
+## Check if any quest in the chain is currently active
+func _is_any_quest_active() -> bool:
+	for q_id: String in quest_ids:
+		if QuestManager.is_quest_active(q_id):
+			return true
+	return false
+
 func _physics_process(delta: float) -> void:
-	if not wander_enabled or has_given_quest == false and _player_near_exit:
+	# Check for player leaving town (simple distance check)
+	# Only show popup if quest not yet given AND not already active (prevents re-showing after accept)
+	if not has_given_quest and not _exit_dialogue_shown and not _is_any_quest_active():
+		_check_player_exit_distance()
+
+	# Skip wandering if intercepting player
+	if not wander_enabled or _player_near_exit:
 		return
 
 	_update_wander(delta)
+
+
+## Check if player is too far from town center and intercept if needed
+func _check_player_exit_distance() -> void:
+	var player: Node3D = get_tree().get_first_node_in_group("player")
+	if not player:
+		return
+
+	# Check distance from town center (world origin)
+	var player_pos: Vector3 = player.global_position
+	var distance_from_center: float = Vector2(player_pos.x, player_pos.z).length()
+
+	if distance_from_center > EXIT_DISTANCE_THRESHOLD:
+		if not _player_near_exit:
+			_player_near_exit = true
+			print("[TharinIronbeard] Player at distance %.1f - intercepting!" % distance_from_center)
+			_intercept_player()
+	else:
+		_player_near_exit = false
 
 
 ## Wander around the camp
@@ -126,30 +167,29 @@ func _pick_new_wander_target() -> void:
 
 ## Create visual representation (dwarf sprite)
 func _create_visual() -> void:
-	# Try to load dwarf sprite, fall back to civilian
-	var tex: Texture2D = load("res://Sprite folders grab bag/man_civilian.png")
+	# Get sprite config from ActorRegistry for consistent values
+	var config: Dictionary = ActorRegistry.get_sprite_config("tharin_ironbeard")
+
+	var tex: Texture2D = null
+	if not config.is_empty() and config.get("sprite_path", "") != "":
+		tex = load(config.get("sprite_path", ""))
 
 	if not tex:
-		push_warning("[TharinIronbeard] No sprite texture available")
+		push_warning("[TharinIronbeard] No sprite texture found in ActorRegistry")
 		return
 
 	billboard = BillboardSprite.new()
 	billboard.sprite_sheet = tex
-	billboard.h_frames = 8  # man_civilian uses 8x2
-	billboard.v_frames = 2
-	billboard.pixel_size = sprite_pixel_size
-	billboard.idle_frames = 8
-	billboard.walk_frames = 8
-	billboard.idle_fps = 3.0
-	billboard.walk_fps = 6.0
+	billboard.h_frames = config.get("h_frames", 1)
+	billboard.v_frames = config.get("v_frames", 1)
+	billboard.pixel_size = config.get("pixel_size", 0.0193)
+	billboard.idle_frames = config.get("idle_frames", 1)
+	billboard.walk_frames = config.get("walk_frames", 1)
+	billboard.idle_fps = config.get("idle_fps", 2.0)
+	billboard.walk_fps = config.get("walk_fps", 6.0)
 	billboard.name = "Billboard"
 
 	add_child(billboard)
-
-	# Tint to distinguish as dwarf (reddish-brown for beard/hair)
-	# Must be set after add_child since sprite is created in _ready
-	if billboard.sprite:
-		billboard.sprite.modulate = Color(0.9, 0.75, 0.65)
 
 
 ## Create interaction area
@@ -182,40 +222,10 @@ func _create_collision() -> void:
 
 
 ## Setup detection for when player approaches wilderness exit
+## Simple distance-based check instead of complex Area3D zones
 func _setup_exit_detection() -> void:
-	# We'll check for player near exit each frame via Area3D overlap
-	# Create a large detection area around the south exit
-	var exit_detector := Area3D.new()
-	exit_detector.name = "ExitDetector"
-	exit_detector.collision_layer = 0
-	exit_detector.collision_mask = 2  # Player layer
-	exit_detector.monitoring = true
-
-	var col := CollisionShape3D.new()
-	var box := BoxShape3D.new()
-	box.size = Vector3(12, 4, 8)
-	col.shape = box
-	# Position at south exit (Z = 30 for 60-unit zone)
-	col.position = Vector3(0, 2, 30)
-	exit_detector.add_child(col)
-
-	# Make detector global (not relative to Tharin's position)
-	exit_detector.top_level = true
-	add_child(exit_detector)
-
-	exit_detector.body_entered.connect(_on_player_near_exit)
-	exit_detector.body_exited.connect(_on_player_left_exit)
-
-
-func _on_player_near_exit(body: Node3D) -> void:
-	if body.is_in_group("player") and not has_given_quest:
-		_player_near_exit = true
-		_intercept_player()
-
-
-func _on_player_left_exit(body: Node3D) -> void:
-	if body.is_in_group("player"):
-		_player_near_exit = false
+	# No complex Area3D setup needed - we check distance in _physics_process
+	print("[TharinIronbeard] Exit detection initialized (distance-based)")
 
 
 ## Intercept player trying to leave without the quest
@@ -377,3 +387,95 @@ func _exit_tree() -> void:
 		ConversationSystem.conversation_ended.disconnect(_on_conversation_ended)
 	if ConversationSystem.scripted_line_shown.is_connected(_on_quest_line_shown):
 		ConversationSystem.scripted_line_shown.disconnect(_on_quest_line_shown)
+
+
+## Take damage from attacks
+func take_damage(amount: int, _damage_type: Enums.DamageType = Enums.DamageType.PHYSICAL, attacker: Node = null) -> int:
+	if _is_dead:
+		return 0
+
+	var actual_damage: int = mini(amount, current_health)
+	current_health -= actual_damage
+
+	# Visual feedback - flash red
+	if billboard and billboard.sprite:
+		var original_color: Color = billboard.sprite.modulate
+		billboard.sprite.modulate = Color(1.0, 0.3, 0.3)
+		get_tree().create_timer(0.15).timeout.connect(func():
+			if billboard and billboard.sprite and not _is_dead:
+				billboard.sprite.modulate = original_color
+		)
+
+	# Play hurt sound
+	if AudioManager:
+		AudioManager.play_sfx("player_hit")
+
+	# Check for death
+	if current_health <= 0:
+		_die(attacker)
+
+	return actual_damage
+
+
+## Check if dead
+func is_dead() -> bool:
+	return _is_dead
+
+
+## Get armor value (Tharin has decent armor as a dwarf)
+func get_armor_value() -> int:
+	return 15
+
+
+## Handle death
+func _die(killer: Node = null) -> void:
+	if _is_dead:
+		return
+
+	_is_dead = true
+
+	print("[TharinIronbeard] Tharin Ironbeard has been killed!")
+
+	# Report crime - killing Tharin is murder (and a major story consequence!)
+	if killer and killer.is_in_group("player"):
+		CrimeManager.report_crime(CrimeManager.CrimeType.MURDER, region_id, [])
+
+	# Spawn corpse with loot
+	_spawn_corpse()
+
+	# Emit death signal
+	CombatManager.entity_killed.emit(self, killer)
+
+	# Play death sound
+	if AudioManager:
+		AudioManager.play_sfx("enemy_death")
+
+	# Remove from groups
+	remove_from_group("interactable")
+	remove_from_group("npcs")
+	remove_from_group("quest_givers")
+	remove_from_group("attackable")
+	remove_from_group("compass_poi")
+
+	# Unregister from PlayerGPS
+	PlayerGPS.unregister_npc(npc_id)
+
+	queue_free()
+
+
+## Spawn a lootable corpse
+func _spawn_corpse() -> void:
+	var corpse: LootableCorpse = LootableCorpse.spawn_corpse(
+		get_parent(),
+		global_position,
+		display_name,
+		npc_id,
+		10  # Level 10 - he's an important NPC
+	)
+
+	# Add Tharin's gold
+	corpse.gold = randi_range(100, 300)
+
+	# Add some unique items
+	corpse.add_item("health_potion", 2, Enums.ItemQuality.ABOVE_AVERAGE)
+	corpse.add_item("ale", 3, Enums.ItemQuality.AVERAGE)

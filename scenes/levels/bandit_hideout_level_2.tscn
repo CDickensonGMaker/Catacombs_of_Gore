@@ -3,20 +3,20 @@
 [ext_resource type="Script" uid="uid://qhpaq0818vpc" path="res://scripts/levels/bandit_hideout_level_2.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
-[ext_resource type="Texture2D" uid="uid://dilhhkx3xdfns" path="res://Sprite folders grab bag/hanging_gore_totem1.png" id="5"]
-[ext_resource type="Texture2D" uid="uid://bm7yidtuy4wyj" path="res://Sprite folders grab bag/hanging_gore_totem2.png" id="6"]
-[ext_resource type="Texture2D" uid="uid://b3o2chjxaj4k" path="res://Sprite folders grab bag/hanging_gore_totem3.png" id="7"]
-[ext_resource type="Texture2D" uid="uid://1xjlkpui02ro" path="res://Sprite folders grab bag/gore_totem2.png" id="7_x7dke"]
-[ext_resource type="Texture2D" uid="uid://bcblmlpu6wmf4" path="res://Sprite folders grab bag/monastary_floor_outside1.png" id="8_8ijyh"]
-[ext_resource type="Texture2D" uid="uid://birqqw3rpi0yv" path="res://Sprite folders grab bag/stonefloor_3.png" id="12_8d3as"]
+[ext_resource type="Texture2D" uid="uid://dilhhkx3xdfns" path="res://assets/sprites/props/dungeon/hanging_gore_totem1.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://bm7yidtuy4wyj" path="res://assets/sprites/props/dungeon/hanging_gore_totem2.png" id="6"]
+[ext_resource type="Texture2D" uid="uid://b3o2chjxaj4k" path="res://assets/sprites/props/dungeon/hanging_gore_totem3.png" id="7"]
+[ext_resource type="Texture2D" uid="uid://1xjlkpui02ro" path="res://assets/sprites/props/dungeon/gore_totem2.png" id="7_x7dke"]
+[ext_resource type="Texture2D" uid="uid://bcblmlpu6wmf4" path="res://assets/textures/environment/floors/monastary_floor_outside1.png" id="8_8ijyh"]
+[ext_resource type="Texture2D" uid="uid://birqqw3rpi0yv" path="res://assets/textures/environment/floors/stonefloor_3.png" id="12_8d3as"]
 [ext_resource type="Material" path="res://assets/materials/dungeon/woodenfloor_mat.tres" id="14_rsfg8"]
-[ext_resource type="Texture2D" uid="uid://cv67a5r1deaum" path="res://assets/sprites/textures/dungeon/wooden_barrel.png" id="tex_barrel"]
-[ext_resource type="Texture2D" uid="uid://dqedk7bprk8s7" path="res://assets/sprites/textures/dungeon/wooden_crate1.png" id="tex_crate1"]
-[ext_resource type="Texture2D" uid="uid://dptsnhvq1x81o" path="res://assets/sprites/textures/dungeon/stonefloor_2.png" id="tex_floor2"]
-[ext_resource type="Texture2D" uid="uid://bvhkhf51thgln" path="res://assets/sprites/textures/dungeon/stonefloor_3.png" id="tex_floor3"]
-[ext_resource type="Texture2D" uid="uid://brkqkr24x8043" path="res://assets/sprites/textures/dungeon/stonewall.png" id="tex_wall"]
-[ext_resource type="Texture2D" uid="uid://cwua2u8ogd2y7" path="res://assets/sprites/textures/dungeon/wood.png" id="tex_wood"]
-[ext_resource type="Texture2D" uid="uid://eisnhw2eqk62" path="res://assets/sprites/textures/dungeon/woodenfloor.png" id="tex_woodfloor"]
+[ext_resource type="Texture2D" uid="uid://cv67a5r1deaum" path="res://assets/textures/environment/dungeon/wooden_barrel.png" id="tex_barrel"]
+[ext_resource type="Texture2D" uid="uid://dqedk7bprk8s7" path="res://assets/textures/environment/dungeon/wooden_crate1.png" id="tex_crate1"]
+[ext_resource type="Texture2D" uid="uid://dptsnhvq1x81o" path="res://assets/textures/environment/dungeon/stonefloor_2.png" id="tex_floor2"]
+[ext_resource type="Texture2D" uid="uid://bvhkhf51thgln" path="res://assets/textures/environment/dungeon/stonefloor_3.png" id="tex_floor3"]
+[ext_resource type="Texture2D" uid="uid://brkqkr24x8043" path="res://assets/textures/environment/dungeon/stonewall.png" id="tex_wall"]
+[ext_resource type="Texture2D" uid="uid://cwua2u8ogd2y7" path="res://assets/textures/environment/dungeon/wood.png" id="tex_wood"]
+[ext_resource type="Texture2D" uid="uid://eisnhw2eqk62" path="res://assets/textures/environment/dungeon/woodenfloor.png" id="tex_woodfloor"]
 
 [sub_resource type="StandardMaterial3D" id="floor_mat"]
 albedo_texture = ExtResource("8_8ijyh")
@@ -1710,6 +1710,17 @@ metadata/patrol_radius = 4
 metadata/aggro_range = 3
 metadata/is_boss = true
 metadata/boss_name = "BanditLeader"
+
+[node name="DarkGeneralBoss" type="Marker3D" parent="EnemySpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -27)
+metadata/enemy_data = "res://data/enemies/dark_general.tres"
+metadata/sprite_path = "res://assets/sprites/enemies/dark_general_idle.png"
+metadata/h_frames = 4
+metadata/v_frames = 1
+metadata/patrol_radius = 6
+metadata/aggro_range = 18
+metadata/is_boss = true
+metadata/boss_name = "DarkGeneral"
 
 [node name="Enemy7" type="Marker3D" parent="EnemySpawns"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 0, -20)

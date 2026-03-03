@@ -3,17 +3,17 @@
 [ext_resource type="Script" uid="uid://df45vmaawgglq" path="res://scripts/levels/dusty_hollow.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
-[ext_resource type="Texture2D" uid="uid://bvnguohyrbl8g" path="res://Sprite folders grab bag/skulls_spike1.png" id="4"]
-[ext_resource type="Texture2D" uid="uid://j8wnsce5j8kx" path="res://Sprite folders grab bag/skulls_spike2.png" id="5"]
-[ext_resource type="Texture2D" uid="uid://ccskyp2wu0gvs" path="res://Sprite folders grab bag/skulls_spike3.png" id="6"]
-[ext_resource type="Texture2D" uid="uid://c0xb88bv7vwmy" path="res://Sprite folders grab bag/gore_pile1.png" id="7"]
-[ext_resource type="Texture2D" uid="uid://16gs2epfq4iq" path="res://Sprite folders grab bag/gore_pile2.png" id="8"]
-[ext_resource type="Texture2D" uid="uid://bhwsqdvpi7nxt" path="res://Sprite folders grab bag/gore_totem1.png" id="9"]
-[ext_resource type="Texture2D" uid="uid://1xjlkpui02ro" path="res://Sprite folders grab bag/gore_totem2.png" id="10"]
-[ext_resource type="Texture2D" uid="uid://dilhhkx3xdfns" path="res://Sprite folders grab bag/hanging_gore_totem1.png" id="11"]
-[ext_resource type="Texture2D" uid="uid://bm7yidtuy4wyj" path="res://Sprite folders grab bag/hanging_gore_totem2.png" id="12"]
-[ext_resource type="Texture2D" uid="uid://b3o2chjxaj4k" path="res://Sprite folders grab bag/hanging_gore_totem3.png" id="13"]
-[ext_resource type="Texture2D" uid="uid://b4axsksl8emst" path="res://Sprite folders grab bag/tegner_flagman.png" id="14"]
+[ext_resource type="Texture2D" uid="uid://bvnguohyrbl8g" path="res://assets/sprites/props/dungeon/skulls_spike1.png" id="4"]
+[ext_resource type="Texture2D" uid="uid://j8wnsce5j8kx" path="res://assets/sprites/props/dungeon/skulls_spike2.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://ccskyp2wu0gvs" path="res://assets/sprites/props/dungeon/skulls_spike3.png" id="6"]
+[ext_resource type="Texture2D" uid="uid://c0xb88bv7vwmy" path="res://assets/sprites/props/dungeon/gore_pile1.png" id="7"]
+[ext_resource type="Texture2D" uid="uid://16gs2epfq4iq" path="res://assets/sprites/props/dungeon/gore_pile2.png" id="8"]
+[ext_resource type="Texture2D" uid="uid://bhwsqdvpi7nxt" path="res://assets/sprites/props/dungeon/gore_totem1.png" id="9"]
+[ext_resource type="Texture2D" uid="uid://1xjlkpui02ro" path="res://assets/sprites/props/dungeon/gore_totem2.png" id="10"]
+[ext_resource type="Texture2D" uid="uid://dilhhkx3xdfns" path="res://assets/sprites/props/dungeon/hanging_gore_totem1.png" id="11"]
+[ext_resource type="Texture2D" uid="uid://bm7yidtuy4wyj" path="res://assets/sprites/props/dungeon/hanging_gore_totem2.png" id="12"]
+[ext_resource type="Texture2D" uid="uid://b3o2chjxaj4k" path="res://assets/sprites/props/dungeon/hanging_gore_totem3.png" id="13"]
+[ext_resource type="Texture2D" uid="uid://b4axsksl8emst" path="res://assets/sprites/enemies/tenger/tegner_flagman.png" id="14"]
 
 [sub_resource type="Environment" id="Environment_desert"]
 background_mode = 1
@@ -731,7 +731,7 @@ material = SubResource("bone_mat")
 [node name="FallenVillager_0" type="Node3D" parent="Bodies"]
 transform = Transform3D(0.423, 0, 0.906, 0, 1, 0, -0.906, 0, 0.423, -6, 0, -12)
 
-[node name="Body" type="CSGCapsule3D" parent="Bodies/FallenVillager_0"]
+[node name="Body" type="CSGCylinder3D" parent="Bodies/FallenVillager_0"]
 _import_path = NodePath("")
 unique_name_in_owner = false
 process_mode = 0
@@ -755,7 +755,7 @@ material = SubResource("blood_mat")
 [node name="FallenVillager_1" type="Node3D" parent="Bodies"]
 transform = Transform3D(0.574, 0, 0.819, 0, 1, 0, -0.819, 0, 0.574, 8, 0, 10)
 
-[node name="Body" type="CSGCapsule3D" parent="Bodies/FallenVillager_1"]
+[node name="Body" type="CSGCylinder3D" parent="Bodies/FallenVillager_1"]
 _import_path = NodePath("")
 unique_name_in_owner = false
 process_mode = 0
@@ -779,7 +779,7 @@ material = SubResource("blood_mat")
 [node name="FallenVillager_2" type="Node3D" parent="Bodies"]
 transform = Transform3D(0.906, 0, 0.423, 0, 1, 0, -0.423, 0, 0.906, -14, 0, 5)
 
-[node name="Body" type="CSGCapsule3D" parent="Bodies/FallenVillager_2"]
+[node name="Body" type="CSGCylinder3D" parent="Bodies/FallenVillager_2"]
 _import_path = NodePath("")
 unique_name_in_owner = false
 process_mode = 0
@@ -803,7 +803,7 @@ material = SubResource("blood_mat")
 [node name="FallenVillager_3" type="Node3D" parent="Bodies"]
 transform = Transform3D(0.342, 0, 0.94, 0, 1, 0, -0.94, 0, 0.342, 5, 0, -5)
 
-[node name="Body" type="CSGCapsule3D" parent="Bodies/FallenVillager_3"]
+[node name="Body" type="CSGCylinder3D" parent="Bodies/FallenVillager_3"]
 _import_path = NodePath("")
 unique_name_in_owner = false
 process_mode = 0
@@ -827,7 +827,7 @@ material = SubResource("blood_mat")
 [node name="FallenVillager_4" type="Node3D" parent="Bodies"]
 transform = Transform3D(0.819, 0, 0.574, 0, 1, 0, -0.574, 0, 0.819, -3, 0, 12)
 
-[node name="Body" type="CSGCapsule3D" parent="Bodies/FallenVillager_4"]
+[node name="Body" type="CSGCylinder3D" parent="Bodies/FallenVillager_4"]
 _import_path = NodePath("")
 unique_name_in_owner = false
 process_mode = 0
@@ -851,7 +851,7 @@ material = SubResource("blood_mat")
 [node name="FallenVillager_5" type="Node3D" parent="Bodies"]
 transform = Transform3D(0.707, 0, 0.707, 0, 1, 0, -0.707, 0, 0.707, 15, 0, 0)
 
-[node name="Body" type="CSGCapsule3D" parent="Bodies/FallenVillager_5"]
+[node name="Body" type="CSGCylinder3D" parent="Bodies/FallenVillager_5"]
 _import_path = NodePath("")
 unique_name_in_owner = false
 process_mode = 0

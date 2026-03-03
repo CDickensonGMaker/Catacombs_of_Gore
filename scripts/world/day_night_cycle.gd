@@ -27,30 +27,30 @@ const DUSK_COLOR := Color(0.7, 0.4, 0.3)        # Blood red sunset
 const NIGHT_COLOR := Color(0.25, 0.28, 0.4)     # Cold blue moonlight
 const MIDNIGHT_COLOR := Color(0.12, 0.14, 0.22) # Deep oppressive darkness
 
-## Light intensities - significantly reduced for darker feel
-const DAWN_ENERGY := 0.4
-const MORNING_ENERGY := 0.6
-const NOON_ENERGY := 0.75      # Even noon is not too bright
-const AFTERNOON_ENERGY := 0.6
-const DUSK_ENERGY := 0.35
-const NIGHT_ENERGY := 0.06     # Much darker at night
-const MIDNIGHT_ENERGY := 0.03  # Nearly pitch black at midnight
+## Light intensities - balanced for visibility while maintaining atmosphere
+const DAWN_ENERGY := 0.7
+const MORNING_ENERGY := 1.1    # Bright morning light
+const NOON_ENERGY := 1.5       # Strong midday sun
+const AFTERNOON_ENERGY := 1.4  # Still strong until ~5pm
+const DUSK_ENERGY := 0.6
+const NIGHT_ENERGY := 0.15     # Dark but visible at night
+const MIDNIGHT_ENERGY := 0.08  # Very dark at midnight but not pitch black
 
-## Ambient light colors - darker, more oppressive
-const DAWN_AMBIENT := Color(0.25, 0.22, 0.2)
-const MORNING_AMBIENT := Color(0.32, 0.3, 0.28)
-const NOON_AMBIENT := Color(0.38, 0.36, 0.32)   # Grey-brown, not bright
-const AFTERNOON_AMBIENT := Color(0.32, 0.28, 0.25)
-const DUSK_AMBIENT := Color(0.22, 0.18, 0.2)
-const NIGHT_AMBIENT := Color(0.04, 0.04, 0.06)  # Much darker ambient at night
-const MIDNIGHT_AMBIENT := Color(0.02, 0.02, 0.03)  # Nearly no ambient at midnight
+## Ambient light colors - balanced for visibility
+const DAWN_AMBIENT := Color(0.4, 0.38, 0.35)
+const MORNING_AMBIENT := Color(0.55, 0.52, 0.48)   # Brighter morning fill
+const NOON_AMBIENT := Color(0.7, 0.68, 0.62)       # Strong warm ambient
+const AFTERNOON_AMBIENT := Color(0.65, 0.6, 0.55)  # Strong afternoon fill
+const DUSK_AMBIENT := Color(0.35, 0.3, 0.32)
+const NIGHT_AMBIENT := Color(0.1, 0.1, 0.14)    # Visible blue-tinted night
+const MIDNIGHT_AMBIENT := Color(0.06, 0.06, 0.08)  # Very dark but not pitch black
 
-## PS1-style fog colors - cold grey, oppressive atmosphere
-const DAWN_FOG := Color(0.3, 0.28, 0.28)        # Grey with slight warmth
-const MORNING_FOG := Color(0.32, 0.32, 0.32)    # Neutral grey mist
-const NOON_FOG := Color(0.35, 0.35, 0.33)       # Grey haze
-const AFTERNOON_FOG := Color(0.32, 0.3, 0.3)    # Cooling grey
-const DUSK_FOG := Color(0.22, 0.2, 0.22)        # Dark grey-purple
+## PS1-style fog colors - lighter during day for better visibility
+const DAWN_FOG := Color(0.35, 0.32, 0.3)        # Grey with slight warmth
+const MORNING_FOG := Color(0.45, 0.42, 0.4)     # Lighter morning mist
+const NOON_FOG := Color(0.5, 0.48, 0.45)        # Light haze, good visibility
+const AFTERNOON_FOG := Color(0.48, 0.45, 0.42)  # Light afternoon haze
+const DUSK_FOG := Color(0.28, 0.25, 0.25)       # Darkening grey
 const NIGHT_FOG := Color(0.06, 0.06, 0.1)       # Deep blue-grey
 const MIDNIGHT_FOG := Color(0.03, 0.03, 0.05)   # Near black
 
@@ -66,14 +66,14 @@ const MIDNIGHT_ANGLE := -45.0   # Deep below
 ## Transition speed (how fast lighting changes)
 @export var transition_speed: float = 2.0
 
-## Ambient light energy values for each time period
-const DAWN_AMBIENT_ENERGY := 0.25
-const MORNING_AMBIENT_ENERGY := 0.35
-const NOON_AMBIENT_ENERGY := 0.4
-const AFTERNOON_AMBIENT_ENERGY := 0.35
-const DUSK_AMBIENT_ENERGY := 0.2
-const NIGHT_AMBIENT_ENERGY := 0.08   # Very dark ambient at night
-const MIDNIGHT_AMBIENT_ENERGY := 0.03  # Nearly no ambient at midnight
+## Ambient light energy values for each time period - increased for visibility
+const DAWN_AMBIENT_ENERGY := 0.5
+const MORNING_AMBIENT_ENERGY := 0.75   # Strong morning ambient
+const NOON_AMBIENT_ENERGY := 1.0       # Full ambient at midday
+const AFTERNOON_AMBIENT_ENERGY := 0.95 # Strong afternoon ambient
+const DUSK_AMBIENT_ENERGY := 0.45
+const NIGHT_AMBIENT_ENERGY := 0.2    # Visible ambient at night
+const MIDNIGHT_AMBIENT_ENERGY := 0.1  # Low but not pitch black
 
 ## Current target values
 var target_color: Color = MORNING_COLOR
@@ -116,32 +116,25 @@ func _setup_lighting() -> void:
 	sun_light.rotation_degrees = Vector3(-30, -45, 0)
 	add_child(sun_light)
 
-	# Find existing world environment in scene (must be in "world_environment" group)
-	# If found, we'll modify it dynamically. If not, we create our own.
+	# CRITICAL FIX: ALWAYS remove any existing WorldEnvironment and create our own
+	# This ensures consistent lighting across ALL scenes (hand-crafted and procedural)
+	# Previously, hand-crafted scenes with custom WorldEnvironments would have different
+	# lighting settings (fog, sky, ambient) causing visual mismatches when streaming cells
+
+	# Remove any WorldEnvironment in the "world_environment" group
 	var existing_env := get_tree().get_first_node_in_group("world_environment")
 	if existing_env and existing_env is WorldEnvironment:
-		world_environment = existing_env
-		_apply_grim_dark_postprocess(world_environment.environment)
-		return
+		print("[DayNightCycle] Removing existing WorldEnvironment from group to use consistent lighting")
+		existing_env.queue_free()
 
-	# Also check for any WorldEnvironment not in the group (common in hand-crafted scenes)
-	# and add it to the group so we can control it
-	var scene_env: WorldEnvironment = null
+	# Also remove any WorldEnvironment in the parent scene (even if not in group)
 	if parent_node:
 		for child in parent_node.get_children():
 			if child is WorldEnvironment:
-				scene_env = child
-				break
+				print("[DayNightCycle] Removing scene WorldEnvironment '%s' to use consistent lighting" % child.name)
+				child.queue_free()
 
-	if scene_env:
-		# Found an existing WorldEnvironment, use it
-		scene_env.add_to_group("world_environment")
-		world_environment = scene_env
-		_apply_grim_dark_postprocess(world_environment.environment)
-		print("[DayNightCycle] Using existing WorldEnvironment from scene")
-		return
-
-	# No existing environment found, create a completely new one
+	# Create our own WorldEnvironment with consistent settings for ALL scenes
 	world_environment = WorldEnvironment.new()
 	world_environment.name = "DayNightEnvironment"
 	world_environment.add_to_group("world_environment")
@@ -154,20 +147,20 @@ func _setup_lighting() -> void:
 	env.ambient_light_energy = 0.3  # Low ambient for darker, moodier feel
 
 	# ====================================================================
-	# GRIM DARK TONEMAPPING - Crushed blacks, muted highlights
+	# TONEMAPPING - Balanced for visibility
 	# ====================================================================
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
-	env.tonemap_exposure = 0.85  # Slightly underexposed
+	env.tonemap_exposure = 1.0  # Neutral exposure
 	env.tonemap_white = 1.2  # Compress highlights
 
 	# ====================================================================
-	# PS1-STYLE ATMOSPHERIC FOG - Heavy, oppressive
+	# PS1-STYLE ATMOSPHERIC FOG - Oppressive but not blinding
 	# ====================================================================
 	env.fog_enabled = true
 	env.fog_light_color = MORNING_FOG
 	env.fog_light_energy = 1.0
 	env.fog_sun_scatter = 0.0  # No sun scattering for cleaner PS1 look
-	env.fog_density = 0.02  # Heavier fog density for oppressive atmosphere
+	env.fog_density = 0.015  # Slightly less fog for better visibility
 	env.fog_aerial_perspective = 0.0  # No aerial perspective
 	env.fog_sky_affect = 1.0  # Fog affects sky too
 	env.fog_depth_curve = 1.2  # Slightly curved for more gradual falloff
@@ -176,12 +169,12 @@ func _setup_lighting() -> void:
 	env.volumetric_fog_enabled = false
 
 	# ====================================================================
-	# COLOR GRADING - Desaturated, grim dark look
+	# COLOR GRADING - Grim dark but visible
 	# ====================================================================
 	env.adjustment_enabled = true
-	env.adjustment_brightness = 0.82  # Darker overall for grim atmosphere
-	env.adjustment_contrast = 1.2  # More contrast for that gritty look
-	env.adjustment_saturation = 0.6  # More desaturated - mutes colors significantly
+	env.adjustment_brightness = 1.0  # Neutral brightness
+	env.adjustment_contrast = 1.1  # Moderate contrast
+	env.adjustment_saturation = 0.75  # Slightly desaturated for grim feel
 
 	# ====================================================================
 	# GLOW - Subtle, for atmosphere (not bright bloom)
@@ -202,16 +195,16 @@ func _apply_grim_dark_postprocess(env: Environment) -> void:
 	if not env:
 		return
 
-	# Tonemapping
+	# Tonemapping - balanced exposure
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
-	env.tonemap_exposure = 0.85
+	env.tonemap_exposure = 1.0  # Neutral exposure
 	env.tonemap_white = 1.2
 
-	# Color grading - the key to grim dark aesthetic
+	# Color grading - keep grim aesthetic but don't crush brightness
 	env.adjustment_enabled = true
-	env.adjustment_brightness = 0.92
-	env.adjustment_contrast = 1.15
-	env.adjustment_saturation = 0.7  # This is what kills the bright greens
+	env.adjustment_brightness = 1.0  # Neutral brightness (was 0.92)
+	env.adjustment_contrast = 1.1    # Slightly reduced contrast
+	env.adjustment_saturation = 0.75 # Slightly more saturated than before
 
 	# Subtle glow
 	env.glow_enabled = true
@@ -259,15 +252,17 @@ func _calculate_sun_angle_from_time(game_time: float) -> float:
 	var time := fmod(game_time, 24.0)
 
 	# Define keyframes: [time, angle]
+	# Noon brightness extended to last until ~5pm
 	var keyframes: Array[Array] = [
 		[0.0, MIDNIGHT_ANGLE],   # Midnight
 		[5.0, DAWN_ANGLE],       # Dawn start
 		[7.0, MORNING_ANGLE],    # Morning start
 		[10.0, NOON_ANGLE],      # Approaching noon
 		[12.0, NOON_ANGLE],      # Solar noon (peak)
-		[14.0, AFTERNOON_ANGLE], # Afternoon start
-		[17.0, DUSK_ANGLE],      # Dusk start
-		[20.0, NIGHT_ANGLE],     # Night start
+		[16.0, NOON_ANGLE],      # Extended noon until 4pm
+		[17.0, AFTERNOON_ANGLE], # Afternoon starts at 5pm
+		[19.0, DUSK_ANGLE],      # Dusk start
+		[21.0, NIGHT_ANGLE],     # Night start
 		[24.0, MIDNIGHT_ANGLE],  # Back to midnight
 	]
 
@@ -354,7 +349,20 @@ func _on_time_of_day_changed(time_of_day: Enums.TimeOfDay) -> void:
 			target_fog = MIDNIGHT_FOG
 
 ## Static spawner for adding to levels
-static func add_to_level(parent: Node) -> DayNightCycle:
+## Returns null if called from a streaming cell context (lighting should come from main scene only)
+static func add_to_level(parent: Node3D) -> DayNightCycle:
+	# Don't add lighting if this scene is loaded as a streaming cell
+	# Check if we're a child of the cell container (means we're streamed, not main scene)
+	var node: Node = parent
+	while node:
+		# CellStreamer names its container "_CellContainer" or "CellContainer"
+		if node.name == "_CellContainer" or node.name == "CellContainer":
+			# We're inside a streamed cell - don't add lighting
+			print("[DayNightCycle] Skipping add_to_level - parent is inside cell container (streaming context)")
+			return null
+		node = node.get_parent()
+
+	# Normal creation for main scene
 	var cycle := DayNightCycle.new()
 	cycle.name = "DayNightCycle"
 	parent.add_child(cycle)

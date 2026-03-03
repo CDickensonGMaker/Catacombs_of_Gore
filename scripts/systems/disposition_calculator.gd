@@ -205,7 +205,7 @@ static func _get_npc_base_disposition(npc: Node) -> int:
 	return 50
 
 ## Calculate faction reputation modifier (-1.0 to 1.0)
-static func _calculate_faction_modifier(npc: Node, player_data: CharacterData) -> float:
+static func _calculate_faction_modifier(npc: Node, _player_data: CharacterData) -> float:
 	# Get NPC's faction
 	var npc_faction: String = ""
 	if "faction" in npc:
@@ -250,7 +250,20 @@ static func _calculate_race_modifier(npc: Node, player_data: CharacterData) -> f
 	# Get NPC's race
 	var npc_race: int = -1
 	if "race" in npc:
-		npc_race = npc.race
+		# NPC race is stored as a String, convert to Enums.Race
+		var race_value: Variant = npc.race
+		if race_value is String:
+			match race_value.to_lower():
+				"human":
+					npc_race = Enums.Race.HUMAN
+				"elf":
+					npc_race = Enums.Race.ELF
+				"halfling":
+					npc_race = Enums.Race.HALFLING
+				"dwarf":
+					npc_race = Enums.Race.DWARF
+		elif race_value is int:
+			npc_race = race_value
 
 	if npc_race < 0:
 		return 0.0
@@ -360,7 +373,7 @@ static func calculate_intimidation_chance(npc: Node, player_data: CharacterData)
 	return clampf(chance, 0.1, 0.9)
 
 ## Calculate persuasion success chance based on player stats vs NPC
-static func calculate_persuasion_chance(npc: Node, player_data: CharacterData, disposition: int) -> float:
+static func calculate_persuasion_chance(_npc: Node, player_data: CharacterData, disposition: int) -> float:
 	var player_speech: int = player_data.get_effective_stat(Enums.Stat.SPEECH)
 	var player_persuasion: int = player_data.get_skill(Enums.Skill.PERSUASION)
 

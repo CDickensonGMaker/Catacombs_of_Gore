@@ -25,7 +25,7 @@ signal destroyed(destroyer: Node)
 const SKELETON_WARRIOR_PATH := "res://data/enemies/skeleton_warrior.tres"
 
 ## Visual
-const PENTAGRAM_SPRITE_PATH := "res://Sprite folders grab bag/candlepentagram.png"
+const PENTAGRAM_SPRITE_PATH := "res://assets/sprites/props/dungeon/pentagram.png"
 
 ## Runtime state
 var current_hp: int
@@ -124,9 +124,9 @@ func _create_visual() -> void:
 		sprite.texture = tex
 		sprite.pixel_size = 0.012  # Scale for visibility
 		sprite.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y  # Face player, stay upright
-		# Position sprite so bottom is at ground level
+		# Position sprite lower - closer to ground (was sprite_height * 0.5)
 		var sprite_height: float = tex.get_height() * sprite.pixel_size
-		sprite.position = Vector3(0, sprite_height * 0.5, 0)
+		sprite.position = Vector3(0, sprite_height * 0.25, 0)  # Lowered Y position
 		sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
 		sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 		sprite.no_depth_test = false

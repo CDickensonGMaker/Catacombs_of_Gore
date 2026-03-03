@@ -15,6 +15,11 @@ const LEVEL_3_DEPTH := -24.0    # Ancient evil level (boss area)
 
 func _ready() -> void:
 	SaveManager.set_current_zone(ZONE_ID, "The Crypt of Pola Perron")
+	# Play crypt ambient and dungeon music (only when main scene)
+	var is_main_scene: bool = get_node_or_null("Player") != null
+	if is_main_scene:
+		AudioManager.play_zone_ambiance("ruins")
+		AudioManager.play_zone_music("dungeon")
 	_setup_spawn_points()
 	_setup_enemy_spawns()
 	_setup_chest_spawns()

@@ -1,0 +1,49 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "ember_blade"
+display_name = "Ember Blade"
+description = "A steel sword infused with ember dust and soul essence. The blade glows with inner heat, searing flesh and igniting enemies on contact."
+weapon_type = 1
+weapon_class = 2
+two_handed = false
+base_damage = Array[int]([3, 6, 3])
+damage_type = 0
+secondary_damage_type = 1
+secondary_damage = Array[int]([2, 6, 0])
+attack_speed = 1.0
+reach = 2.0
+stagger_power = 1.0
+armor_pierce = 0.05
+crit_chance = 0.08
+crit_multiplier = 2.0
+is_ranged = false
+projectile_speed = 30.0
+max_range = 320.0
+reload_time = 0.0
+ammo_type = ""
+inflicts_condition = 3
+condition_chance = 0.35
+condition_duration = 5.0
+lifesteal_percent = 0.0
+is_homing = false
+required_grit = 4
+required_agility = 0
+required_knowledge = 2
+base_value = 800
+weight = 3.0
+mesh_path = "res://assets/weapons/melee/right_fist_sword.glb"
+icon_path = ""
+attack_animation = "attack_slash"
+heavy_attack_animation = "attack_heavy_slash"
+fps_sprite_path = "res://assets/sprites/weapons/arm_swing_4x4.png"
+fps_h_frames = 4
+fps_v_frames = 4
+fps_sprite_size = Vector2(305, 305)
+fps_mesh_path = "res://assets/weapons/melee/right_fist_sword.glb"
+fps_mesh_scale = Vector3(0.85, 0.85, 0.85)
+fps_mesh_position = Vector3(-0.117, -0.315, 0.323)
+fps_mesh_rotation = Vector3(19.7, -82.4, 0.9)

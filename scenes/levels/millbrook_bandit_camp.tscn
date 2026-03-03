@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=7 format=3 uid="uid://cm6gcisea0f8e"]
 
 [ext_resource type="Script" path="res://scripts/levels/millbrook_bandit_camp.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]

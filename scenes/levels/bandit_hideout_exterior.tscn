@@ -491,20 +491,6 @@ metadata/persistent_id = "bandit_ext_chest_3"
 
 [node name="DoorPositions" type="Node3D" parent="."]
 
-[node name="DoorPos_Thornfield" type="Marker3D" parent="DoorPositions"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 21)
-metadata/target_scene = "res://scenes/levels/thornfield.tscn"
-metadata/spawn_id = "from_bandit_hideout"
-metadata/door_label = "Forest Path to Thornfield"
-metadata/show_frame = false
-
-[node name="DoorPos_Wilderness" type="Marker3D" parent="DoorPositions"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -10, 0, 21)
-metadata/target_scene = "RETURN_TO_WILDERNESS"
-metadata/spawn_id = "from_bandit_hideout"
-metadata/door_label = "Leave Bandit Territory"
-metadata/show_frame = false
-
 [node name="DoorPos_CaveEntrance" type="Marker3D" parent="DoorPositions"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)
 metadata/target_scene = "res://scenes/levels/bandit_hideout_level_1.tscn"

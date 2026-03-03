@@ -5,10 +5,16 @@ extends StaticBody3D
 signal harvested(yield_amount: int)
 
 ## Rock types with different yields
-enum RockType { STONE, IRON_VEIN, RICH_IRON }
+enum RockType { STONE, IRON_VEIN, RICH_IRON, SILVER_VEIN, GOLD_VEIN }
+
+## Sprite paths for rock types
+const ROCK_SPRITE_PATH := "res://assets/sprites/world/rock.png"
+const IRON_VEIN_SPRITE_PATH := "res://assets/sprites/world/iron_vein.png"
+const SILVER_VEIN_SPRITE_PATH := "res://assets/sprites/world/silver_vein.png"
+const GOLD_VEIN_SPRITE_PATH := "res://assets/sprites/world/gold_vein.png"
 
 ## Visual representation
-var mesh: CSGBox3D
+var sprite: Sprite3D
 var interaction_area: Area3D
 var collision_shape: CollisionShape3D
 
@@ -20,9 +26,6 @@ var has_been_harvested: bool = false
 @export var yield_min: int = 1
 @export var yield_max: int = 2
 @export var display_name: String = "Rock"
-
-## Rock material
-var rock_material: StandardMaterial3D
 
 
 func _ready() -> void:
@@ -36,26 +39,8 @@ func _ready() -> void:
 
 
 func _setup_material() -> void:
-	rock_material = StandardMaterial3D.new()
-	rock_material.roughness = 0.95
-	rock_material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
-
-	# Use stone texture
-	var stone_tex: Texture2D = load("res://Sprite folders grab bag/stonewall.png")
-	if stone_tex:
-		rock_material.albedo_texture = stone_tex
-		rock_material.uv1_scale = Vector3(0.3, 0.3, 0.3)
-	else:
-		rock_material.albedo_color = Color(0.4, 0.38, 0.35)
-
-	# Apply color tint based on rock type
-	match rock_type:
-		RockType.STONE:
-			rock_material.albedo_color = Color(0.75, 0.73, 0.7)  # Gray stone
-		RockType.IRON_VEIN:
-			rock_material.albedo_color = Color(0.6, 0.5, 0.45)  # Brownish-gray with iron
-		RockType.RICH_IRON:
-			rock_material.albedo_color = Color(0.5, 0.35, 0.3)  # Dark rust color
+	# Material setup no longer needed - using sprites instead
+	pass
 
 
 func _setup_collision() -> void:
@@ -77,23 +62,50 @@ func _setup_interaction_area() -> void:
 
 
 func _setup_visuals() -> void:
-	# Random rock size
-	var size_x: float = randf_range(0.8, 2.0)
-	var size_y: float = randf_range(0.5, 1.5)
-	var size_z: float = randf_range(0.8, 2.0)
+	# Create billboard sprite for rock
+	sprite = Sprite3D.new()
+	sprite.name = "RockSprite"
+	sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	sprite.no_depth_test = false
+	sprite.transparent = true
 
-	mesh = CSGBox3D.new()
-	mesh.name = "RockMesh"
-	mesh.size = Vector3(size_x, size_y, size_z)
-	mesh.position = Vector3(0, size_y / 2.0, 0)
-	mesh.rotation_degrees = Vector3(
-		randf_range(-15, 15),
-		randf_range(0, 360),
-		randf_range(-15, 15)
-	)
-	mesh.material = rock_material
-	mesh.use_collision = true
-	add_child(mesh)
+	# Load appropriate texture based on rock type
+	var tex_path: String = ROCK_SPRITE_PATH
+	match rock_type:
+		RockType.IRON_VEIN, RockType.RICH_IRON:
+			tex_path = IRON_VEIN_SPRITE_PATH
+		RockType.SILVER_VEIN:
+			tex_path = SILVER_VEIN_SPRITE_PATH
+		RockType.GOLD_VEIN:
+			tex_path = GOLD_VEIN_SPRITE_PATH
+
+	var tex: Texture2D = load(tex_path)
+	if tex:
+		sprite.texture = tex
+		# Random size variation
+		var base_size: float = randf_range(0.018, 0.028)
+		# Rich iron is slightly larger
+		if rock_type == RockType.RICH_IRON:
+			base_size *= 1.3
+		sprite.pixel_size = base_size
+		# Position sprite so bottom is at ground level
+		sprite.position = Vector3(0, tex.get_height() * base_size * 0.5, 0)
+	else:
+		push_warning("Failed to load rock texture: %s" % tex_path)
+
+	# Slight random Y rotation for variety
+	sprite.rotation_degrees.y = randf_range(0, 360)
+
+	add_child(sprite)
+
+	# Add collision shape for the rock
+	var coll := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(1.0, 1.5, 1.0)
+	coll.shape = box
+	coll.position = Vector3(0, 0.75, 0)
+	add_child(coll)
 
 
 ## Check if player has a pickaxe equipped
@@ -176,6 +188,13 @@ func _get_yields_for_rock_type() -> Array[Dictionary]:
 		RockType.RICH_IRON:
 			# Rich iron: 2-4 iron_ore
 			yields.append({"item_id": "iron_ore", "min": 2, "max": 4})
+		RockType.SILVER_VEIN:
+			# Silver vein: 1-2 silver_ore + 1 stone_block
+			yields.append({"item_id": "silver_ore", "min": 1, "max": 2})
+			yields.append({"item_id": "stone_block", "min": 1, "max": 1})
+		RockType.GOLD_VEIN:
+			# Gold vein: 1-2 gold_ore (rare, valuable)
+			yields.append({"item_id": "gold_ore", "min": 1, "max": 2})
 
 	return yields
 
@@ -184,9 +203,9 @@ func _on_harvested() -> void:
 	# Remove from interactable group so prompt doesn't show
 	remove_from_group("interactable")
 
-	# Hide the rock mesh (disappears when mined)
-	if mesh:
-		mesh.visible = false
+	# Hide the rock sprite (disappears when mined)
+	if sprite:
+		sprite.visible = false
 
 	# Disable collision
 	collision_layer = 0
@@ -219,6 +238,12 @@ static func spawn_rock(parent: Node, pos: Vector3, p_display_name: String = "Roc
 		RockType.RICH_IRON:
 			instance.yield_min = 2
 			instance.yield_max = 4
+		RockType.SILVER_VEIN:
+			instance.yield_min = 1
+			instance.yield_max = 2
+		RockType.GOLD_VEIN:
+			instance.yield_min = 1
+			instance.yield_max = 2
 
 	parent.add_child(instance)
 	return instance
@@ -231,26 +256,38 @@ static func spawn_random_rock(parent: Node, pos: Vector3, highlands: bool = fals
 	var name: String
 
 	if highlands:
-		# Highlands have more iron
-		if roll < 0.5:
+		# Highlands have more ore veins, including precious metals
+		if roll < 0.4:
 			rock_type_sel = RockType.STONE
 			name = "Rock"
+		elif roll < 0.7:
+			rock_type_sel = RockType.IRON_VEIN
+			name = "Iron Vein"
 		elif roll < 0.85:
-			rock_type_sel = RockType.IRON_VEIN
-			name = "Iron Vein"
-		else:
 			rock_type_sel = RockType.RICH_IRON
 			name = "Rich Iron Deposit"
+		elif roll < 0.94:
+			rock_type_sel = RockType.SILVER_VEIN
+			name = "Silver Vein"
+		else:
+			rock_type_sel = RockType.GOLD_VEIN
+			name = "Gold Vein"
 	else:
-		# Normal areas - mostly stone
-		if roll < 0.8:
+		# Normal areas - mostly stone, rare precious metals
+		if roll < 0.75:
 			rock_type_sel = RockType.STONE
 			name = "Rock"
-		elif roll < 0.95:
+		elif roll < 0.9:
 			rock_type_sel = RockType.IRON_VEIN
 			name = "Iron Vein"
-		else:
+		elif roll < 0.96:
 			rock_type_sel = RockType.RICH_IRON
 			name = "Rich Iron Deposit"
+		elif roll < 0.99:
+			rock_type_sel = RockType.SILVER_VEIN
+			name = "Silver Vein"
+		else:
+			rock_type_sel = RockType.GOLD_VEIN
+			name = "Gold Vein"
 
 	return spawn_rock(parent, pos, name, rock_type_sel)

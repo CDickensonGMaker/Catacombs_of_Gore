@@ -6,14 +6,15 @@
 script = ExtResource("1")
 id = "axe"
 display_name = "Axe"
-description = "A sturdy axe balanced for both offense and defense."
+description = "A sturdy axe balanced for both offense and defense. Required to chop trees."
+weapon_type = 2
 weapon_class = 1
 base_damage = Array[int]([3, 6, 4])
 required_grit = 4
 base_value = 150
 weight = 3.0
 mesh_path = "res://assets/weapons/melee/right_fist_axe.glb"
-fps_sprite_path = "res://Sprite folders grab bag/arm swing 4x4fixed.png"
+fps_sprite_path = "res://assets/sprites/weapons/arm_swing_4x4.png"
 fps_v_frames = 4
 fps_sprite_size = Vector2(300, 300)
 fps_mesh_path = "res://assets/weapons/melee/right_fist_axe.glb"

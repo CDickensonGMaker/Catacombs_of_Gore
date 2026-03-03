@@ -377,6 +377,9 @@ class WorldSaveData:
 	## Rest manager state (diminishing returns, respawn tracking)
 	var rest_manager: Dictionary = {}
 
+	## Custom spells created by player via SpellCreator
+	var custom_spells: Dictionary = {}
+
 	## ============================================================================
 	## DEPRECATED HEX WORLD DATA (v1 format, kept for migration compatibility)
 	## These fields are no longer used - replaced by CellStreamer + PlayerGPS
@@ -401,7 +404,8 @@ class WorldSaveData:
 			"opened_containers": opened_containers,
 			"unlocked_shortcuts": unlocked_shortcuts,
 			"dungeon_seeds": dungeon_seeds,
-			"rest_manager": rest_manager
+			"rest_manager": rest_manager,
+			"custom_spells": custom_spells
 			# Hex data removed in v2 - now using CellStreamer + PlayerGPS
 		}
 
@@ -417,6 +421,7 @@ class WorldSaveData:
 		unlocked_shortcuts = data.get("unlocked_shortcuts", {})
 		dungeon_seeds = data.get("dungeon_seeds", {})
 		rest_manager = data.get("rest_manager", {})
+		custom_spells = data.get("custom_spells", {})
 		# Hex data ignored in v2 - legacy saves will just reset to default position
 
 

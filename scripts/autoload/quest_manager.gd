@@ -16,7 +16,7 @@ class Quest:
 	var state: Enums.QuestState = Enums.QuestState.UNAVAILABLE
 	var is_main_quest: bool = false  # Main story quests get gold markers, side quests get teal
 	var objectives: Array[Objective] = []
-	var rewards: Dictionary = {}  # {gold, xp, items: [{id, quantity}]}
+	var rewards: Dictionary = {}  # {gold, xp, items: [{id, quantity}], faction_reputation: {faction_id: amount}}
 	var prerequisites: Array[String] = []  # Quest IDs that must be completed
 
 	# Quest source and giver tracking
@@ -35,11 +35,29 @@ class Quest:
 	var next_quest: String = ""  # Auto-start this quest on completion
 	var trigger_item: String = ""  # Item that triggers this quest when picked up
 
+	# Starter items given when quest begins
+	var starter_items: Array[Dictionary] = []  # [{id: String, quantity: int}]
+
+	# Spawn-on-accept: Spawn objects when quest is accepted
+	# Format: [{"type": "chest"|"camp", "location": "zone_id", "coords": [x, y, z], "contains": ["item_id"], "loot_tier": "common"}]
+	var spawn_on_accept: Array[Dictionary] = []
+
+	# Quest item tracking for temptation system
+	var quest_items: Array[String] = []  # Item IDs that are quest-bound (fail quest if sold/equipped)
+
+	# Faction the quest belongs to (for reputation on complete/fail)
+	var faction: String = ""
+
+	# Bounty cooldown system
+	var cooldown_days: int = 0  # Days before this bounty can be taken again (0 = no cooldown)
+	var possible_zones: Array[String] = []  # Random zone selection for objectives (empty = use fixed target_zone)
+
 class Objective:
 	var id: String
 	var description: String
 	var type: String  # "kill", "collect", "talk", "reach", "interact"
 	var target: String  # Enemy ID, item ID, NPC ID, location ID
+	var target_zone: String = ""  # Zone where target is located (for cross-zone markers)
 	var required_count: int = 1
 	var current_count: int = 0
 	var is_completed: bool = false
@@ -71,6 +89,13 @@ var tracked_quest_id: String = ""
 ## Caches resolved locations for quest objectives for efficient navigation
 var objective_locations: Dictionary = {}
 
+## Bounty cooldowns: quest_id -> game_day when bounty becomes available again
+## This persists between saves and prevents bounty spam
+var bounty_cooldowns: Dictionary = {}
+
+## Default cooldown for bounties (5 in-game days)
+const DEFAULT_BOUNTY_COOLDOWN_DAYS := 5
+
 func _ready() -> void:
 	_load_quest_database()
 	# Defer signal connection to ensure other managers are ready
@@ -85,6 +110,14 @@ func _connect_signals() -> void:
 	# Connect to InventoryManager for trigger_item quests
 	if InventoryManager and InventoryManager.has_signal("item_added"):
 		InventoryManager.item_added.connect(_on_item_added)
+
+	# Connect to InventoryManager for temptation tracking (selling quest items)
+	if InventoryManager and InventoryManager.has_signal("item_sold"):
+		InventoryManager.item_sold.connect(_on_item_sold)
+
+	# Connect to InventoryManager for temptation tracking (equipping quest items)
+	if InventoryManager and InventoryManager.has_signal("equipment_changed"):
+		InventoryManager.equipment_changed.connect(_on_equipment_changed)
 
 ## Handle entity killed event from combat manager (backup for spell kills via CombatManager)
 func _on_entity_killed(entity: Node, _killer: Node) -> void:
@@ -116,26 +149,84 @@ func _on_item_added(item_id: String, _quantity: int) -> void:
 						hud.show_notification("Quest Started: " + quest.title)
 
 
+## Handle item sold - check for temptation (selling quest items)
+func _on_item_sold(item_id: String, _quantity: int, _quality: Enums.ItemQuality) -> void:
+	# Check all active quests for this item as a quest item
+	for quest_id: String in quests:
+		var quest: Quest = quests[quest_id]
+		if quest.state != Enums.QuestState.ACTIVE:
+			continue
+
+		# Check if this item is a quest item for this quest
+		if item_id in quest.quest_items:
+			print("[QuestManager] TEMPTATION: Player sold quest item '%s' from quest '%s'" % [item_id, quest_id])
+			fail_quest(quest_id, "temptation")
+			return
+
+
+## Handle equipment changed - check for temptation (equipping quest items)
+func _on_equipment_changed(slot: String, _old_item: Dictionary, new_item: Dictionary) -> void:
+	if new_item.is_empty():
+		return  # Unequipping doesn't count
+
+	var item_id: String = new_item.get("item_id", "")
+	if item_id.is_empty():
+		return
+
+	# Check all active quests for this item as a quest item
+	for quest_id: String in quests:
+		var quest: Quest = quests[quest_id]
+		if quest.state != Enums.QuestState.ACTIVE:
+			continue
+
+		# Check if this item is a quest item for this quest
+		if item_id in quest.quest_items:
+			print("[QuestManager] TEMPTATION: Player equipped quest item '%s' (slot: %s) from quest '%s'" % [item_id, slot, quest_id])
+			fail_quest(quest_id, "temptation")
+			return
+
+
 func _load_quest_database() -> void:
 	var quest_dir := "res://data/quests/"
 	if not DirAccess.dir_exists_absolute(quest_dir):
 		return
 
-	var dir := DirAccess.open(quest_dir)
+	_load_quests_from_directory(quest_dir)
+	print("[QuestManager] Loaded %d quest templates" % quest_database.size())
+
+
+## Recursively load quests from a directory and its subdirectories
+func _load_quests_from_directory(dir_path: String) -> void:
+	var dir := DirAccess.open(dir_path)
 	if not dir:
 		return
 
 	dir.list_dir_begin()
 	var file_name := dir.get_next()
 	while file_name != "":
-		if file_name.ends_with(".json"):
-			var file := FileAccess.open(quest_dir + file_name, FileAccess.READ)
+		var full_path: String = dir_path + file_name
+
+		if dir.current_is_dir() and not file_name.begins_with("."):
+			# Recursively load from subdirectory
+			_load_quests_from_directory(full_path + "/")
+		elif file_name.ends_with(".json"):
+			var file := FileAccess.open(full_path, FileAccess.READ)
 			if file:
 				var json: Variant = JSON.parse_string(file.get_as_text())
 				if json is Dictionary:
-					var quest := _parse_quest(json as Dictionary)
-					quest_database[quest.id] = quest
+					var json_dict: Dictionary = json as Dictionary
+					# Skip disabled quests (preserved for later re-enabling)
+					if json_dict.get("disabled", false):
+						var disabled_reason: String = json_dict.get("disabled_reason", "Quest disabled")
+						print("[QuestManager] Skipping disabled quest '%s': %s" % [json_dict.get("id", "unknown"), disabled_reason])
+						file_name = dir.get_next()
+						continue
+					var quest := _parse_quest(json_dict)
+					if not quest.id.is_empty():
+						quest_database[quest.id] = quest
+
 		file_name = dir.get_next()
+	dir.list_dir_end()
 
 func _parse_quest(data: Dictionary) -> Quest:
 	var quest := Quest.new()
@@ -179,9 +270,44 @@ func _parse_quest(data: Dictionary) -> Quest:
 		obj.description = obj_data.get("description", "")
 		obj.type = obj_data.get("type", "")
 		obj.target = obj_data.get("target", "")
+		obj.target_zone = obj_data.get("target_zone", "")
 		obj.required_count = obj_data.get("required_count", 1)
 		obj.is_optional = obj_data.get("is_optional", false)
 		quest.objectives.append(obj)
+
+	# Starter items (given to player when quest starts)
+	var starter_items_data: Array = data.get("starter_items", [])
+	for item_data: Variant in starter_items_data:
+		if item_data is Dictionary:
+			var item_dict: Dictionary = item_data as Dictionary
+			quest.starter_items.append({
+				"id": item_dict.get("id", ""),
+				"quantity": item_dict.get("quantity", 1)
+			})
+
+	# Spawn-on-accept (spawn chests, camps, etc. when quest starts)
+	var spawn_data: Array = data.get("spawn_on_accept", [])
+	for spawn: Variant in spawn_data:
+		if spawn is Dictionary:
+			quest.spawn_on_accept.append(spawn as Dictionary)
+
+	# Quest items (items that are quest-bound for temptation tracking)
+	var quest_items_data: Array = data.get("quest_items", [])
+	for item_id: Variant in quest_items_data:
+		if item_id is String:
+			quest.quest_items.append(item_id as String)
+
+	# Faction for this quest
+	quest.faction = data.get("faction", "")
+
+	# Bounty cooldown (days before quest can be taken again)
+	quest.cooldown_days = data.get("cooldown_days", 0)
+
+	# Possible zones for random selection (for bounties)
+	var possible_zones_data: Array = data.get("possible_zones", [])
+	for zone_id: Variant in possible_zones_data:
+		if zone_id is String:
+			quest.possible_zones.append(zone_id as String)
 
 	return quest
 
@@ -213,6 +339,11 @@ func start_quest(quest_id: String) -> bool:
 
 	if quests.has(quest_id):
 		return false  # Already active or completed
+
+	# Check if bounty is on cooldown
+	if is_bounty_on_cooldown(quest_id):
+		print("[QuestManager] Bounty '%s' is on cooldown until day %d" % [quest_id, bounty_cooldowns.get(quest_id, 0)])
+		return false
 
 	# Check prerequisites
 	var template: Quest = quest_database[quest_id]
@@ -246,21 +377,52 @@ func start_quest(quest_id: String) -> bool:
 	quest.next_quest = template.next_quest
 	quest.trigger_item = template.trigger_item
 
+	# Copy cooldown settings
+	quest.cooldown_days = template.cooldown_days
+	for zone: String in template.possible_zones:
+		quest.possible_zones.append(zone)
+
+	# Select random zone if possible_zones is set
+	var selected_zone: String = ""
+	if template.possible_zones.size() > 0:
+		selected_zone = template.possible_zones[randi() % template.possible_zones.size()]
+		print("[QuestManager] Selected random zone '%s' for quest '%s'" % [selected_zone, quest_id])
+
 	for obj in template.objectives:
 		var new_obj := Objective.new()
 		new_obj.id = obj.id
 		new_obj.description = obj.description
 		new_obj.type = obj.type
 		new_obj.target = obj.target
+		# Use selected random zone if possible_zones was set, otherwise use objective's target_zone
+		if not selected_zone.is_empty():
+			new_obj.target_zone = selected_zone
+		else:
+			new_obj.target_zone = obj.target_zone
 		new_obj.required_count = obj.required_count
 		new_obj.is_optional = obj.is_optional
 		quest.objectives.append(new_obj)
+
+	# Copy spawn_on_accept, quest_items, and faction
+	for spawn: Dictionary in template.spawn_on_accept:
+		quest.spawn_on_accept.append(spawn.duplicate())
+	for item_id: String in template.quest_items:
+		quest.quest_items.append(item_id)
+	quest.faction = template.faction
 
 	quests[quest_id] = quest
 	print("[QuestManager] Quest STARTED: id='%s', title='%s', turn_in_type=%s, turn_in_target='%s', turn_in_zone='%s'" % [
 		quest.id, quest.title, quest.turn_in_type, quest.turn_in_target, quest.turn_in_zone
 	])
 	quest_started.emit(quest_id)
+
+	# Execute spawn_on_accept spawns (chests, camps, etc.)
+	if template.spawn_on_accept.size() > 0:
+		_execute_spawn_on_accept(quest)
+
+	# Give starter items to player
+	if template.starter_items.size() > 0:
+		_give_starter_items(template.starter_items, quest.title)
 
 	# Auto-track newly started quests (or if no quest is currently tracked)
 	if tracked_quest_id.is_empty():
@@ -273,6 +435,208 @@ func start_quest(quest_id: String) -> bool:
 	_cache_objective_locations(quest_id)
 
 	return true
+
+
+## Give starter items to player when quest begins
+func _give_starter_items(items: Array[Dictionary], quest_title: String) -> void:
+	if not InventoryManager:
+		push_warning("[QuestManager] InventoryManager not available for starter items")
+		return
+
+	for item_entry: Dictionary in items:
+		var item_id: String = item_entry.get("id", "")
+		var quantity: int = item_entry.get("quantity", 1)
+
+		if item_id.is_empty():
+			continue
+
+		# Try to add the item to inventory
+		var success: bool = InventoryManager.add_item(item_id, quantity)
+		if success:
+			print("[QuestManager] Gave starter item: %s x%d for quest '%s'" % [item_id, quantity, quest_title])
+
+			# Show notification to player
+			var item_name: String = InventoryManager.get_item_name(item_id)
+			if item_name.is_empty():
+				item_name = item_id
+			var hud := get_tree().get_first_node_in_group("hud")
+			if hud and hud.has_method("show_notification"):
+				hud.show_notification("Received: %s x%d" % [item_name, quantity])
+		else:
+			push_warning("[QuestManager] Failed to give starter item: %s" % item_id)
+
+
+# =============================================================================
+# SPAWN ON ACCEPT (Quest Chests and Camps)
+# =============================================================================
+
+## Active quest spawns: quest_id -> Array[Node] (spawned objects to cleanup on quest fail/abandon)
+var _quest_spawns: Dictionary = {}
+
+## Execute spawn_on_accept entries when quest starts
+func _execute_spawn_on_accept(quest: Quest) -> void:
+	if quest.spawn_on_accept.is_empty():
+		return
+
+	var spawned_nodes: Array[Node] = []
+
+	for spawn: Dictionary in quest.spawn_on_accept:
+		var spawn_type: String = spawn.get("type", "")
+
+		match spawn_type:
+			"chest":
+				var node: Node = _spawn_quest_chest(spawn, quest.id)
+				if node:
+					spawned_nodes.append(node)
+			"hostage":
+				var node: Node = _spawn_quest_hostage(spawn, quest.id)
+				if node:
+					spawned_nodes.append(node)
+			"camp":
+				# Future: spawn bandit camp instance
+				print("[QuestManager] Camp spawning not yet implemented for quest: %s" % quest.id)
+			_:
+				push_warning("[QuestManager] Unknown spawn type: %s" % spawn_type)
+
+	if spawned_nodes.size() > 0:
+		_quest_spawns[quest.id] = spawned_nodes
+		print("[QuestManager] Spawned %d objects for quest '%s'" % [spawned_nodes.size(), quest.id])
+
+
+## Spawn a quest-specific chest at the designated location
+func _spawn_quest_chest(spawn_data: Dictionary, quest_id: String) -> Node:
+	var location: String = spawn_data.get("location", "")
+	var coords_arr: Array = spawn_data.get("coords", [])
+	var contains: Array = spawn_data.get("contains", [])
+	var loot_tier_str: String = spawn_data.get("loot_tier", "common")
+
+	# Calculate world position
+	var world_pos: Vector3 = Vector3.ZERO
+
+	if coords_arr.size() >= 3:
+		# Direct world coordinates
+		world_pos = Vector3(coords_arr[0], coords_arr[1], coords_arr[2])
+	elif not location.is_empty():
+		# Get position from location ID
+		var loc_coords: Vector2i = WorldGrid.get_location_coords(location)
+		if loc_coords != Vector2i.ZERO or location == "elder_moor":
+			world_pos = WorldGrid.cell_to_world(loc_coords)
+			# Add some random offset within the cell
+			world_pos += Vector3(randf_range(-30, 30), 0, randf_range(-30, 30))
+
+	if world_pos == Vector3.ZERO:
+		push_warning("[QuestManager] Could not determine position for quest chest in quest: %s" % quest_id)
+		return null
+
+	# Spawn the chest using our QuestChest class
+	var chest_scene_path: String = "res://scripts/world/quest_chest.gd"
+	var chest: Node3D = null
+
+	# Use regular Chest class with quest tagging
+	chest = Chest.spawn_chest(
+		get_tree().current_scene,
+		world_pos,
+		"Quest Chest",
+		false,  # Not locked by default
+		0,
+		false,  # Not persistent (disappears when emptied or quest fails)
+		"quest_chest_%s" % quest_id
+	)
+
+	if not chest:
+		push_warning("[QuestManager] Failed to spawn quest chest for quest: %s" % quest_id)
+		return null
+
+	# Add quest-specific contents
+	for item_id: Variant in contains:
+		if item_id is String:
+			chest.add_item(item_id as String, 1, Enums.ItemQuality.AVERAGE)
+
+	# Add random loot based on tier
+	var tier: LootTables.LootTier = _parse_loot_tier(loot_tier_str)
+	chest.setup_with_loot(tier)
+
+	# Tag the chest with quest_id for cleanup
+	chest.set_meta("quest_id", quest_id)
+	chest.add_to_group("quest_spawns")
+
+	print("[QuestManager] Spawned quest chest at %s for quest '%s'" % [world_pos, quest_id])
+	return chest
+
+
+## Spawn a quest-specific hostage at the designated location
+func _spawn_quest_hostage(spawn_data: Dictionary, quest_id: String) -> Node:
+	var location: String = spawn_data.get("location", "")
+	var coords_arr: Array = spawn_data.get("coords", [])
+	var hostage_id: String = spawn_data.get("hostage_id", "hostage")
+	var hostage_name: String = spawn_data.get("name", "Hostage")
+	var objective_id: String = spawn_data.get("objective_id", "")
+
+	# Calculate world position
+	var world_pos: Vector3 = Vector3.ZERO
+
+	if coords_arr.size() >= 3:
+		# Direct world coordinates
+		world_pos = Vector3(coords_arr[0], coords_arr[1], coords_arr[2])
+	elif not location.is_empty():
+		# Get position from location ID
+		var loc_coords: Vector2i = WorldGrid.get_location_coords(location)
+		if loc_coords != Vector2i.ZERO or location == "elder_moor":
+			world_pos = WorldGrid.cell_to_world(loc_coords)
+			# Add some random offset within the cell (but closer to center)
+			world_pos += Vector3(randf_range(-15, 15), 0, randf_range(-15, 15))
+
+	if world_pos == Vector3.ZERO:
+		push_warning("[QuestManager] Could not determine position for hostage in quest: %s" % quest_id)
+		return null
+
+	# Spawn the hostage using HostageNPC
+	var hostage: Node = HostageNPC.spawn_hostage(
+		get_tree().current_scene,
+		world_pos,
+		hostage_id,
+		hostage_name,
+		quest_id,
+		objective_id
+	)
+
+	if not hostage:
+		push_warning("[QuestManager] Failed to spawn hostage for quest: %s" % quest_id)
+		return null
+
+	# Tag the hostage with quest_id for cleanup
+	hostage.set_meta("quest_id", quest_id)
+	hostage.add_to_group("quest_spawns")
+
+	print("[QuestManager] Spawned hostage '%s' at %s for quest '%s'" % [hostage_name, world_pos, quest_id])
+	return hostage
+
+
+## Parse loot tier string to enum
+func _parse_loot_tier(tier_str: String) -> LootTables.LootTier:
+	match tier_str.to_lower():
+		"junk": return LootTables.LootTier.JUNK
+		"common": return LootTables.LootTier.COMMON
+		"uncommon": return LootTables.LootTier.UNCOMMON
+		"rare": return LootTables.LootTier.RARE
+		"epic": return LootTables.LootTier.EPIC
+		"legendary": return LootTables.LootTier.LEGENDARY
+		_: return LootTables.LootTier.COMMON
+
+
+## Cleanup spawned objects when quest fails or is abandoned
+func _cleanup_quest_spawns(quest_id: String) -> void:
+	if not _quest_spawns.has(quest_id):
+		return
+
+	var spawns: Array = _quest_spawns[quest_id]
+	for node: Variant in spawns:
+		if node is Node and is_instance_valid(node):
+			(node as Node).queue_free()
+
+	_quest_spawns.erase(quest_id)
+	print("[QuestManager] Cleaned up spawns for quest '%s'" % quest_id)
+
 
 # =============================================================================
 # OBJECTIVE LOCATION CACHING (for navigation/compass)
@@ -315,7 +679,14 @@ func _resolve_objective_location(obj: Objective) -> Dictionary:
 		"collect":
 			return _resolve_item_location(obj.target)
 		"talk":
-			return _resolve_npc_location(obj.target)
+			# First try to find NPC locally
+			var npc_loc: Dictionary = _resolve_npc_location(obj.target)
+			if not npc_loc.is_empty():
+				return npc_loc
+			# If NPC not found and target_zone is specified, use zone location
+			if obj.target_zone != "":
+				return _resolve_zone_location(obj.target_zone)
+			return {}
 		"reach":
 			return _resolve_zone_location(obj.target)
 		"interact":
@@ -486,6 +857,11 @@ func update_progress(objective_type: String, target: String, amount: int = 1) ->
 			if obj.is_completed:
 				continue
 			if obj.type == objective_type and obj.target == target:
+				# For "talk" objectives, check if all prior required objectives are complete
+				# This prevents "return to NPC" objectives from completing immediately
+				if objective_type == "talk" and not are_prior_objectives_complete(quest, obj):
+					continue
+
 				obj.current_count += amount
 				quest_updated.emit(quest_id, obj.id)
 
@@ -498,6 +874,23 @@ func update_progress(objective_type: String, target: String, amount: int = 1) ->
 
 		# Check if quest is complete
 		_check_quest_completion(quest_id)
+
+
+## Check if all objectives before a given objective are complete
+## Used to prevent "return to NPC" talk objectives from completing too early
+## Made public so ConversationSystem can access it for talk objective dialogue
+func are_prior_objectives_complete(quest: Quest, target_obj: Objective) -> bool:
+	for obj in quest.objectives:
+		# If we've reached the target objective, all prior objectives are complete
+		if obj.id == target_obj.id:
+			return true
+		# Skip optional objectives
+		if obj.is_optional:
+			continue
+		# If any prior required objective is incomplete, return false
+		if not obj.is_completed:
+			return false
+	return true
 
 ## Track enemy kill
 func on_enemy_killed(enemy_id: String) -> void:
@@ -585,10 +978,30 @@ func complete_quest(quest_id: String) -> void:
 		for item in quest.rewards["items"]:
 			InventoryManager.add_item(item["id"], item.get("quantity", 1))
 
+	# Apply faction reputation rewards
+	if quest.rewards.has("faction_reputation"):
+		var rep_changes: Dictionary = quest.rewards["faction_reputation"]
+		for faction_id: Variant in rep_changes:
+			var amount: int = rep_changes[faction_id]
+			if FactionManager:
+				FactionManager.modify_reputation(faction_id as String, amount, "completed quest: %s" % quest.title)
+				print("[QuestManager] Applied +%d reputation to %s for completing '%s'" % [amount, faction_id, quest.title])
+
 	quest_completed.emit(quest_id)
+
+	# Set bounty cooldown if applicable
+	if quest.cooldown_days > 0:
+		_set_bounty_cooldown(quest_id, quest.cooldown_days)
 
 	# Clear cached objective locations
 	_clear_objective_locations(quest_id)
+
+	# Cleanup any quest spawns (chests collected, etc.)
+	_cleanup_quest_spawns(quest_id)
+
+	# Remove from active quests so it can be taken again after cooldown
+	if quest.cooldown_days > 0:
+		quests.erase(quest_id)
 
 	# Handle quest chain - auto-start next quest if specified
 	var next_quest_id: String = quest.next_quest
@@ -616,17 +1029,45 @@ func _start_chain_quest(quest_id: String) -> void:
 		set_tracked_quest(quest_id)
 
 ## Fail a quest
-func fail_quest(quest_id: String) -> void:
+## reason: optional string indicating why (e.g., "temptation" for selling/equipping quest item)
+func fail_quest(quest_id: String, reason: String = "") -> void:
 	if not quests.has(quest_id):
 		return
 
 	var quest: Quest = quests[quest_id]
+	if quest.state != Enums.QuestState.ACTIVE:
+		return
+
 	quest.state = Enums.QuestState.FAILED
+	print("[QuestManager] Quest FAILED: id='%s', title='%s', reason='%s'" % [quest_id, quest.title, reason])
+
+	# Apply negative faction reputation for failing
+	if not quest.faction.is_empty() and FactionManager:
+		var rep_loss: int = -20  # Default reputation loss
+		if reason == "temptation":
+			rep_loss = -25  # Extra penalty for betrayal
+		FactionManager.modify_reputation(quest.faction, rep_loss, "failed quest: %s" % quest.title)
+		print("[QuestManager] Applied %d reputation to %s for failing '%s'" % [rep_loss, quest.faction, quest.title])
+
+		# Set betrayal flag if failed via temptation
+		if reason == "temptation" and DialogueManager:
+			DialogueManager.set_dialogue_flag("betrayed_%s" % quest.faction, true)
 
 	# Clear cached objective locations
 	_clear_objective_locations(quest_id)
 
+	# Cleanup quest spawns (chests, etc.)
+	_cleanup_quest_spawns(quest_id)
+
 	quest_failed.emit(quest_id)
+
+	# Show notification
+	var hud := get_tree().get_first_node_in_group("hud")
+	if hud and hud.has_method("show_notification"):
+		if reason == "temptation":
+			hud.show_notification("Quest Failed: You kept or sold a quest item!")
+		else:
+			hud.show_notification("Quest Failed: %s" % quest.title)
 
 ## Get active quests
 func get_active_quests() -> Array[Quest]:
@@ -683,6 +1124,80 @@ func get_tracked_quest() -> Quest:
 ## Get the tracked quest ID
 func get_tracked_quest_id() -> String:
 	return tracked_quest_id
+
+
+## Get all active kill objective targets (enemy IDs to mark on compass/minimap)
+## Returns Array of dictionaries: [{target: String, quest_id: String, is_main: bool, remaining: int}]
+func get_active_kill_targets() -> Array[Dictionary]:
+	var targets: Array[Dictionary] = []
+	for quest_id: String in quests:
+		var quest: Quest = quests[quest_id]
+		if quest.state != Enums.QuestState.ACTIVE:
+			continue
+
+		for obj in quest.objectives:
+			if obj.type == "kill" and not obj.is_completed:
+				targets.append({
+					"target": obj.target,
+					"quest_id": quest_id,
+					"is_main": quest.is_main_quest,
+					"remaining": obj.required_count - obj.current_count
+				})
+	return targets
+
+
+## Check if an enemy ID matches any active kill objective target
+## Returns Dictionary with match info or empty if no match
+func is_enemy_quest_target(enemy_id: String) -> Dictionary:
+	var kill_targets: Array[Dictionary] = get_active_kill_targets()
+	for target_info: Dictionary in kill_targets:
+		var target: String = target_info["target"]
+		# Match exact ID or prefix (e.g., "cultist" matches "cultist_mage")
+		if enemy_id == target or enemy_id.begins_with(target + "_") or target == enemy_id.split("_")[0]:
+			return target_info
+	return {}
+
+
+## Check if a bounty is currently on cooldown
+func is_bounty_on_cooldown(quest_id: String) -> bool:
+	if not bounty_cooldowns.has(quest_id):
+		return false
+	var current_day: int = _get_current_game_day()
+	var available_day: int = bounty_cooldowns[quest_id]
+	return current_day < available_day
+
+
+## Get the day when a bounty becomes available again
+func get_bounty_available_day(quest_id: String) -> int:
+	return bounty_cooldowns.get(quest_id, 0)
+
+
+## Set cooldown for a bounty after completion
+func _set_bounty_cooldown(quest_id: String, cooldown_days: int) -> void:
+	var current_day: int = _get_current_game_day()
+	var available_day: int = current_day + cooldown_days
+	bounty_cooldowns[quest_id] = available_day
+	print("[QuestManager] Bounty '%s' on cooldown until day %d (current day: %d)" % [quest_id, available_day, current_day])
+
+
+## Get current in-game day from GameManager
+func _get_current_game_day() -> int:
+	if GameManager:
+		return GameManager.current_day
+	return 0
+
+
+## Get all available bounties (not on cooldown, not active)
+func get_available_bounties() -> Array[String]:
+	var available: Array[String] = []
+	for quest_id: String in quest_database:
+		var template: Quest = quest_database[quest_id]
+		# Check if it's a bounty (has cooldown set)
+		if template.cooldown_days > 0:
+			# Not already active and not on cooldown
+			if not quests.has(quest_id) and not is_bounty_on_cooldown(quest_id):
+				available.append(quest_id)
+	return available
 
 
 ## Get current progress for a specific objective
@@ -1091,6 +1606,10 @@ func _set_objective_destination(nav: QuestNavigation, quest: Quest) -> void:
 				var npc_pos: Vector3 = _find_npc_position(obj.target)
 				if npc_pos != Vector3.ZERO:
 					nav.destination_position = npc_pos
+				elif obj.target_zone != "":
+					# NPC not in current scene - use target zone for navigation
+					nav.destination_zone = obj.target_zone
+					nav.destination_name = obj.description
 
 			"reach":
 				# Find location marker
@@ -1227,7 +1746,8 @@ func _find_location_position(location_id: String) -> Vector3:
 func to_dict() -> Dictionary:
 	var data := {
 		"tracked_quest_id": tracked_quest_id,
-		"quests": {}
+		"quests": {},
+		"bounty_cooldowns": bounty_cooldowns.duplicate()
 	}
 	for quest_id in quests:
 		var quest: Quest = quests[quest_id]
@@ -1259,6 +1779,9 @@ func to_dict() -> Dictionary:
 ## Deserialize from save
 func from_dict(data: Dictionary) -> void:
 	quests.clear()
+
+	# Restore bounty cooldowns
+	bounty_cooldowns = data.get("bounty_cooldowns", {}).duplicate()
 
 	# Handle both old format (quest_id -> data) and new format ({tracked_quest_id, quests})
 	var quests_data: Dictionary = data.get("quests", data)  # Fallback to old format
@@ -1304,6 +1827,7 @@ func from_dict(data: Dictionary) -> void:
 			obj.description = t_obj.description
 			obj.type = t_obj.type
 			obj.target = t_obj.target
+			obj.target_zone = t_obj.target_zone
 			obj.required_count = t_obj.required_count
 			obj.is_optional = t_obj.is_optional
 

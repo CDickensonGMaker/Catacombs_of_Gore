@@ -3,8 +3,8 @@
 [ext_resource type="Script" path="res://scripts/levels/riverside_village.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
-[ext_resource type="Texture2D" path="res://Sprite folders grab bag/cat_animiation.png" id="4"]
-[ext_resource type="Texture2D" path="res://Sprite folders grab bag/cow animiation.png" id="5"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/animals/cat_animiation.png" id="4"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/animals/cow_animiation.png" id="5"]
 
 [sub_resource type="Environment" id="Environment_village"]
 background_mode = 2

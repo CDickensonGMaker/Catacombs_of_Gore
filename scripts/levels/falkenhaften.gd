@@ -8,12 +8,18 @@
 extends Node3D
 
 const ZONE_ID := "capital_falkenhafen"
+const TOWN_AMBIENT_PATH := "res://assets/audio/Ambiance/towns/town_murmur_medieval_mix_60s_ps1_retro.wav"
 
 @onready var nav_region: NavigationRegion3D = $NavigationRegion3D
 
 
 func _ready() -> void:
 	SaveManager.set_current_zone(ZONE_ID, "Falkenhaften Capital")
+	# Play town ambient sound (only when main scene)
+	var is_main_scene: bool = get_node_or_null("Player") != null
+	if is_main_scene:
+		AudioManager.play_ambient(TOWN_AMBIENT_PATH)
+		AudioManager.play_zone_music("village")
 
 	_setup_spawn_point_metadata()
 	_spawn_merchants()
@@ -31,7 +37,11 @@ func _ready() -> void:
 
 ## Setup dynamic day/night lighting
 func _setup_day_night_cycle() -> void:
-	DayNightCycle.add_to_level(self)
+	# Only setup day/night lighting when this is the main scene (has Player node)
+	# When loaded as a streamed cell, CellStreamer strips lighting to prevent doubling
+	var is_main_scene: bool = get_node_or_null("Player") != null
+	if is_main_scene:
+		DayNightCycle.add_to_level(self)
 
 
 ## Setup spawn point metadata for pre-placed Marker3D nodes

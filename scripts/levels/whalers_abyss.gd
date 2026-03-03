@@ -26,7 +26,11 @@ func _ready() -> void:
 	_spawn_interactables()
 	_spawn_doors()
 	_setup_navigation()
-	DayNightCycle.add_to_level(self)
+	# Only setup day/night lighting when this is the main scene (has Player node)
+	# When loaded as a streamed cell, CellStreamer strips lighting to prevent doubling
+	var is_main_scene: bool = get_node_or_null("Player") != null
+	if is_main_scene:
+		DayNightCycle.add_to_level(self)
 	print("[Whalers Abyss] Chasm town loaded (Multi-level)")
 
 

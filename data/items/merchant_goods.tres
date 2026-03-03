@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "merchant_goods"
+display_name = "Recovered Trade Goods"
+description = "Trade goods recovered from the wrecked caravan near Willow Dale. Though damaged, these bolts of cloth and sealed jars of spices still hold value."
+item_type = 2
+is_stackable = true
+max_stack = 3
+shop_bundle_size = 1
+consumable_effect = 0
+effect_value = Array[int]([0, 0, 0])
+effect_duration = 0.0
+effect_percent = 0.0
+teaches_spell_id = ""
+requires_literacy = false
+literacy_dc = 10
+repair_amount = 0
+repairs_quality = false
+base_value = 0
+weight = 3.0
+icon_path = ""
+mesh_path = ""
+use_sound = ""

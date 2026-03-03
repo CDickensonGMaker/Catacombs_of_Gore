@@ -1,7 +1,7 @@
 {
 	"id": "tharins_message",
 	"title": "A Message for Thornfield",
-	"description": "Tharin Ironbeard has asked you to deliver a message to Elder Vorn in Thornfield. The message concerns timber shipments and trade agreements between the two settlements. A simple errand, but one that will help Tharin see if you can be trusted with more important tasks.",
+	"description": "Tharin Ironbeard has asked you to deliver a message to Elder Vorn in Thornfield. The message concerns timber shipments and trade agreements between the two settlements. A simple errand, but one that will help Tharin see if you can be trusted with more important tasks. Return to Tharin after delivering the message.",
 	"is_main_quest": true,
 	"quest_source": "story",
 	"giver_npc_id": "tharin_ironbeard",
@@ -21,11 +21,18 @@
 			"type": "talk",
 			"target": "elder_vorn_thornfield",
 			"required_count": 1
+		},
+		{
+			"id": "return_tharin",
+			"description": "Return to Tharin Ironbeard",
+			"type": "talk",
+			"target": "tharin_ironbeard",
+			"required_count": 1
 		}
 	],
 	"turn_in_type": "npc_specific",
-	"turn_in_target": "elder_vorn_thornfield",
-	"turn_in_zone": "thornfield",
+	"turn_in_target": "tharin_ironbeard",
+	"turn_in_zone": "elder_moor",
 	"rewards": {
 		"gold": 25,
 		"xp": 50,

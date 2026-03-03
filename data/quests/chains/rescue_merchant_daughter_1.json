@@ -1,0 +1,32 @@
+{
+	"id": "rescue_merchant_daughter_1",
+	"title": "Find the Kidnappers",
+	"description": "The merchant's daughter has been kidnapped by bandits. They demand a ransom, but the merchant has asked you to rescue her instead. Find their camp to the north.",
+	"is_main_quest": false,
+	"quest_source": "npc",
+	"giver_npc_id": "dalhurst_merchant",
+	"giver_npc_type": "merchant",
+	"giver_region": "dalhurst",
+	"faction": "merchants_guild",
+	"objectives": [
+		{
+			"id": "find_camp",
+			"description": "Find the bandit camp north of Dalhurst",
+			"type": "reach",
+			"target": "bandit_camp_north",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 0,
+		"xp": 75,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": [],
+	"next_quest": "rescue_merchant_daughter_2",
+	"spawn_on_accept": []
+}

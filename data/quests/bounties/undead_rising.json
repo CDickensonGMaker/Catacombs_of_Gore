@@ -1,0 +1,41 @@
+{
+	"id": "bounty_undead_rising",
+	"title": "Undead Rising",
+	"description": "Skeletons have been rising from graves near Willow Dale. A cursed totem appears to be the source of the dark magic. Destroy the totem and put the dead back to rest.",
+	"is_main_quest": false,
+	"quest_source": "bounty",
+	"giver_npc_id": "bounty_board",
+	"giver_npc_type": "bounty_board",
+	"giver_region": "elder_moor",
+	"faction": "common_folk",
+	"objectives": [
+		{
+			"id": "kill_skeletons",
+			"description": "Destroy the risen skeletons",
+			"type": "kill",
+			"target": "skeleton_shade",
+			"required_count": 5
+		},
+		{
+			"id": "destroy_totem",
+			"description": "Destroy the cursed totem",
+			"type": "interact",
+			"target": "cursed_totem",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "bounty_board",
+	"turn_in_target": "bounty_board",
+	"turn_in_zone": "elder_moor",
+	"rewards": {
+		"gold": 150,
+		"xp": 350,
+		"items": [],
+		"faction_reputation": {
+			"common_folk": 25
+		}
+	},
+	"cooldown_days": 5,
+	"prerequisites": [],
+	"next_quest": ""
+}

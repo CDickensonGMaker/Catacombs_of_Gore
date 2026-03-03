@@ -1,0 +1,54 @@
+{
+	"id": "market_theft_2",
+	"title": "Track the Thief",
+	"description": "The witness saw someone suspicious heading toward the Darkwood Grove. Track them down and recover the stolen goods.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "merchants_guild",
+	"objectives": [
+		{
+			"id": "find_thief",
+			"description": "Track the thief to Darkwood Grove",
+			"type": "reach",
+			"target": "darkwood_grove",
+			"required_count": 1
+		},
+		{
+			"id": "kill_thief",
+			"description": "Defeat the thief (or their accomplices)",
+			"type": "kill",
+			"target": "human_bandit",
+			"required_count": 2
+		},
+		{
+			"id": "recover_goods",
+			"description": "Recover the stolen goods",
+			"type": "collect",
+			"target": "stolen_goods",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 0,
+		"xp": 150,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": ["market_theft_1"],
+	"next_quest": "market_theft_3",
+	"spawn_on_accept": [
+		{
+			"type": "chest",
+			"location": "darkwood_grove",
+			"coords": [-280, 0, 520],
+			"contains": ["stolen_goods"],
+			"loot_tier": "uncommon"
+		}
+	]
+}

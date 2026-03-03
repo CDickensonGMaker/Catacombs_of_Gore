@@ -23,7 +23,11 @@ func _ready() -> void:
 	_spawn_enemies()
 	_spawn_chests()
 	_setup_light_effects()
-	DayNightCycle.add_to_level(self)
+	# Only setup day/night lighting when this is the main scene (has Player node)
+	# When loaded as a streamed cell, CellStreamer strips lighting to prevent doubling
+	var is_main_scene: bool = get_node_or_null("Player") != null
+	if is_main_scene:
+		DayNightCycle.add_to_level(self)
 	print("[Kings Watch] Ancient ruins loaded (Zone size: %dx%d)" % [ZONE_SIZE, ZONE_SIZE])
 
 
@@ -119,8 +123,8 @@ func _spawn_enemies() -> void:
 		enemies_container.name = "Enemies"
 		add_child(enemies_container)
 
-	var skeleton_texture: Texture2D = load("res://Sprite folders grab bag/skeleton_warrior.png")
-	var bandit_texture: Texture2D = load("res://Sprite folders grab bag/bandit.png")
+	var skeleton_texture: Texture2D = load("res://assets/sprites/enemies/undead/skeleton_warrior.png")
+	var bandit_texture: Texture2D = load("res://assets/sprites/enemies/humanoid/human_bandit_alt.png")
 
 	var enemy_count: int = 0
 	for child in enemy_spawn_points.get_children():

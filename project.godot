@@ -50,6 +50,7 @@ PostProcess="*res://scripts/autoload/post_process.gd"
 EnchantmentManager="*res://scripts/autoload/enchantment_manager.gd"
 SpellCreator="*res://scripts/autoload/spell_creator.gd"
 TournamentManager="*res://scripts/autoload/tournament_manager.gd"
+ActorRegistry="*res://scripts/autoload/actor_registry.gd"
 
 [display]
 

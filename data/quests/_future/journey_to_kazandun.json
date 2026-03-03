@@ -1,0 +1,38 @@
+{
+	"id": "journey_to_kazandun",
+	"title": "Journey to Kazan-Dun",
+	"description": "Aldric Vane has asked you to investigate troubling reports from Kazan-Dun, the great dwarven hold in the southern mountains. The dwarves have gone silent, and dark rumors speak of goblin incursions into their halls. Travel south through the wilderness to find Kazan-Dun and see what you can learn.",
+	"is_main_quest": true,
+	"quest_source": "story",
+	"giver_npc_id": "aldric_vane",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "dalhurst",
+	"objectives": [
+		{
+			"id": "travel_south",
+			"description": "Travel south through the wilderness toward the mountains",
+			"type": "reach",
+			"target": "kazer_dun_entrance",
+			"required_count": 1
+		},
+		{
+			"id": "investigate_entrance",
+			"description": "Investigate the entrance to Kazan-Dun",
+			"type": "interact",
+			"target": "kazandun_entrance_gate",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "kazer_dun_entrance",
+	"rewards": {
+		"gold": 0,
+		"xp": 250,
+		"items": []
+	},
+	"prerequisites": ["keepers_letter_delivery"],
+	"next_quest": null,
+	"demo_endpoint": true,
+	"demo_message": "The great gates of Kazan-Dun loom before you, scarred by battle. Whatever happened here, the full story awaits in the depths below... Coming in the full game."
+}

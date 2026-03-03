@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="EnchantmentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enchantment_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "greater_flame"
+display_name = "Greater Flame"
+description = "Adds significant fire damage to attacks."
+enchantment_type = 0
+effect_value = 8
+damage_type = 1
+stat_type = 0
+inflicts_condition = 0
+proc_chance = 0.0
+condition_duration = 0.0
+min_soulstone_tier = 3
+required_arcana = 5
+gold_cost = 400
+applicable_slots = ["weapon"]
+glow_color = Color(1, 0.3, 0.1, 1)

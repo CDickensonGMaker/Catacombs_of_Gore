@@ -22,8 +22,8 @@ const RESPAWN_TIME := 300.0  # 5 minutes in-game
 
 ## Barren bush textures (shown after harvesting)
 const BARREN_BUSH_TEXTURES := [
-	"res://Sprite folders grab bag/barren_bush.png",
-	"res://Sprite folders grab bag/barren_bush2.png"
+	"res://assets/sprites/environment/trees/barren_bush.png",
+	"res://assets/sprites/environment/trees/barren_bush2.png"
 ]
 
 ## Plant type definitions with weights and textures
@@ -34,32 +34,32 @@ const PLANT_TYPES: Array[Dictionary] = [
 		"name": "Red Herb",
 		"yield": 1,
 		"weight": 0.45,  # 45%
-		"fresh_texture": "res://Sprite folders grab bag/herb_bush2.png",
-		"harvested_texture": "res://Sprite folders grab bag/herb_bush_picked2.png"
+		"fresh_texture": "res://assets/sprites/environment/trees/herb_bush2.png",
+		"harvested_texture": "res://assets/sprites/environment/trees/herb_bush_picked2.png"
 	},
 	{
 		"id": "wild_berry",
 		"name": "Wild Berry Bush",
 		"yield": 1,
 		"weight": 0.25,  # 25%
-		"fresh_texture": "res://Sprite folders grab bag/autmun bush.png",
-		"harvested_texture": "res://Sprite folders grab bag/barren_bush.png"
+		"fresh_texture": "res://assets/sprites/environment/trees/autumn_bush.png",
+		"harvested_texture": "res://assets/sprites/environment/trees/barren_bush.png"
 	},
 	{
 		"id": "blue_flower",
 		"name": "Blue Flower",
 		"yield": 1,
 		"weight": 0.20,  # 20%
-		"fresh_texture": "res://Sprite folders grab bag/herb_bush2.png",
-		"harvested_texture": "res://Sprite folders grab bag/herb_bush_picked2.png"
+		"fresh_texture": "res://assets/sprites/environment/trees/herb_bush2.png",
+		"harvested_texture": "res://assets/sprites/environment/trees/herb_bush_picked2.png"
 	},
 	{
 		"id": "mushroom",
 		"name": "Mushroom",
 		"yield": 1,
 		"weight": 0.10,  # 10%
-		"fresh_texture": "res://Sprite folders grab bag/autmun bush.png",
-		"harvested_texture": "res://Sprite folders grab bag/barren_bush2.png"
+		"fresh_texture": "res://assets/sprites/environment/ground/mushroom.png",
+		"harvested_texture": "res://assets/sprites/environment/ground/mushroom.png"  # Mushroom disappears when picked (same texture, just hides)
 	}
 ]
 
@@ -125,7 +125,7 @@ func _get_plant_texture() -> String:
 			return plant_def["fresh_texture"]
 
 	# Fallback to autumn bush
-	return "res://Sprite folders grab bag/autmun bush.png"
+	return "res://assets/sprites/environment/trees/autumn_bush.png"
 
 
 ## Get harvested texture for current plant type

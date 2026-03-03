@@ -23,8 +23,8 @@ extends Resource
 @export var spawner_zones: Array[Vector3] = []  # For EnemySpawner totems
 
 ## Enemy configuration
-@export var min_enemies: int = 0
-@export var max_enemies: int = 3
+@export var min_enemies: int = 1  # Increased for demo
+@export var max_enemies: int = 5  # Increased for demo
 @export var enemy_data_paths: Array[String] = []  # Paths to .tres enemy data files
 @export var enemy_sprite_paths: Array[String] = []  # Matching sprite paths (empty = mesh enemy)
 @export var enemy_h_frames: Array[int] = []  # Sprite sheet columns

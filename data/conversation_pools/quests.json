@@ -1,5 +1,62 @@
 {
   "pool_id": "quests",
+  "talk_objective_responses": [
+    {
+      "response_id": "talk_obj_message_received",
+      "text": "Ah, thank you for bringing this to me. You've done well.",
+      "context_keywords": ["deliver", "message", "letter"],
+      "weight": 1.0
+    },
+    {
+      "response_id": "talk_obj_report_received",
+      "text": "I see. Thank you for the report. This information is valuable.",
+      "context_keywords": ["report", "news", "inform"],
+      "weight": 1.0
+    },
+    {
+      "response_id": "talk_obj_generic",
+      "text": "Very good. I appreciate you taking the time to speak with me about this.",
+      "context_keywords": [],
+      "weight": 0.5
+    }
+  ],
+  "quest_turnin_responses": {
+    "merchant": [
+      "The job's done then? Excellent work. Here's your payment - earned fair and square.",
+      "Ah, you've returned! And successful too. Business is always better when contracts get fulfilled.",
+      "Well handled, friend. Take your coin and know you've earned a good reputation here."
+    ],
+    "guard": [
+      "Report acknowledged. The watch appreciates your service to the realm.",
+      "Good. This matter is now resolved. The guard captain will be pleased.",
+      "Duty fulfilled. You've done the right thing. Here's your reward."
+    ],
+    "scholar": [
+      "Fascinating! You've succeeded where others failed. I shall make note of this for my research.",
+      "The task is complete? Excellent. Knowledge gained through action is knowledge well-earned.",
+      "Most illuminating. You've proven quite capable. Accept this with my gratitude."
+    ],
+    "priest": [
+      "The gods smile upon your deeds this day. Accept their blessing along with this reward.",
+      "You've done holy work, friend. May this payment serve you well in your continued devotion.",
+      "Blessings upon you. The faithful are grateful for your service to the community."
+    ],
+    "innkeeper": [
+      "Ha! Knew you'd come through. Drinks are on the house tonight, and here's your payment.",
+      "Back in one piece! That's always a relief. Here's what I owe you, with thanks.",
+      "Well done! The regulars will be glad to hear it. Take your coin and rest your feet."
+    ],
+    "farmer": [
+      "You've done right by us. It's not much, but here's what we promised.",
+      "The fields are safer now thanks to you. Take this with our humble gratitude.",
+      "Honest work deserves honest pay. You've earned every coin of this."
+    ],
+    "default": [
+      "You've done well. The task is complete.",
+      "Good work. Here's what was promised.",
+      "The job's finished then. Take your reward with my thanks."
+    ]
+  },
   "responses": [
     {
       "response_id": "quest_hostile_1",

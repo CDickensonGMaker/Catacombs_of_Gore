@@ -532,7 +532,7 @@ The usual mountain route toward Duncaster is blocked by a rockslide. Thrain need
 - **Horror Check:** 14+ (in groups of 3+)
 - **Movement:** 9
 - **Stats:** Grit 12, Agility 13, Vitality 12, Will 7
-- **Weapon:** Emperor Alric's Longsword +3 (3d6+3 damage)
+- **Weapon:** Emperor Valdric's Longsword +3 (3d6+3 damage)
 - **To Hit:** Melee +19, Ranged +17
 - **Skills:** Leadership 11, Endurance 12
 - **Personality:** Cunning, terrified of magic (refuses to use it)
@@ -590,7 +590,7 @@ The usual mountain route toward Duncaster is blocked by a rockslide. Thrain need
 - **Crafter:** Tormek GrimmForgehands
 - **Purpose:** Required for ancient rite of power succession
 
-### Emperor Alric's Longsword +3
+### Emperor Valdric's Longsword +3
 - **Type:** Legendary Weapon
 - **Current Owner:** Grukthak
 - **Stats:** +3 to hit, 3d6+3 damage

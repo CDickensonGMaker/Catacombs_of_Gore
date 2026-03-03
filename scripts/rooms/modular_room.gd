@@ -249,11 +249,22 @@ func _process_enemy_markers() -> void:
 ## Spawn an enemy from marker metadata
 func _spawn_enemy_from_marker(marker: Node3D) -> Node:
 	var enemy_data_path: String = marker.get_meta("enemy_data", "res://data/enemies/human_bandit.tres")
+	var enemy_type: String = marker.get_meta("enemy_type", "human_bandit")
+
+	# Default values from marker metadata
 	var sprite_path: String = marker.get_meta("sprite_path", "res://assets/sprites/enemies/human_bandit.png")
-	var h_frames: int = marker.get_meta("h_frames", 3)
+	var h_frames: int = marker.get_meta("h_frames", 1)
 	var v_frames: int = marker.get_meta("v_frames", 1)
 	var patrol_radius: float = marker.get_meta("patrol_radius", 0.0)
 	var aggro_range: float = marker.get_meta("aggro_range", 10.0)
+
+	# Check ActorRegistry for Zoo patches
+	if ActorRegistry:
+		var sprite_config: Dictionary = ActorRegistry.get_sprite_config(enemy_type)
+		if not sprite_config.is_empty():
+			sprite_path = sprite_config.get("sprite_path", sprite_path)
+			h_frames = sprite_config.get("h_frames", h_frames)
+			v_frames = sprite_config.get("v_frames", v_frames)
 
 	# Generate persistent ID for save/load
 	var enemy_id: String = marker.get_meta("enemy_id", "%s_%s" % [room_id, marker.name])

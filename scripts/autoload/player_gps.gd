@@ -47,9 +47,25 @@ var registered_npcs: Dictionary = {}
 
 
 func _ready() -> void:
-	# Initialize with starting location discovered
+	# Initialize with starting location discovered (no XP - it's where you spawn)
 	discover_cell(Vector2i.ZERO)
-	_discover_location_at(Vector2i.ZERO)
+	_discover_location_at(Vector2i.ZERO, false)  # false = no discovery XP for starting location
+
+	# Connect to scene manager to clear node references before scene changes
+	if SceneManager:
+		SceneManager.scene_load_started.connect(_on_scene_load_started)
+
+
+## Called when a scene change begins - clear all node references to prevent stale casts
+func _on_scene_load_started(_scene_path: String) -> void:
+	_clear_node_references()
+
+
+## Clear all node references to prevent "Trying to cast a freed object" errors
+## Called at the START of scene transitions, before the old scene is freed
+func _clear_node_references() -> void:
+	# Clear all NPC registrations since they will be freed with the old scene
+	registered_npcs.clear()
 
 
 ## Update the current cell (called by CellStreamer when player crosses boundary)
@@ -114,7 +130,8 @@ func is_discovered(coords: Vector2i) -> bool:
 
 
 ## Discover a location at coordinates (if any)
-func _discover_location_at(coords: Vector2i) -> void:
+## Set award_xp=false for starting locations (player spawns there, no discovery)
+func _discover_location_at(coords: Vector2i, award_xp: bool = true) -> void:
 	var cell_info: WorldGrid.CellInfo = WorldGrid.get_cell(coords)
 	if not cell_info:
 		return
@@ -133,10 +150,12 @@ func _discover_location_at(coords: Vector2i) -> void:
 		"discovered_time": Time.get_unix_time_from_system()
 	}
 
-	# Award discovery XP based on location importance
-	var xp_reward: int = _get_discovery_xp(cell_info.location_type)
-	if xp_reward > 0:
-		_award_discovery_xp(xp_reward, cell_info.location_name)
+	# Award discovery XP based on location importance (skip for starting location)
+	var xp_reward: int = 0
+	if award_xp:
+		xp_reward = _get_discovery_xp(cell_info.location_type)
+		if xp_reward > 0:
+			_award_discovery_xp(xp_reward, cell_info.location_name)
 
 	location_discovered.emit(cell_info.location_id, cell_info.location_name)
 	print("[PlayerGPS] Location discovered: %s (XP: %d)" % [cell_info.location_name, xp_reward])
@@ -336,6 +355,9 @@ func load_save_data(data: Dictionary) -> void:
 			var coords := Vector2i(int(parts[0]), int(parts[1]))
 			discovered_cells[coords] = cells_data[key]
 			WorldGrid.discover_cell(coords)
+			# Also sync to WorldData (uses grid coords with Elder Moor at 12,8)
+			var grid_coords: Vector2i = WorldData.region_to_grid(coords)
+			WorldData.discover_cell(grid_coords)
 
 	# Load discovered locations
 	discovered_locations.clear()
@@ -369,9 +391,9 @@ func reset() -> void:
 	total_cells_traveled = 0
 	total_distance_traveled = 0
 
-	# Discover starting location
+	# Discover starting location (no XP - it's where you spawn)
 	discover_cell(Vector2i.ZERO)
-	_discover_location_at(Vector2i.ZERO)
+	_discover_location_at(Vector2i.ZERO, false)  # false = no discovery XP for starting location
 
 
 ## Alias for get_save_data() used by save_manager.gd
@@ -452,22 +474,36 @@ func unregister_npc(npc_id: String) -> void:
 ## Get all NPCs in a specific cell
 func get_npcs_in_cell(cell: Vector2i) -> Array:
 	var result: Array = []
+	var invalid_ids: Array[String] = []
+
 	for npc_id: String in registered_npcs:
 		var info: Dictionary = registered_npcs[npc_id]
 		if info.get("cell", Vector2i(-999, -999)) == cell:
-			var node: Node3D = info.get("node")
-			if is_instance_valid(node):
+			var node_ref: Variant = info.get("node")
+			var node: Node3D = node_ref as Node3D if is_instance_valid(node_ref) else null
+			if node:
 				result.append({"id": npc_id, "node": node, "type": info.get("type", "")})
+			else:
+				# Mark for cleanup
+				invalid_ids.append(npc_id)
+
+	# Clean up invalid entries
+	for invalid_id: String in invalid_ids:
+		registered_npcs.erase(invalid_id)
+
 	return result
 
 
 ## Get all registered NPCs
 func get_all_npcs() -> Array:
 	var result: Array = []
+	var invalid_ids: Array[String] = []
+
 	for npc_id: String in registered_npcs:
 		var info: Dictionary = registered_npcs[npc_id]
-		var node: Node3D = info.get("node")
-		if is_instance_valid(node):
+		var node_ref: Variant = info.get("node")
+		var node: Node3D = node_ref as Node3D if is_instance_valid(node_ref) else null
+		if node:
 			result.append({
 				"id": npc_id,
 				"node": node,
@@ -475,6 +511,14 @@ func get_all_npcs() -> Array:
 				"cell": info.get("cell", Vector2i.ZERO),
 				"zone_id": info.get("zone_id", "")
 			})
+		else:
+			# Mark for cleanup
+			invalid_ids.append(npc_id)
+
+	# Clean up invalid entries
+	for invalid_id: String in invalid_ids:
+		registered_npcs.erase(invalid_id)
+
 	return result
 
 
@@ -496,7 +540,17 @@ func is_npc_registered(npc_id: String) -> bool:
 func get_npc_info(npc_id: String) -> Dictionary:
 	if not registered_npcs.has(npc_id):
 		return {}
-	return registered_npcs[npc_id].duplicate()
+
+	var info: Dictionary = registered_npcs[npc_id]
+	var node_ref: Variant = info.get("node")
+
+	# Check if node is still valid
+	if not is_instance_valid(node_ref):
+		# Clean up invalid entry
+		registered_npcs.erase(npc_id)
+		return {}
+
+	return info.duplicate()
 
 
 ## Clear all NPC registrations (for scene changes)

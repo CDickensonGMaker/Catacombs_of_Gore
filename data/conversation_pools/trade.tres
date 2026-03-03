@@ -3,10 +3,6 @@
 [ext_resource type="Script" path="res://scripts/dialogue/conversation_response_pool.gd" id="1_pool"]
 [ext_resource type="Script" path="res://scripts/dialogue/conversation_response.gd" id="2_resp"]
 
-# =============================================================================
-# MERCHANT GOODS AND SERVICES
-# =============================================================================
-
 [sub_resource type="Resource" id="trade_goods_1"]
 script = ExtResource("2_resp")
 text = "I deal in all manner of goods - weapons, armor, potions. If you need it, I probably have it. For the right price."
@@ -45,10 +41,6 @@ weight = 1.0
 actions = []
 conditions = []
 response_id = "trade_goods_3"
-
-# =============================================================================
-# PRICES AND HAGGLING
-# =============================================================================
 
 [sub_resource type="Resource" id="trade_haggle_1"]
 script = ExtResource("2_resp")
@@ -89,10 +81,6 @@ actions = []
 conditions = []
 response_id = "trade_haggle_3"
 
-# =============================================================================
-# TRADE ROUTES AND CARAVANS
-# =============================================================================
-
 [sub_resource type="Resource" id="trade_routes_1"]
 script = ExtResource("2_resp")
 text = "Most of our goods come through Dalhurst. It's the trade hub for the entire region. Roads converge there from every direction."
@@ -131,10 +119,6 @@ weight = 1.0
 actions = []
 conditions = []
 response_id = "trade_routes_3"
-
-# =============================================================================
-# IMPORTING AND EXPORTING
-# =============================================================================
 
 [sub_resource type="Resource" id="trade_import_1"]
 script = ExtResource("2_resp")
@@ -175,10 +159,6 @@ actions = []
 conditions = []
 response_id = "trade_export_1"
 
-# =============================================================================
-# SUPPLY AND DEMAND
-# =============================================================================
-
 [sub_resource type="Resource" id="trade_supply_1"]
 script = ExtResource("2_resp")
 text = "Weapons are in high demand right now. With all the monster sightings, everyone wants protection."
@@ -218,10 +198,6 @@ actions = []
 conditions = []
 response_id = "trade_supply_3"
 
-# =============================================================================
-# GENERIC CIVILIAN OPINIONS ON TRADE
-# =============================================================================
-
 [sub_resource type="Resource" id="trade_civilian_1"]
 script = ExtResource("2_resp")
 text = "Trade? I just try to make ends meet. The merchants get richer while folk like me scrape by."
@@ -260,10 +236,6 @@ weight = 1.0
 actions = []
 conditions = []
 response_id = "trade_civilian_3"
-
-# =============================================================================
-# LOW DISPOSITION / DISMISSIVE RESPONSES
-# =============================================================================
 
 [sub_resource type="Resource" id="trade_hostile_1"]
 script = ExtResource("2_resp")

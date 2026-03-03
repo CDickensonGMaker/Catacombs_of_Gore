@@ -15,7 +15,7 @@ var interaction_area: Area3D
 var sprite_texture: Texture2D = null
 var sprite_h_frames: int = 3
 var sprite_v_frames: int = 3
-var sprite_pixel_size: float = 0.0384  # Standardized humanoid pixel size
+var sprite_pixel_size: float = 0.027  # (was 0.0384 - reduced 30%)
 
 ## Shop UI instance
 var shop_ui: Control = null
@@ -49,11 +49,19 @@ var shop_inventory: Array[Dictionary] = []
 ## PS1-style material
 var merchant_material: StandardMaterial3D
 
+## Health and combat
+var max_health: int = 50
+var current_health: int = 50
+var _is_dead: bool = false
+
 func _ready() -> void:
 	add_to_group("interactable")
 	add_to_group("merchants")
 	add_to_group("shops")
 	add_to_group("npcs")
+	add_to_group("attackable")
+
+	current_health = max_health
 
 	# Add to specific shop type groups for minimap icons
 	match shop_type:
@@ -140,20 +148,54 @@ func _create_merchant_mesh() -> void:
 	var h_frames_to_use: int = sprite_h_frames
 	var v_frames_to_use: int = sprite_v_frames
 
+	# Check ActorRegistry for Zoo patches (applies to scene-instanced merchants)
+	# Determine actor_id to check - use merchant_id, merchant_name snake_case, or shop_type
+	var registry_id: String = merchant_id
+	if registry_id.is_empty():
+		registry_id = merchant_name.to_lower().replace(" ", "_")
+	# Also try shop type based IDs
+	var shop_registry_id: String = ""
+	match shop_type:
+		"blacksmith", "weapon", "armor":
+			shop_registry_id = "blacksmith"
+		"general":
+			shop_registry_id = "merchant_civilian"
+		"magic", "alchemist":
+			shop_registry_id = "magic_shop_worker"
+
+	# Check ActorRegistry for actor configuration (base ZooRegistry + any patches)
+	# ZooRegistry is the source of truth - scene file values are only fallback
+	if ActorRegistry:
+		# Try merchant-specific ID first, then shop type ID
+		for check_id in [registry_id, shop_registry_id]:
+			if check_id.is_empty():
+				continue
+			if ActorRegistry.has_actor(check_id):
+				var config: Dictionary = ActorRegistry.get_sprite_config(check_id)
+				if not config.is_empty():
+					var registry_path: String = config.get("sprite_path", "")
+					if not registry_path.is_empty() and ResourceLoader.exists(registry_path):
+						texture_to_use = load(registry_path) as Texture2D
+						h_frames_to_use = config.get("h_frames", h_frames_to_use)
+						v_frames_to_use = config.get("v_frames", v_frames_to_use)
+						sprite_pixel_size = config.get("pixel_size", sprite_pixel_size)
+						if DEBUG:
+							print("[Merchant] Using ActorRegistry sprite for %s (id: %s)" % [merchant_name, check_id])
+						break
+
 	if not texture_to_use:
 		# Try fallback paths based on gender
 		var fallback_paths: Array[Dictionary]
 		if is_female:
 			fallback_paths = [
-				{"path": "res://Sprite folders grab bag/new lady in red.png", "h": 8, "v": 1, "size": 0.0182},
-				{"path": "res://Sprite folders grab bag/3x3barmaid_civilian.png", "h": 3, "v": 1, "size": 0.0234},
-				{"path": "res://Sprite folders grab bag/merchant_civilian.png", "h": 1, "v": 1, "size": 0.0115},
+				{"path": "res://assets/sprites/npcs/civilians/lady_in_red.png", "h": 8, "v": 1, "size": 0.0182},
+				{"path": "res://assets/sprites/npcs/civilians/barmaid_3x3.png", "h": 3, "v": 1, "size": 0.0234},
+				{"path": "res://assets/sprites/npcs/merchants/merchant_civilian.png", "h": 1, "v": 1, "size": 0.0115},
 			]
 		else:
 			fallback_paths = [
-				{"path": "res://assets/sprites/npcs/generalmerchant.png", "h": 3, "v": 3, "size": 0.0384},
-				{"path": "res://Sprite folders grab bag/merchantman.png", "h": 1, "v": 1, "size": 0.0115},
-				{"path": "res://Sprite folders grab bag/man_civilian.png", "h": 8, "v": 2, "size": 0.0384},
+				{"path": "res://assets/sprites/npcs/merchants/merchant_civilian.png", "h": 1, "v": 1, "size": 0.0384},
+				{"path": "res://assets/sprites/npcs/civilians/man_civilian.png", "h": 8, "v": 2, "size": 0.0384},
 			]
 
 		for fallback: Dictionary in fallback_paths:
@@ -233,6 +275,9 @@ func _setup_default_inventory() -> void:
 			var mana_qty: int = stock_rng.randi_range(1, 3)
 			_add_shop_item("mana_potion", 110, mana_qty, Enums.ItemQuality.AVERAGE)  # ~47% markup
 
+		# Bestiary books - general stores carry tiers 1-5 (common creatures)
+		_add_random_bestiary_books(stock_rng, 1, 5, 0.4)
+
 		if DEBUG:
 			print("[Merchant] General store: tools, supplies, and possibly potions")
 		return
@@ -259,10 +304,45 @@ func _setup_default_inventory() -> void:
 			"quality": item.get("quality", Enums.ItemQuality.AVERAGE)
 		})
 
+	# Add bestiary books to magic shops and alchemists (tiers 1-10, higher chance for rare books)
+	if shop_type == "magic" or shop_type == "alchemist":
+		var book_rng := RandomNumberGenerator.new()
+		book_rng.seed = hash(merchant_name + str(global_position) + "books")
+		_add_random_bestiary_books(book_rng, 1, 10, 0.5)  # Higher chance, all tiers
+
 	if DEBUG:
 		print("[Merchant] Final shop_inventory count: %d item types" % shop_inventory.size())
 		if shop_inventory.is_empty():
 			print("[Merchant] WARNING: Shop inventory is empty! Check LootTables output above.")
+
+## Add random bestiary books based on tier range and chance
+func _add_random_bestiary_books(rng: RandomNumberGenerator, min_tier: int, max_tier: int, base_chance: float) -> void:
+	var book_data: Array[Dictionary] = [
+		{"id": "bestiary_vol_1_vermin", "tier": 1, "price": 50},
+		{"id": "bestiary_vol_2_predators", "tier": 2, "price": 75},
+		{"id": "bestiary_vol_3_arachnids", "tier": 3, "price": 100},
+		{"id": "bestiary_vol_4_goblins", "tier": 4, "price": 150},
+		{"id": "bestiary_vol_5_bandits", "tier": 5, "price": 200},
+		{"id": "bestiary_vol_6_undead", "tier": 6, "price": 250},
+		{"id": "bestiary_vol_7_cultists", "tier": 7, "price": 300},
+		{"id": "bestiary_vol_8_monsters", "tier": 8, "price": 400},
+		{"id": "bestiary_vol_9_tengers", "tier": 9, "price": 500},
+		{"id": "bestiary_vol_10_legendary", "tier": 10, "price": 750}
+	]
+
+	for book: Dictionary in book_data:
+		var tier: int = book["tier"]
+		if tier < min_tier or tier > max_tier:
+			continue
+
+		# Higher tier books have lower chance to appear
+		var tier_modifier: float = 1.0 - (tier - min_tier) * 0.08
+		var chance: float = base_chance * tier_modifier
+
+		if rng.randf() < chance:
+			var marked_up_price: int = int(book["price"] * buy_price_multiplier * 1.2)  # 20% book markup
+			_add_shop_item(book["id"], marked_up_price, 1, Enums.ItemQuality.AVERAGE)
+
 
 ## Helper to add items to shop inventory
 func _add_shop_item(item_id: String, base_price: int, quantity: int, quality: Enums.ItemQuality) -> void:
@@ -456,13 +536,7 @@ func buy_item(shop_index: int) -> bool:
 		push_warning("[Merchant] Not enough gold. Need: %d, Have: %d" % [price, InventoryManager.gold])
 		return false
 
-	# Check inventory space
-	if InventoryManager.inventory.size() >= InventoryManager.max_inventory_size:
-		if not InventoryManager._can_stack(item_id, quality):
-			push_warning("[Merchant] Inventory full")
-			return false
-
-	# Complete purchase
+	# Complete purchase (no hard inventory limit - encumbrance system handles weight)
 	InventoryManager.remove_gold(price)
 	InventoryManager.add_item(item_id, 1, quality)
 
@@ -492,6 +566,9 @@ func sell_item(inventory_index: int) -> bool:
 	# Remove from player inventory
 	if not InventoryManager.remove_item(item_id, 1, quality):
 		return false
+
+	# Emit item_sold signal for quest temptation tracking
+	InventoryManager.item_sold.emit(item_id, 1, quality)
 
 	# Give player gold
 	InventoryManager.add_gold(sell_price)
@@ -627,7 +704,8 @@ func get_buy_price_with_speech(shop_index: int) -> int:
 ## sprite_path: Optional path to sprite sheet texture (e.g., "res://assets/sprites/npcs/merchant.png")
 ## h_frames/v_frames: Sprite sheet grid dimensions (default 3x3)
 ## pixel_size: Size of each pixel in world units (default 0.0384)
-static func spawn_merchant(parent: Node, pos: Vector3, name: String = "Merchant", tier: LootTables.LootTier = LootTables.LootTier.UNCOMMON, type: String = "general", sprite_path: String = "", h_frames: int = 3, v_frames: int = 3, pixel_size: float = 0.0384, female: bool = false) -> Merchant:
+## actor_id: Optional actor ID for ActorRegistry lookup (e.g., "blacksmith", "merchant_civilian")
+static func spawn_merchant(parent: Node, pos: Vector3, name: String = "Merchant", tier: LootTables.LootTier = LootTables.LootTier.UNCOMMON, type: String = "general", sprite_path: String = "", h_frames: int = 3, v_frames: int = 3, pixel_size: float = 0.0384, female: bool = false, actor_id: String = "") -> Merchant:
 	var instance := Merchant.new()
 	instance.position = pos
 	instance.merchant_name = name
@@ -636,13 +714,49 @@ static func spawn_merchant(parent: Node, pos: Vector3, name: String = "Merchant"
 	instance.sprite_pixel_size = pixel_size
 	instance.is_female = female
 
-	# Load sprite texture if path provided
-	if sprite_path != "":
-		var texture = load(sprite_path)
+	# Check ActorRegistry for Zoo patches first
+	var actual_sprite_path: String = sprite_path
+	var actual_h_frames: int = h_frames
+	var actual_v_frames: int = v_frames
+	var actual_pixel_size: float = pixel_size
+
+	# Determine actor_id to check - use explicit ID or derive from shop type
+	var registry_id: String = actor_id
+	if registry_id.is_empty():
+		# Map shop types to actor IDs
+		match type:
+			"blacksmith", "weapon", "armor":
+				registry_id = "blacksmith"
+			"general":
+				registry_id = "merchant_civilian"
+			"magic", "alchemist":
+				registry_id = "magic_shop_worker"
+			_:
+				registry_id = "merchant_civilian"
+
+	# Check ActorRegistry for patched sprite
+	var actor_registry: Node = Engine.get_singleton("ActorRegistry") if Engine.has_singleton("ActorRegistry") else null
+	if not actor_registry:
+		actor_registry = parent.get_node_or_null("/root/ActorRegistry")
+
+	if actor_registry and actor_registry.has_actor(registry_id):
+		var config: Dictionary = actor_registry.get_sprite_config(registry_id)
+		if not config.is_empty():
+			var registry_path: String = config.get("sprite_path", "")
+			if not registry_path.is_empty() and ResourceLoader.exists(registry_path):
+				actual_sprite_path = registry_path
+				actual_h_frames = config.get("h_frames", h_frames)
+				actual_v_frames = config.get("v_frames", v_frames)
+				actual_pixel_size = config.get("pixel_size", pixel_size)
+
+	# Load sprite texture if path provided or from registry
+	if actual_sprite_path != "":
+		var texture = load(actual_sprite_path)
 		if texture:
 			instance.sprite_texture = texture
-			instance.sprite_h_frames = h_frames
-			instance.sprite_v_frames = v_frames
+			instance.sprite_h_frames = actual_h_frames
+			instance.sprite_v_frames = actual_v_frames
+			instance.sprite_pixel_size = actual_pixel_size
 
 	# Add collision shape for world collision
 	var col_shape := CollisionShape3D.new()
@@ -655,3 +769,109 @@ static func spawn_merchant(parent: Node, pos: Vector3, name: String = "Merchant"
 
 	parent.add_child(instance)
 	return instance
+
+
+## Take damage from attacks
+func take_damage(amount: int, _damage_type: Enums.DamageType = Enums.DamageType.PHYSICAL, attacker: Node = null) -> int:
+	if _is_dead:
+		return 0
+
+	var actual_damage: int = mini(amount, current_health)
+	current_health -= actual_damage
+
+	# Visual feedback - flash red
+	if billboard_sprite and billboard_sprite.sprite:
+		var original_color: Color = billboard_sprite.sprite.modulate
+		billboard_sprite.sprite.modulate = Color(1.0, 0.3, 0.3)
+		get_tree().create_timer(0.15).timeout.connect(func():
+			if billboard_sprite and billboard_sprite.sprite and not _is_dead:
+				billboard_sprite.sprite.modulate = original_color
+		)
+
+	# Play hurt sound
+	if AudioManager:
+		AudioManager.play_sfx("player_hit")
+
+	# Check for death
+	if current_health <= 0:
+		_die(attacker)
+
+	return actual_damage
+
+
+## Check if dead
+func is_dead() -> bool:
+	return _is_dead
+
+
+## Get armor value (merchants have minimal armor)
+func get_armor_value() -> int:
+	return 3
+
+
+## Handle death
+func _die(killer: Node = null) -> void:
+	if _is_dead:
+		return
+
+	_is_dead = true
+
+	print("[Merchant] %s has been killed" % merchant_name)
+
+	# Report crime - killing a merchant is murder
+	if killer and killer.is_in_group("player"):
+		var crime_region: String = region_id if not region_id.is_empty() else "unknown"
+		CrimeManager.report_crime(CrimeManager.CrimeType.MURDER, crime_region, [])
+
+	# Close any open shop UI
+	if shop_ui and is_instance_valid(shop_ui):
+		var canvas: Node = shop_ui.get_parent()
+		shop_ui.queue_free()
+		if canvas:
+			canvas.queue_free()
+		shop_ui = null
+
+	# Spawn corpse with loot
+	_spawn_corpse()
+
+	# Emit death signal
+	CombatManager.entity_killed.emit(self, killer)
+
+	# Play death sound
+	if AudioManager:
+		AudioManager.play_sfx("enemy_death")
+
+	# Remove from groups
+	remove_from_group("interactable")
+	remove_from_group("merchants")
+	remove_from_group("shops")
+	remove_from_group("npcs")
+	remove_from_group("attackable")
+	remove_from_group("compass_poi")
+
+	# Unregister from PlayerGPS
+	PlayerGPS.unregister_npc(get_npc_id())
+
+	queue_free()
+
+
+## Spawn a lootable corpse
+func _spawn_corpse() -> void:
+	var corpse: LootableCorpse = LootableCorpse.spawn_corpse(
+		get_parent(),
+		global_position,
+		merchant_name,
+		get_npc_id(),
+		5  # Level 5 - decent loot for merchants
+	)
+
+	# Add merchant's gold (they had some money)
+	corpse.gold = randi_range(50, 200)
+
+	# Add some of their shop inventory as loot
+	var loot_count: int = mini(3, shop_inventory.size())
+	for i in range(loot_count):
+		var item: Dictionary = shop_inventory[randi() % shop_inventory.size()]
+		var item_id: String = item.get("item_id", "")
+		if not item_id.is_empty():
+			corpse.add_item(item_id, 1, item.get("quality", Enums.ItemQuality.AVERAGE))

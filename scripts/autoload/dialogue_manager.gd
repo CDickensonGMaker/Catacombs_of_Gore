@@ -342,6 +342,18 @@ func _evaluate_condition_internal(condition: DialogueCondition) -> bool:
 		DialogueData.ConditionType.RANDOM_CHANCE:
 			return randf() <= condition.param_float
 
+		DialogueData.ConditionType.PLAYER_RACE:
+			if not GameManager.player_data:
+				return false
+			var player_race: Enums.Race = GameManager.player_data.race
+			var race_name: String = condition.param_string.to_lower().strip_edges()
+			match race_name:
+				"human": return player_race == Enums.Race.HUMAN
+				"elf": return player_race == Enums.Race.ELF
+				"halfling": return player_race == Enums.Race.HALFLING
+				"dwarf": return player_race == Enums.Race.DWARF
+			return false
+
 	return true
 
 ## Check quest state condition
@@ -565,7 +577,7 @@ func _get_skill_governing_stat(skill_enum: int) -> int:
 			return Enums.Stat.GRIT
 		# AGILITY-based
 		Enums.Skill.RANGED, Enums.Skill.DODGE, Enums.Skill.STEALTH, \
-		Enums.Skill.ENDURANCE, Enums.Skill.THIEVERY, Enums.Skill.ACROBATICS, \
+		Enums.Skill.ENDURANCE, Enums.Skill.THIEVERY, \
 		Enums.Skill.ATHLETICS:
 			return Enums.Stat.AGILITY
 		# WILL-based
@@ -576,7 +588,7 @@ func _get_skill_governing_stat(skill_enum: int) -> int:
 			return Enums.Stat.SPEECH
 		# KNOWLEDGE-based
 		Enums.Skill.ARCANA_LORE, Enums.Skill.HISTORY, Enums.Skill.INTUITION, \
-		Enums.Skill.ENGINEERING, Enums.Skill.INVESTIGATION, Enums.Skill.PERCEPTION, \
+		Enums.Skill.ENGINEERING, Enums.Skill.INVESTIGATION, \
 		Enums.Skill.RELIGION, Enums.Skill.NATURE:
 			return Enums.Stat.KNOWLEDGE
 		# VITALITY-based
@@ -612,7 +624,6 @@ func _get_skill_name(skill_enum: int) -> String:
 		Enums.Skill.STEALTH: return "Stealth"
 		Enums.Skill.ENDURANCE: return "Endurance"
 		Enums.Skill.THIEVERY: return "Thievery"
-		Enums.Skill.ACROBATICS: return "Acrobatics"
 		Enums.Skill.ATHLETICS: return "Athletics"
 		Enums.Skill.CONCENTRATION: return "Concentration"
 		Enums.Skill.RESIST: return "Resist"
@@ -625,7 +636,6 @@ func _get_skill_name(skill_enum: int) -> String:
 		Enums.Skill.INTUITION: return "Intuition"
 		Enums.Skill.ENGINEERING: return "Engineering"
 		Enums.Skill.INVESTIGATION: return "Investigation"
-		Enums.Skill.PERCEPTION: return "Perception"
 		Enums.Skill.RELIGION: return "Religion"
 		Enums.Skill.NATURE: return "Nature"
 		Enums.Skill.FIRST_AID: return "First Aid"

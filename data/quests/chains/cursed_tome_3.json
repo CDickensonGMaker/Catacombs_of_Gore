@@ -1,0 +1,34 @@
+{
+	"id": "cursed_tome_3",
+	"title": "Return the Tome",
+	"description": "You have the cursed tome. Return it to the scholar in Dalhurst for safekeeping.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "scholars_guild",
+	"objectives": [
+		{
+			"id": "return",
+			"description": "Return the tome to the scholar",
+			"type": "talk",
+			"target": "dalhurst_scholar",
+			"target_zone": "dalhurst",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "dalhurst_scholar",
+	"turn_in_zone": "dalhurst",
+	"rewards": {
+		"gold": 225,
+		"xp": 320,
+		"items": [],
+		"faction_reputation": {
+			"scholars_guild": 25
+		}
+	},
+	"prerequisites": ["cursed_tome_2"],
+	"next_quest": ""
+}

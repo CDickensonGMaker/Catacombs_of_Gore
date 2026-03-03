@@ -1,0 +1,54 @@
+{
+	"id": "rescue_wizard_apprentice_2",
+	"title": "Free the Apprentice",
+	"description": "The cultists are draining the apprentice's magical energy for their dark rituals. Stop them and rescue him.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "mages_circle",
+	"objectives": [
+		{
+			"id": "kill_cultists",
+			"description": "Kill the cultists",
+			"type": "kill",
+			"target": "cultist",
+			"required_count": 4
+		},
+		{
+			"id": "kill_leader",
+			"description": "Kill the Cult Leader",
+			"type": "kill",
+			"target": "cult_leader",
+			"required_count": 1
+		},
+		{
+			"id": "free_apprentice",
+			"description": "Free the wizard's apprentice",
+			"type": "talk",
+			"target": "hostage_wizard_apprentice",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 0,
+		"xp": 220,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": ["rescue_wizard_apprentice_1"],
+	"next_quest": "rescue_wizard_apprentice_3",
+	"spawn_on_accept": [
+		{
+			"type": "hostage",
+			"location": "cultist_temple_south",
+			"hostage_id": "hostage_wizard_apprentice",
+			"name": "Wizard's Apprentice",
+			"objective_id": "free_apprentice"
+		}
+	]
+}

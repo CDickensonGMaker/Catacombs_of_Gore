@@ -1,0 +1,51 @@
+{
+	"id": "missing_miner",
+	"title": "The Missing Miner",
+	"description": "Mayor Bjorn of Aberdeen is worried about a miner who went missing three days ago. Erik Stonepick went to prospect in the old abandoned mine shaft east of town and hasn't returned. The mayor fears the worst and offers a reward to anyone who can find out what happened.",
+	"is_main_quest": false,
+	"quest_source": "npc",
+	"giver_npc_id": "mayor_aberdeeen",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "aberdeen",
+	"objectives": [
+		{
+			"id": "travel_mine",
+			"description": "Travel to the abandoned mine east of Aberdeen",
+			"type": "reach",
+			"target": "abandoned_mine",
+			"required_count": 1
+		},
+		{
+			"id": "search_mine",
+			"description": "Search the mine for signs of Erik",
+			"type": "interact",
+			"target": "erik_journal",
+			"required_count": 1
+		},
+		{
+			"id": "find_erik",
+			"description": "Find Erik Stonepick or his remains",
+			"type": "interact",
+			"target": "erik_body",
+			"required_count": 1
+		},
+		{
+			"id": "optional_avenge",
+			"description": "(Optional) Slay the creature that killed Erik",
+			"type": "kill",
+			"target": "cave_spider_queen",
+			"required_count": 1,
+			"is_optional": true
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "mayor_aberdeeen",
+	"turn_in_zone": "aberdeen",
+	"rewards": {
+		"gold": 80,
+		"xp": 250,
+		"items": []
+	},
+	"prerequisites": [],
+	"next_quest": null
+}

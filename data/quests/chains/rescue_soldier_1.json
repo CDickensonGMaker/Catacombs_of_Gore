@@ -1,0 +1,31 @@
+{
+	"id": "rescue_soldier_1",
+	"title": "Missing Soldier",
+	"description": "A soldier on patrol has gone missing. The guard captain suspects he was captured by bandits. Track him down.",
+	"is_main_quest": false,
+	"quest_source": "npc",
+	"giver_npc_id": "thornfield_guard_captain",
+	"giver_npc_type": "guard",
+	"giver_region": "thornfield",
+	"faction": "human_empire",
+	"objectives": [
+		{
+			"id": "find_soldier",
+			"description": "Track the soldier to the southern bandit camp",
+			"type": "reach",
+			"target": "bandit_camp_south",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 0,
+		"xp": 100,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": [],
+	"next_quest": "rescue_soldier_2"
+}

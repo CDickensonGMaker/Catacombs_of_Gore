@@ -198,6 +198,9 @@ func _create_interaction_area() -> void:
 
 ## Called by player interaction system
 func interact(_interactor: Node) -> void:
+	# Play alchemy clink sound when interacting with table
+	if AudioManager:
+		AudioManager.play_alchemy_sound(false)  # Clink sound (not success)
 	_open_crafting_ui()
 
 

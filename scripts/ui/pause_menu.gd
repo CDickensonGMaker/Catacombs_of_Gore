@@ -7,16 +7,19 @@ signal menu_closed
 enum MenuState { MAIN, SAVE_SELECT, LOAD_SELECT, OPTIONS }
 var current_state: MenuState = MenuState.MAIN
 
-# Dark gothic colors (matching game_menu.gd)
-const COL_BG = Color(0.08, 0.08, 0.1)
-const COL_PANEL = Color(0.12, 0.12, 0.15)
-const COL_BORDER = Color(0.3, 0.25, 0.2)
-const COL_TEXT = Color(0.9, 0.85, 0.75)
-const COL_DIM = Color(0.5, 0.5, 0.5)
-const COL_GOLD = Color(0.8, 0.6, 0.2)
-const COL_SELECT = Color(0.25, 0.2, 0.15)
-const COL_GREEN = Color(0.3, 0.8, 0.3)
-const COL_RED = Color(0.8, 0.3, 0.3)
+# Grey drab gothic colors (matching game_menu.gd)
+const COL_BG = Color(0.1, 0.1, 0.1, 0.85)  # Semi-transparent for texture to show through
+const COL_PANEL = Color(0.15, 0.15, 0.15, 0.9)
+const COL_BORDER = Color(0.3, 0.3, 0.3)
+const COL_TEXT = Color(0.75, 0.75, 0.72)
+const COL_DIM = Color(0.4, 0.4, 0.4)
+const COL_GOLD = Color(0.6, 0.55, 0.4)  # Muted brass/bronze
+const COL_SELECT = Color(0.2, 0.2, 0.2)
+const COL_GREEN = Color(0.4, 0.6, 0.4)  # Muted green
+const COL_RED = Color(0.6, 0.3, 0.3)  # Muted red
+
+# Full-screen menu background texture
+const MENU_BG_TEXTURE = "res://assets/ui/menu_background.png"
 
 # UI References
 var main_panel: PanelContainer
@@ -31,6 +34,12 @@ var confirm_dialog: ConfirmationDialog
 var dice_roll_checkbox: CheckBox
 var ui_scale_slider: HSlider
 var ui_scale_label: Label
+var master_volume_slider: HSlider
+var master_volume_label: Label
+var music_volume_slider: HSlider
+var music_volume_label: Label
+var sfx_volume_slider: HSlider
+var sfx_volume_label: Label
 
 func _ready() -> void:
 	visible = false
@@ -48,11 +57,20 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 func _build_menu() -> void:
-	# Dark overlay
-	var overlay := ColorRect.new()
-	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	overlay.color = Color(0, 0, 0, 0.8)
-	add_child(overlay)
+	# Full-screen textured background
+	if ResourceLoader.exists(MENU_BG_TEXTURE):
+		var bg := TextureRect.new()
+		bg.texture = load(MENU_BG_TEXTURE)
+		bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+		bg.stretch_mode = TextureRect.STRETCH_SCALE
+		bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		add_child(bg)
+	else:
+		# Fallback to dark overlay
+		var overlay := ColorRect.new()
+		overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+		overlay.color = Color(0, 0, 0, 0.8)
+		add_child(overlay)
 
 	# Main menu panel
 	main_panel = _create_main_panel()
@@ -274,6 +292,7 @@ func open() -> void:
 	_show_main_menu()
 	GameManager.enter_menu()
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	GameManager.set_menu_cursor()  # Use menu cursor
 	get_tree().paused = true
 
 func close() -> void:
@@ -281,6 +300,7 @@ func close() -> void:
 	current_state = MenuState.MAIN
 	GameManager.exit_menu()
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	GameManager.set_default_cursor()  # Restore default cursor
 	get_tree().paused = false
 	menu_closed.emit()
 
@@ -461,10 +481,10 @@ func _show_notification(message: String) -> void:
 func _create_options_panel() -> PanelContainer:
 	var panel := PanelContainer.new()
 	panel.set_anchors_preset(Control.PRESET_CENTER)
-	panel.offset_left = -200
-	panel.offset_right = 200
-	panel.offset_top = -200
-	panel.offset_bottom = 200
+	panel.offset_left = -220
+	panel.offset_right = 220
+	panel.offset_top = -280
+	panel.offset_bottom = 280
 
 	var style := StyleBoxFlat.new()
 	style.bg_color = COL_BG
@@ -545,9 +565,103 @@ func _create_options_panel() -> PanelContainer:
 	# Update label with current value
 	_update_scale_label(ui_scale_slider.value)
 
+	# Separator before audio
+	var sep2 := HSeparator.new()
+	sep2.add_theme_color_override("separation", COL_BORDER)
+	vbox.add_child(sep2)
+
+	# Audio section title
+	var audio_title := Label.new()
+	audio_title.text = "AUDIO"
+	audio_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	audio_title.add_theme_color_override("font_color", COL_GOLD)
+	audio_title.add_theme_font_size_override("font_size", 16)
+	vbox.add_child(audio_title)
+
+	# Master Volume Slider
+	var master_hbox := HBoxContainer.new()
+	master_hbox.add_theme_constant_override("separation", 10)
+	vbox.add_child(master_hbox)
+
+	var master_title := Label.new()
+	master_title.text = "Master"
+	master_title.custom_minimum_size.x = 60
+	master_title.add_theme_color_override("font_color", COL_TEXT)
+	master_hbox.add_child(master_title)
+
+	master_volume_slider = HSlider.new()
+	master_volume_slider.min_value = 0.0
+	master_volume_slider.max_value = 1.0
+	master_volume_slider.step = 0.05
+	master_volume_slider.value = AudioManager.master_volume
+	master_volume_slider.custom_minimum_size = Vector2(150, 20)
+	master_volume_slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	master_volume_slider.value_changed.connect(_on_master_volume_changed)
+	master_hbox.add_child(master_volume_slider)
+
+	master_volume_label = Label.new()
+	master_volume_label.text = "%d%%" % int(AudioManager.master_volume * 100)
+	master_volume_label.custom_minimum_size.x = 40
+	master_volume_label.add_theme_color_override("font_color", COL_GOLD)
+	master_hbox.add_child(master_volume_label)
+
+	# Music Volume Slider
+	var music_hbox := HBoxContainer.new()
+	music_hbox.add_theme_constant_override("separation", 10)
+	vbox.add_child(music_hbox)
+
+	var music_title := Label.new()
+	music_title.text = "Music"
+	music_title.custom_minimum_size.x = 60
+	music_title.add_theme_color_override("font_color", COL_TEXT)
+	music_hbox.add_child(music_title)
+
+	music_volume_slider = HSlider.new()
+	music_volume_slider.min_value = 0.0
+	music_volume_slider.max_value = 1.0
+	music_volume_slider.step = 0.05
+	music_volume_slider.value = AudioManager.music_volume
+	music_volume_slider.custom_minimum_size = Vector2(150, 20)
+	music_volume_slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	music_volume_slider.value_changed.connect(_on_music_volume_changed)
+	music_hbox.add_child(music_volume_slider)
+
+	music_volume_label = Label.new()
+	music_volume_label.text = "%d%%" % int(AudioManager.music_volume * 100)
+	music_volume_label.custom_minimum_size.x = 40
+	music_volume_label.add_theme_color_override("font_color", COL_GOLD)
+	music_hbox.add_child(music_volume_label)
+
+	# SFX Volume Slider
+	var sfx_hbox := HBoxContainer.new()
+	sfx_hbox.add_theme_constant_override("separation", 10)
+	vbox.add_child(sfx_hbox)
+
+	var sfx_title := Label.new()
+	sfx_title.text = "SFX"
+	sfx_title.custom_minimum_size.x = 60
+	sfx_title.add_theme_color_override("font_color", COL_TEXT)
+	sfx_hbox.add_child(sfx_title)
+
+	sfx_volume_slider = HSlider.new()
+	sfx_volume_slider.min_value = 0.0
+	sfx_volume_slider.max_value = 1.0
+	sfx_volume_slider.step = 0.05
+	sfx_volume_slider.value = AudioManager.sfx_volume
+	sfx_volume_slider.custom_minimum_size = Vector2(150, 20)
+	sfx_volume_slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sfx_volume_slider.value_changed.connect(_on_sfx_volume_changed)
+	sfx_hbox.add_child(sfx_volume_slider)
+
+	sfx_volume_label = Label.new()
+	sfx_volume_label.text = "%d%%" % int(AudioManager.sfx_volume * 100)
+	sfx_volume_label.custom_minimum_size.x = 40
+	sfx_volume_label.add_theme_color_override("font_color", COL_GOLD)
+	sfx_hbox.add_child(sfx_volume_label)
+
 	# Spacer
 	var spacer := Control.new()
-	spacer.custom_minimum_size.y = 20
+	spacer.custom_minimum_size.y = 10
 	vbox.add_child(spacer)
 
 	# Back button
@@ -578,6 +692,17 @@ func _show_options_panel() -> void:
 		ui_scale_slider.value = current_scale
 		_update_scale_label(current_scale)
 
+	# Refresh volume sliders
+	if master_volume_slider and master_volume_label:
+		master_volume_slider.value = AudioManager.master_volume
+		master_volume_label.text = "%d%%" % int(AudioManager.master_volume * 100)
+	if music_volume_slider and music_volume_label:
+		music_volume_slider.value = AudioManager.music_volume
+		music_volume_label.text = "%d%%" % int(AudioManager.music_volume * 100)
+	if sfx_volume_slider and sfx_volume_label:
+		sfx_volume_slider.value = AudioManager.sfx_volume
+		sfx_volume_label.text = "%d%%" % int(AudioManager.sfx_volume * 100)
+
 func _on_dice_roll_toggled(enabled: bool) -> void:
 	if DiceManager:
 		DiceManager.set_show_dice_rolls(enabled)
@@ -602,3 +727,23 @@ func _on_ui_scale_changed(value: float) -> void:
 func _update_scale_label(value: float) -> void:
 	if ui_scale_label:
 		ui_scale_label.text = "%d%%" % int(value * 100)
+
+
+func _on_master_volume_changed(value: float) -> void:
+	AudioManager.set_master_volume(value)
+	if master_volume_label:
+		master_volume_label.text = "%d%%" % int(value * 100)
+
+
+func _on_music_volume_changed(value: float) -> void:
+	AudioManager.set_music_volume(value)
+	if music_volume_label:
+		music_volume_label.text = "%d%%" % int(value * 100)
+
+
+func _on_sfx_volume_changed(value: float) -> void:
+	AudioManager.set_sfx_volume(value)
+	if sfx_volume_label:
+		sfx_volume_label.text = "%d%%" % int(value * 100)
+	# Play a test sound so user can hear the change
+	AudioManager.play_sfx("ui_accept")

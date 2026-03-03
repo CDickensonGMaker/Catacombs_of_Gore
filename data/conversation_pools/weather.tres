@@ -3,10 +3,6 @@
 [ext_resource type="Script" path="res://scripts/dialogue/conversation_response_pool.gd" id="1_pool"]
 [ext_resource type="Script" path="res://scripts/dialogue/conversation_response.gd" id="2_resp"]
 
-# =============================================================================
-# CURRENT WEATHER OBSERVATIONS
-# =============================================================================
-
 [sub_resource type="Resource" id="weather_observe_1"]
 script = ExtResource("2_resp")
 text = "Gray skies again today. Can't remember the last time I saw the sun properly."
@@ -46,10 +42,6 @@ actions = []
 conditions = []
 response_id = "weather_observe_3"
 
-# =============================================================================
-# WEATHER PREDICTIONS / OMENS
-# =============================================================================
-
 [sub_resource type="Resource" id="weather_omen_1"]
 script = ExtResource("2_resp")
 text = "Red sky at dawn this morning. Mark my words - storm's coming before nightfall."
@@ -88,10 +80,6 @@ weight = 0.9
 actions = []
 conditions = []
 response_id = "weather_omen_3"
-
-# =============================================================================
-# WEATHER AFFECTS WORK (FARMERS, MERCHANTS, GUARDS)
-# =============================================================================
 
 [sub_resource type="Resource" id="weather_work_1"]
 script = ExtResource("2_resp")
@@ -145,10 +133,6 @@ actions = []
 conditions = []
 response_id = "weather_work_4"
 
-# =============================================================================
-# ELDER MOOR SWAMP WEATHER SPECIFICS
-# =============================================================================
-
 [sub_resource type="Resource" id="weather_moor_1"]
 script = ExtResource("2_resp")
 text = "The mist never fully lifts here in Elder Moor. You get used to it. Eventually."
@@ -201,10 +185,6 @@ actions = []
 conditions = []
 response_id = "weather_moor_4"
 
-# =============================================================================
-# SEASONAL COMMENTS
-# =============================================================================
-
 [sub_resource type="Resource" id="weather_season_1"]
 script = ExtResource("2_resp")
 text = "Spring's finally here. About time too - thought the frost would never break."
@@ -244,10 +224,6 @@ actions = []
 conditions = []
 response_id = "weather_season_3"
 
-# =============================================================================
-# SUPERSTITIONS ABOUT WEATHER
-# =============================================================================
-
 [sub_resource type="Resource" id="weather_superstition_1"]
 script = ExtResource("2_resp")
 text = "Thunder without lightning means the old gods are angry. Best make an offering at the temple."
@@ -273,10 +249,6 @@ weight = 0.9
 actions = []
 conditions = []
 response_id = "weather_superstition_2"
-
-# =============================================================================
-# WEATHER-RELATED COMPLAINTS
-# =============================================================================
 
 [sub_resource type="Resource" id="weather_complaint_1"]
 script = ExtResource("2_resp")

@@ -1,0 +1,46 @@
+{
+	"id": "aberdeens_blessing",
+	"title": "Aberdeen's Blessing",
+	"description": "Father Aldwin, the priest of Chronos in Aberdeen, seeks a faithful soul to retrieve a sacred relic from the old temple ruins to the east. The Temple of Chronos was abandoned when the undead began rising in the region, but the relic must be recovered before darkness fully claims it.",
+	"is_main_quest": false,
+	"quest_source": "npc",
+	"giver_npc_id": "priest_chronos_aberdeen",
+	"giver_npc_type": "quest_giver",
+	"giver_region": "aberdeen",
+	"objectives": [
+		{
+			"id": "travel_temple",
+			"description": "Travel to the ruined Temple of Chronos east of Aberdeen",
+			"type": "reach",
+			"target": "ruined_temple_chronos",
+			"required_count": 1
+		},
+		{
+			"id": "defeat_undead",
+			"description": "Clear the temple of undead",
+			"type": "kill",
+			"target": "skeleton",
+			"required_count": 10
+		},
+		{
+			"id": "recover_relic",
+			"description": "Recover the Sacred Hourglass from the inner sanctum",
+			"type": "collect",
+			"target": "sacred_hourglass",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "priest_chronos_aberdeen",
+	"turn_in_zone": "aberdeen",
+	"rewards": {
+		"gold": 75,
+		"xp": 350,
+		"items": [],
+		"faction_reputation": {
+			"temple_of_chronos": 50
+		}
+	},
+	"prerequisites": [],
+	"next_quest": null
+}

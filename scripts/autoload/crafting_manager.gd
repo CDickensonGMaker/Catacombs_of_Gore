@@ -299,6 +299,198 @@ func _register_recipes() -> void:
 		"can_crit": false
 	})
 
+	# Silver Ingot (from ore)
+	_add_recipe({
+		"recipe_id": "smelt_silver",
+		"display_name": "Smelt Silver Ingot",
+		"description": "Smelt silver ore into a precious metal ingot",
+		"category": "Material",
+		"materials": {"silver_ore": 2},
+		"gold_cost": 0,
+		"required_engineering": 1,
+		"output_item_id": "silver_ingot",
+		"base_quality": Enums.ItemQuality.AVERAGE,
+		"can_crit": false
+	})
+
+	# Gold Ingot (from ore)
+	_add_recipe({
+		"recipe_id": "smelt_gold",
+		"display_name": "Smelt Gold Ingot",
+		"description": "Smelt gold ore into a precious metal ingot",
+		"category": "Material",
+		"materials": {"gold_ore": 2},
+		"gold_cost": 0,
+		"required_engineering": 2,
+		"output_item_id": "gold_ingot",
+		"base_quality": Enums.ItemQuality.AVERAGE,
+		"can_crit": false
+	})
+
+	# === JEWELRY (Basic - no stats, for enchanting) ===
+
+	# Iron Ring
+	_add_recipe({
+		"recipe_id": "craft_iron_ring",
+		"display_name": "Iron Ring",
+		"description": "A simple iron band, perfect for enchanting",
+		"category": "Armor",
+		"materials": {"iron_ingot": 1},
+		"gold_cost": 5,
+		"required_engineering": 1,
+		"output_item_id": "iron_ring",
+		"base_quality": Enums.ItemQuality.AVERAGE
+	})
+
+	# Silver Ring
+	_add_recipe({
+		"recipe_id": "craft_silver_ring",
+		"display_name": "Silver Ring",
+		"description": "A polished silver band that holds enchantments well",
+		"category": "Armor",
+		"materials": {"silver_ingot": 1},
+		"gold_cost": 15,
+		"required_engineering": 2,
+		"output_item_id": "silver_ring",
+		"base_quality": Enums.ItemQuality.AVERAGE
+	})
+
+	# Gold Ring
+	_add_recipe({
+		"recipe_id": "craft_gold_ring",
+		"display_name": "Gold Ring",
+		"description": "A gleaming gold band, ideal for powerful enchantments",
+		"category": "Armor",
+		"materials": {"gold_ingot": 1},
+		"gold_cost": 30,
+		"required_engineering": 3,
+		"output_item_id": "gold_ring",
+		"base_quality": Enums.ItemQuality.AVERAGE
+	})
+
+	# Copper Amulet
+	_add_recipe({
+		"recipe_id": "craft_copper_amulet",
+		"display_name": "Copper Amulet",
+		"description": "A simple copper pendant on a leather cord",
+		"category": "Armor",
+		"materials": {"iron_ingot": 1, "leather_strip": 1},
+		"gold_cost": 10,
+		"required_engineering": 1,
+		"output_item_id": "copper_amulet",
+		"base_quality": Enums.ItemQuality.AVERAGE
+	})
+
+	# Silver Amulet
+	_add_recipe({
+		"recipe_id": "craft_silver_amulet",
+		"display_name": "Silver Amulet",
+		"description": "A silver pendant ready for enchantment",
+		"category": "Armor",
+		"materials": {"silver_ingot": 1, "leather_strip": 1},
+		"gold_cost": 20,
+		"required_engineering": 2,
+		"output_item_id": "silver_amulet",
+		"base_quality": Enums.ItemQuality.AVERAGE
+	})
+
+	# Gold Amulet
+	_add_recipe({
+		"recipe_id": "craft_gold_amulet",
+		"display_name": "Gold Amulet",
+		"description": "A fine gold pendant for powerful enchantments",
+		"category": "Armor",
+		"materials": {"gold_ingot": 1, "leather_strip": 1},
+		"gold_cost": 40,
+		"required_engineering": 3,
+		"output_item_id": "gold_amulet",
+		"base_quality": Enums.ItemQuality.AVERAGE
+	})
+
+	# === JEWELRY (Special - with unique effects) ===
+
+	# Bone Ring
+	_add_recipe({
+		"recipe_id": "craft_bone_ring",
+		"display_name": "Bone Ring",
+		"description": "A ring carved from bone with necromantic properties",
+		"category": "Armor",
+		"materials": {"iron_ingot": 1, "soul_essence": 1},
+		"gold_cost": 25,
+		"required_engineering": 2,
+		"required_arcana": 2,
+		"output_item_id": "bone_ring",
+		"base_quality": Enums.ItemQuality.AVERAGE
+	})
+
+	# Serpent Ring
+	_add_recipe({
+		"recipe_id": "craft_serpent_ring",
+		"display_name": "Serpent Ring",
+		"description": "A coiled silver serpent that grants agility",
+		"category": "Armor",
+		"materials": {"silver_ingot": 2, "basilisk_scale": 1},
+		"gold_cost": 50,
+		"required_engineering": 3,
+		"output_item_id": "serpent_ring",
+		"base_quality": Enums.ItemQuality.AVERAGE
+	})
+
+	# Flame Heart Ring
+	_add_recipe({
+		"recipe_id": "craft_flame_heart_ring",
+		"display_name": "Flame Heart Ring",
+		"description": "A gold ring with a ruby that burns with inner fire",
+		"category": "Armor",
+		"materials": {"gold_ingot": 1, "ember_dust": 3},
+		"gold_cost": 75,
+		"required_engineering": 3,
+		"required_arcana": 3,
+		"output_item_id": "flame_heart_ring",
+		"base_quality": Enums.ItemQuality.AVERAGE
+	})
+
+	# Wolf Fang Necklace
+	_add_recipe({
+		"recipe_id": "craft_wolf_fang_necklace",
+		"display_name": "Wolf Fang Necklace",
+		"description": "A primal necklace strung with wolf fangs",
+		"category": "Armor",
+		"materials": {"wolf_fang": 3, "leather_strip": 2},
+		"gold_cost": 15,
+		"required_engineering": 1,
+		"output_item_id": "wolf_fang_necklace",
+		"base_quality": Enums.ItemQuality.AVERAGE
+	})
+
+	# Spider Silk Pendant
+	_add_recipe({
+		"recipe_id": "craft_spider_silk_pendant",
+		"display_name": "Spider Silk Pendant",
+		"description": "A pendant wrapped in enchanted spider silk",
+		"category": "Armor",
+		"materials": {"silver_ingot": 1, "spider_silk": 3, "spider_venom": 1},
+		"gold_cost": 40,
+		"required_engineering": 2,
+		"required_arcana": 2,
+		"output_item_id": "spider_silk_pendant",
+		"base_quality": Enums.ItemQuality.AVERAGE
+	})
+
+	# Frost Crystal Pendant
+	_add_recipe({
+		"recipe_id": "craft_frost_crystal_pendant",
+		"display_name": "Frost Crystal Pendant",
+		"description": "A pendant containing an eternally frozen crystal",
+		"category": "Armor",
+		"materials": {"silver_ingot": 2, "soul_essence": 1},
+		"gold_cost": 60,
+		"required_engineering": 3,
+		"required_arcana": 3,
+		"output_item_id": "frost_crystal_pendant",
+		"base_quality": Enums.ItemQuality.AVERAGE
+	})
+
 	# === FOOD (Cooking) ===
 
 	# Cooked Meat
@@ -433,3 +625,47 @@ func _calculate_crafting_xp(recipe: CraftingRecipe) -> int:
 ## Get a specific recipe
 func get_recipe(recipe_id: String) -> CraftingRecipe:
 	return recipes.get(recipe_id, null)
+
+
+## Discover all recipes the player meets requirements for and add them to the codex
+## Call this when crafting UI opens or when skills change
+func discover_available_recipes() -> void:
+	if not CodexManager:
+		return
+
+	for recipe_id: String in recipes:
+		var recipe: CraftingRecipe = recipes[recipe_id]
+		# If player meets skill requirements, add to codex
+		if recipe.meets_requirements():
+			# Map crafting category to codex category
+			var codex_category: String = _get_codex_category(recipe.category)
+			# Create recipe data for codex
+			var recipe_data: Dictionary = {
+				"id": recipe.recipe_id,
+				"name": recipe.display_name,
+				"description": recipe.description,
+				"category": codex_category,
+				"materials": recipe.materials,
+				"output": recipe.output_item_id,
+				"skill_required": max(recipe.required_engineering, recipe.required_arcana)
+			}
+			# Add to codex all_recipes if not already there
+			if not CodexManager.all_recipes.has(recipe.recipe_id):
+				CodexManager.all_recipes[recipe.recipe_id] = recipe_data
+			# Discover it
+			CodexManager.discover_recipe(recipe.recipe_id)
+
+
+## Map crafting category to codex category
+func _get_codex_category(crafting_category: String) -> String:
+	match crafting_category:
+		"Weapon", "Armor":
+			return "smithing"
+		"Alchemy", "Consumable":
+			return "alchemy"
+		"Food":
+			return "cooking"
+		"Tool", "Material", "Ammo":
+			return "engineering"
+		_:
+			return "misc"

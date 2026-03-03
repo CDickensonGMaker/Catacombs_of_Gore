@@ -29,6 +29,12 @@ var weather: String = "clear"
 var pending_bounty_id: String = ""
 ## Pending quest ID for accept/decline workflow
 var pending_quest_id: String = ""
+## Pending talk objective info for completion workflow
+## Format: {quest_id, quest_title, objective_id, objective_description}
+var pending_talk_objective: Dictionary = {}
+## Pending quest turn-in info (quest ready to complete, awaiting player choice)
+## Format: {quest_id, quest_title, next_quest_id} - empty dict when no pending turn-in
+var pending_quest_turnin: Dictionary = {}
 ## Additional custom variables for injection
 var custom_variables: Dictionary = {}
 

@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="SpellEffectData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/spell_effect_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "apply_stun"
+display_name = "Stun"
+description = "Stuns the target, preventing all actions"
+effect_type = 4
+damage_type = 2
+condition = 7
+stat = 0
+allowed_delivery = [1, 2]
+base_magnitude = 1
+max_magnitude = 3
+base_duration = 2.0
+max_duration = 5.0
+base_cost = 20
+magnitude_cost_mult = 0.0
+duration_cost_mult = 3.0
+aoe_cost_mult = 4.0
+required_arcana = 7
+icon_path = ""
+effect_color = Color(1, 1, 0.4, 1)

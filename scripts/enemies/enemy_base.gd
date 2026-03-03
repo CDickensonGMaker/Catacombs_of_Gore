@@ -2,7 +2,7 @@
 class_name EnemyBase
 extends CharacterBody3D
 
-const DEBUG := false  # DISABLED - was causing freeze from excessive prints
+const DEBUG := true  # Set to true for AI diagnosis - TESTING FIX
 
 signal damaged(amount: int, damage_type: Enums.DamageType, attacker: Node)
 signal died(killer: Node)
@@ -255,6 +255,13 @@ func _ready() -> void:
 
 	# Store spawn position for stationary enemies
 	spawn_position = global_position
+	var enemy_name: String = enemy_data.display_name if enemy_data else name
+	print("[Enemy] ", enemy_name, " _ready() - spawn_position set to: ", spawn_position, " (global_pos=", global_position, ")")
+
+	# Connect to floating origin shift signal to update stored positions
+	if CellStreamer and CellStreamer.has_signal("origin_shifted"):
+		if not CellStreamer.origin_shifted.is_connected(_on_origin_shifted):
+			CellStreamer.origin_shifted.connect(_on_origin_shifted)
 
 	# Register with WorldData for tracking
 	_register_with_world_data()
@@ -319,9 +326,8 @@ func _ready() -> void:
 	if behavior_mode == BehaviorMode.PATROL and patrol_points.is_empty() and auto_generate_patrol_points:
 		_generate_patrol_points()
 
-	# Defer initial behavior start to allow navigation map to synchronize
-	# NavigationServer3D needs a physics frame to be ready
-	call_deferred("_start_initial_behavior")
+	# Wait for navigation to be ready before starting behavior
+	call_deferred("_wait_for_navigation_then_start")
 
 
 ## Hide 3D mesh placeholders if no billboard sprite was set up
@@ -340,6 +346,30 @@ func _hide_mesh_placeholders_if_no_billboard() -> void:
 func _exit_tree() -> void:
 	# Safety cleanup - ensure we're unregistered even if freed without proper death
 	CombatManager.unregister_enemy(self)
+	# Disconnect from origin shift signal
+	if CellStreamer and CellStreamer.has_signal("origin_shifted"):
+		if CellStreamer.origin_shifted.is_connected(_on_origin_shifted):
+			CellStreamer.origin_shifted.disconnect(_on_origin_shifted)
+
+
+## Handle floating origin shift - update all stored world positions
+func _on_origin_shifted(shift: Vector3) -> void:
+	spawn_position -= shift
+	last_known_target_position -= shift
+	last_position_check -= shift
+	wander_target_position -= shift
+	unstuck_target -= shift
+	investigation_position -= shift
+	current_search_point -= shift
+
+	# Update patrol points
+	for i in range(patrol_points.size()):
+		patrol_points[i] -= shift
+
+	if DEBUG:
+		var enemy_name: String = enemy_data.display_name if enemy_data else name
+		print("[Enemy] ", enemy_name, " origin shifted by ", shift, " - spawn_position now: ", spawn_position)
+
 
 func _initialize_from_data() -> void:
 	# Get player level for scaling (default to 1 if not available)
@@ -465,6 +495,16 @@ func _generate_patrol_points() -> void:
 		for i in range(patrol_points.size()):
 			print("  Point ", i, ": ", patrol_points[i])
 
+## Wait for navigation mesh to be ready before starting behavior
+## Simple approach: wait 2 physics frames for NavigationServer3D to sync after baking
+## This works regardless of when the enemy spawns (initial load, save load, or late spawn)
+func _wait_for_navigation_then_start() -> void:
+	# Wait 2 physics frames for NavigationServer3D to sync
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	_start_initial_behavior()
+
+
 ## Start the initial behavior state immediately
 func _start_initial_behavior() -> void:
 	if DEBUG:
@@ -505,6 +545,17 @@ func _physics_process(delta: float) -> void:
 	if current_state == AIState.DEAD:
 		return
 
+	# RECOVERY: Detect broken spawn_position (from origin shift desync or bad save)
+	# If spawn is impossibly far (>150 units) and we're in DISENGAGE, reset to current position
+	if current_state == AIState.DISENGAGE:
+		var dist_to_spawn: float = global_position.distance_to(spawn_position)
+		if dist_to_spawn > 150.0:  # Way beyond any reasonable leash
+			var enemy_name: String = enemy_data.display_name if enemy_data else name
+			print("[AI] ", enemy_name, " RECOVERY: spawn_position was broken (dist=", snapped(dist_to_spawn, 0.1), "). Resetting to current position.")
+			spawn_position = global_position
+			_change_state(AIState.IDLE)
+			return
+
 	# PERFORMANCE: Re-cache player if invalid (scene changed, etc.)
 	if not is_instance_valid(_cached_player):
 		_cached_player = get_tree().get_first_node_in_group("player")
@@ -532,6 +583,28 @@ func _physics_process(delta: float) -> void:
 		if _physics_frame_count % 2 != 0:
 			return  # Update at 1/2 rate
 	# else: full update rate for nearby enemies
+
+	# AI THOUGHT PROCESS DEBUG - every 60 frames (~1 second)
+	if _physics_frame_count % 60 == 0:
+		var enemy_name: String = enemy_data.display_name if enemy_data else name
+		var state_name: String = AIState.keys()[current_state] if current_state < AIState.size() else str(current_state)
+		var dist_to_player: float = sqrt(_cached_player_distance_sq)
+		var dist_to_spawn: float = global_position.distance_to(spawn_position)
+		var aggro_range_val: float = enemy_data.aggro_range if enemy_data else 12.0
+		print("═══════════════════════════════════════════════════════════")
+		print("[AI] ", enemy_name, " THOUGHT PROCESS:")
+		print("  State: ", state_name, " | Alert: ", AlertState.keys()[current_alert_state])
+		print("  Position: ", snapped(global_position, Vector3(0.1, 0.1, 0.1)))
+		print("  Spawn Position: ", snapped(spawn_position, Vector3(0.1, 0.1, 0.1)))
+		print("  Distance to PLAYER: ", snapped(dist_to_player, 0.1), " (aggro_range=", aggro_range_val, ")")
+		print("  Distance to SPAWN: ", snapped(dist_to_spawn, 0.1), " (leash_radius=", leash_radius, ")")
+		print("  Target: ", current_target.name if current_target else "NONE")
+		print("  Has LOS: ", has_line_of_sight)
+		print("  Disengage Cooldown: ", snapped(disengage_cooldown, 0.1))
+		print("  Nav Agent: ", nav_agent != null, " | Nav Target: ", nav_agent.target_position if nav_agent else "N/A")
+		if nav_agent:
+			print("  Nav Finished: ", nav_agent.is_navigation_finished(), " | Reachable: ", nav_agent.is_target_reachable())
+		print("═══════════════════════════════════════════════════════════")
 
 	_update_timers(delta)
 	_update_conditions(delta)
@@ -1005,6 +1078,9 @@ func _update_state_machine(delta: float) -> void:
 	# Check leash distance first (except when already disengaging or dead)
 	if current_state not in [AIState.DISENGAGE, AIState.DEAD, AIState.STAGGERED]:
 		if _is_beyond_leash():
+			var enemy_name: String = enemy_data.display_name if enemy_data else name
+			print("[AI] ", enemy_name, " LEASH TRIGGERED! dist_to_spawn=", snapped(global_position.distance_to(spawn_position), 0.1), " > leash_radius=", leash_radius)
+			print("[AI]   Current position: ", global_position, " | Spawn position: ", spawn_position)
 			_change_state(AIState.DISENGAGE)
 			return
 
@@ -1500,6 +1576,8 @@ func _change_state(new_state: AIState) -> void:
 		AIState.CHASE:
 			# Entering chase means we have a target - ensure combat alert state
 			chase_timer = 0.0  # Reset chase timeout
+			var enemy_name: String = enemy_data.display_name if enemy_data else name
+			print("[AI] ", enemy_name, " ENTERING CHASE! Target=", current_target.name if current_target else "NONE")
 			if current_alert_state != AlertState.COMBAT:
 				_change_alert_state(AlertState.COMBAT)
 		AIState.DEAD:
@@ -1887,23 +1965,23 @@ func _update_movement(delta: float) -> void:
 	if direction.length() > 0.1:
 		# Check minimum combat distance - don't walk closer than this to the target
 		# This prevents enemies from blocking the player's view during combat
+		# IMPORTANT: Only apply during CHASE state, NOT during ATTACK state
+		# During ATTACK, enemy needs to be able to approach to complete the attack
 		if current_target and is_instance_valid(current_target):
 			var dist := global_position.distance_to(current_target.global_position)
 
-			# If within minimum combat distance, stop approaching (but can still attack)
-			if dist <= MIN_COMBAT_DISTANCE and (current_state == AIState.CHASE or current_state == AIState.ATTACK):
-				# Check if we're moving toward the target
-				var to_target := (current_target.global_position - global_position).normalized()
-				to_target.y = 0
-				var moving_toward := direction.dot(to_target) > 0.3
-
-				if moving_toward:
-					# Stop moving toward target - we're close enough
-					velocity.x = 0
-					velocity.z = 0
-					if DEBUG and Engine.get_physics_frames() % 60 == 0:
-						print("[Enemy]   At min combat distance (", snapped(dist, 0.1), "), stopping approach")
-					return
+			# When at minimum combat distance, ALWAYS stop and try to attack
+			# Don't check movement direction - at this range, attack is the priority
+			# The old moving_toward check caused enemies to "fly past" the player when
+			# the nav path direction didn't align with the direct line to target
+			if dist <= MIN_COMBAT_DISTANCE and current_state == AIState.CHASE:
+				velocity.x = 0
+				velocity.z = 0
+				if DEBUG and Engine.get_physics_frames() % 60 == 0:
+					print("[Enemy]   At min combat distance (", snapped(dist, 0.1), "), stopping to attack")
+				if attack_cooldown <= 0:
+					_change_state(AIState.ATTACK)
+				return
 
 			# Slow down when approaching target in attack state
 			if current_state == AIState.ATTACK and dist < 3.0:
@@ -2471,13 +2549,12 @@ func _is_humanoid_faction() -> bool:
 ## Aggro detection
 
 func _on_aggro_area_body_entered(body: Node3D) -> void:
-	if DEBUG:
-		print("[Enemy] Aggro area entered by: ", body.name, " groups: ", body.get_groups())
+	var enemy_name: String = enemy_data.display_name if enemy_data else name
+	print("[AI] ", enemy_name, " AGGRO AREA entered by: ", body.name, " groups: ", body.get_groups())
 
 	# Ignore while disengaging or during disengage cooldown
 	if current_state == AIState.DISENGAGE or disengage_cooldown > 0:
-		if DEBUG:
-			print("[Enemy] Ignoring aggro - disengaging or in cooldown")
+		print("[AI]   IGNORED - disengaging=", current_state == AIState.DISENGAGE, " cooldown=", snapped(disengage_cooldown, 0.1))
 		return
 
 	# Player detection - use visibility-based awareness system
@@ -2501,13 +2578,14 @@ func _on_aggro_area_body_entered(body: Node3D) -> void:
 
 ## Immediately detect player (when not hidden or awareness threshold reached)
 func _detect_player_immediately(body: Node3D) -> void:
+	var enemy_name: String = enemy_data.display_name if enemy_data else name
 	if current_target:
+		print("[AI] ", enemy_name, " _detect_player_immediately - ALREADY HAS TARGET: ", current_target.name)
 		return  # Already have a target
 
 	current_target = body
 	last_known_target_position = body.global_position
-	if DEBUG:
-		print("[Enemy] Target acquired: ", body.name)
+	print("[AI] ", enemy_name, " TARGET ACQUIRED: ", body.name, " at ", body.global_position)
 	target_acquired.emit(body)
 
 	# Check for humanoid dialogue (pacifist option for human/elf/dwarf enemies)

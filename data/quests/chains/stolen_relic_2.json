@@ -1,0 +1,39 @@
+{
+	"id": "stolen_relic_2",
+	"title": "Recover the Sacred Relic",
+	"description": "The cultists have hidden the relic somewhere in the temple. Clear out the cultists and find it.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "temple_of_three",
+	"objectives": [
+		{
+			"id": "kill_cultists",
+			"description": "Kill the cultists guarding the relic",
+			"type": "kill",
+			"target": "cultist",
+			"required_count": 4
+		},
+		{
+			"id": "get_relic",
+			"description": "Retrieve the sacred relic",
+			"type": "collect",
+			"target": "sacred_relic",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 0,
+		"xp": 150,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": ["stolen_relic_1"],
+	"next_quest": "stolen_relic_3",
+	"quest_items": ["sacred_relic"]
+}

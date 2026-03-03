@@ -42,7 +42,11 @@ func _bake_navigation() -> void:
 
 
 func _setup_day_night_cycle() -> void:
-	DayNightCycle.add_to_level(self)
+	# Only setup day/night lighting when this is the main scene (has Player node)
+	# When loaded as a streamed cell, CellStreamer strips lighting to prevent doubling
+	var is_main_scene: bool = get_node_or_null("Player") != null
+	if is_main_scene:
+		DayNightCycle.add_to_level(self)
 
 
 func _setup_spawn_point_metadata() -> void:
@@ -69,9 +73,27 @@ func _spawn_enemies() -> void:
 
 func _spawn_enemy_at_marker(marker: Marker3D) -> void:
 	var enemy_data_path: String = marker.get_meta("enemy_data", "res://data/enemies/human_bandit.tres")
-	var sprite_path: String = marker.get_meta("sprite_path", "res://assets/sprites/enemies/human_bandit.png")
-	var h_frames: int = marker.get_meta("h_frames", 3)
-	var v_frames: int = marker.get_meta("v_frames", 4)
+
+	# Extract enemy type ID from path (e.g., "human_bandit" from ".../human_bandit.tres")
+	var enemy_type: String = enemy_data_path.get_file().get_basename()
+
+	# Check ActorRegistry first for sprite config (includes zoo patches)
+	var sprite_config: Dictionary = ActorRegistry.get_sprite_config(enemy_type)
+
+	var sprite_path: String
+	var h_frames: int
+	var v_frames: int
+
+	if not sprite_config.is_empty():
+		# Use ActorRegistry values (includes zoo patches)
+		sprite_path = sprite_config.get("sprite_path", "")
+		h_frames = sprite_config.get("h_frames", 4)
+		v_frames = sprite_config.get("v_frames", 1)
+	else:
+		# Fall back to marker metadata
+		sprite_path = marker.get_meta("sprite_path", "res://assets/sprites/enemies/human_bandit.png")
+		h_frames = marker.get_meta("h_frames", 4)
+		v_frames = marker.get_meta("v_frames", 1)
 
 	var sprite_texture: Texture2D = load(sprite_path)
 	if not sprite_texture:

@@ -1,0 +1,40 @@
+{
+	"id": "stolen_relic_1",
+	"title": "The Stolen Temple Relic",
+	"description": "Cultists raided the temple in Dalhurst and stole a sacred relic. The priest believes they've taken it to their temple in the east. Recover it before they can corrupt it with dark magic.",
+	"is_main_quest": false,
+	"quest_source": "npc",
+	"giver_npc_id": "dalhurst_priest",
+	"giver_npc_type": "priest",
+	"giver_region": "dalhurst",
+	"faction": "temple_of_three",
+	"objectives": [
+		{
+			"id": "find_temple",
+			"description": "Find the cultist temple east of Dalhurst",
+			"type": "reach",
+			"target": "cultist_temple_east",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 0,
+		"xp": 75,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": [],
+	"next_quest": "stolen_relic_2",
+	"spawn_on_accept": [
+		{
+			"type": "chest",
+			"location": "cultist_temple_east",
+			"contains": ["sacred_relic"],
+			"loot_tier": "rare"
+		}
+	],
+	"quest_items": ["sacred_relic"]
+}

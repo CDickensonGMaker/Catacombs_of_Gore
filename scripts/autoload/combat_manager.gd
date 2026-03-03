@@ -8,6 +8,8 @@ signal critical_hit(attacker: Node, target: Node)
 signal horror_check_triggered(source: Node, target: Node, passed: bool)
 signal humanoid_dialogue_requested(enemy: Node, group: Array)  ## Emitted when humanoid combat dialogue should open
 
+const DEBUG := false
+
 ## Active combatants tracking
 var active_enemies: Array[Node] = []
 var player: Node = null
@@ -22,6 +24,12 @@ var projectile_pool: ProjectilePool = null
 var _cleanup_timer: float = 0.0
 const CLEANUP_INTERVAL: float = 5.0
 
+## PERFORMANCE: Raycast budget system - limit expensive LOS checks per frame
+const MAX_RAYCASTS_PER_FRAME := 5
+const LOS_MAX_RANGE := 50.0  # Skip raycasts for targets beyond this distance
+var _raycast_count_this_frame: int = 0
+var _last_known_los: Dictionary = {}  # Cache LOS results: "from_id:to_id" -> bool
+
 func _ready() -> void:
 	# Try to load damage number scene if it exists
 	if ResourceLoader.exists("res://scenes/ui/damage_number.tscn"):
@@ -32,6 +40,28 @@ func _ready() -> void:
 	projectile_pool.name = "ProjectilePool"
 	add_child(projectile_pool)
 
+	# Connect to scene manager to clear node references before scene changes
+	if SceneManager:
+		SceneManager.scene_load_started.connect(_on_scene_load_started)
+
+
+## Called when a scene change begins - clear all node references to prevent stale casts
+func _on_scene_load_started(_scene_path: String) -> void:
+	_clear_node_references()
+
+
+## Clear all node references to prevent "Trying to cast a freed object" errors
+## Called at the START of scene transitions, before the old scene is freed
+func _clear_node_references() -> void:
+	player = null
+	# PERFORMANCE: Clear LOS cache on scene change to prevent stale entries
+	_last_known_los.clear()
+	_pending_humanoid_enemy = null
+	_pending_humanoid_group.clear()
+	active_enemies.clear()
+	_humanoid_dialogue_pending = false
+	clear_all_projectiles()
+
 func _process(delta: float) -> void:
 	# Periodically clean up invalid enemies to prevent iteration over freed nodes
 	_cleanup_timer += delta
@@ -41,6 +71,11 @@ func _process(delta: float) -> void:
 
 	# Update horror check cooldowns
 	update_horror_cooldowns(delta)
+
+
+func _physics_process(_delta: float) -> void:
+	# PERFORMANCE: Reset raycast budget each physics frame
+	_raycast_count_this_frame = 0
 
 ## Register player reference
 func register_player(player_node: Node) -> void:
@@ -94,6 +129,22 @@ func apply_melee_damage(
 		var stealth_skill: int = attacker_data.get_skill(Enums.Skill.STEALTH)
 		var backstab_mult: float = 1.5 + (stealth_skill * 0.1)  # 1.5x to 2.5x
 		total_damage = int(total_damage * backstab_mult)
+
+	# Stealth bonus - extra damage when target is unaware (hidden backstab)
+	var target_unaware: bool = false
+	if target.has_method("is_unaware"):
+		target_unaware = target.is_unaware()
+	if target_unaware and attacker.is_in_group("player"):
+		# Check if attacker is hidden
+		var attacker_hidden: bool = false
+		if attacker.has_method("get_is_hidden"):
+			attacker_hidden = attacker.get_is_hidden()
+		if attacker_hidden and attacker_data:
+			var stealth_skill: int = attacker_data.get_skill(Enums.Skill.STEALTH)
+			var stealth_mult: float = StealthConstants.get_stealth_backstab_multiplier(stealth_skill, true)
+			total_damage = int(total_damage * stealth_mult)
+			if DEBUG:
+				print("[CombatManager] Stealth attack! Multiplier: %.2f" % stealth_mult)
 
 	# Critical hit check
 	var crit_chance: float = weapon.crit_chance
@@ -157,7 +208,7 @@ func apply_melee_damage(
 
 	# Degrade target's armor if it's the player
 	if target.is_in_group("player"):
-		var degrade_amount: int = maxi(1, actual_damage / 10)
+		var degrade_amount: int = maxi(1, int(actual_damage / 10))
 		InventoryManager.degrade_armor(degrade_amount)
 
 	# Spawn damage number
@@ -427,7 +478,7 @@ var _pending_humanoid_group: Array[EnemyBase] = []
 ## Check if humanoid dialogue should trigger for this enemy
 ## Returns true if dialogue was triggered (enemy should wait for result)
 func check_humanoid_dialogue(enemy: EnemyBase) -> bool:
-	if not enemy or not enemy.enemy_data:
+	if not is_instance_valid(enemy) or not enemy.enemy_data:
 		return false
 
 	# Only enemies with allows_dialogue = true can be negotiated with
@@ -453,6 +504,9 @@ func check_humanoid_dialogue(enemy: EnemyBase) -> bool:
 
 ## Find all humanoid enemies in the same group as the given enemy
 func _find_humanoid_group(lead_enemy: EnemyBase) -> Array[EnemyBase]:
+	if not is_instance_valid(lead_enemy):
+		return []
+
 	var group: Array[EnemyBase] = [lead_enemy]
 	var group_radius := 15.0
 
@@ -460,7 +514,7 @@ func _find_humanoid_group(lead_enemy: EnemyBase) -> Array[EnemyBase]:
 		if not is_instance_valid(enemy_node) or enemy_node == lead_enemy:
 			continue
 
-		var enemy := enemy_node as EnemyBase
+		var enemy: EnemyBase = enemy_node as EnemyBase if is_instance_valid(enemy_node) else null
 		if not enemy or not enemy.enemy_data:
 			continue
 
@@ -477,6 +531,9 @@ func _find_humanoid_group(lead_enemy: EnemyBase) -> Array[EnemyBase]:
 
 ## Trigger the humanoid dialogue UI
 func _trigger_humanoid_dialogue(enemy: EnemyBase, group: Array[EnemyBase]) -> void:
+	if not is_instance_valid(enemy):
+		return
+
 	_humanoid_dialogue_pending = true
 	_pending_humanoid_enemy = enemy
 	_pending_humanoid_group = group
@@ -519,8 +576,14 @@ func _on_humanoid_dialogue_closed(result: HumanoidDialogue.DialogueResult) -> vo
 			# Enemies already set to disengage in dialogue handler
 			pass
 
+	# Clear references to prevent stale object casts
 	_pending_humanoid_enemy = null
 	_pending_humanoid_group.clear()
+
+
+## Check if the player reference is still valid
+func is_player_valid() -> bool:
+	return is_instance_valid(player)
 
 ## Get target's armor value
 func _get_target_armor(target: Node) -> int:
@@ -558,6 +621,21 @@ func _handle_kill_rewards(killer: Node, killed: Node) -> void:
 	# Apply Knowledge XP bonus
 	var xp_mult: float = killer_data.get_xp_multiplier()
 	xp_reward = int(xp_reward * xp_mult)
+
+	# Apply book knowledge bonus (25% extra XP if creature was studied)
+	if JournalManager:
+		var creature_id: String = ""
+		if killed.has_method("get_creature_id"):
+			creature_id = killed.get_creature_id()
+		elif "enemy_data" in killed and killed.enemy_data:
+			var enemy_data = killed.enemy_data
+			if enemy_data and "id" in enemy_data:
+				creature_id = str(enemy_data.id)
+
+		if not creature_id.is_empty():
+			var book_mult: float = JournalManager.get_creature_xp_multiplier(creature_id)
+			if book_mult > 1.0:
+				xp_reward = int(xp_reward * book_mult)
 
 	killer_data.add_ip(xp_reward)
 
@@ -635,8 +713,52 @@ func get_closest_enemy(point: Vector3, max_range: float = 100.0) -> Node:
 
 	return closest
 
+
+## Check if the player is currently in combat (enemies nearby and aware)
+func is_in_combat() -> bool:
+	if not is_instance_valid(player):
+		return false
+
+	# Check if any active enemies are within combat range
+	var combat_range: float = 15.0
+	for enemy in active_enemies:
+		if not is_instance_valid(enemy):
+			continue
+		if enemy is Node3D:
+			var dist: float = (enemy as Node3D).global_position.distance_to(player.global_position)
+			if dist < combat_range:
+				# Check if enemy is aware/hostile
+				if enemy.has_method("is_aware") and enemy.is_aware():
+					return true
+				# Fallback - if enemy is in combat state
+				if enemy.has_method("is_in_combat_state") and enemy.is_in_combat_state():
+					return true
+				# Simple fallback - just being close counts
+				if dist < 8.0:
+					return true
+	return false
+
+
 ## Check line of sight between two nodes
+## PERFORMANCE: Optimized with distance check and raycast budget
 func has_line_of_sight(from_node: Node3D, to_node: Node3D) -> bool:
+	if not is_instance_valid(from_node) or not is_instance_valid(to_node):
+		return false
+
+	# PERFORMANCE: Quick distance check - skip raycast for distant targets
+	var distance_sq: float = from_node.global_position.distance_squared_to(to_node.global_position)
+	if distance_sq > LOS_MAX_RANGE * LOS_MAX_RANGE:
+		return false  # Too far, no LOS
+
+	# Create cache key for this pair
+	var cache_key: String = "%d:%d" % [from_node.get_instance_id(), to_node.get_instance_id()]
+
+	# PERFORMANCE: Check raycast budget - return cached result if over budget
+	if _raycast_count_this_frame >= MAX_RAYCASTS_PER_FRAME:
+		return _last_known_los.get(cache_key, false)
+
+	# Do the actual raycast
+	_raycast_count_this_frame += 1
 	var space_state: PhysicsDirectSpaceState3D = from_node.get_world_3d().direct_space_state
 	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(
 		from_node.global_position + Vector3.UP,
@@ -645,7 +767,11 @@ func has_line_of_sight(from_node: Node3D, to_node: Node3D) -> bool:
 	)
 	query.exclude = [from_node, to_node]
 	var result: Dictionary = space_state.intersect_ray(query)
-	return result.is_empty()
+	var has_los: bool = result.is_empty()
+
+	# Cache the result
+	_last_known_los[cache_key] = has_los
+	return has_los
 
 ## Spawn a projectile from the pool
 func spawn_projectile(data: ProjectileData, source: Node, spawn_position: Vector3, direction: Vector3, target: Node3D = null) -> ProjectileBase:

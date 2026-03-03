@@ -187,6 +187,79 @@ func is_full_lore_revealed(creature_id: String) -> bool:
 	return get_reveal_level(creature_id) >= 4
 
 
+## Unlock bestiary entry from reading a book (gives full knowledge without kills)
+## Returns true if new knowledge was gained, false if already known
+func unlock_bestiary_from_book(creature_id: String) -> bool:
+	# If already have full lore from kills, no new knowledge
+	if creature_id in bestiary and bestiary[creature_id].get("from_book", false):
+		return false
+
+	# Get creature data from enemy database
+	var creature_data: Dictionary = _get_creature_data_from_database(creature_id)
+
+	if creature_id not in bestiary:
+		# Create new entry with book knowledge
+		bestiary[creature_id] = {
+			"creature_id": creature_id,
+			"creature_name": creature_data.get("name", creature_id.capitalize().replace("_", " ")),
+			"creature_type": creature_data.get("type", "Unknown"),
+			"first_encounter_location": "Learned from book",
+			"kill_count": 0,
+			"lore_description": creature_data.get("lore", "A creature described in scholarly texts."),
+			"weaknesses": creature_data.get("weaknesses", []),
+			"resistances": creature_data.get("resistances", []),
+			"discovered_time": Time.get_unix_time_from_system(),
+			"from_book": true  # Mark as learned from book
+		}
+		print("[Journal] Bestiary entry created from book: %s" % creature_id)
+	else:
+		# Already have entry from kills - mark as also learned from book for full knowledge
+		bestiary[creature_id]["from_book"] = true
+
+	bestiary_updated.emit(creature_id, bestiary[creature_id])
+	return true
+
+
+## Check if player has book knowledge of a creature (for XP bonus)
+func has_book_knowledge(creature_id: String) -> bool:
+	if creature_id not in bestiary:
+		return false
+	return bestiary[creature_id].get("from_book", false)
+
+
+## Get XP multiplier for killing a creature (bonus for book knowledge)
+## Returns 1.0 for no bonus, 1.25 for book knowledge
+func get_creature_xp_multiplier(creature_id: String) -> float:
+	if has_book_knowledge(creature_id):
+		return 1.25  # 25% XP bonus for studying the creature beforehand
+	return 1.0
+
+
+## Helper to get creature data from EnemyData database
+func _get_creature_data_from_database(creature_id: String) -> Dictionary:
+	# Try to load the enemy data file
+	var enemy_data_path := "res://data/enemies/%s.tres" % creature_id
+	if ResourceLoader.exists(enemy_data_path):
+		var enemy_data: Resource = load(enemy_data_path)
+		if enemy_data:
+			return {
+				"name": enemy_data.get("display_name") if "display_name" in enemy_data else creature_id.capitalize().replace("_", " "),
+				"type": enemy_data.get("enemy_type") if "enemy_type" in enemy_data else "Unknown",
+				"lore": enemy_data.get("lore_description") if "lore_description" in enemy_data else "",
+				"weaknesses": enemy_data.get("weaknesses") if "weaknesses" in enemy_data else [],
+				"resistances": enemy_data.get("resistances") if "resistances" in enemy_data else []
+			}
+
+	# Return default data if not found
+	return {
+		"name": creature_id.capitalize().replace("_", " "),
+		"type": "Unknown",
+		"lore": "",
+		"weaknesses": [],
+		"resistances": []
+	}
+
+
 # =============================================================================
 # CODEX UNLOCKS (Recipes/Knowledge)
 # =============================================================================

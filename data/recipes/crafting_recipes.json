@@ -163,5 +163,163 @@
     "gold_cost": 0,
     "skill_required": "None",
     "output": "leather_strip x3"
+  },
+  {
+    "id": "craft_regeneration_potion",
+    "title": "Regeneration Potion",
+    "category": "consumables",
+    "description": "A potent healing draught brewed from troll blood. The regenerative properties of the troll are captured in liquid form, granting the drinker rapid healing over time. The process requires careful extraction and purification to remove toxins.",
+    "materials": {
+      "troll_blood": 2,
+      "empty_vial": 1
+    },
+    "gold_cost": 50,
+    "skill_required": "Engineering 3",
+    "output": "regeneration_potion"
+  },
+  {
+    "id": "craft_poison_vial",
+    "title": "Poison Vial",
+    "category": "consumables",
+    "description": "Concentrated basilisk venom distilled into a weapon coating. A single application can turn any blade into a deadly poisoned weapon. Handle with extreme care - even experienced alchemists have lost fingers to careless handling.",
+    "materials": {
+      "basilisk_venom": 1,
+      "empty_vial": 1
+    },
+    "gold_cost": 25,
+    "skill_required": "Engineering 2",
+    "output": "poison_vial"
+  },
+  {
+    "id": "craft_agility_elixir",
+    "title": "Agility Elixir",
+    "category": "consumables",
+    "description": "A fizzing dark potion brewed from bat wings. The essence of the bat's supernatural agility is captured, temporarily enhancing the drinker's reflexes and movement speed. Favored by thieves and assassins.",
+    "materials": {
+      "bat_wing": 3,
+      "empty_vial": 1
+    },
+    "gold_cost": 20,
+    "skill_required": "Engineering 2",
+    "output": "agility_elixir"
+  },
+  {
+    "id": "craft_strength_tonic",
+    "title": "Strength Tonic",
+    "category": "consumables",
+    "description": "A thick, meaty brew made from beast heart and restorative herbs. Grants the raw power of a great beast for a limited time. Warriors drink this before major battles to gain an edge in combat.",
+    "materials": {
+      "beast_heart": 1,
+      "red_herb": 2,
+      "empty_vial": 1
+    },
+    "gold_cost": 30,
+    "skill_required": "Engineering 2",
+    "output": "strength_tonic"
+  },
+  {
+    "id": "craft_fur_cloak",
+    "title": "Fur Cloak",
+    "category": "armor",
+    "description": "A warm, protective cloak crafted from wolf pelts. Multiple pelts are stitched together with leather bindings to create a garment that protects against both cold weather and enemy attacks. Popular among rangers and northern travelers.",
+    "materials": {
+      "wolf_pelt": 3,
+      "leather_strip": 2
+    },
+    "gold_cost": 40,
+    "skill_required": "Engineering 2",
+    "output": "fur_cloak"
+  },
+  {
+    "id": "craft_troll_armor",
+    "title": "Troll Hide Armor",
+    "category": "armor",
+    "description": "Heavy armor crafted from the thick hide of a troll. The troll's regenerative properties persist in the cured leather, slowly repairing damage over time. A masterwork of the armorer's craft that requires significant skill to create.",
+    "materials": {
+      "troll_hide": 2,
+      "leather_strip": 3
+    },
+    "gold_cost": 150,
+    "skill_required": "Engineering 5",
+    "output": "troll_armor"
+  },
+  {
+    "id": "craft_scale_mail",
+    "title": "Basilisk Scale Mail",
+    "category": "armor",
+    "description": "Armor crafted by overlaying basilisk scales onto a chainmail base. The scales provide exceptional protection and retain some of the basilisk's resistance to petrification. Only master armorers can properly work with these rare materials.",
+    "materials": {
+      "basilisk_scale": 4,
+      "iron_ingot": 2
+    },
+    "gold_cost": 200,
+    "skill_required": "Engineering 5",
+    "output": "scale_mail"
+  },
+  {
+    "id": "craft_wyvern_armor",
+    "title": "Wyvern Scale Armor",
+    "category": "armor",
+    "description": "The pinnacle of scaled armor, crafted from wyvern scales reinforced with steel. Lighter than any metal armor yet stronger than most, with natural resistance to poison. Creating this armor is considered a masterwork achievement.",
+    "materials": {
+      "wyvern_scale": 5,
+      "steel_ingot": 3,
+      "leather_strip": 2
+    },
+    "gold_cost": 400,
+    "skill_required": "Engineering 6",
+    "output": "wyvern_armor"
+  },
+  {
+    "id": "craft_venomous_dagger",
+    "title": "Venomous Dagger",
+    "category": "weapons",
+    "description": "An iron dagger permanently coated with basilisk venom. The venom is alchemically bonded to the blade, delivering poison with every strike. A favorite weapon of assassins who prefer a subtle approach.",
+    "materials": {
+      "iron_dagger": 1,
+      "basilisk_venom": 1
+    },
+    "gold_cost": 75,
+    "skill_required": "Engineering 3",
+    "output": "venomous_dagger"
+  },
+  {
+    "id": "craft_ember_blade",
+    "title": "Ember Blade",
+    "category": "weapons",
+    "description": "A steel sword infused with ember dust and bound with soul essence. The blade glows with perpetual inner heat, searing enemies on contact. Creating this enchanted weapon requires both smithing skill and arcane knowledge.",
+    "materials": {
+      "steel_sword": 1,
+      "ember_dust": 3,
+      "soul_essence": 1
+    },
+    "gold_cost": 200,
+    "skill_required": "Engineering 4",
+    "output": "ember_blade"
+  },
+  {
+    "id": "craft_silk_rope",
+    "title": "Silk Rope",
+    "category": "tools",
+    "description": "Strong, lightweight rope woven from spider silk. Pound for pound stronger than hemp rope yet far lighter. Essential for climbing, binding, or any situation requiring reliable cordage. Highly valued by adventurers and climbers.",
+    "materials": {
+      "spider_silk": 5
+    },
+    "gold_cost": 10,
+    "skill_required": "Engineering 1",
+    "output": "silk_rope"
+  },
+  {
+    "id": "craft_rat_poison",
+    "title": "Rat Poison",
+    "category": "tools",
+    "description": "A noxious powder ground from rat tails and bitter herbs. Originally developed for pest control, creative individuals have found other uses - poisoning food supplies, coating weapons, or eliminating unwanted guests.",
+    "materials": {
+      "rat_tail": 3,
+      "red_herb": 1
+    },
+    "gold_cost": 5,
+    "skill_required": "None",
+    "output": "rat_poison"
   }
 ]

@@ -1,0 +1,54 @@
+{
+	"id": "rescue_soldier_2",
+	"title": "Free the Soldier",
+	"description": "You've found the camp. Clear the enemies and free the captured soldier.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "human_empire",
+	"objectives": [
+		{
+			"id": "kill_bandits",
+			"description": "Kill the captors",
+			"type": "kill",
+			"target": "human_bandit",
+			"required_count": 6
+		},
+		{
+			"id": "kill_captain",
+			"description": "Defeat the Bandit Captain",
+			"type": "kill",
+			"target": "bandit_captain",
+			"required_count": 1
+		},
+		{
+			"id": "free_soldier",
+			"description": "Free the soldier",
+			"type": "talk",
+			"target": "hostage_soldier",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 0,
+		"xp": 250,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": ["rescue_soldier_1"],
+	"next_quest": "rescue_soldier_3",
+	"spawn_on_accept": [
+		{
+			"type": "hostage",
+			"location": "bandit_camp_south",
+			"hostage_id": "hostage_soldier",
+			"name": "Captured Soldier",
+			"objective_id": "free_soldier"
+		}
+	]
+}

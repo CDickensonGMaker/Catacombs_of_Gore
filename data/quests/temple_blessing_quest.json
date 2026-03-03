@@ -1,0 +1,46 @@
+{
+	"id": "temple_blessing_quest",
+	"title": "The Three's Blessing",
+	"description": "Priestess of Gaela at the Temple of the Three Gods seeks a faithful soul to gather sacred ingredients for a blessing ritual. The herbs and waters must be collected from blessed sites to maintain their purity.",
+	"is_main_quest": false,
+	"quest_source": "npc",
+	"giver_npc_id": "priest_gaela_dalhurst",
+	"giver_npc_type": "civilian",
+	"giver_region": "dalhurst",
+	"objectives": [
+		{
+			"id": "collect_moonpetals",
+			"description": "Gather Moonpetal flowers from the shrine grove",
+			"type": "collect",
+			"target": "moonpetal_flower",
+			"required_count": 5
+		},
+		{
+			"id": "collect_holy_water",
+			"description": "Fill a vial with water from the sacred spring",
+			"type": "collect",
+			"target": "sacred_spring_water",
+			"required_count": 1
+		},
+		{
+			"id": "return_ingredients",
+			"description": "Return the ingredients to Priestess of Gaela",
+			"type": "talk",
+			"target": "priest_gaela_dalhurst",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "priest_gaela_dalhurst",
+	"turn_in_zone": "dalhurst",
+	"rewards": {
+		"gold": 50,
+		"xp": 300,
+		"items": ["blessing_of_gaela"],
+		"faction_reputation": {
+			"church_of_three": 25
+		}
+	},
+	"prerequisites": [],
+	"next_quest": ""
+}

@@ -3,18 +3,18 @@
 [ext_resource type="Script" uid="uid://b5deh5yw7jpvd" path="res://scripts/levels/aberdeen.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
-[ext_resource type="Texture2D" uid="uid://gmwgb548r8l7" path="res://Sprite folders grab bag/stonefloor.png" id="4"]
-[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://Sprite folders grab bag/stonewall.png" id="5"]
-[ext_resource type="Texture2D" uid="uid://dyhj3smpg4g87" path="res://Sprite folders grab bag/woodenfloor.png" id="6"]
+[ext_resource type="Texture2D" uid="uid://gmwgb548r8l7" path="res://assets/textures/environment/floors/stonefloor.png" id="4"]
+[ext_resource type="Texture2D" uid="uid://dh326odj53nps" path="res://assets/textures/environment/walls/stonewall.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://dyhj3smpg4g87" path="res://assets/textures/environment/floors/woodenfloor.png" id="6"]
 [ext_resource type="PackedScene" path="res://scenes/world/merchant_instance.tscn" id="7"]
 [ext_resource type="PackedScene" path="res://scenes/world/rest_spot_instance.tscn" id="8"]
 [ext_resource type="PackedScene" path="res://scenes/world/fast_travel_shrine_instance.tscn" id="9"]
 [ext_resource type="PackedScene" path="res://scenes/npcs/quest_giver_instance.tscn" id="10"]
 [ext_resource type="PackedScene" path="res://scenes/world/zone_door_instance.tscn" id="11"]
 [ext_resource type="PackedScene" path="res://scenes/world/bounty_board_instance.tscn" id="12"]
-[ext_resource type="Texture2D" uid="uid://dd2545kodv82h" path="res://Sprite folders grab bag/road_to_kazan_dun_background.png" id="13"]
-[ext_resource type="Texture2D" path="res://Sprite folders grab bag/frost_monster.png" id="14"]
-[ext_resource type="Texture2D" path="res://Sprite folders grab bag/cat_animiation.png" id="15"]
+[ext_resource type="Texture2D" uid="uid://dd2545kodv82h" path="res://assets/sprites/environment/backgrounds/road_to_kazan_dun_background.png" id="13"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/beasts/frost_monster.png" id="14"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/animals/cat_animiation.png" id="15"]
 
 [sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
 sky_top_color = Color(0.55, 0.6, 0.7, 1)
@@ -887,9 +887,9 @@ show_frame = false
 
 [node name="WestExit" parent="Doors" instance=ExtResource("11")]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -44, 0, 5)
-target_scene = "res://scenes/levels/larton.tscn"
-spawn_point_id = "from_aberdeen"
-door_name = "Road to Larton (Dangerous)"
+target_scene = "RETURN_TO_WILDERNESS"
+spawn_point_id = "default"
+door_name = "Western Road"
 show_frame = false
 
 [node name="SpawnPoints" type="Node3D" parent="."]

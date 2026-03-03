@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="SpellEffectData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/spell_effect_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "drain_agility"
+display_name = "Drain Agility"
+description = "Temporarily decreases the target's Agility stat"
+effect_type = 8
+damage_type = 0
+condition = 0
+stat = 1
+allowed_delivery = [1, 2]
+base_magnitude = 2
+max_magnitude = 8
+base_duration = 20.0
+max_duration = 60.0
+base_cost = 14
+magnitude_cost_mult = 1.8
+duration_cost_mult = 0.4
+aoe_cost_mult = 2.5
+required_arcana = 6
+icon_path = ""
+effect_color = Color(0.2, 0.4, 0.2, 1)

@@ -1,0 +1,32 @@
+{
+	"id": "lost_locket_2",
+	"title": "Find the Locket",
+	"description": "You're near where the widow lost the locket. Search the area carefully.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "common_folk",
+	"objectives": [
+		{
+			"id": "get_locket",
+			"description": "Find the locket",
+			"type": "collect",
+			"target": "silver_necklace",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 0,
+		"xp": 60,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": ["lost_locket_1"],
+	"next_quest": "lost_locket_3",
+	"quest_items": ["silver_necklace"]
+}

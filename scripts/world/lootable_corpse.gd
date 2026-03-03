@@ -92,7 +92,7 @@ func _create_corpse_mesh() -> void:
 
 	var mat := StandardMaterial3D.new()
 	# Try to load gore texture if available
-	var gore_tex_path := "res://assets/sprites/textures/dungeon/gore_dungeon_wall.png"
+	var gore_tex_path := "res://assets/textures/environment/dungeon/gore_dungeon_wall.png"
 	if ResourceLoader.exists(gore_tex_path):
 		mat.albedo_texture = load(gore_tex_path)
 		mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST

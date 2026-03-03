@@ -6,12 +6,6 @@
 [ext_resource type="Script" path="res://scripts/dialogue/dialogue_condition.gd" id="4_cond"]
 [ext_resource type="Script" path="res://scripts/dialogue/dialogue_action.gd" id="5_action"]
 
-# ============================================================================
-# CONDITIONS
-# ============================================================================
-
-# Condition: Already befriended (permanent discount)
-# Uses {merchant_id} placeholder - substituted by DialogueManager with actual merchant ID
 [sub_resource type="Resource" id="cond_befriended"]
 script = ExtResource("4_cond")
 type = 5
@@ -20,7 +14,6 @@ param_int = 0
 param_float = 0.0
 invert = false
 
-# Condition: Not befriended
 [sub_resource type="Resource" id="cond_not_befriended"]
 script = ExtResource("4_cond")
 type = 5
@@ -29,7 +22,6 @@ param_int = 0
 param_float = 0.0
 invert = true
 
-# Condition: Merchant angered
 [sub_resource type="Resource" id="cond_angered"]
 script = ExtResource("4_cond")
 type = 5
@@ -38,7 +30,6 @@ param_int = 0
 param_float = 0.0
 invert = false
 
-# Condition: Merchant not angered
 [sub_resource type="Resource" id="cond_not_angered"]
 script = ExtResource("4_cond")
 type = 5
@@ -47,11 +38,6 @@ param_int = 0
 param_float = 0.0
 invert = true
 
-# ============================================================================
-# ACTIONS
-# ============================================================================
-
-# Action: Open shop normally
 [sub_resource type="Resource" id="action_open_shop"]
 script = ExtResource("5_action")
 type = 15
@@ -61,7 +47,6 @@ param_float = 0.0
 success_node_id = ""
 failure_node_id = ""
 
-# Action: Set haggle success flag (per-merchant via {merchant_id} placeholder)
 [sub_resource type="Resource" id="action_set_haggle_success"]
 script = ExtResource("5_action")
 type = 8
@@ -71,7 +56,6 @@ param_float = 0.0
 success_node_id = ""
 failure_node_id = ""
 
-# Action: Set intimidate success flag (per-merchant via {merchant_id} placeholder)
 [sub_resource type="Resource" id="action_set_intimidate_success"]
 script = ExtResource("5_action")
 type = 8
@@ -81,7 +65,6 @@ param_float = 0.0
 success_node_id = ""
 failure_node_id = ""
 
-# Action: Set befriend flag (permanent discount, per-merchant)
 [sub_resource type="Resource" id="action_set_befriend"]
 script = ExtResource("5_action")
 type = 8
@@ -91,7 +74,6 @@ param_float = 0.0
 success_node_id = ""
 failure_node_id = ""
 
-# Action: Set angered flag (per-merchant)
 [sub_resource type="Resource" id="action_set_angered"]
 script = ExtResource("5_action")
 type = 8
@@ -101,7 +83,6 @@ param_float = 0.0
 success_node_id = ""
 failure_node_id = ""
 
-# Skill Check: Negotiation DC 12
 [sub_resource type="Resource" id="action_skill_negotiation"]
 script = ExtResource("5_action")
 type = 10
@@ -111,7 +92,6 @@ param_float = 12.0
 success_node_id = "negotiate_success"
 failure_node_id = "negotiate_fail"
 
-# Skill Check: Intimidation DC 15
 [sub_resource type="Resource" id="action_skill_intimidation"]
 script = ExtResource("5_action")
 type = 10
@@ -121,7 +101,6 @@ param_float = 15.0
 success_node_id = "intimidate_success"
 failure_node_id = "intimidate_fail"
 
-# Skill Check: Persuasion DC 10
 [sub_resource type="Resource" id="action_skill_persuasion"]
 script = ExtResource("5_action")
 type = 10
@@ -130,10 +109,6 @@ param_int = 12
 param_float = 10.0
 success_node_id = "persuade_success"
 failure_node_id = "persuade_fail"
-
-# ============================================================================
-# CHOICES
-# ============================================================================
 
 [sub_resource type="Resource" id="choice_goodbye"]
 script = ExtResource("3_choice")
@@ -243,10 +218,6 @@ show_when_unavailable = false
 unavailable_reason = ""
 actions = [SubResource("action_set_angered"), SubResource("action_open_shop")]
 
-# ============================================================================
-# NODES
-# ============================================================================
-
 [sub_resource type="Resource" id="node_start"]
 script = ExtResource("2_node")
 id = "start"
@@ -267,7 +238,6 @@ is_end_node = false
 auto_continue_to = ""
 portrait_id = "merchant_friendly"
 
-# Negotiation branch
 [sub_resource type="Resource" id="node_negotiate_success"]
 script = ExtResource("2_node")
 id = "negotiate_success"
@@ -288,7 +258,6 @@ is_end_node = false
 auto_continue_to = ""
 portrait_id = "merchant_firm"
 
-# Intimidation branch
 [sub_resource type="Resource" id="node_intimidate_success"]
 script = ExtResource("2_node")
 id = "intimidate_success"
@@ -309,7 +278,6 @@ is_end_node = false
 auto_continue_to = ""
 portrait_id = "merchant_hostile"
 
-# Persuasion branch
 [sub_resource type="Resource" id="node_persuade_success"]
 script = ExtResource("2_node")
 id = "persuade_success"
@@ -330,7 +298,6 @@ is_end_node = false
 auto_continue_to = ""
 portrait_id = "merchant_polite"
 
-# Angry shop
 [sub_resource type="Resource" id="node_shop_angry"]
 script = ExtResource("2_node")
 id = "shop_angry"
@@ -341,7 +308,6 @@ is_end_node = false
 auto_continue_to = ""
 portrait_id = "merchant_suspicious"
 
-# End nodes
 [sub_resource type="Resource" id="node_end"]
 script = ExtResource("2_node")
 id = "end"
@@ -361,10 +327,6 @@ choices = []
 is_end_node = true
 auto_continue_to = ""
 portrait_id = "merchant_angry"
-
-# ============================================================================
-# RESOURCE
-# ============================================================================
 
 [resource]
 script = ExtResource("1_data")

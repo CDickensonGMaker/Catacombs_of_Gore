@@ -1,0 +1,34 @@
+{
+	"id": "bounty_bandit_patrol",
+	"title": "Bandit Patrol",
+	"description": "Bandits have been spotted patrolling the roads. The guard captain is offering a bounty for their elimination.",
+	"is_main_quest": false,
+	"quest_source": "bounty",
+	"giver_npc_id": "bounty_board",
+	"giver_npc_type": "bounty_board",
+	"giver_region": "thornfield",
+	"faction": "human_empire",
+	"objectives": [
+		{
+			"id": "kill_bandits",
+			"description": "Kill bandits on the roads",
+			"type": "kill",
+			"target": "human_bandit",
+			"required_count": 3
+		}
+	],
+	"turn_in_type": "bounty_board",
+	"turn_in_target": "bounty_board",
+	"turn_in_zone": "thornfield",
+	"rewards": {
+		"gold": 75,
+		"xp": 200,
+		"items": [],
+		"faction_reputation": {
+			"human_empire": 15
+		}
+	},
+	"cooldown_days": 5,
+	"prerequisites": [],
+	"next_quest": ""
+}

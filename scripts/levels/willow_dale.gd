@@ -5,6 +5,10 @@ extends Node3D
 
 const ZONE_ID := "dungeon_willow_dale"
 
+## Preloaded textures (more reliable than runtime load)
+const MOSSY_STONE_TEX: Texture2D = preload("res://assets/textures/environment/walls/mossy stones.png")
+const DIRT_FLOOR_TEX: Texture2D = preload("res://assets/textures/environment/floors/monastary_floor_outside1.png")
+
 ## Materials
 var stone_floor_mat: StandardMaterial3D
 var stone_wall_mat: StandardMaterial3D
@@ -12,70 +16,181 @@ var grass_mat: StandardMaterial3D
 var dirt_mat: StandardMaterial3D
 var gravestone_mat: StandardMaterial3D
 var wood_mat: StandardMaterial3D
+var mossy_stone_mat: StandardMaterial3D  ## For GLB model
+
+## Terrain model
+var terrain_model: Node3D
 
 ## Navigation
 var nav_region: NavigationRegion3D
 
 
 func _ready() -> void:
-	# Set current region for world map tracking
-	if SceneManager:
-		SceneManager.set_current_region(ZONE_ID)
+	# Check if we're the main scene (have Player) or a streamed cell
+	var is_main_scene: bool = get_node_or_null("Player") != null
 
-	SaveManager.set_current_zone(ZONE_ID, "Willow Dale Watchtower")
+	# Set current region for world map tracking (only if main scene)
+	if is_main_scene:
+		if SceneManager:
+			SceneManager.set_current_region(ZONE_ID)
+		SaveManager.set_current_zone(ZONE_ID, "Willow Dale Watchtower")
+		# Play ruins ambient and dungeon music
+		AudioManager.play_zone_ambiance("ruins")
+		AudioManager.play_zone_music("ruins")
 
 	_create_materials()
+	_load_terrain_model()
 	_setup_navigation()
-	_create_exterior_cemetery()
-	_create_tower_structure()
-	_create_tower_interior()
 	_spawn_spawn_points()
-	_spawn_exit_portal()
+
+	# Only spawn exit portal if this is the main scene, not a streamed cell
+	if is_main_scene:
+		_spawn_exit_portal()
+
 	_spawn_undead()
 	_spawn_cultists()
 	_spawn_loot()
 	_spawn_quest_objectives()
+	_spawn_cursed_totem()
+	_spawn_environmental_lore()
 	_create_lighting()
 	_setup_cell_streaming()
 
-	# Quest triggers for entering willow dale
-	QuestManager.on_location_reached("willow_dale_entrance")
-	QuestManager.on_location_reached("willow_dale")
-	QuestManager.on_location_reached("willow_dale_depths")
+	# Quest triggers for entering willow dale (only if main scene)
+	if is_main_scene:
+		QuestManager.on_location_reached("willow_dale_entrance")
+		QuestManager.on_location_reached("willow_dale")
+		QuestManager.on_location_reached("willow_dale_depths")
 
 	print("[WillowDale] Dungeon initialized!")
 
 
 func _create_materials() -> void:
-	# Stone floor - old weathered stone
-	stone_floor_mat = StandardMaterial3D.new()
-	stone_floor_mat.albedo_color = Color(0.22, 0.2, 0.18)
-	stone_floor_mat.roughness = 0.95
+	# Mossy stone material for GLB model walls/structure
+	mossy_stone_mat = StandardMaterial3D.new()
+	mossy_stone_mat.albedo_texture = MOSSY_STONE_TEX
+	mossy_stone_mat.uv1_scale = Vector3(2, 2, 1)
+	mossy_stone_mat.roughness = 0.9
+	mossy_stone_mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	mossy_stone_mat.vertex_color_use_as_albedo = false
 
-	# Stone walls - slightly mossy gray
+	# Stone floor with dirt texture
+	stone_floor_mat = StandardMaterial3D.new()
+	stone_floor_mat.albedo_texture = DIRT_FLOOR_TEX
+	stone_floor_mat.roughness = 0.95
+	stone_floor_mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	stone_floor_mat.vertex_color_use_as_albedo = false
+
+	# Stone walls - same mossy texture
 	stone_wall_mat = StandardMaterial3D.new()
-	stone_wall_mat.albedo_color = Color(0.28, 0.3, 0.26)
+	stone_wall_mat.albedo_texture = MOSSY_STONE_TEX
 	stone_wall_mat.roughness = 0.9
+	stone_wall_mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	stone_wall_mat.vertex_color_use_as_albedo = false
 
 	# Grass - dead, yellowed
 	grass_mat = StandardMaterial3D.new()
 	grass_mat.albedo_color = Color(0.25, 0.28, 0.15)
 	grass_mat.roughness = 0.95
+	grass_mat.vertex_color_use_as_albedo = false
 
-	# Dirt - dark brown
+	# Dirt - dark brown with texture
 	dirt_mat = StandardMaterial3D.new()
-	dirt_mat.albedo_color = Color(0.18, 0.14, 0.1)
+	dirt_mat.albedo_texture = DIRT_FLOOR_TEX
 	dirt_mat.roughness = 0.98
+	dirt_mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	dirt_mat.vertex_color_use_as_albedo = false
 
 	# Gravestones - weathered gray stone
 	gravestone_mat = StandardMaterial3D.new()
 	gravestone_mat.albedo_color = Color(0.35, 0.33, 0.32)
 	gravestone_mat.roughness = 0.85
+	gravestone_mat.vertex_color_use_as_albedo = false
 
 	# Rotting wood
 	wood_mat = StandardMaterial3D.new()
 	wood_mat.albedo_color = Color(0.2, 0.15, 0.1)
 	wood_mat.roughness = 0.9
+	wood_mat.vertex_color_use_as_albedo = false
+
+
+## Load the willow_dale.glb terrain model and add mesh collision
+func _load_terrain_model() -> void:
+	# Check if terrain model already exists in scene (placed in .tscn)
+	var terrain_container: Node3D = get_node_or_null("Terrain")
+	if terrain_container:
+		terrain_model = terrain_container.get_node_or_null("TerrainModel")
+
+	if not terrain_model:
+		# Try to load dynamically if not in scene
+		var glb_scene: PackedScene = load("res://assets/models/terrain/willow_dale.glb")
+		if not glb_scene:
+			push_error("[WillowDale] Failed to load willow_dale.glb")
+			return
+
+		terrain_model = glb_scene.instantiate()
+		terrain_model.name = "TerrainModel"
+		if terrain_container:
+			terrain_container.add_child(terrain_model)
+		else:
+			add_child(terrain_model)
+
+	# Apply materials and collision to all meshes
+	print("[WillowDale] Applying texture: %s (valid: %s)" % [MOSSY_STONE_TEX, MOSSY_STONE_TEX != null])
+	_process_model_meshes(terrain_model)
+
+
+## Mesh naming conventions for collision control:
+## - "_nocol" suffix: No collision (e.g., "Vines_nocol")
+## - "collision" or "walkable" in name: Collision-only mesh (invisible)
+const NO_COLLISION_SUFFIX := "_nocol"
+const COLLISION_ONLY_NAMES := ["collision", "walkable", "colonly"]
+
+## Recursively process all meshes in the model to add collision and materials
+func _process_model_meshes(node: Node) -> void:
+	if node is MeshInstance3D:
+		var mesh_instance: MeshInstance3D = node as MeshInstance3D
+		var mesh_name: String = mesh_instance.name.to_lower()
+
+		# Check if this is a collision-only mesh (hide visual, keep collision)
+		var is_collision_only: bool = false
+		for col_name in COLLISION_ONLY_NAMES:
+			if mesh_name.contains(col_name):
+				is_collision_only = true
+				break
+
+		# Check if this mesh should be skipped for collision
+		var skip_collision: bool = mesh_name.ends_with(NO_COLLISION_SUFFIX.to_lower())
+
+		# Apply material (unless collision-only mesh which should be invisible)
+		if is_collision_only:
+			mesh_instance.visible = false
+		elif mesh_instance.mesh:
+			# GLB embedded materials override material_override
+			# Force our texture by duplicating mesh and setting surface materials
+			var unique_mesh: Mesh = mesh_instance.mesh.duplicate()
+			for i in range(unique_mesh.get_surface_count()):
+				unique_mesh.surface_set_material(i, mossy_stone_mat)
+			mesh_instance.mesh = unique_mesh
+
+		# Create collision unless explicitly marked _nocol
+		if not skip_collision and mesh_instance.mesh:
+			var static_body := StaticBody3D.new()
+			static_body.name = mesh_instance.name + "_Collision"
+			static_body.collision_layer = 1
+			static_body.collision_mask = 0
+
+			var shape := mesh_instance.mesh.create_trimesh_shape()
+			if shape:
+				var collision_shape := CollisionShape3D.new()
+				collision_shape.shape = shape
+				static_body.add_child(collision_shape)
+				mesh_instance.add_sibling(static_body)
+				static_body.global_transform = mesh_instance.global_transform
+
+	# Process children recursively
+	for child in node.get_children():
+		_process_model_meshes(child)
 
 
 func _setup_navigation() -> void:
@@ -101,342 +216,6 @@ func _bake_navigation() -> void:
 	if nav_region and nav_region.navigation_mesh:
 		nav_region.bake_navigation_mesh()
 		print("[WillowDale] Navigation mesh baked!")
-
-
-## ============================================================================
-## LAYOUT OVERVIEW (top-down, north = -Z):
-##
-##                    [TOWER INTERIOR]
-##                     Entry Hall
-##                          |
-##                   +------+------+
-##                   |   TOWER     |
-##                   |   BASE      |
-##                   +------+------+
-##                          |
-##              [CEMETERY EXTERIOR]
-##                   Gravestones
-##                   scattered
-##                          |
-##                   [ENTRANCE]
-##                     (south)
-## ============================================================================
-
-
-## EXTERIOR CEMETERY - Open area with graves before the tower
-func _create_exterior_cemetery() -> void:
-	# Large ground area (40x50)
-	var ground := CSGBox3D.new()
-	ground.name = "CemeteryGround"
-	ground.size = Vector3(50, 1, 60)
-	ground.position = Vector3(0, -0.5, 30)
-	ground.material = grass_mat
-	ground.use_collision = true
-	add_child(ground)
-
-	# Dirt path leading to tower
-	var path := CSGBox3D.new()
-	path.name = "DirtPath"
-	path.size = Vector3(6, 0.05, 40)
-	path.position = Vector3(0, 0.03, 25)
-	path.material = dirt_mat
-	path.use_collision = false
-	add_child(path)
-
-	# Gravestones scattered around
-	_create_gravestones()
-
-	# Ruined cemetery fence/wall fragments
-	_create_cemetery_walls()
-
-	print("[WillowDale] Cemetery exterior created")
-
-
-func _create_gravestones() -> void:
-	# Gravestone positions (scattered around cemetery)
-	var positions := [
-		# Left side
-		Vector3(-12, 0, 45),
-		Vector3(-15, 0, 38),
-		Vector3(-10, 0, 32),
-		Vector3(-18, 0, 28),
-		Vector3(-8, 0, 22),
-		# Right side
-		Vector3(12, 0, 42),
-		Vector3(16, 0, 35),
-		Vector3(10, 0, 28),
-		Vector3(14, 0, 20),
-		Vector3(18, 0, 40),
-		# Some tilted/fallen near tower
-		Vector3(-6, 0, 15),
-		Vector3(6, 0, 12),
-	]
-
-	for i in positions.size():
-		_create_gravestone(positions[i], i)
-
-
-func _create_gravestone(pos: Vector3, index: int) -> void:
-	var stone := CSGBox3D.new()
-	stone.name = "Gravestone_%d" % index
-	stone.size = Vector3(0.8, 1.2 + randf_range(-0.3, 0.3), 0.2)
-	stone.position = Vector3(pos.x, stone.size.y / 2.0, pos.z)
-	stone.material = gravestone_mat
-	stone.use_collision = true
-
-	# Random slight rotation for variety
-	stone.rotation.y = randf_range(-0.2, 0.2)
-	# Some stones tilted as if falling
-	if index > 8:
-		stone.rotation.x = randf_range(0.1, 0.3)
-
-	add_child(stone)
-
-	# Dirt mound in front of some graves
-	if index % 2 == 0:
-		var mound := CSGBox3D.new()
-		mound.name = "GraveMound_%d" % index
-		mound.size = Vector3(1.0, 0.15, 1.8)
-		mound.position = Vector3(pos.x, 0.08, pos.z + 1.0)
-		mound.material = dirt_mat
-		mound.use_collision = true
-		add_child(mound)
-
-
-func _create_cemetery_walls() -> void:
-	# Ruined low stone walls around cemetery perimeter
-	var wall_height := 1.5
-	var wall_thickness := 0.5
-
-	# South entrance gap (player spawn area)
-	# West wall segment (broken)
-	var west_wall := CSGBox3D.new()
-	west_wall.name = "CemeteryWall_West"
-	west_wall.size = Vector3(wall_thickness, wall_height, 35)
-	west_wall.position = Vector3(-22, wall_height / 2.0, 32)
-	west_wall.material = stone_wall_mat
-	west_wall.use_collision = true
-	add_child(west_wall)
-
-	# East wall segment (broken)
-	var east_wall := CSGBox3D.new()
-	east_wall.name = "CemeteryWall_East"
-	east_wall.size = Vector3(wall_thickness, wall_height, 35)
-	east_wall.position = Vector3(22, wall_height / 2.0, 32)
-	east_wall.material = stone_wall_mat
-	east_wall.use_collision = true
-	add_child(east_wall)
-
-	# Broken wall fragments near entrance
-	var frag1 := CSGBox3D.new()
-	frag1.name = "WallFragment_1"
-	frag1.size = Vector3(4, 0.8, wall_thickness)
-	frag1.position = Vector3(-16, 0.4, 52)
-	frag1.rotation.y = 0.1
-	frag1.material = stone_wall_mat
-	frag1.use_collision = true
-	add_child(frag1)
-
-	var frag2 := CSGBox3D.new()
-	frag2.name = "WallFragment_2"
-	frag2.size = Vector3(5, 0.6, wall_thickness)
-	frag2.position = Vector3(14, 0.3, 53)
-	frag2.rotation.y = -0.15
-	frag2.material = stone_wall_mat
-	frag2.use_collision = true
-	add_child(frag2)
-
-
-## TOWER STRUCTURE - Stone watchtower with ruined upper section
-func _create_tower_structure() -> void:
-	var tower_center := Vector3(0, 0, 0)
-	var tower_radius := 10.0
-	var wall_thickness := 1.5
-	var tower_height := 12.0
-
-	# Tower base (octagonal approximated with box walls)
-	# Front wall with doorway
-	_create_tower_wall_with_door(
-		Vector3(0, tower_height / 2.0, tower_radius),
-		Vector3(tower_radius * 1.6, tower_height, wall_thickness),
-		"TowerFront"
-	)
-
-	# Back wall (solid)
-	var back_wall := CSGBox3D.new()
-	back_wall.name = "TowerBack"
-	back_wall.size = Vector3(tower_radius * 1.6, tower_height, wall_thickness)
-	back_wall.position = Vector3(0, tower_height / 2.0, -tower_radius)
-	back_wall.material = stone_wall_mat
-	back_wall.use_collision = true
-	add_child(back_wall)
-
-	# Left wall
-	var left_wall := CSGBox3D.new()
-	left_wall.name = "TowerLeft"
-	left_wall.size = Vector3(wall_thickness, tower_height, tower_radius * 2.0)
-	left_wall.position = Vector3(-tower_radius, tower_height / 2.0, 0)
-	left_wall.material = stone_wall_mat
-	left_wall.use_collision = true
-	add_child(left_wall)
-
-	# Right wall
-	var right_wall := CSGBox3D.new()
-	right_wall.name = "TowerRight"
-	right_wall.size = Vector3(wall_thickness, tower_height, tower_radius * 2.0)
-	right_wall.position = Vector3(tower_radius, tower_height / 2.0, 0)
-	right_wall.material = stone_wall_mat
-	right_wall.use_collision = true
-	add_child(right_wall)
-
-	# Ruined top section - broken crenellations
-	_create_ruined_battlements(tower_center, tower_radius, tower_height)
-
-	print("[WillowDale] Tower structure created")
-
-
-func _create_tower_wall_with_door(pos: Vector3, size: Vector3, wall_name: String) -> void:
-	var door_width := 4.0
-	var door_height := 3.5
-	var side_width := (size.x - door_width) / 2.0
-
-	# Left segment
-	var left := CSGBox3D.new()
-	left.name = wall_name + "_Left"
-	left.size = Vector3(side_width, size.y, size.z)
-	left.position = Vector3(pos.x - size.x / 2.0 + side_width / 2.0, pos.y, pos.z)
-	left.material = stone_wall_mat
-	left.use_collision = true
-	add_child(left)
-
-	# Right segment
-	var right := CSGBox3D.new()
-	right.name = wall_name + "_Right"
-	right.size = Vector3(side_width, size.y, size.z)
-	right.position = Vector3(pos.x + size.x / 2.0 - side_width / 2.0, pos.y, pos.z)
-	right.material = stone_wall_mat
-	right.use_collision = true
-	add_child(right)
-
-	# Top segment above door
-	var top := CSGBox3D.new()
-	top.name = wall_name + "_Top"
-	top.size = Vector3(door_width, size.y - door_height, size.z)
-	top.position = Vector3(pos.x, pos.y + door_height / 2.0, pos.z)
-	top.material = stone_wall_mat
-	top.use_collision = true
-	add_child(top)
-
-
-func _create_ruined_battlements(center: Vector3, radius: float, height: float) -> void:
-	# Broken stone blocks at top of tower
-	var battlement_positions := [
-		Vector3(-8, height, -8),
-		Vector3(-4, height, -9),
-		Vector3(6, height, -7),
-		Vector3(-7, height, 6),
-		Vector3(8, height, 4),
-	]
-
-	for i in battlement_positions.size():
-		var block := CSGBox3D.new()
-		block.name = "Battlement_%d" % i
-		block.size = Vector3(
-			randf_range(1.5, 2.5),
-			randf_range(1.0, 2.0),
-			randf_range(1.5, 2.5)
-		)
-		block.position = battlement_positions[i] + Vector3(0, block.size.y / 2.0, 0)
-		block.rotation.y = randf_range(-0.3, 0.3)
-		block.material = stone_wall_mat
-		block.use_collision = true
-		add_child(block)
-
-
-## TOWER INTERIOR - Ground floor entry hall
-func _create_tower_interior() -> void:
-	# Interior floor
-	var floor := CSGBox3D.new()
-	floor.name = "TowerFloor"
-	floor.size = Vector3(18, 0.5, 18)
-	floor.position = Vector3(0, -0.25, 0)
-	floor.material = stone_floor_mat
-	floor.use_collision = true
-	add_child(floor)
-
-	# Ceiling (partial - ruined)
-	var ceiling := CSGBox3D.new()
-	ceiling.name = "TowerCeiling"
-	ceiling.size = Vector3(16, 0.5, 10)
-	ceiling.position = Vector3(-2, 5.5, -3)
-	ceiling.material = stone_wall_mat
-	ceiling.use_collision = true
-	add_child(ceiling)
-
-	# Collapsed stairs (decorative debris)
-	_create_collapsed_stairs()
-
-	# Pillars inside tower
-	_create_pillar(Vector3(-5, 0, -4))
-	_create_pillar(Vector3(5, 0, -4))
-
-	# Debris piles
-	_create_debris(Vector3(-6, 0, 2))
-	_create_debris(Vector3(4, 0, -6))
-
-	print("[WillowDale] Tower interior created")
-
-
-func _create_collapsed_stairs() -> void:
-	# Broken staircase fragments along one wall
-	var stair_base := Vector3(-7, 0, -6)
-
-	for i in range(4):
-		var step := CSGBox3D.new()
-		step.name = "BrokenStair_%d" % i
-		step.size = Vector3(3, 0.4, 1.2)
-		step.position = Vector3(
-			stair_base.x,
-			0.2 + i * 0.5,
-			stair_base.z - i * 1.0
-		)
-		step.rotation.z = randf_range(-0.1, 0.1) if i > 1 else 0
-		step.material = stone_floor_mat
-		step.use_collision = true
-		add_child(step)
-
-	# Collapsed section
-	var rubble := CSGBox3D.new()
-	rubble.name = "StairRubble"
-	rubble.size = Vector3(4, 1.5, 3)
-	rubble.position = Vector3(-7, 0.75, -9)
-	rubble.rotation.x = 0.2
-	rubble.material = stone_wall_mat
-	rubble.use_collision = true
-	add_child(rubble)
-
-
-func _create_pillar(pos: Vector3) -> void:
-	var pillar := CSGCylinder3D.new()
-	pillar.name = "Pillar"
-	pillar.radius = 0.6
-	pillar.height = 6.0
-	pillar.position = Vector3(pos.x, 3.0, pos.z)
-	pillar.material = stone_wall_mat
-	pillar.use_collision = true
-	add_child(pillar)
-
-
-func _create_debris(pos: Vector3) -> void:
-	# Small pile of rubble
-	var debris := CSGBox3D.new()
-	debris.name = "Debris"
-	debris.size = Vector3(2.5, 0.6, 2.0)
-	debris.position = Vector3(pos.x, 0.3, pos.z)
-	debris.rotation.y = randf_range(0, TAU)
-	debris.material = stone_wall_mat
-	debris.use_collision = true
-	add_child(debris)
 
 
 ## ============================================================================
@@ -472,93 +251,77 @@ func _spawn_exit_portal() -> void:
 		"from_willow_dale",
 		"Exit to Wilderness"
 	)
-	portal.rotation.y = PI  # Face into the dungeon
-	portal.show_frame = false  # No door frame for outdoor exit
-	print("[WillowDale] Spawned exit portal")
+	if portal:
+		portal.rotation.y = PI  # Face into the dungeon
+		portal.show_frame = false  # No door frame for outdoor exit
+		print("[WillowDale] Spawned exit portal")
 
 
 ## ============================================================================
-## UNDEAD SPAWNS
+## SKELETON SHADE SPAWNS - Soul Shades haunt these cursed ruins
 ## ============================================================================
 
 func _spawn_undead() -> void:
-	_spawn_cemetery_undead()
-	_spawn_tower_undead()
+	_spawn_cemetery_shades()
+	_spawn_tower_shades()
 
 
-## Cemetery area - risen dead from graves
-func _spawn_cemetery_undead() -> void:
-	# Zombies shambling near graves
-	_spawn_zombie(Vector3(-10, 0, 35))
-	_spawn_zombie(Vector3(12, 0, 40))
-	_spawn_zombie(Vector3(-16, 0, 25))
-
-	# Skeleton patrol on path
-	_spawn_skeleton(Vector3(0, 0, 30))
-	_spawn_skeleton(Vector3(-5, 0, 20))
+## Cemetery area - shades wandering among the graves
+func _spawn_cemetery_shades() -> void:
+	_spawn_skeleton_shade(Vector3(-10, 0, 35))
+	_spawn_skeleton_shade(Vector3(12, 0, 40))
+	_spawn_skeleton_shade(Vector3(-16, 0, 25))
+	_spawn_skeleton_shade(Vector3(0, 0, 30))
+	_spawn_skeleton_shade(Vector3(-5, 0, 20))
 
 
-## Tower interior - more dangerous undead
-func _spawn_tower_undead() -> void:
-	# Skeletons inside tower
-	_spawn_skeleton(Vector3(-4, 0, 0))
-	_spawn_skeleton(Vector3(5, 0, -3))
-	_spawn_skeleton(Vector3(0, 0, -6))
-
-	# Zombie near debris
-	_spawn_zombie(Vector3(3, 0, 2))
+## Tower interior - more shades guarding the depths
+func _spawn_tower_shades() -> void:
+	_spawn_skeleton_shade(Vector3(-4, 0, 0))
+	_spawn_skeleton_shade(Vector3(5, 0, -3))
+	_spawn_skeleton_shade(Vector3(0, 0, -6))
+	_spawn_skeleton_shade(Vector3(3, 0, 2))
+	_spawn_skeleton_shade(Vector3(-2, 0, -10))
 
 
-## Helper: Spawn a skeleton enemy
-func _spawn_skeleton(pos: Vector3) -> void:
-	var sprite: Texture2D = load("res://assets/sprites/enemies/skeleton_warrior.png")
+## Helper: Spawn a skeleton shade enemy
+func _spawn_skeleton_shade(pos: Vector3) -> void:
+	var data_path := "res://data/enemies/skeleton_shade.tres"
+
+	# Check ActorRegistry first for sprite config
+	var sprite_config: Dictionary = ActorRegistry.get_sprite_config("skeleton_shade")
+
+	var sprite_path: String
+	var h_frames: int
+	var v_frames: int
+
+	if not sprite_config.is_empty():
+		sprite_path = sprite_config.get("sprite_path", "")
+		h_frames = sprite_config.get("h_frames", 4)
+		v_frames = sprite_config.get("v_frames", 1)
+	else:
+		# Fall back to defaults
+		sprite_path = "res://assets/sprites/enemies/undead/skeleton_shade_walking.png"
+		h_frames = 4
+		v_frames = 1
+
+	var sprite: Texture2D = load(sprite_path)
 	if not sprite:
-		# Fallback to skeleton shade if warrior not available
-		sprite = load("res://assets/sprites/enemies/skeleton_shade.png")
-	if not sprite:
-		push_warning("[WillowDale] Missing skeleton sprite")
+		push_warning("[WillowDale] Missing skeleton shade sprite: %s" % sprite_path)
 		return
-
-	var data_path := "res://data/enemies/skeleton_warrior.tres"
-	if not ResourceLoader.exists(data_path):
-		data_path = "res://data/enemies/skeleton_shade.tres"
 
 	var enemy := EnemyBase.spawn_billboard_enemy(
 		self,
 		pos,
 		data_path,
 		sprite,
-		4, 4  # 4x4 sprite sheet
+		h_frames,
+		v_frames
 	)
 	if enemy:
 		enemy.add_to_group("willow_dale_undead")
-		print("[WillowDale] Spawned skeleton at %s" % pos)
-
-
-## Helper: Spawn a zombie enemy
-func _spawn_zombie(pos: Vector3) -> void:
-	var sprite: Texture2D = load("res://assets/sprites/enemies/zombie.png")
-	if not sprite:
-		# Fallback sprite
-		sprite = load("res://assets/sprites/enemies/skeleton_shade.png")
-	if not sprite:
-		push_warning("[WillowDale] Missing zombie sprite")
-		return
-
-	var data_path := "res://data/enemies/zombie.tres"
-	if not ResourceLoader.exists(data_path):
-		data_path = "res://data/enemies/skeleton_shade.tres"
-
-	var enemy := EnemyBase.spawn_billboard_enemy(
-		self,
-		pos,
-		data_path,
-		sprite,
-		4, 4  # 4x4 sprite sheet
-	)
-	if enemy:
-		enemy.add_to_group("willow_dale_undead")
-		print("[WillowDale] Spawned zombie at %s" % pos)
+		enemy.add_to_group("skeleton_shade")
+		print("[WillowDale] Spawned skeleton shade at %s" % pos)
 
 
 ## ============================================================================
@@ -645,6 +408,12 @@ func _setup_cell_streaming() -> void:
 		push_warning("[%s] CellStreamer not found" % ZONE_ID)
 		return
 
+	# Check if we're being run directly (F6) for testing vs through normal game flow
+	# SceneManager.has_transitioned is true if a scene was loaded through normal game flow
+	if not SceneManager.has_transitioned:
+		print("[%s] Direct scene test mode - skipping cell streaming" % ZONE_ID)
+		return
+
 	# Use WorldGrid location_id (may differ from ZONE_ID for save compatibility)
 	var my_coords: Vector2i = WorldGrid.get_location_coords("willow_dale")
 	CellStreamer.register_main_scene_cell(my_coords, self)
@@ -675,24 +444,40 @@ func _spawn_cultists() -> void:
 
 ## Helper: Spawn a cultist enemy
 func _spawn_cultist(pos: Vector3) -> void:
-	var sprite: Texture2D = load("res://assets/sprites/enemies/cultist.png")
-	if not sprite:
-		# Fallback to skeleton if cultist sprite not available
-		sprite = load("res://assets/sprites/enemies/skeleton_shade.png")
+	var data_path := "res://data/enemies/cultist.tres"
+
+	# Extract enemy type ID from path
+	var enemy_type: String = data_path.get_file().get_basename()
+
+	# Check ActorRegistry first for sprite config
+	var sprite_config: Dictionary = ActorRegistry.get_sprite_config(enemy_type)
+
+	var sprite_path: String
+	var h_frames: int
+	var v_frames: int
+
+	if not sprite_config.is_empty():
+		sprite_path = sprite_config.get("sprite_path", "")
+		h_frames = sprite_config.get("h_frames", 3)
+		v_frames = sprite_config.get("v_frames", 1)
+	else:
+		# Fall back to defaults
+		sprite_path = "res://assets/sprites/enemies/humanoid/cultist_red.png"
+		h_frames = 3
+		v_frames = 1
+
+	var sprite: Texture2D = load(sprite_path)
 	if not sprite:
 		push_warning("[WillowDale] Missing cultist sprite")
 		return
-
-	var data_path := "res://data/enemies/cultist.tres"
-	if not ResourceLoader.exists(data_path):
-		data_path = "res://data/enemies/skeleton_shade.tres"
 
 	var enemy := EnemyBase.spawn_billboard_enemy(
 		self,
 		pos,
 		data_path,
 		sprite,
-		3, 1  # 3x1 sprite sheet for cultist
+		h_frames,
+		v_frames
 	)
 	if enemy:
 		enemy.add_to_group("willow_dale_cultists")
@@ -702,23 +487,40 @@ func _spawn_cultist(pos: Vector3) -> void:
 
 ## Helper: Spawn the cult leader (mini-boss)
 func _spawn_cult_leader(pos: Vector3) -> void:
-	var sprite: Texture2D = load("res://assets/sprites/enemies/cultist.png")
-	if not sprite:
-		sprite = load("res://assets/sprites/enemies/skeleton_shade.png")
+	var data_path := "res://data/enemies/cult_leader.tres"
+
+	# Extract enemy type ID from path
+	var enemy_type: String = data_path.get_file().get_basename()
+
+	# Check ActorRegistry first for sprite config
+	var sprite_config: Dictionary = ActorRegistry.get_sprite_config(enemy_type)
+
+	var sprite_path: String
+	var h_frames: int
+	var v_frames: int
+
+	if not sprite_config.is_empty():
+		sprite_path = sprite_config.get("sprite_path", "")
+		h_frames = sprite_config.get("h_frames", 5)
+		v_frames = sprite_config.get("v_frames", 1)
+	else:
+		# Fall back to defaults
+		sprite_path = "res://assets/sprites/enemies/undead/vampire_lord_walk.png"
+		h_frames = 5
+		v_frames = 1
+
+	var sprite: Texture2D = load(sprite_path)
 	if not sprite:
 		push_warning("[WillowDale] Missing cult leader sprite")
 		return
-
-	var data_path := "res://data/enemies/cult_leader.tres"
-	if not ResourceLoader.exists(data_path):
-		data_path = "res://data/enemies/cultist.tres"
 
 	var enemy := EnemyBase.spawn_billboard_enemy(
 		self,
 		pos,
 		data_path,
 		sprite,
-		3, 1
+		h_frames,
+		v_frames
 	)
 	if enemy:
 		enemy.add_to_group("willow_dale_cultists")
@@ -1050,3 +852,254 @@ func _spawn_willow_dale_altar(pos: Vector3) -> void:
 
 func _on_altar_examined(_area: Area3D) -> void:
 	QuestManager.on_interact("willow_dale_altar")
+
+
+## ============================================================================
+## CURSED TOTEM - For bounty_undead_rising quest
+## ============================================================================
+
+## Spawn the cursed totem that powers the undead
+func _spawn_cursed_totem() -> void:
+	# Position near the altar/tower area where skeleton shades patrol
+	var totem_pos := Vector3(0, 0, -12)
+
+	var totem := StaticBody3D.new()
+	totem.name = "cursed_totem"
+	totem.position = totem_pos
+	totem.add_to_group("interactable")
+	totem.add_to_group("destructible")
+	totem.set_meta("object_id", "cursed_totem")
+	totem.set_meta("display_name", "Cursed Totem")
+	totem.set_meta("interaction_type", "destroy")
+	totem.set_meta("hp", 50)
+	totem.set_meta("max_hp", 50)
+	add_child(totem)
+
+	# Totem pillar - tall dark stone
+	var pillar := CSGCylinder3D.new()
+	pillar.name = "TotemPillar"
+	pillar.radius = 0.4
+	pillar.height = 2.5
+	pillar.sides = 8
+	pillar.position = Vector3(0, 1.25, 0)
+	var pillar_mat := StandardMaterial3D.new()
+	pillar_mat.albedo_color = Color(0.1, 0.08, 0.12)  # Very dark purple-black
+	pillar_mat.roughness = 0.95
+	pillar_mat.emission_enabled = true
+	pillar_mat.emission = Color(0.3, 0.1, 0.4)  # Faint purple glow
+	pillar_mat.emission_energy_multiplier = 0.5
+	pillar.material = pillar_mat
+	pillar.use_collision = true
+	totem.add_child(pillar)
+
+	# Skull on top
+	var skull := CSGSphere3D.new()
+	skull.name = "TotemSkull"
+	skull.radius = 0.35
+	skull.radial_segments = 8
+	skull.rings = 4
+	skull.position = Vector3(0, 2.7, 0)
+	var skull_mat := StandardMaterial3D.new()
+	skull_mat.albedo_color = Color(0.85, 0.8, 0.7)  # Bone color
+	skull_mat.roughness = 0.9
+	skull_mat.emission_enabled = true
+	skull_mat.emission = Color(0.5, 0.2, 0.1)  # Faint red glow in eye sockets
+	skull_mat.emission_energy_multiplier = 0.8
+	skull.material = skull_mat
+	totem.add_child(skull)
+
+	# Dark runes on base
+	var base := CSGBox3D.new()
+	base.name = "TotemBase"
+	base.size = Vector3(1.0, 0.3, 1.0)
+	base.position = Vector3(0, 0.15, 0)
+	var base_mat := StandardMaterial3D.new()
+	base_mat.albedo_color = Color(0.08, 0.06, 0.1)
+	base_mat.roughness = 0.98
+	base.material = base_mat
+	base.use_collision = true
+	totem.add_child(base)
+
+	# Eerie purple light emanating from totem
+	var totem_light := OmniLight3D.new()
+	totem_light.name = "TotemGlow"
+	totem_light.light_color = Color(0.5, 0.2, 0.6)  # Purple
+	totem_light.light_energy = 1.2
+	totem_light.omni_range = 8.0
+	totem_light.position = Vector3(0, 2.0, 0)
+	totem.add_child(totem_light)
+
+	# Collision shape
+	var collision := CollisionShape3D.new()
+	var shape := CylinderShape3D.new()
+	shape.radius = 0.5
+	shape.height = 2.8
+	collision.shape = shape
+	collision.position.y = 1.4
+	totem.add_child(collision)
+
+	# Interaction area
+	var area := Area3D.new()
+	area.name = "InteractionArea"
+	area.collision_layer = 256  # Interactable layer
+	area.collision_mask = 0
+	var area_col := CollisionShape3D.new()
+	var area_shape := SphereShape3D.new()
+	area_shape.radius = 2.5
+	area_col.shape = area_shape
+	area_col.position.y = 1.5
+	area.add_child(area_col)
+	totem.add_child(area)
+
+	# Connect interaction
+	area.area_entered.connect(_on_totem_area_entered)
+
+	print("[WillowDale] Spawned cursed totem at %s" % totem_pos)
+
+
+func _on_totem_area_entered(_area: Area3D) -> void:
+	# When player gets close, they can interact to destroy
+	# The actual destruction is handled by the interaction system
+	pass
+
+
+## Called when totem is destroyed (by combat system or interaction)
+func _on_totem_destroyed() -> void:
+	# Trigger quest objective completion
+	QuestManager.on_interact("cursed_totem")
+	print("[WillowDale] Cursed totem destroyed!")
+
+
+## ============================================================================
+## ENVIRONMENTAL LORE - Tombstones, symbols, readable objects
+## ============================================================================
+
+## Spawn environmental storytelling elements
+func _spawn_environmental_lore() -> void:
+	# Readable tombstones with lore about the Keepers
+	_spawn_tombstone(Vector3(-12, 0, 38), "watchman_tomb_1",
+		"HERE LIES WARDEN ALDETH\nWho stood watch through the Long Night\nMay the Eye see forever")
+
+	_spawn_tombstone(Vector3(-8, 0, 42), "watchman_tomb_2",
+		"FALLEN AT THEIR POST\nThe Last Watchers of Willow Dale\nTheir vigil ended, ours begins")
+
+	_spawn_tombstone(Vector3(10, 0, 36), "watchman_tomb_3",
+		"IN MEMORY OF SISTER IRENA\nShe saw what others could not\nThe veil is thin, the watchers few")
+
+	# Ancient Keeper symbol carved in stone near the tower
+	_spawn_keeper_symbol(Vector3(-2, 0, 5))
+
+	# Lore item pickup - a tattered journal page
+	_spawn_lore_item(Vector3(5, 0, -2), "watchers_journal_page",
+		"Watcher's Journal Fragment",
+		"...the signs grow more troubling. The wards we placed centuries ago are failing. Something stirs beneath the old stones, something that remembers when there was no Empire, no kingdoms - only the darkness and those who fed upon it. We Keepers have watched too long to be fooled. The cultists think they summon power, but they summon only their own doom. When the barrier breaks, nothing will save them - or us...")
+
+	print("[WillowDale] Spawned environmental lore elements")
+
+
+## Spawn a readable tombstone with lore text
+func _spawn_tombstone(pos: Vector3, tomb_id: String, inscription: String) -> void:
+	var tombstone := StaticBody3D.new()
+	tombstone.name = tomb_id
+	tombstone.position = pos
+	tombstone.add_to_group("interactable")
+	tombstone.set_meta("object_id", tomb_id)
+	tombstone.set_meta("display_name", "Tombstone")
+	tombstone.set_meta("interaction_type", "read")
+	tombstone.set_meta("readable_text", inscription)
+	add_child(tombstone)
+
+	# Tombstone mesh - simple weathered stone slab
+	var stone := CSGBox3D.new()
+	stone.name = "TombstoneMesh"
+	stone.size = Vector3(0.8, 1.2, 0.2)
+	stone.position = Vector3(0, 0.6, 0)
+	stone.rotation_degrees.x = -5  # Slightly leaning
+	stone.material = gravestone_mat
+	stone.use_collision = true
+	tombstone.add_child(stone)
+
+	# Collision shape
+	var collision := CollisionShape3D.new()
+	var shape := BoxShape3D.new()
+	shape.size = Vector3(0.9, 1.3, 0.3)
+	collision.shape = shape
+	collision.position.y = 0.65
+	tombstone.add_child(collision)
+
+
+## Spawn the ancient Keeper symbol carved in stone
+func _spawn_keeper_symbol(pos: Vector3) -> void:
+	var symbol := StaticBody3D.new()
+	symbol.name = "keeper_symbol"
+	symbol.position = pos
+	symbol.add_to_group("interactable")
+	symbol.set_meta("object_id", "keeper_symbol")
+	symbol.set_meta("display_name", "Ancient Symbol")
+	symbol.set_meta("interaction_type", "examine")
+	symbol.set_meta("readable_text", "An eye within a circle of stars is carved into the stone. The symbol is weathered but still clear - the mark of some ancient order. Around it are inscribed words in an old tongue: 'We who watch. We who remember. We who guard the threshold.'")
+	add_child(symbol)
+
+	# Symbol base - circular stone slab embedded in floor
+	var base := CSGCylinder3D.new()
+	base.name = "SymbolBase"
+	base.radius = 0.8
+	base.height = 0.1
+	base.sides = 12
+	base.position = Vector3(0, 0.05, 0)
+	var symbol_mat := StandardMaterial3D.new()
+	symbol_mat.albedo_color = Color(0.25, 0.23, 0.28)
+	symbol_mat.emission_enabled = true
+	symbol_mat.emission = Color(0.2, 0.15, 0.3)
+	symbol_mat.emission_energy_multiplier = 0.3
+	base.material = symbol_mat
+	base.use_collision = true
+	symbol.add_child(base)
+
+	# Faint mystical glow
+	var glow := OmniLight3D.new()
+	glow.name = "SymbolGlow"
+	glow.light_color = Color(0.4, 0.3, 0.6)
+	glow.light_energy = 0.4
+	glow.omni_range = 3.0
+	glow.position = Vector3(0, 0.5, 0)
+	symbol.add_child(glow)
+
+
+## Spawn a lore item (journal page, note, etc.)
+func _spawn_lore_item(pos: Vector3, item_id: String, display_name: String, lore_text: String) -> void:
+	var item := StaticBody3D.new()
+	item.name = item_id
+	item.position = pos
+	item.add_to_group("interactable")
+	item.set_meta("object_id", item_id)
+	item.set_meta("display_name", display_name)
+	item.set_meta("interaction_type", "pickup")
+	item.set_meta("lore_text", lore_text)
+	item.set_meta("is_lore_item", true)
+	add_child(item)
+
+	# Paper/parchment visual
+	var paper := CSGBox3D.new()
+	paper.name = "PaperMesh"
+	paper.size = Vector3(0.3, 0.02, 0.4)
+	paper.position = Vector3(0, 0.01, 0)
+	paper.rotation_degrees.y = randf_range(-30, 30)
+	var paper_mat := StandardMaterial3D.new()
+	paper_mat.albedo_color = Color(0.85, 0.80, 0.65)
+	paper_mat.roughness = 0.95
+	paper.material = paper_mat
+	item.add_child(paper)
+
+	# Interaction area
+	var area := Area3D.new()
+	area.name = "InteractionArea"
+	area.collision_layer = 256
+	area.collision_mask = 0
+	var area_col := CollisionShape3D.new()
+	var area_shape := SphereShape3D.new()
+	area_shape.radius = 1.5
+	area_col.shape = area_shape
+	area_col.position.y = 0.3
+	area.add_child(area_col)
+	item.add_child(area)

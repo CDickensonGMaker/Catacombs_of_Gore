@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "soulstone_petty_filled"
+display_name = "Petty Soulstone (Filled)"
+description = "A small gem filled with soul energy. Can be used to apply minor enchantments at an enchanting table."
+item_type = 5
+stack_size = 10
+base_value = 200
+weight = 0.1

@@ -4,12 +4,18 @@
 extends Node3D
 
 const ZONE_ID := "village_riverside"
+const TOWN_AMBIENT_PATH := "res://assets/audio/Ambiance/towns/town_murmur_medieval_mix_60s_ps1_retro.wav"
 
 @onready var nav_region: NavigationRegion3D = $NavigationRegion3D
 
 
 func _ready() -> void:
 	SaveManager.set_current_zone(ZONE_ID, "Rotherhine")
+	# Play town ambient sound (only when main scene)
+	var is_main_scene: bool = get_node_or_null("Player") != null
+	if is_main_scene:
+		AudioManager.play_ambient(TOWN_AMBIENT_PATH)
+		AudioManager.play_zone_music("village")
 	_setup_spawn_points()
 	_spawn_merchants()
 	_spawn_quest_npcs()
@@ -162,16 +168,12 @@ func _spawn_priests() -> void:
 func _spawn_villagers() -> void:
 	var npc_spawns := $NPCSpawnPoints
 
-	# Spawn random villagers at villager markers
+	# Spawn random villagers with proper gender variety
 	for i in range(5):
 		var marker := npc_spawns.get_node_or_null("VillagerSpawn_%d" % i)
 		if marker:
-			if i % 2 == 0:
-				CivilianNPC.spawn_random(self, marker.position, ZONE_ID)
-			elif i == 3:
-				CivilianNPC.spawn_woman(self, marker.position, ZONE_ID)
-			else:
-				CivilianNPC.spawn_man(self, marker.position, ZONE_ID)
+			# Use gendered_random for proper variety with correct name/gender matching
+			CivilianNPC.spawn_gendered_random(self, marker.position, ZONE_ID)
 
 	print("[Rotherhine] Spawned villagers")
 

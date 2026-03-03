@@ -1,0 +1,34 @@
+{
+	"id": "bandit_justice_3",
+	"title": "Report to the Guard Captain",
+	"description": "The bandit camp has been eliminated. Return to Elder Moor and collect your bounty.",
+	"is_main_quest": false,
+	"quest_source": "chain",
+	"giver_npc_id": "",
+	"giver_npc_type": "",
+	"giver_region": "",
+	"faction": "human_empire",
+	"objectives": [
+		{
+			"id": "report",
+			"description": "Report to the guard captain",
+			"type": "talk",
+			"target": "elder_moor_guard",
+			"target_zone": "elder_moor",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "elder_moor_guard",
+	"turn_in_zone": "elder_moor",
+	"rewards": {
+		"gold": 350,
+		"xp": 500,
+		"items": [],
+		"faction_reputation": {
+			"human_empire": 35
+		}
+	},
+	"prerequisites": ["bandit_justice_2"],
+	"next_quest": ""
+}

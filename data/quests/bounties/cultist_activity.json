@@ -1,0 +1,42 @@
+{
+	"id": "bounty_cultist_activity",
+	"title": "Dark Cult Activity",
+	"description": "Cultists have been spotted performing dark rituals at an ancient temple in the forest. They've been seen conducting blood sacrifices. Put an end to their evil.",
+	"is_main_quest": false,
+	"quest_source": "bounty",
+	"giver_npc_id": "bounty_board",
+	"giver_npc_type": "bounty_board",
+	"giver_region": "millbrook",
+	"faction": "common_folk",
+	"objectives": [
+		{
+			"id": "kill_cultists",
+			"description": "Kill the cultists at the Ruined Temple",
+			"type": "kill",
+			"target": "cultist",
+			"required_count": 4
+		},
+		{
+			"id": "kill_leader",
+			"description": "Kill the Cult Leader",
+			"type": "kill",
+			"target": "cult_leader",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "bounty_board",
+	"turn_in_target": "bounty_board",
+	"turn_in_zone": "millbrook",
+	"rewards": {
+		"gold": 175,
+		"xp": 380,
+		"items": [],
+		"faction_reputation": {
+			"common_folk": 30
+		}
+	},
+	"possible_zones": ["cultist_temple_north", "cultist_temple_east", "cultist_temple_south", "cultist_temple_west", "cultist_temple_central"],
+	"cooldown_days": 5,
+	"prerequisites": [],
+	"next_quest": ""
+}

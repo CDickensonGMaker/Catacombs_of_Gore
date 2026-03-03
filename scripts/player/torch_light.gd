@@ -6,8 +6,8 @@ extends Node3D
 const DEBUG := false
 
 ## Light configuration
-@export var light_energy: float = 1.5  ## Brightness of the torch
-@export var light_range: float = 15.0  ## Range in world units
+@export var light_energy: float = 2.5  ## Brightness of the torch (increased 67%)
+@export var light_range: float = 22.0  ## Range in world units (increased 47%)
 @export var light_color: Color = Color(1.0, 0.85, 0.6)  ## Warm orange/yellow
 @export var flicker_enabled: bool = true  ## Enable realistic flickering
 @export var flicker_speed: float = 8.0  ## How fast the flicker oscillates

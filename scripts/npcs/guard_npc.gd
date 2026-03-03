@@ -1,6 +1,6 @@
 ## guard_npc.gd - Town guard NPCs
 ## Guards that can optionally patrol and have guard-specific dialogue
-## Uses directional sprites (front/back) based on camera angle and attack sprite for combat
+## Uses static billboard sprites (dwarf guard or roman soldier variants)
 ## Handles bounty detection, arrests, and combat with criminals
 class_name GuardNPC
 extends CivilianNPC
@@ -30,17 +30,40 @@ var _default_guard_dialogue: DialogueData = preload("res://data/dialogues/guard_
 ## Use topic-based conversation instead of scripted dialogue
 @export var use_conversation_system: bool = true
 
-## Guard uses 3D mesh instead of 2D sprite
+## Guard uses billboard sprite (not 3D mesh)
 const GUARD_HEIGHT := 1.8
 const GUARD_RADIUS := 0.35
+
+## Guard sprite variants - single frame static images
+const GUARD_SPRITE_DWARF := "res://assets/sprites/npcs/civilians/guard_civilian.png"
+const GUARD_SPRITE_ROMAN := "res://assets/sprites/npcs/civilians/guard2_civilian.png"
+
+## All available guard sprites for random selection
+const GUARD_SPRITES: Array[String] = [
+	GUARD_SPRITE_DWARF,
+	GUARD_SPRITE_ROMAN
+]
+
+## Pixel size for guard sprites - 96px frame height, same as other NPCs
+const PIXEL_SIZE_GUARD := 0.0256
+
+## Export to allow specifying which sprite variant to use (0=dwarf, 1=roman, -1=random)
+@export var guard_sprite_variant: int = -1  # -1 = random selection
 
 ## Combat state
 var is_in_combat: bool = false
 var is_attacking: bool = false
 
-## Guard 3D mesh visual
-var guard_mesh: MeshInstance3D
-var guard_material: StandardMaterial3D
+## Guard-specific combat stats (override parent)
+## Guards are tougher than regular civilians
+const GUARD_MAX_HEALTH := 80
+const GUARD_ARMOR := 15
+const GUARD_DAMAGE := 15
+var attack_cooldown: float = 0.0
+const ATTACK_COOLDOWN_TIME := 1.5
+
+## Guard visual - now uses billboard sprite from parent class
+## guard_mesh removed - using billboard sprite instead
 
 ## Guard AI state
 var guard_state: GuardState = GuardState.PATROL
@@ -79,14 +102,15 @@ func _ready() -> void:
 	if npc_id.is_empty():
 		npc_id = "guard_%d" % get_instance_id()
 
-	# Don't set sprite_texture - we'll create our own 3D mesh
-	sprite_texture = null
+	# Set guard-specific stats BEFORE parent _ready
+	max_health = GUARD_MAX_HEALTH
+	gold_carried = randi_range(20, 50)  # Guards have more gold
 
-	# Call parent _ready which creates collision, etc. but no visual since sprite_texture is null
+	# Setup guard sprite - select variant and load texture
+	_setup_guard_sprite()
+
+	# Call parent _ready which creates collision, billboard sprite, etc.
 	super._ready()
-
-	# Create guard 3D mesh after parent setup
-	_create_guard_mesh()
 
 	# Debug logging for quest system debugging
 	print("[Guard] npc_id=%s, npc_type=%s, region_id=%s" % [npc_id, npc_type, region_id])
@@ -118,63 +142,25 @@ func _exit_tree() -> void:
 	PlayerGPS.unregister_npc(effective_id)
 
 
-func _create_guard_mesh() -> void:
-	# Create a capsule mesh for the guard body
-	guard_mesh = MeshInstance3D.new()
-	guard_mesh.name = "GuardMesh"
+## Setup guard billboard sprite before parent _ready is called
+func _setup_guard_sprite() -> void:
+	# Select sprite variant
+	var sprite_path: String
+	if guard_sprite_variant < 0 or guard_sprite_variant >= GUARD_SPRITES.size():
+		# Random selection
+		sprite_path = GUARD_SPRITES[randi() % GUARD_SPRITES.size()]
+	else:
+		sprite_path = GUARD_SPRITES[guard_sprite_variant]
 
-	var capsule := CapsuleMesh.new()
-	capsule.radius = GUARD_RADIUS
-	capsule.height = GUARD_HEIGHT
-	guard_mesh.mesh = capsule
-
-	# Position mesh so bottom is at node origin
-	guard_mesh.position = Vector3(0, GUARD_HEIGHT / 2.0, 0)
-
-	# Create guard material - dark iron/steel armor look
-	guard_material = StandardMaterial3D.new()
-	guard_material.albedo_color = Color(0.25, 0.28, 0.32)  # Dark steel gray
-	guard_material.metallic = 0.7
-	guard_material.roughness = 0.4
-	guard_mesh.material_override = guard_material
-
-	add_child(guard_mesh)
-
-	# Add a head sphere
-	var head_mesh := MeshInstance3D.new()
-	head_mesh.name = "GuardHead"
-	var head := SphereMesh.new()
-	head.radius = 0.2
-	head.height = 0.4
-	head_mesh.mesh = head
-	head_mesh.position = Vector3(0, GUARD_HEIGHT + 0.1, 0)
-
-	# Skin-colored head
-	var head_material := StandardMaterial3D.new()
-	head_material.albedo_color = Color(0.85, 0.7, 0.55)  # Skin tone
-	head_material.roughness = 0.8
-	head_mesh.material_override = head_material
-
-	add_child(head_mesh)
-
-	# Add a helmet (cone on top)
-	var helmet_mesh := MeshInstance3D.new()
-	helmet_mesh.name = "GuardHelmet"
-	var helmet := CylinderMesh.new()
-	helmet.top_radius = 0.05
-	helmet.bottom_radius = 0.22
-	helmet.height = 0.25
-	helmet_mesh.mesh = helmet
-	helmet_mesh.position = Vector3(0, GUARD_HEIGHT + 0.35, 0)
-
-	# Helmet same as armor
-	var helmet_material := StandardMaterial3D.new()
-	helmet_material.albedo_color = Color(0.3, 0.32, 0.35)
-	helmet_material.metallic = 0.8
-	helmet_material.roughness = 0.3
-	helmet_mesh.material_override = helmet_material
-
-	add_child(helmet_mesh)
+	# Load the sprite texture
+	var tex: Texture2D = load(sprite_path)
+	if tex:
+		sprite_texture = tex
+		sprite_h_frames = 1  # Single frame static image
+		sprite_v_frames = 1  # Single frame static image
+		sprite_pixel_size = PIXEL_SIZE_GUARD
+	else:
+		push_error("[GuardNPC] Failed to load guard sprite: %s" % sprite_path)
 
 
 func _process(delta: float) -> void:
@@ -185,7 +171,7 @@ func _process(delta: float) -> void:
 	if guard_state == GuardState.PATROL:
 		super._process(delta)
 
-	# Update mesh color based on combat state
+	# Update sprite tint based on combat state
 	_update_guard_visual()
 
 
@@ -303,9 +289,18 @@ func _move_towards_player(delta: float, speed: float) -> void:
 
 
 ## Combat behavior
-func _combat_behavior(_delta: float) -> void:
+func _combat_behavior(delta: float) -> void:
+	# Update attack cooldown
+	if attack_cooldown > 0:
+		attack_cooldown -= delta
+
 	# Basic combat - approach and attack
 	if not _target_player:
+		return
+
+	# Check if player is dead - return to patrol
+	if _target_player.has_method("is_dead") and _target_player.is_dead():
+		_give_up_chase()
 		return
 
 	var distance := global_position.distance_to(_target_player.global_position)
@@ -317,11 +312,14 @@ func _combat_behavior(_delta: float) -> void:
 		velocity = direction * CHASE_SPEED
 		move_and_slide()
 	else:
-		# Attack
-		if not is_attacking:
+		# Stop moving when in range
+		velocity = Vector3.ZERO
+
+		# Attack if cooldown is ready
+		if attack_cooldown <= 0 and not is_attacking:
 			play_attack()
-			# Deal damage to player (would connect to combat system)
 			_attack_player()
+			attack_cooldown = ATTACK_COOLDOWN_TIME
 
 
 ## Attack the player
@@ -568,31 +566,34 @@ func _show_notification(text: String) -> void:
 		hud.show_notification(text)
 
 
-## Update guard visual based on state
+## Update guard visual based on state (using billboard sprite modulate)
 func _update_guard_visual() -> void:
-	if not guard_material:
+	if not billboard or not billboard.sprite:
 		return
 
-	# Change armor color based on state
+	# Change sprite tint based on state
 	match guard_state:
 		GuardState.PATROL:
-			guard_material.albedo_color = Color(0.25, 0.28, 0.32)  # Normal steel
+			billboard.sprite.modulate = Color.WHITE  # Normal
 		GuardState.ALERT:
-			guard_material.albedo_color = Color(0.35, 0.32, 0.25)  # Yellowish alert
+			billboard.sprite.modulate = Color(1.1, 1.0, 0.8)  # Slight yellow tint
 		GuardState.CHASE, GuardState.COMBAT:
-			guard_material.albedo_color = Color(0.4, 0.25, 0.25)  # Reddish combat
+			billboard.sprite.modulate = Color(1.2, 0.85, 0.85)  # Reddish tint
 		GuardState.ARRESTING:
-			guard_material.albedo_color = Color(0.3, 0.3, 0.4)  # Blueish
+			billboard.sprite.modulate = Color(0.9, 0.9, 1.1)  # Slight blue tint
 
 
-## Trigger attack (visual feedback via mesh color flash)
+## Trigger attack (visual feedback via sprite flash)
 func play_attack() -> void:
 	is_attacking = true
 	# Brief color flash for attack
-	if guard_material:
-		guard_material.albedo_color = Color(0.6, 0.3, 0.3)  # Flash red
+	if billboard and billboard.sprite:
+		billboard.sprite.modulate = Color(1.5, 0.6, 0.6)  # Flash red
 		# Reset after short delay
-		get_tree().create_timer(0.2).timeout.connect(func(): is_attacking = false)
+		get_tree().create_timer(0.2).timeout.connect(func():
+			is_attacking = false
+			_update_guard_visual()  # Restore state-appropriate color
+		)
 
 
 ## Set combat state
@@ -739,9 +740,144 @@ func _get_guard_profile() -> NPCKnowledgeProfile:
 	return NPCKnowledgeProfile.guard()
 
 
+## ============================================================================
+## GUARD COMBAT OVERRIDES
+## Guards fight back instead of fleeing
+## ============================================================================
+
+## Override take_damage - guards fight back
+func take_damage(amount: int, damage_type: Enums.DamageType = Enums.DamageType.PHYSICAL, attacker: Node = null) -> int:
+	if _is_dead:
+		return 0
+
+	# Apply armor reduction
+	var armor_mult: float = 100.0 / (100.0 + float(GUARD_ARMOR))
+	var reduced_amount: int = int(float(amount) * armor_mult)
+	reduced_amount = maxi(1, reduced_amount)
+
+	# Apply damage
+	var actual_damage: int = mini(reduced_amount, current_health)
+	current_health -= actual_damage
+
+	# Visual feedback - flash red on sprite
+	if billboard and billboard.sprite:
+		billboard.sprite.modulate = Color(1.5, 0.4, 0.4)  # Flash red
+		get_tree().create_timer(0.15).timeout.connect(func():
+			if billboard and billboard.sprite:
+				_update_guard_visual()  # Restore state-appropriate color
+		)
+
+	# Report crime if attacker is the player
+	if attacker and attacker.is_in_group("player"):
+		_report_attack_crime(attacker)
+
+	# Enter combat instead of fleeing (guards don't run!)
+	if attacker and attacker is Node3D and guard_state != GuardState.COMBAT:
+		_target_player = attacker as Node3D
+		_change_state(GuardState.COMBAT)
+		_call_for_backup()
+
+	# Check for death
+	if current_health <= 0:
+		_die(attacker)
+
+	var damage_type_name: String = Enums.DamageType.keys()[damage_type] if damage_type < Enums.DamageType.size() else "UNKNOWN"
+	var attacker_name: String = attacker.name if attacker else "unknown"
+	print("[Guard] %s took %d %s damage (reduced from %d) from %s (HP: %d/%d)" % [
+		npc_name,
+		actual_damage,
+		damage_type_name,
+		amount,
+		attacker_name,
+		current_health,
+		max_health
+	])
+
+	return actual_damage
+
+
+## Override _die for guard-specific death handling
+func _die(killer: Node = null) -> void:
+	if _is_dead:
+		return
+
+	_is_dead = true
+	is_in_combat = false
+
+	print("[Guard] %s has been killed by %s" % [npc_name, killer.name if killer else "unknown"])
+
+	# Report murder crime (killing a guard is very serious)
+	if killer and killer.is_in_group("player"):
+		_report_murder_crime(killer)
+		# Extra bounty for killing a guard
+		var crime_region: String = region_id if not region_id.is_empty() else _get_current_region()
+		CrimeManager.report_crime(CrimeManager.CrimeType.ASSAULT, crime_region, [])  # Add extra assault charge
+
+	# Remove from groups
+	remove_from_group("interactable")
+	remove_from_group("npcs")
+	remove_from_group("guards")
+	remove_from_group("attackable")
+
+	# Stop any movement
+	if wander:
+		wander.queue_free()
+		wander = null
+	velocity = Vector3.ZERO
+
+	# Spawn lootable corpse with guard equipment
+	_spawn_guard_corpse()
+
+	# Emit killed signal via CombatManager
+	CombatManager.entity_killed.emit(self, killer)
+
+	# Play death sound
+	if AudioManager:
+		AudioManager.play_sfx("guard_death")
+
+	# Queue removal after short delay
+	get_tree().create_timer(0.1).timeout.connect(queue_free)
+
+
+## Spawn guard-specific corpse with equipment
+func _spawn_guard_corpse() -> void:
+	var corpse: LootableCorpse = LootableCorpse.spawn_corpse(
+		get_parent(),
+		global_position,
+		npc_name,
+		npc_id,
+		10  # Level 10 guard
+	)
+
+	# Add gold
+	corpse.gold = gold_carried
+
+	# Guards drop weapons and armor
+	if InventoryManager.weapon_database.has("iron_sword"):
+		corpse.add_item("iron_sword", 1, Enums.ItemQuality.AVERAGE)
+	if InventoryManager.armor_database.has("chainmail"):
+		corpse.add_item("chainmail", 1, Enums.ItemQuality.AVERAGE)
+	elif InventoryManager.armor_database.has("leather_armor"):
+		corpse.add_item("leather_armor", 1, Enums.ItemQuality.AVERAGE)
+
+	# Maybe add a health potion
+	if randf() < 0.4:
+		if InventoryManager.item_database.has("health_potion"):
+			corpse.add_item("health_potion", 1, Enums.ItemQuality.AVERAGE)
+
+
+## Override armor value
+func get_armor_value() -> int:
+	return GUARD_ARMOR
+
+
 ## Static factory method for spawning guards
-static func spawn_guard(parent: Node, pos: Vector3, patrol: Array[Vector3] = [], p_region_id: String = "elder_moor") -> GuardNPC:
+## sprite_variant: 0 = dwarf guard, 1 = roman soldier, -1 = random (default)
+static func spawn_guard(parent: Node, pos: Vector3, patrol: Array[Vector3] = [], p_region_id: String = "elder_moor", sprite_variant: int = -1) -> GuardNPC:
 	var guard := GuardNPC.new()
+
+	# Set sprite variant before adding to scene (so _ready uses correct sprite)
+	guard.guard_sprite_variant = sprite_variant
 
 	# Validate spawn position
 	var validated_pos := CivilianNPC.validate_spawn_position(parent, pos)
@@ -755,3 +891,13 @@ static func spawn_guard(parent: Node, pos: Vector3, patrol: Array[Vector3] = [],
 
 	parent.add_child(guard)
 	return guard
+
+
+## Spawn a dwarf-style guard (stocky armored) - named differently to avoid parent conflict
+static func spawn_guard_dwarf(parent: Node, pos: Vector3, patrol: Array[Vector3] = [], p_region_id: String = "elder_moor") -> GuardNPC:
+	return spawn_guard(parent, pos, patrol, p_region_id, 0)
+
+
+## Spawn a roman-style guard (spear and shield) - named differently to avoid parent conflict
+static func spawn_guard_roman(parent: Node, pos: Vector3, patrol: Array[Vector3] = [], p_region_id: String = "elder_moor") -> GuardNPC:
+	return spawn_guard(parent, pos, patrol, p_region_id, 1)

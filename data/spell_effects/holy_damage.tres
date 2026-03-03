@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="SpellEffectData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/spell_effect_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "holy_damage"
+display_name = "Holy Damage"
+description = "Deals radiant damage, effective against undead"
+effect_type = 0
+damage_type = 6
+condition = 0
+stat = 0
+allowed_delivery = [0, 1, 2, 3]
+base_magnitude = 5
+max_magnitude = 45
+base_duration = 0.0
+max_duration = 0.0
+base_cost = 10
+magnitude_cost_mult = 0.7
+duration_cost_mult = 0.0
+aoe_cost_mult = 2.5
+required_arcana = 5
+icon_path = ""
+effect_color = Color(1, 1, 0.6, 1)

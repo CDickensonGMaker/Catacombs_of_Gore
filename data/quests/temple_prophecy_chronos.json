@@ -1,0 +1,46 @@
+{
+	"id": "temple_prophecy_chronos",
+	"title": "Visions of Time",
+	"description": "The Priest of Chronos has received troubling visions of events to come. He requires you to deliver a sealed prophecy to the Temple of Time in Thornfield, where the High Chronist can properly interpret its meaning. Time is of the essence - the prophecy must not fall into the wrong hands.",
+	"is_main_quest": false,
+	"quest_source": "npc",
+	"giver_npc_id": "priest_chronos_dalhurst",
+	"giver_npc_type": "civilian",
+	"giver_region": "dalhurst",
+	"objectives": [
+		{
+			"id": "receive_prophecy",
+			"description": "Receive the sealed prophecy from the Priest of Chronos",
+			"type": "collect",
+			"target": "sealed_prophecy",
+			"required_count": 1
+		},
+		{
+			"id": "travel_thornfield",
+			"description": "Travel to Thornfield",
+			"type": "reach",
+			"target": "thornfield",
+			"required_count": 1
+		},
+		{
+			"id": "deliver_prophecy",
+			"description": "Deliver the prophecy to the High Chronist",
+			"type": "talk",
+			"target": "high_chronist_thornfield",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "npc_specific",
+	"turn_in_target": "high_chronist_thornfield",
+	"turn_in_zone": "thornfield",
+	"rewards": {
+		"gold": 75,
+		"xp": 400,
+		"items": ["blessing_of_chronos"],
+		"faction_reputation": {
+			"church_of_three": 35
+		}
+	},
+	"prerequisites": [],
+	"next_quest": ""
+}

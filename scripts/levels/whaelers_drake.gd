@@ -34,14 +34,18 @@ func _ready() -> void:
 
 ## Setup dynamic day/night lighting
 func _setup_day_night_cycle() -> void:
-	DayNightCycle.add_to_level(self)
+	# Only setup day/night lighting when this is the main scene (has Player node)
+	# When loaded as a streamed cell, CellStreamer strips lighting to prevent doubling
+	var is_main_scene: bool = get_node_or_null("Player") != null
+	if is_main_scene:
+		DayNightCycle.add_to_level(self)
 
 
 ## Create the canyon terrain - two cliff sides with an abyss between
 func _create_canyon_terrain() -> void:
 	# Load textures
-	var stone_wall_tex: Texture2D = load("res://Sprite folders grab bag/stonewall.png")
-	var stone_floor_tex: Texture2D = load("res://Sprite folders grab bag/stonefloor.png")
+	var stone_wall_tex: Texture2D = load("res://assets/textures/environment/walls/stonewall.png")
+	var stone_floor_tex: Texture2D = load("res://assets/textures/environment/floors/stonefloor.png")
 
 	# Cliff face material - rugged canyon stone
 	var cliff_mat := StandardMaterial3D.new()
@@ -220,7 +224,7 @@ func _create_cliff_ramps(path_mat: Material) -> void:
 
 ## Create the main stone bridge spanning the canyon
 func _create_main_bridge() -> void:
-	var stone_wall_tex: Texture2D = load("res://Sprite folders grab bag/stonewall.png")
+	var stone_wall_tex: Texture2D = load("res://assets/textures/environment/walls/stonewall.png")
 
 	# Bridge material - sturdy stone
 	var bridge_mat := StandardMaterial3D.new()
@@ -330,7 +334,7 @@ func _create_main_bridge() -> void:
 
 ## Create rickety rope/wood bridges connecting cliff buildings
 func _create_rickety_bridges() -> void:
-	var wood_tex: Texture2D = load("res://Sprite folders grab bag/woodenfloor.png")
+	var wood_tex: Texture2D = load("res://assets/textures/environment/floors/woodenfloor.png")
 
 	# Rickety bridge material - worn wood
 	var wood_mat := StandardMaterial3D.new()
@@ -424,8 +428,8 @@ func _create_rope_bridge(start_pos: Vector3, end_pos: Vector3, bridge_name: Stri
 
 ## Create buildings built into the west cliff face
 func _create_west_cliff_buildings() -> void:
-	var stone_wall_tex: Texture2D = load("res://Sprite folders grab bag/stonewall.png")
-	var wood_tex: Texture2D = load("res://Sprite folders grab bag/woodenfloor.png")
+	var stone_wall_tex: Texture2D = load("res://assets/textures/environment/walls/stonewall.png")
+	var wood_tex: Texture2D = load("res://assets/textures/environment/floors/woodenfloor.png")
 
 	var stone_mat := StandardMaterial3D.new()
 	stone_mat.albedo_color = Color(0.5, 0.45, 0.4)
@@ -490,8 +494,8 @@ func _create_west_cliff_buildings() -> void:
 
 ## Create buildings built into the east cliff face
 func _create_east_cliff_buildings() -> void:
-	var stone_wall_tex: Texture2D = load("res://Sprite folders grab bag/stonewall.png")
-	var wood_tex: Texture2D = load("res://Sprite folders grab bag/woodenfloor.png")
+	var stone_wall_tex: Texture2D = load("res://assets/textures/environment/walls/stonewall.png")
+	var wood_tex: Texture2D = load("res://assets/textures/environment/floors/woodenfloor.png")
 
 	var stone_mat := StandardMaterial3D.new()
 	stone_mat.albedo_color = Color(0.5, 0.45, 0.4)
@@ -636,8 +640,8 @@ func _spawn_tavern() -> void:
 	tavern_root.name = "TheDrunkProspector"
 	add_child(tavern_root)
 
-	var stone_wall_tex: Texture2D = load("res://Sprite folders grab bag/stonewall.png")
-	var wood_floor_tex: Texture2D = load("res://Sprite folders grab bag/woodenfloor.png")
+	var stone_wall_tex: Texture2D = load("res://assets/textures/environment/walls/stonewall.png")
+	var wood_floor_tex: Texture2D = load("res://assets/textures/environment/floors/woodenfloor.png")
 
 	# Materials
 	var wall_mat := StandardMaterial3D.new()
@@ -818,8 +822,8 @@ func _create_inn_building(pos: Vector3) -> void:
 	inn_root.name = "InnBuilding"
 	add_child(inn_root)
 
-	var stone_wall_tex: Texture2D = load("res://Sprite folders grab bag/stonewall.png")
-	var wood_floor_tex: Texture2D = load("res://Sprite folders grab bag/woodenfloor.png")
+	var stone_wall_tex: Texture2D = load("res://assets/textures/environment/walls/stonewall.png")
+	var wood_floor_tex: Texture2D = load("res://assets/textures/environment/floors/woodenfloor.png")
 
 	var wall_mat := StandardMaterial3D.new()
 	wall_mat.albedo_color = Color(0.5, 0.44, 0.38)

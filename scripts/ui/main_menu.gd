@@ -8,6 +8,9 @@ const BUTTON_NORMAL := Color(0.15, 0.12, 0.1)
 const BUTTON_HOVER := Color(0.25, 0.15, 0.12)
 const BUTTON_DISABLED := Color(0.1, 0.1, 0.1)
 
+## Menu background path (stone/skull texture)
+const MENU_BG_PATH := "res://assets/ui/menu_background.png"
+
 ## UI References
 var menu_container: VBoxContainer
 var continue_button: Button
@@ -19,39 +22,37 @@ var fade_overlay: ColorRect
 var is_transitioning: bool = false
 
 func _ready() -> void:
+	# Make sure mouse is visible on main menu
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	# Use menu cursor on main menu
+	if GameManager:
+		GameManager.set_menu_cursor()
+
+	# Play main menu music (loops automatically)
+	if AudioManager:
+		AudioManager.play_zone_music("menu")
+
 	# Set up full screen
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 
-	# Dark background
+	# Dark background (base layer)
 	var bg := ColorRect.new()
 	bg.name = "Background"
 	bg.color = Color(0.02, 0.02, 0.03)
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
 
-	# Decorative blood drips on sides (static)
-	_create_decorative_drips()
-
-	# Title at top
-	var title_container := VBoxContainer.new()
-	title_container.name = "TitleContainer"
-	title_container.set_anchors_preset(Control.PRESET_CENTER_TOP)
-	title_container.anchor_top = 0.08
-	title_container.anchor_bottom = 0.08
-	title_container.offset_left = -200
-	title_container.offset_right = 200
-	title_container.alignment = BoxContainer.ALIGNMENT_CENTER
-	add_child(title_container)
-
-	var title_label := Label.new()
-	title_label.text = "CATACOMBS OF GORE"
-	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title_label.add_theme_font_size_override("font_size", 42)
-	title_label.add_theme_color_override("font_color", TITLE_COLOR)
-	title_label.add_theme_color_override("font_outline_color", Color(0.1, 0.0, 0.0))
-	title_label.add_theme_constant_override("outline_size", 3)
-	title_container.add_child(title_label)
+	# Stone/skull background image (stretched to fit with pixelated look)
+	if ResourceLoader.exists(MENU_BG_PATH):
+		var bg_tex := TextureRect.new()
+		bg_tex.name = "MenuBackground"
+		bg_tex.texture = load(MENU_BG_PATH)
+		bg_tex.set_anchors_preset(Control.PRESET_FULL_RECT)
+		bg_tex.stretch_mode = TextureRect.STRETCH_SCALE
+		bg_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		bg_tex.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST  # Pixelated look
+		add_child(bg_tex)
 
 	# Menu container (centered)
 	menu_container = VBoxContainer.new()
@@ -170,37 +171,6 @@ func _create_menu_button(text: String) -> Button:
 	return btn
 
 
-func _create_decorative_drips() -> void:
-	# Create static blood drip decorations on the sides
-	var drip_canvas := Control.new()
-	drip_canvas.name = "DecorativeDrips"
-	drip_canvas.set_anchors_preset(Control.PRESET_FULL_RECT)
-	drip_canvas.draw.connect(_draw_decorative_drips.bind(drip_canvas))
-	add_child(drip_canvas)
-
-
-func _draw_decorative_drips(canvas: Control) -> void:
-	var viewport_size := get_viewport_rect().size
-	var blood_color := Color(0.5, 0.05, 0.05, 0.6)
-
-	# Left side drips
-	var left_drip_x := [30.0, 50.0, 75.0, 45.0, 60.0]
-	var left_drip_lengths := [150.0, 200.0, 120.0, 180.0, 90.0]
-
-	for i in range(left_drip_x.size()):
-		var x: float = left_drip_x[i]
-		var length: float = left_drip_lengths[i]
-		canvas.draw_line(Vector2(x, 0), Vector2(x, length), blood_color, 3.0)
-		canvas.draw_circle(Vector2(x, length), 5.0, blood_color)
-
-	# Right side drips
-	for i in range(left_drip_x.size()):
-		var x: float = viewport_size.x - left_drip_x[i]
-		var length: float = left_drip_lengths[i] * 0.8
-		canvas.draw_line(Vector2(x, 0), Vector2(x, length), blood_color, 3.0)
-		canvas.draw_circle(Vector2(x, length), 5.0, blood_color)
-
-
 func _create_load_game_panel() -> void:
 	load_game_panel = Panel.new()
 	load_game_panel.name = "LoadGamePanel"
@@ -289,7 +259,7 @@ func _populate_save_list() -> void:
 
 	for save_info in saves:
 		var slot: int = save_info.get("slot", -1)
-		if save_info.get("empty", true):
+		if save_info.get("empty", false):
 			continue
 
 		has_any_save = true
@@ -354,68 +324,30 @@ func _on_new_game() -> void:
 	if is_transitioning:
 		return
 	is_transitioning = true
+	AudioManager.play_ui_confirm()
+	print("[MainMenu] Starting new game...")
 
 	# Reset game state for new game
+	print("[MainMenu] Resetting GameManager...")
 	GameManager.reset_for_new_game()
-	InventoryManager.clear_inventory_state()  # Clear without items - quick start adds its own
+	print("[MainMenu] Clearing inventory...")
+	InventoryManager.clear_inventory_state()
+	print("[MainMenu] Resetting QuestManager...")
 	QuestManager.reset_for_new_game()
+	print("[MainMenu] Resetting SaveManager world state...")
 	SaveManager.reset_world_state()
+	# Reset easter egg spawn flags
+	SpockEasterEgg.reset_for_new_game()
 
-	# DEV MODE: Skip character creation, create random character
-	_create_random_character_and_start()
-
-
-## DEV: Create a random character and start game directly (skips character creation)
-func _create_random_character_and_start() -> void:
-	var char_data := CharacterData.new()
-
-	# Random race
-	var races := [Enums.Race.HUMAN, Enums.Race.ELF, Enums.Race.DWARF, Enums.Race.HALFLING]
-	char_data.race = races[randi() % races.size()]
-
-	# Random name based on race
-	var names := {
-		Enums.Race.HUMAN: ["Aldric", "Bran", "Caden", "Darius", "Elena", "Freya"],
-		Enums.Race.ELF: ["Aelindra", "Caelum", "Lyria", "Thalas", "Sylvana"],
-		Enums.Race.DWARF: ["Thorin", "Gimrik", "Bolin", "Durin", "Helga"],
-		Enums.Race.HALFLING: ["Pippin", "Merry", "Rosie", "Tuck", "Bramble"]
-	}
-	var race_names: Array = names.get(char_data.race, ["Stranger"])
-	char_data.character_name = race_names[randi() % race_names.size()]
-
-	# Apply racial bonuses
-	char_data.initialize_race_bonuses()
-
-	# Distribute some random stat points
-	var bonus_points := 5
-	var stats := ["grit", "agility", "will", "speech", "knowledge", "vitality"]
-	for i in range(bonus_points):
-		var stat: String = stats[randi() % stats.size()]
-		char_data.set(stat, char_data.get(stat) + 1)
-
-	# Recalculate derived stats and set to full
-	char_data.recalculate_derived_stats()
-	char_data.current_hp = char_data.max_hp
-	char_data.current_stamina = char_data.max_stamina
-	char_data.current_mana = char_data.max_mana
-
-	# Set as active character
-	GameManager.player_data = char_data
-
-	# DEV quick start - minimal gear, just enough to test
-	InventoryManager.add_item("iron_sword", 1)
-	InventoryManager.add_item("health_potion", 3)
-	InventoryManager.add_gold(50)
-
-	print("[MainMenu] DEV Quick start: %s the %s" % [char_data.character_name, Enums.Race.keys()[char_data.race]])
-
-	# Start in Elder Moor
-	_fade_to_scene("res://scenes/levels/elder_moor.tscn")
+	# Go to character creation screen
+	print("[MainMenu] Going to character creation...")
+	_fade_to_scene("res://scenes/ui/character_creation.tscn")
 
 
 func _on_continue() -> void:
 	if is_transitioning:
 		return
+	AudioManager.play_ui_confirm()
 
 	# Determine which autosave slot to load (prefer exit, fallback to periodic)
 	var slot_to_load: int = -1
@@ -442,6 +374,7 @@ func _on_continue() -> void:
 func _on_load_game() -> void:
 	if is_transitioning:
 		return
+	AudioManager.play_ui_confirm()
 
 	_populate_save_list()
 	load_game_panel.visible = true
@@ -449,6 +382,7 @@ func _on_load_game() -> void:
 
 
 func _on_load_game_back() -> void:
+	AudioManager.play_ui_confirm()
 	load_game_panel.visible = false
 	menu_container.visible = true
 
@@ -457,6 +391,7 @@ func _on_load_slot(slot: int) -> void:
 	if is_transitioning:
 		return
 	is_transitioning = true
+	AudioManager.play_ui_confirm()
 
 	# Load the save
 	if SaveManager.load_game(slot):
@@ -471,6 +406,7 @@ func _on_quit() -> void:
 	if is_transitioning:
 		return
 	is_transitioning = true
+	AudioManager.play_ui_confirm()
 
 	var tween := create_tween()
 	tween.tween_property(fade_overlay, "color:a", 1.0, 0.5)
@@ -480,7 +416,7 @@ func _on_quit() -> void:
 func _fade_to_scene(scene_path: String) -> void:
 	var tween := create_tween()
 	tween.tween_property(fade_overlay, "color:a", 1.0, 0.5)
-	tween.tween_callback(func(): get_tree().change_scene_to_file(scene_path))
+	tween.tween_callback(func(): SceneManager.change_scene(scene_path, "", false))
 
 
 func _input(event: InputEvent) -> void:

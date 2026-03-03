@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="SpellEffectData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/spell_effect_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "apply_poison"
+display_name = "Poison"
+description = "Poisons the target, dealing damage over time"
+effect_type = 4
+damage_type = 4
+condition = 2
+stat = 0
+allowed_delivery = [1, 2, 3]
+base_magnitude = 2
+max_magnitude = 10
+base_duration = 8.0
+max_duration = 30.0
+base_cost = 8
+magnitude_cost_mult = 0.4
+duration_cost_mult = 0.5
+aoe_cost_mult = 1.5
+required_arcana = 3
+icon_path = ""
+effect_color = Color(0.3, 0.7, 0.2, 1)

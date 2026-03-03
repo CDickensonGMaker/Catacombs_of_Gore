@@ -43,9 +43,23 @@ var dev_speed_multiplier: float = 1.0
 ## Global world seed for procedural generation (unique per playthrough)
 var world_seed: int = 0
 
+## Active goblin camps for this playthrough (randomly selected on new game)
+## Contains location_ids like "goblin_camp_southwest"
+var active_goblin_camps: Array[String] = []
+
+## All possible goblin camp location IDs
+const GOBLIN_CAMP_LOCATIONS: Array[String] = [
+	"goblin_camp_southwest",
+	"goblin_camp_south",
+	"goblin_camp_west"
+]
+
 func _ready() -> void:
 	# Set default UI scale to 68%
 	get_tree().root.content_scale_factor = 0.68
+
+	# Set custom cursor
+	_setup_custom_cursor()
 
 	# Create default player data if none exists
 	if not player_data:
@@ -53,6 +67,28 @@ func _ready() -> void:
 		player_data.recalculate_derived_stats()
 		player_data.current_hp = player_data.max_hp
 		player_data.current_stamina = player_data.max_stamina
+
+
+func _setup_custom_cursor() -> void:
+	# Load custom sword cursor
+	var cursor_path := "res://assets/ui/custom_cursor.png"
+	if ResourceLoader.exists(cursor_path):
+		var cursor_texture: Texture2D = load(cursor_path)
+		if cursor_texture:
+			# Hotspot at the tip of the sword (top-left area)
+			var hotspot := Vector2(4, 4)
+			Input.set_custom_mouse_cursor(cursor_texture, Input.CURSOR_ARROW, hotspot)
+			print("[GameManager] Custom cursor set")
+	else:
+		push_warning("[GameManager] Custom cursor not found at: %s" % cursor_path)
+
+
+## Cursor functions (no-op now - single cursor for all uses)
+func set_menu_cursor() -> void:
+	pass
+
+func set_default_cursor() -> void:
+	pass
 
 func _process(delta: float) -> void:
 	if is_paused or is_in_menu:
@@ -251,6 +287,39 @@ func reset_for_new_game() -> void:
 	is_in_menu = false
 	is_in_dialogue = false
 	is_in_combat = false
+
+	# Randomly activate 1-3 goblin camps for this playthrough
+	_randomize_goblin_camps()
+
+
+## Randomly select 1-3 goblin camps to be active for this playthrough
+func _randomize_goblin_camps() -> void:
+	active_goblin_camps.clear()
+
+	# Use world seed for deterministic selection
+	var rng := RandomNumberGenerator.new()
+	rng.seed = world_seed
+
+	# Shuffle the camps array
+	var camps_copy: Array[String] = GOBLIN_CAMP_LOCATIONS.duplicate()
+	for i in range(camps_copy.size() - 1, 0, -1):
+		var j: int = rng.randi_range(0, i)
+		var temp: String = camps_copy[i]
+		camps_copy[i] = camps_copy[j]
+		camps_copy[j] = temp
+
+	# Pick 1-3 camps randomly
+	var camp_count: int = rng.randi_range(1, 3)
+	for i in range(camp_count):
+		active_goblin_camps.append(camps_copy[i])
+
+	print("[GameManager] Active goblin camps for this playthrough: %s" % str(active_goblin_camps))
+
+
+## Check if a goblin camp is active in this playthrough
+func is_goblin_camp_active(location_id: String) -> bool:
+	return location_id in active_goblin_camps
+
 
 ## Create a new character
 func create_new_character(char_name: String, race: Enums.Race, career: Enums.Career) -> void:

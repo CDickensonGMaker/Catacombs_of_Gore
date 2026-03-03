@@ -1,0 +1,41 @@
+{
+	"id": "family_heirloom_1",
+	"title": "The Family Heirloom",
+	"description": "An old woman lost her grandmother's ring while fleeing from bandits. She thinks she dropped it near the Crossroads. Please find it for her.",
+	"is_main_quest": false,
+	"quest_source": "npc",
+	"giver_npc_id": "elder_moor_civilian",
+	"giver_npc_type": "civilian",
+	"giver_region": "elder_moor",
+	"faction": "common_folk",
+	"objectives": [
+		{
+			"id": "find_chest",
+			"description": "Search near the Crossroads for the lost ring",
+			"type": "reach",
+			"target": "crossroads",
+			"required_count": 1
+		}
+	],
+	"turn_in_type": "auto_complete",
+	"turn_in_target": "",
+	"turn_in_zone": "",
+	"rewards": {
+		"gold": 0,
+		"xp": 50,
+		"items": [],
+		"faction_reputation": {}
+	},
+	"prerequisites": [],
+	"next_quest": "family_heirloom_2",
+	"spawn_on_accept": [
+		{
+			"type": "chest",
+			"location": "crossroads",
+			"coords": [-480, 0, -180],
+			"contains": ["gold_ring"],
+			"loot_tier": "common"
+		}
+	],
+	"quest_items": ["gold_ring"]
+}

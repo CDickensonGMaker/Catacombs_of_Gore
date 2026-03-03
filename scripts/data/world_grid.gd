@@ -44,6 +44,9 @@ class CellInfo:
 	func _init(t: Terrain = Terrain.FOREST, b: Biome = Biome.FOREST) -> void:
 		terrain = t
 		biome = b
+		# Note: WATER is marked impassable for player movement (can't walk on water)
+		# but we use terrain type checks separately to spawn correct visuals
+		# (water boundary vs mountain walls)
 		passable = (t != Terrain.BLOCKED and t != Terrain.WATER)
 
 
@@ -105,30 +108,45 @@ const LOCATION_SCENES: Dictionary = {
 	"bandit_hideout": "res://scenes/levels/bandit_hideout_exterior.tscn",
 	"kazer_dun_entrance": "res://scenes/levels/kazan_dun_entrance.tscn",
 	"sunken_crypts": "res://scenes/levels/sunken_crypt.tscn",
-	"crossroads": "res://scenes/regions/crossroads.tscn",
+	"crossroads": "res://scenes/levels/cultist_ruins_corner.tscn",
 	"bloodsand_arena": "res://scenes/levels/bloodsand_arena.tscn",
+	"wyverns_roost": "res://scenes/levels/wyverns_roost.tscn",
+	# Cultist temples (quest locations) - different scene variations
+	"cultist_temple_north": "res://scenes/levels/cultist_temple.tscn",
+	"cultist_temple_east": "res://scenes/levels/cultist_temple_2.tscn",
+	"cultist_temple_south": "res://scenes/levels/cultist_ruins_corner.tscn",
+	"cultist_temple_west": "res://scenes/levels/cultist_temple_2.tscn",
+	"cultist_temple_central": "res://scenes/levels/cultist_ruins_corner.tscn",
+	# Bandit camps (quest locations)
+	"bandit_camp_north": "res://scenes/levels/bandit_camp_north.tscn",
+	"bandit_camp_east": "res://scenes/levels/bandit_camp_east.tscn",
+	"bandit_camp_south": "res://scenes/levels/bandit_camp_south.tscn",
+	# Goblin camps (randomly activated on new game)
+	"goblin_camp_southwest": "res://scenes/levels/goblin_camp.tscn",
+	"goblin_camp_south": "res://scenes/levels/goblin_camp.tscn",
+	"goblin_camp_west": "res://scenes/levels/goblin_camp.tscn",
 }
 
 ## The canonical 20x20 terrain grid (row 0 = North, row 19 = South)
 const GRID_DATA: Array = [
-	["B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B"],
-	["B","B","B","B","F","F","F","F","F","F","F","F","F","F","B","B","B","B","B","P"],
-	["B","B","B","F","F","F","F","F","F","F","F","F","F","F","F","B","B","B","B","B"],
-	["W","W","F","F","F","F","F","P","F","F","F","F","F","F","F","H","B","B","B","B"],
-	["W","W","F","F","F","F","F","R","F","F","F","F","F","P","F","H","P","B","B","B"],
-	["W","W","C","F","F","F","F","R","F","F","F","F","F","F","F","H","B","B","B","B"],
-	["W","W","C","F","P","F","F","R","R","R","R","R","R","R","R","P","H","B","B","B"],
-	["W","W","C","F","F","F","F","R","F","F","F","F","F","F","F","H","B","B","B","B"],
-	["W","W","C","F","F","F","F","R","F","F","F","F","P","F","F","H","H","B","B","B"],
-	["W","W","C","F","F","F","F","R","F","F","F","F","F","F","F","F","H","B","B","B"],
-	["W","W","C","F","F","F","F","R","F","P","F","F","F","F","F","H","H","B","B","B"],
-	["W","W","C","F","F","F","F","R","F","F","F","F","F","F","H","H","B","B","B","B"],
-	["W","W","C","F","F","P","F","R","F","F","F","F","F","F","H","H","B","B","B","B"],
-	["W","W","C","F","F","F","F","R","F","F","F","F","F","H","H","B","B","B","B","B"],
-	["W","W","C","F","F","F","F","R","F","F","F","F","H","H","B","B","B","B","B","B"],
-	["W","C","F","F","F","F","F","R","F","F","F","F","H","H","B","B","B","B","B","B"],
-	["W","C","F","F","F","F","F","R","F","F","F","H","H","B","B","B","B","B","B","B"],
-	["W","C","F","F","F","F","F","P","F","F","H","H","B","B","B","B","B","B","B","B"],
+	["W","W","D","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B"],
+	["W","W","D","B","F","F","F","F","F","F","F","F","F","F","B","B","B","B","B","P"],
+	["W","W","D","F","F","F","F","F","F","F","F","F","F","F","F","B","B","B","B","B"],
+	["W","W","D","F","F","F","F","P","F","F","F","F","F","F","F","H","B","B","B","B"],
+	["W","W","D","F","F","F","F","R","F","F","F","F","F","P","F","H","P","B","B","B"],
+	["W","W","D","F","F","F","F","R","F","F","F","F","F","F","F","H","B","B","B","B"],
+	["W","W","D","F","P","F","F","R","R","R","R","R","R","R","R","P","H","B","B","B"],
+	["W","W","D","F","F","F","F","R","F","F","F","F","F","F","F","H","B","B","B","B"],
+	["W","W","D","F","F","F","F","R","F","F","F","F","P","F","F","H","H","B","B","B"],
+	["W","W","D","F","F","F","F","R","F","F","F","F","F","F","F","F","H","B","B","B"],
+	["W","W","D","F","F","F","F","R","F","P","F","F","F","F","F","H","H","B","B","B"],
+	["W","W","D","F","F","F","F","R","F","F","F","F","F","F","H","H","B","B","B","B"],
+	["W","W","D","F","F","P","F","R","F","F","F","F","F","F","H","H","B","B","B","B"],
+	["W","W","D","F","F","F","F","R","F","F","F","F","F","H","H","B","B","B","B","B"],
+	["W","W","D","F","F","F","F","R","F","F","F","F","H","H","B","B","B","B","B","B"],
+	["W","W","D","F","F","F","F","R","F","F","F","F","H","H","B","B","B","B","B","B"],
+	["W","W","D","F","F","F","F","R","F","F","F","H","H","B","B","B","B","B","B","B"],
+	["W","W","D","F","F","F","F","P","F","F","H","H","B","B","B","B","B","B","B","B"],
 	["W","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B"],
 	["W","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B"]
 ]
@@ -146,8 +164,8 @@ const LOCATIONS: Array = [
 	{"id": "dalhurst", "name": "Dalhurst", "x": -8, "y": -2, "type": "town",
 	 "scene_size": [160, 172],
 	 "description": "A quiet settlement on the western road."},
-	{"id": "crossroads", "name": "Crossroads", "x": -5, "y": -2, "type": "landmark",
-	 "description": "A weathered signpost marks where the roads meet."},
+	{"id": "crossroads", "name": "Ruined Crossroads", "x": -5, "y": -2, "type": "dungeon",
+	 "description": "Cultists have defiled this once-peaceful crossroads with dark rituals."},
 	{"id": "thornfield", "name": "Thornfield", "x": 3, "y": -2, "type": "town",
 	 "description": "The easternmost town in the valley."},
 	{"id": "millbrook", "name": "Millbrook", "x": -7, "y": 4, "type": "town",
@@ -156,25 +174,52 @@ const LOCATIONS: Array = [
 	 "description": "The great northern gate of Kazer-Dun Dwarf Hold."},
 	{"id": "sunken_crypts", "name": "Sunken Crypts", "x": -3, "y": 2, "type": "dungeon",
 	 "description": "A waterlogged burial ground slowly sinking into the marsh."},
-	# === SOUTH/SOUTHWEST LOCATIONS (filling empty areas) ===
-	{"id": "darkwood_grove", "name": "Darkwood Grove", "x": -3, "y": 5, "type": "dungeon",
-	 "description": "Ancient trees twisted by dark magic. The forest spirits here have turned hostile."},
-	{"id": "troll_bridge", "name": "Troll Bridge", "x": -6, "y": 6, "type": "landmark",
-	 "description": "A crumbling stone bridge over a ravine. A territorial troll has claimed it as his domain."},
-	{"id": "abandoned_mine", "name": "Abandoned Silver Mine", "x": 0, "y": 4, "type": "dungeon",
-	 "description": "A mine shaft once worked by dwarven prospectors. Something drove them out."},
+	# === SOUTH/SOUTHWEST LOCATIONS ===
 	{"id": "wyverns_roost", "name": "Wyvern's Roost", "x": 2, "y": 5, "type": "landmark",
+	 "scene_size": [100, 100],
 	 "description": "A rocky outcropping where wyverns nest. Their shrieks echo across the hills."},
-	{"id": "border_wars_graveyard", "name": "Border Wars Graveyard", "x": -2, "y": 7, "type": "dungeon",
-	 "description": "Mass graves from the Tegner Wars. The restless dead do not sleep quietly here."},
-	{"id": "smugglers_cove", "name": "Smuggler's Cove", "x": -9, "y": 5, "type": "dungeon",
-	 "description": "A hidden sea cave used by pirates and smugglers. Rumored to hold buried treasure."},
-	{"id": "old_watchtower", "name": "Old Watchtower", "x": 1, "y": 2, "type": "landmark",
-	 "description": "A ruined imperial watchtower overlooking the road. Now a bandit lookout."},
 	# === COMBAT ARENA ===
 	{"id": "bloodsand_arena", "name": "Bloodsand Arena", "x": 0, "y": 3, "type": "landmark",
 	 "scene_size": [100, 100],
 	 "description": "A gladiatorial arena where warriors test their mettle in bloody combat."},
+	# === BANDIT CAMPS (for quest system) ===
+	{"id": "bandit_camp_north", "name": "Bandit Camp", "x": -2, "y": -5, "type": "dungeon",
+	 "description": "A rough camp of brigands hidden in the northern forest. They prey on travelers."},
+	{"id": "bandit_camp_east", "name": "Bandit Outpost", "x": 4, "y": -1, "type": "dungeon",
+	 "description": "An eastern outpost where bandits watch the road to Thornfield."},
+	{"id": "bandit_camp_south", "name": "Bandit Encampment", "x": -1, "y": 5, "type": "dungeon",
+	 "description": "A southern bandit camp that raids the road to Millbrook."},
+	# === CULTIST TEMPLES (quest locations) ===
+	{"id": "cultist_temple_north", "name": "Ruined Temple", "x": -4, "y": -3, "type": "dungeon",
+	 "description": "Ancient temple ruins where dark cultists perform forbidden rituals."},
+	{"id": "cultist_temple_east", "name": "Ruined Temple", "x": 2, "y": 1, "type": "dungeon",
+	 "description": "A crumbling temple overtaken by a sinister cult."},
+	{"id": "cultist_temple_south", "name": "Ruined Temple", "x": -5, "y": 6, "type": "dungeon",
+	 "description": "Dark rituals echo through these forsaken ruins."},
+	{"id": "cultist_temple_west", "name": "Ruined Temple", "x": -7, "y": 0, "type": "dungeon",
+	 "description": "Overgrown temple ruins where cultists gather in secret."},
+	{"id": "cultist_temple_central", "name": "Ruined Temple", "x": -2, "y": 3, "type": "dungeon",
+	 "description": "A forgotten temple deep in the forest, now claimed by dark worshippers."},
+	# === GOBLIN CAMPS (randomly activated on new game - 1-3 active per playthrough) ===
+	{"id": "goblin_camp_southwest", "name": "Goblin Camp", "x": -9, "y": 7, "type": "dungeon",
+	 "description": "A crude goblin encampment in the southwestern wilderness. Their scouts watch the roads."},
+	{"id": "goblin_camp_south", "name": "Goblin Camp", "x": -2, "y": 8, "type": "dungeon",
+	 "description": "Goblins have made camp here, raiding nearby travelers and settlements."},
+	{"id": "goblin_camp_west", "name": "Goblin Camp", "x": -10, "y": 1, "type": "dungeon",
+	 "description": "A goblin warband has established a foothold in the western forest."},
+	# === PROCEDURAL SETTLEMENTS (generated by TownGenerator) ===
+	{"id": "riverford", "name": "Riverford", "x": -9, "y": -3, "type": "village",
+	 "description": "A small fishing village where the western road meets the river."},
+	{"id": "bramblewood", "name": "Bramblewood", "x": -3, "y": -4, "type": "village",
+	 "description": "A quiet hamlet nestled deep in the northern forest."},
+	{"id": "highwatch", "name": "Highwatch", "x": 4, "y": -4, "type": "town",
+	 "description": "A fortified trading post overlooking the eastern valleys."},
+	{"id": "stonehaven", "name": "Stonehaven", "x": -6, "y": 2, "type": "outpost",
+	 "description": "A rugged outpost built among the rocky southern hills."},
+	{"id": "greendale", "name": "Greendale", "x": -1, "y": -3, "type": "village",
+	 "description": "A pastoral village known for its orchards and friendly folk."},
+	{"id": "ironhollow", "name": "Ironhollow", "x": 1, "y": 2, "type": "town",
+	 "description": "A prosperous mining town that supplies ore to the region."},
 ]
 
 ## Road connections (Elder Moor-relative coordinates)
@@ -195,7 +240,9 @@ const ROAD_CONNECTIONS: Array = [
 	# Spur to Bandit Hideout
 	[[1,-2], [1,-3]], [[1,-3], [1,-4]],
 	# Spur to Elder Moor
-	[[0,-2], [0,-1]], [[0,-1], [0,0]]
+	[[0,-2], [0,-1]], [[0,-1], [0,0]],
+	# Spur to Bloodsand Arena (south of Elder Moor)
+	[[0,0], [0,1]], [[0,1], [0,2]], [[0,2], [0,3]]
 ]
 
 ## Region name constants
@@ -252,10 +299,18 @@ static func initialize() -> void:
 			"dungeon":
 				cell.location_type = LocationType.DUNGEON
 				cell.dungeon_discovered = false
+			"village":
+				cell.location_type = LocationType.VILLAGE
 			"town":
 				cell.location_type = LocationType.TOWN
+			"city":
+				cell.location_type = LocationType.CITY
+			"capital":
+				cell.location_type = LocationType.CAPITAL
 			"landmark":
 				cell.location_type = LocationType.LANDMARK
+			"outpost":
+				cell.location_type = LocationType.OUTPOST
 			"blocked":
 				cell.location_type = LocationType.BLOCKED
 				cell.passable = false
@@ -307,7 +362,7 @@ static func _get_region_for_coords(coords: Vector2i) -> String:
 static func _get_danger_level(coords: Vector2i) -> int:
 	# Distance from Elder Moor increases danger
 	var distance: int = abs(coords.x) + abs(coords.y)
-	return clampi(1 + distance / 3, 1, 10)
+	return clampi(1 + int(distance / 3.0), 1, 10)
 
 
 ## ============================================================================
@@ -584,3 +639,87 @@ static func find_path(from_coords: Vector2i, to_coords: Vector2i) -> Array[Vecto
 ## Calculate Manhattan distance between coordinates
 static func grid_distance(from_coords: Vector2i, to_coords: Vector2i) -> int:
 	return abs(from_coords.x - to_coords.x) + abs(from_coords.y - to_coords.y)
+
+
+## ============================================================================
+## SCENE COVERAGE
+## ============================================================================
+
+## Check if a cell is covered by another cell's hand-crafted scene
+## Returns Dictionary with "covered": bool, "by_location": String, "by_coords": Vector2i
+## A cell is covered if it falls within the physical bounds of another scene's scene_size
+static func is_covered_by_scene(coords: Vector2i) -> Dictionary:
+	if cells.is_empty():
+		initialize()
+
+	var result: Dictionary = {"covered": false, "by_location": "", "by_coords": Vector2i.ZERO}
+
+	# Check all cells with scene_path set
+	for check_coords: Vector2i in cells:
+		if check_coords == coords:
+			continue  # Don't check against self
+
+		var check_cell: CellInfo = cells[check_coords]
+		if check_cell.scene_path.is_empty():
+			continue  # Only check hand-crafted scenes
+
+		# Calculate the scene's coverage in grid cells
+		# scene_size is in world units, CELL_SIZE is 100 units per cell
+		var scene_width_cells: float = check_cell.scene_size.x / CELL_SIZE
+		var scene_depth_cells: float = check_cell.scene_size.y / CELL_SIZE
+
+		# Scene is centered on its cell, so calculate the bounds
+		# A scene at (0,0) with size 242x219 covers from about (-0.71, -0.595) to (1.71, 1.595) in grid coords
+		var half_width: float = scene_width_cells / 2.0
+		var half_depth: float = scene_depth_cells / 2.0
+
+		var min_x: float = float(check_coords.x) - half_width
+		var max_x: float = float(check_coords.x) + half_width
+		var min_y: float = float(check_coords.y) - half_depth
+		var max_y: float = float(check_coords.y) + half_depth
+
+		# Check if coords falls within this scene's bounds
+		# Use the cell center for the check
+		var cell_center_x: float = float(coords.x)
+		var cell_center_y: float = float(coords.y)
+
+		if cell_center_x >= min_x and cell_center_x <= max_x and cell_center_y >= min_y and cell_center_y <= max_y:
+			result["covered"] = true
+			result["by_location"] = check_cell.location_id
+			result["by_coords"] = check_coords
+			return result
+
+	return result
+
+
+## Get all cells covered by a specific scene
+static func get_cells_covered_by_scene(scene_coords: Vector2i) -> Array[Vector2i]:
+	if cells.is_empty():
+		initialize()
+
+	var result: Array[Vector2i] = []
+	var cell: CellInfo = cells.get(scene_coords)
+	if not cell or cell.scene_path.is_empty():
+		return result
+
+	# Calculate coverage bounds
+	var scene_width_cells: float = cell.scene_size.x / CELL_SIZE
+	var scene_depth_cells: float = cell.scene_size.y / CELL_SIZE
+	var half_width: float = scene_width_cells / 2.0
+	var half_depth: float = scene_depth_cells / 2.0
+
+	# Check all cells within the potential bounds
+	var min_check_x: int = int(floor(float(scene_coords.x) - half_width))
+	var max_check_x: int = int(ceil(float(scene_coords.x) + half_width))
+	var min_check_y: int = int(floor(float(scene_coords.y) - half_depth))
+	var max_check_y: int = int(ceil(float(scene_coords.y) + half_depth))
+
+	for x: int in range(min_check_x, max_check_x + 1):
+		for y: int in range(min_check_y, max_check_y + 1):
+			var check_coords := Vector2i(x, y)
+			if check_coords == scene_coords:
+				continue  # Don't include the scene's own cell
+			if is_in_bounds(check_coords):
+				result.append(check_coords)
+
+	return result
