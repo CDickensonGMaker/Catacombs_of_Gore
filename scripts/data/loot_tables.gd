@@ -28,10 +28,24 @@ var armor_pools: Dictionary = {
 	LootTier.EPIC: ["amulet_of_vitality", "amulet_of_wisdom"],
 }
 
+## Basic weapon pool - village blacksmith items only (no exotic/rare weapons)
+var basic_weapon_pools: Dictionary = {
+	LootTier.COMMON: ["dagger"],
+	LootTier.UNCOMMON: ["longsword", "hunting_bow"],
+}
+
+## Basic armor pool - village blacksmith items only (no exotic/rare armor)
+var basic_armor_pools: Dictionary = {
+	LootTier.COMMON: ["leather_armor"],
+	LootTier.UNCOMMON: ["chainmail", "wooden_shield"],
+}
+
 ## Jewelry pool (rings and amulets) - for magic shops
 var jewelry_pools: Dictionary = {
-	LootTier.RARE: ["ring_of_protection", "ring_of_strength"],
-	LootTier.EPIC: ["amulet_of_vitality", "amulet_of_wisdom"],
+	LootTier.COMMON: ["iron_ring", "copper_amulet"],
+	LootTier.UNCOMMON: ["silver_ring", "silver_amulet", "bone_ring", "wolf_fang_necklace"],
+	LootTier.RARE: ["gold_ring", "gold_amulet", "ring_of_protection", "ring_of_strength", "serpent_ring", "spider_silk_pendant"],
+	LootTier.EPIC: ["amulet_of_vitality", "amulet_of_wisdom", "flame_heart_ring", "frost_crystal_pendant", "signet_ring", "scholars_medallion"],
 }
 
 ## Magic consumables pool (mana potions, etc.)
@@ -45,11 +59,19 @@ var consumable_pools: Dictionary = {
 	LootTier.RARE: ["antidote"],
 }
 
+## Food and cooking ingredients pool - sold by innkeepers
+var food_pools: Dictionary = {
+	LootTier.JUNK: ["water"],
+	LootTier.COMMON: ["raw_meat", "bread", "cheese", "flour", "potato", "carrot"],
+	LootTier.UNCOMMON: ["ale", "cooked_meat"],
+}
+
 var material_pools: Dictionary = {
 	LootTier.JUNK: ["stone_block", "coal"],
 	LootTier.COMMON: ["iron_ore", "leather", "wood_plank", "empty_vial"],
-	LootTier.UNCOMMON: ["iron_ingot", "leather_strip", "red_herb"],
-	LootTier.RARE: ["gold_ore", "steel_ingot"],
+	LootTier.UNCOMMON: ["iron_ingot", "leather_strip", "red_herb", "silver_ore"],
+	LootTier.RARE: ["steel_ingot", "silver_ingot"],
+	LootTier.EPIC: ["gold_ore", "gold_ingot"],
 }
 
 var ammo_pools: Dictionary = {
@@ -71,10 +93,12 @@ var tool_pools: Dictionary = {
 const SHOP_TYPE_POOLS: Dictionary = {
 	"general": ["consumable", "material", "ammo", "tool"],
 	"blacksmith": ["weapon", "armor", "material"],
+	"basic_blacksmith": ["basic_weapon", "basic_armor", "material"],  # Village smith - no exotic items
 	"alchemist": ["consumable", "scroll"],
 	"weapon": ["weapon", "ammo"],
 	"armor": ["armor"],
 	"magic": ["scroll", "magic_consumable", "jewelry"],  # scrolls, mana potions, rings/amulets
+	"innkeeper": ["food", "consumable"],  # food ingredients, drinks, basic consumables
 }
 
 ## Number of items to generate per shop tier
@@ -160,6 +184,8 @@ func get_pool_by_name(pool_name: String) -> Dictionary:
 	match pool_name:
 		"weapon": return weapon_pools
 		"armor": return armor_pools
+		"basic_weapon": return basic_weapon_pools
+		"basic_armor": return basic_armor_pools
 		"jewelry": return jewelry_pools
 		"consumable": return consumable_pools
 		"magic_consumable": return magic_consumable_pools
@@ -167,6 +193,7 @@ func get_pool_by_name(pool_name: String) -> Dictionary:
 		"ammo": return ammo_pools
 		"scroll": return scroll_pools
 		"tool": return tool_pools
+		"food": return food_pools
 	return {}
 
 

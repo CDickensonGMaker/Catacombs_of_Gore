@@ -92,7 +92,7 @@ var totem_position: Vector3 = Vector3.ZERO
 @export_group("Ranged Combat")
 @export var is_ranged: bool = false           ## Uses ranged attacks
 @export var preferred_range: float = 10.0     ## Distance to maintain from target
-@export var min_range: float = 5.0            ## Minimum distance - will back away if closer
+@export var min_range: float = 3.0            ## Minimum distance - will back away if closer (reduced from 5.0 for less fleeing)
 @export var ranged_attack_projectile: ProjectileData  ## Projectile to fire
 @export var ranged_attack_cooldown: float = 2.0  ## Time between ranged attacks
 @export var ranged_attack_windup: float = 0.5 ## Wind-up time before firing
@@ -193,6 +193,11 @@ const PATH_RECALC_INTERVAL: float = 1.5      ## How often to recalculate nav pat
 const MAX_UNSTUCK_ATTEMPTS: int = 5          ## Max attempts before giving up temporarily
 const UNSTUCK_COOLDOWN: float = 3.0          ## Cooldown after max attempts reached
 
+## Minimum combat distance - enemies won't walk closer than this to the player
+## This prevents enemies from blocking the player's view during combat
+## Set lower than default attack_range (2.0) to ensure enemies can attack
+const MIN_COMBAT_DISTANCE: float = 1.2       ## Minimum distance to maintain from target
+
 ## Ranged enemy visual tint
 var _original_material: Material = null
 var _ranged_tint_applied: bool = false
@@ -220,6 +225,11 @@ const INTIMIDATION_COOLDOWN_DURATION: float = 30.0  ## Can't be re-intimidated f
 ## Conditions
 var active_conditions: Dictionary = {}
 
+## Stealth awareness system
+var awareness_level: float = 0.0  # 0.0 = unaware, builds toward thresholds
+var player_in_detection_range: bool = false  # True when player is in aggro area
+var _awareness_target: Node3D = null  # Reference to player being tracked for awareness
+
 ## Persistent ID for enemy kill tracking (set by spawner for procedural dungeons)
 ## If not empty, death will be recorded in SaveManager so enemy doesn't respawn
 var persistent_id: String = ""
@@ -227,12 +237,21 @@ var persistent_id: String = ""
 ## Physics
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
+## PERFORMANCE: Cached player reference to avoid get_nodes_in_group("player") spam
+var _cached_player: Node3D = null
+
+## PERFORMANCE: Cached distance to player (recalculated at start of each physics frame)
+var _cached_player_distance_sq: float = INF
+
 func _ready() -> void:
 	add_to_group("enemies")
 	CombatManager.register_enemy(self)
 	# Defer hiding mesh placeholders - if a billboard is set up later, they'll be hidden anyway
 	# This ensures enemies without explicit billboard setup don't show ugly 3D placeholders
 	call_deferred("_hide_mesh_placeholders_if_no_billboard")
+
+	# PERFORMANCE: Cache player reference at startup
+	_cached_player = get_tree().get_first_node_in_group("player")
 
 	# Store spawn position for stationary enemies
 	spawn_position = global_position
@@ -486,13 +505,46 @@ func _physics_process(delta: float) -> void:
 	if current_state == AIState.DEAD:
 		return
 
+	# PERFORMANCE: Re-cache player if invalid (scene changed, etc.)
+	if not is_instance_valid(_cached_player):
+		_cached_player = get_tree().get_first_node_in_group("player")
+		if not _cached_player or not is_instance_valid(_cached_player):
+			return  # No player, skip all updates
+
+	# Safety check - player might have been freed between cache and use
+	if not is_instance_valid(_cached_player) or not _cached_player.is_inside_tree():
+		_cached_player = null
+		return
+
+	# PERFORMANCE: Cache distance to player once per frame (used by multiple systems)
+	_cached_player_distance_sq = global_position.distance_squared_to(_cached_player.global_position)
+
+	# PERFORMANCE: Enemy LOD system - skip updates for distant enemies
+	# > 60 units: skip all updates
+	# > 30 units: update at 1/4 rate
+	# > 20 units: update at 1/2 rate
+	if _cached_player_distance_sq > 3600.0:  # > 60 units
+		return  # Skip all updates for distant enemies
+	elif _cached_player_distance_sq > 900.0:  # > 30 units
+		if _physics_frame_count % 4 != 0:
+			return  # Update at 1/4 rate
+	elif _cached_player_distance_sq > 400.0:  # > 20 units
+		if _physics_frame_count % 2 != 0:
+			return  # Update at 1/2 rate
+	# else: full update rate for nearby enemies
+
 	_update_timers(delta)
 	_update_conditions(delta)
+	_update_awareness(delta)  # Stealth awareness system
 	_update_target()
 	_update_state_machine(delta)
 	_update_movement(delta)
 
 	move_and_slide()
+
+	# Update rat directional sprite based on movement direction
+	if _is_rat_enemy:
+		_update_rat_directional_sprite()
 
 	# Debug: confirm movement is being applied
 	if DEBUG and _physics_frame_count <= 10:
@@ -796,6 +848,56 @@ func _update_conditions(delta: float) -> void:
 	for condition in to_remove:
 		active_conditions.erase(condition)
 
+## Update stealth awareness system
+func _update_awareness(delta: float) -> void:
+	# Already have a target - awareness maxed
+	if current_target and is_instance_valid(current_target):
+		awareness_level = 1.0
+		return
+
+	# No player in detection range - decay awareness
+	if not player_in_detection_range or not _awareness_target or not is_instance_valid(_awareness_target):
+		awareness_level = maxf(0.0, awareness_level - StealthConstants.AWARENESS_DECAY_RATE * delta)
+		return
+
+	# Player is in range - check visibility and LOS
+	var player: Node3D = _awareness_target
+
+	# Check line of sight
+	if not CombatManager.has_line_of_sight(self, player):
+		# Can't see player - slowly decay awareness
+		awareness_level = maxf(0.0, awareness_level - StealthConstants.AWARENESS_DECAY_RATE * 0.5 * delta)
+		return
+
+	# Can see player - get their visibility
+	var player_visibility: float = 1.0
+	if player.has_method("get_visibility"):
+		player_visibility = player.get_visibility()
+
+	# If player is undetectable, don't build awareness at all
+	if StealthConstants.is_undetectable(player_visibility):
+		awareness_level = maxf(0.0, awareness_level - StealthConstants.AWARENESS_DECAY_RATE * delta)
+		return
+
+	# Build awareness based on player visibility
+	var build_rate: float = StealthConstants.get_awareness_build_rate(player_visibility)
+	awareness_level = minf(1.0, awareness_level + build_rate * delta)
+
+	# Check thresholds
+	if awareness_level >= StealthConstants.COMBAT_THRESHOLD and current_alert_state != AlertState.COMBAT:
+		# Full detection!
+		_detect_player_immediately(player)
+	elif awareness_level >= StealthConstants.ALERT_THRESHOLD and current_alert_state == AlertState.IDLE:
+		# Become alerted
+		investigation_position = player.global_position
+		_change_alert_state(AlertState.ALERTED)
+		if DEBUG:
+			print("[Enemy] Became ALERTED - awareness=%.2f, player visibility=%.2f" % [awareness_level, player_visibility])
+
+## Check if enemy is unaware (for backstab)
+func is_unaware() -> bool:
+	return current_alert_state == AlertState.IDLE and awareness_level < StealthConstants.ALERT_THRESHOLD
+
 func _update_target() -> void:
 	# Skip all target tracking while disengaging - enemy is returning home
 	if current_state == AIState.DISENGAGE:
@@ -832,19 +934,17 @@ func _update_target() -> void:
 func _scan_for_player() -> void:
 	var aggro_range := enemy_data.aggro_range if enemy_data else 12.0
 
-	# First priority: scan for player
-	var players := get_tree().get_nodes_in_group("player")
-	for player in players:
-		if player is Node3D:
-			var dist := global_position.distance_to(player.global_position)
-			if dist <= aggro_range:
-				current_target = player
-				last_known_target_position = player.global_position
-				target_acquired.emit(player)
-				_change_state(AIState.CHASE)
-				if DEBUG:
-					print("[Enemy] Backup scan found player at distance: ", dist)
-				return
+	# PERFORMANCE: Use cached player reference instead of get_nodes_in_group()
+	if _cached_player and is_instance_valid(_cached_player):
+		var dist := global_position.distance_to(_cached_player.global_position)
+		if dist <= aggro_range:
+			current_target = _cached_player
+			last_known_target_position = _cached_player.global_position
+			target_acquired.emit(_cached_player)
+			_change_state(AIState.CHASE)
+			if DEBUG:
+				print("[Enemy] Backup scan found player at distance: ", dist)
+			return
 
 	# Second priority: scan for hostile faction enemies
 	_scan_for_hostile_enemies()
@@ -866,35 +966,36 @@ func _check_for_player_during_movement() -> bool:
 			print("[Enemy]   Already has target: ", current_target.name)
 		return true
 
+	# PERFORMANCE: Use cached player reference instead of get_nodes_in_group()
+	if not _cached_player or not is_instance_valid(_cached_player):
+		return false
+
 	var aggro_range := enemy_data.aggro_range if enemy_data else 12.0
-	var players := get_tree().get_nodes_in_group("player")
 
 	if DEBUG:
-		print("[Enemy]   Players found: ", players.size(), " aggro_range=", aggro_range)
+		print("[Enemy]   Checking player aggro_range=", aggro_range)
 
-	for player in players:
-		if player is Node3D:
-			var dist := global_position.distance_to(player.global_position)
+	var dist := global_position.distance_to(_cached_player.global_position)
+	if DEBUG:
+		print("[Enemy]   Checking player '", _cached_player.name, "' at distance=", snapped(dist, 0.1))
+	if dist <= aggro_range:
+		# Check line of sight before acquiring target
+		var has_los := CombatManager.has_line_of_sight(self, _cached_player)
+		if DEBUG:
+			print("[Enemy]   In range! LOS check=", has_los)
+		if has_los:
+			current_target = _cached_player
+			last_known_target_position = _cached_player.global_position
+			target_acquired.emit(_cached_player)
+			_change_alert_state(AlertState.COMBAT)
+			_change_state(AIState.CHASE)
 			if DEBUG:
-				print("[Enemy]   Checking player '", player.name, "' at distance=", snapped(dist, 0.1))
-			if dist <= aggro_range:
-				# Check line of sight before acquiring target
-				var has_los := CombatManager.has_line_of_sight(self, player)
-				if DEBUG:
-					print("[Enemy]   In range! LOS check=", has_los)
-				if has_los:
-					current_target = player
-					last_known_target_position = player.global_position
-					target_acquired.emit(player)
-					_change_alert_state(AlertState.COMBAT)
-					_change_state(AIState.CHASE)
-					if DEBUG:
-						print("[Enemy] Movement scan found player at distance: ", dist)
-					return true
-				elif DEBUG:
-					print("[Enemy]   LOS blocked - not acquiring target")
-			elif DEBUG:
-				print("[Enemy]   Out of aggro range (", dist, " > ", aggro_range, ")")
+				print("[Enemy] Movement scan found player at distance: ", dist)
+			return true
+		elif DEBUG:
+			print("[Enemy]   LOS blocked - not acquiring target")
+	elif DEBUG:
+		print("[Enemy]   Out of aggro range (", dist, " > ", aggro_range, ")")
 
 	return false
 
@@ -1453,6 +1554,9 @@ func _change_alert_state(new_alert_state: AlertState) -> void:
 			# Return to normal behavior
 			_return_to_normal_behavior()
 		AlertState.COMBAT:
+			# Play aggro sound (use attack sounds for war cry effect)
+			if enemy_data and not enemy_data.attack_sounds.is_empty():
+				AudioManager.play_enemy_sound(enemy_data.attack_sounds, global_position, 2.0)
 			# Clear any search/alert timers
 			alert_timer = 0.0
 			search_timer = 0.0
@@ -1494,7 +1598,7 @@ func alert_to_target(target: Node, defend_position: Vector3) -> void:
 ## Returns true if intimidation succeeded, false otherwise
 ## Intimidator should be the player or NPC attempting intimidation
 ## Formula: (Intimidator Grit + Intimidation) vs (Enemy Will + Bravery) + d10 roll
-func attempt_intimidation(intimidator: Node) -> bool:
+func attempt_intimidation(_intimidator: Node) -> bool:
 	# Can't intimidate if dead, already intimidated, or on cooldown
 	if current_state == AIState.DEAD:
 		return false
@@ -1781,10 +1885,28 @@ func _update_movement(delta: float) -> void:
 	direction.y = 0
 
 	if direction.length() > 0.1:
-		# Slow down when close to target in attack state
-		if current_state == AIState.ATTACK and current_target and is_instance_valid(current_target):
+		# Check minimum combat distance - don't walk closer than this to the target
+		# This prevents enemies from blocking the player's view during combat
+		if current_target and is_instance_valid(current_target):
 			var dist := global_position.distance_to(current_target.global_position)
-			if dist < 3.0:
+
+			# If within minimum combat distance, stop approaching (but can still attack)
+			if dist <= MIN_COMBAT_DISTANCE and (current_state == AIState.CHASE or current_state == AIState.ATTACK):
+				# Check if we're moving toward the target
+				var to_target := (current_target.global_position - global_position).normalized()
+				to_target.y = 0
+				var moving_toward := direction.dot(to_target) > 0.3
+
+				if moving_toward:
+					# Stop moving toward target - we're close enough
+					velocity.x = 0
+					velocity.z = 0
+					if DEBUG and Engine.get_physics_frames() % 60 == 0:
+						print("[Enemy]   At min combat distance (", snapped(dist, 0.1), "), stopping approach")
+					return
+
+			# Slow down when approaching target in attack state
+			if current_state == AIState.ATTACK and dist < 3.0:
 				speed *= 0.3
 
 		velocity.x = direction.x * speed
@@ -1839,6 +1961,10 @@ func _perform_attack() -> void:
 
 	is_attacking = true
 	attack_started.emit(current_attack)
+
+	# Play attack sound from enemy data
+	if enemy_data and not enemy_data.attack_sounds.is_empty():
+		AudioManager.play_enemy_sound(enemy_data.attack_sounds, global_position, 1.0)
 
 	# Face target
 	if current_target and mesh_root:
@@ -2165,6 +2291,10 @@ func take_damage(amount: int, damage_type: Enums.DamageType, attacker: Node) -> 
 	amount = max(1, amount)
 	current_hp -= amount
 
+	# Play hurt sound from enemy data
+	if enemy_data and not enemy_data.hurt_sounds.is_empty():
+		AudioManager.play_enemy_sound(enemy_data.hurt_sounds, global_position)
+
 	damaged.emit(amount, damage_type, attacker)
 
 	# Acquire target if we don't have one
@@ -2223,6 +2353,10 @@ func get_enemy_data() -> EnemyData:
 ## Death
 
 func _on_death() -> void:
+	# Play death sound from enemy data
+	if enemy_data and not enemy_data.death_sounds.is_empty():
+		AudioManager.play_enemy_sound(enemy_data.death_sounds, global_position, 2.0)
+
 	# Disable collisions
 	if hurtbox:
 		hurtbox.disable()
@@ -2346,27 +2480,49 @@ func _on_aggro_area_body_entered(body: Node3D) -> void:
 			print("[Enemy] Ignoring aggro - disengaging or in cooldown")
 		return
 
-	# Player detection (highest priority)
-	if body.is_in_group("player") and not current_target:
-		current_target = body
-		last_known_target_position = body.global_position
-		if DEBUG:
-			print("[Enemy] Target acquired: ", body.name)
-		target_acquired.emit(body)
+	# Player detection - use visibility-based awareness system
+	if body.is_in_group("player"):
+		player_in_detection_range = true
+		_awareness_target = body
 
-		# Check for humanoid dialogue (pacifist option for human/elf/dwarf enemies)
-		# If dialogue triggers, enemy will wait in IDLE state for result
-		if CombatManager.check_humanoid_dialogue(self):
+		# Get player visibility
+		var player_visibility: float = 1.0
+		if body.has_method("get_visibility"):
+			player_visibility = body.get_visibility()
+
+		# If player is NOT hidden, detect immediately (legacy behavior)
+		# If player IS hidden, use awareness system for gradual detection
+		if not StealthConstants.is_hidden(player_visibility):
+			_detect_player_immediately(body)
+		else:
+			# Hidden player - start awareness tracking
 			if DEBUG:
-				print("[Enemy] Humanoid dialogue triggered - waiting for player response")
-			return  # Don't enter combat yet, wait for dialogue result
+				print("[Enemy] Player is hidden (visibility=%.2f), tracking awareness" % player_visibility)
 
-		_change_alert_state(AlertState.COMBAT)
-		_change_state(AIState.CHASE)
+## Immediately detect player (when not hidden or awareness threshold reached)
+func _detect_player_immediately(body: Node3D) -> void:
+	if current_target:
+		return  # Already have a target
 
-		# Horror check for certain enemies
-		if enemy_data and enemy_data.causes_horror:
-			CombatManager.trigger_horror_check(self, body, enemy_data.horror_difficulty)
+	current_target = body
+	last_known_target_position = body.global_position
+	if DEBUG:
+		print("[Enemy] Target acquired: ", body.name)
+	target_acquired.emit(body)
+
+	# Check for humanoid dialogue (pacifist option for human/elf/dwarf enemies)
+	# If dialogue triggers, enemy will wait in IDLE state for result
+	if CombatManager.check_humanoid_dialogue(self):
+		if DEBUG:
+			print("[Enemy] Humanoid dialogue triggered - waiting for player response")
+		return  # Don't enter combat yet, wait for dialogue result
+
+	_change_alert_state(AlertState.COMBAT)
+	_change_state(AIState.CHASE)
+
+	# Horror check for certain enemies
+	if enemy_data and enemy_data.causes_horror:
+		CombatManager.trigger_horror_check(self, body, enemy_data.horror_difficulty)
 		return
 
 	# Hostile faction enemy detection
@@ -2382,6 +2538,11 @@ func _on_aggro_area_body_entered(body: Node3D) -> void:
 			_change_state(AIState.CHASE)
 
 func _on_aggro_area_body_exited(body: Node3D) -> void:
+	# Player left detection range - reset awareness tracking
+	if body.is_in_group("player"):
+		player_in_detection_range = false
+		_awareness_target = null
+
 	if body == current_target:
 		# Don't immediately lose target, keep chasing to last known position
 		# The search behavior will trigger when we fully lose the target
@@ -2415,6 +2576,7 @@ func _scan_for_hostile_enemies() -> bool:
 		return false
 
 	var aggro_range := enemy_data.aggro_range if enemy_data else 12.0
+	var aggro_range_sq := aggro_range * aggro_range  # PERFORMANCE: Pre-compute squared distance
 	var enemies := get_tree().get_nodes_in_group("enemies")
 
 	for enemy in enemies:
@@ -2428,9 +2590,10 @@ func _scan_for_hostile_enemies() -> bool:
 		if not _is_hostile_faction(other_enemy):
 			continue
 
-		var dist := global_position.distance_to(other_enemy.global_position)
-		if dist <= aggro_range:
-			# Check line of sight
+		# PERFORMANCE: Use squared distance to avoid sqrt
+		var dist_sq := global_position.distance_squared_to(other_enemy.global_position)
+		if dist_sq <= aggro_range_sq:
+			# Check line of sight (only if in range)
 			var has_los := CombatManager.has_line_of_sight(self, other_enemy)
 			if has_los:
 				current_target = other_enemy
@@ -2483,6 +2646,14 @@ var billboard_sprite: BillboardSprite = null
 
 ## Reference to enemy glow light (for undead/spectral enemies)
 var enemy_glow_light: OmniLight3D = null
+
+## Rat directional sprite support
+## Rats use different textures based on movement direction relative to camera
+var _is_rat_enemy: bool = false
+var _rat_tex_forward: Texture2D = null  # Moving toward camera
+var _rat_tex_away: Texture2D = null     # Moving away from camera
+var _rat_tex_right: Texture2D = null    # Moving right (flip for left)
+var _rat_current_direction: int = 0     # 0=forward, 1=away, 2=right, 3=left
 
 ## Setup billboard sprite to replace 3D mesh visuals
 ## texture: The sprite sheet texture
@@ -2548,6 +2719,10 @@ func setup_billboard_sprite(texture: Texture2D, h_frames: int = 4, v_frames: int
 				billboard_sprite.death_frames = enemy_data.death_hframes
 				billboard_sprite.death_fps = 6.0
 
+		# Setup rat directional sprites if this is a rat enemy
+		if enemy_data.id == "giant_rat":
+			_setup_rat_directional_sprites()
+
 	return billboard_sprite
 
 ## Handle state changes for billboard sprite animation
@@ -2572,6 +2747,107 @@ func _on_damaged_for_sprite(_amount: int, _damage_type: Enums.DamageType, _attac
 	if billboard_sprite and current_state != AIState.DEAD:
 		billboard_sprite.play_hurt()
 
+## Setup rat directional sprites - call after setup_billboard_sprite for rat enemies
+func _setup_rat_directional_sprites() -> void:
+	_is_rat_enemy = true
+	_rat_tex_forward = load("res://assets/sprites/enemies/beasts/rat_moving_forward.png")
+	_rat_tex_away = load("res://assets/sprites/enemies/beasts/rat_moving_away.png")
+	_rat_tex_right = load("res://assets/sprites/enemies/beasts/rat_moving_right.png")
+
+	if not _rat_tex_forward or not _rat_tex_away or not _rat_tex_right:
+		push_warning("[EnemyBase] Failed to load one or more rat directional textures")
+		_is_rat_enemy = false
+
+## Update rat sprite based on movement direction relative to camera
+## Called every physics frame for rat enemies
+func _update_rat_directional_sprite() -> void:
+	if not _is_rat_enemy or not billboard_sprite or not billboard_sprite.sprite:
+		return
+
+	# Get camera
+	var camera := get_viewport().get_camera_3d()
+	if not camera:
+		return
+
+	# Get movement direction (use velocity)
+	var move_dir: Vector3 = velocity
+	move_dir.y = 0
+
+	# If not moving significantly, keep current direction
+	if move_dir.length_squared() < 0.1:
+		return
+
+	move_dir = move_dir.normalized()
+
+	# Get camera forward direction (flattened to XZ plane)
+	var cam_forward: Vector3 = -camera.global_transform.basis.z
+	cam_forward.y = 0
+	cam_forward = cam_forward.normalized()
+
+	# Get camera right direction
+	var cam_right: Vector3 = camera.global_transform.basis.x
+	cam_right.y = 0
+	cam_right = cam_right.normalized()
+
+	# Calculate dot products to determine direction
+	var forward_dot: float = move_dir.dot(cam_forward)
+	var right_dot: float = move_dir.dot(cam_right)
+
+	# Determine which direction sprite to use
+	# Thresholds: if moving mostly forward/back vs left/right
+	var new_direction: int = _rat_current_direction
+
+	if absf(forward_dot) > absf(right_dot):
+		# Moving more forward/backward than left/right
+		if forward_dot > 0.3:
+			new_direction = 0  # Moving toward camera (forward sprite)
+		elif forward_dot < -0.3:
+			new_direction = 1  # Moving away from camera (away sprite)
+	else:
+		# Moving more left/right than forward/backward
+		if right_dot > 0.3:
+			new_direction = 2  # Moving right
+		elif right_dot < -0.3:
+			new_direction = 3  # Moving left
+
+	# Only update if direction changed
+	if new_direction != _rat_current_direction:
+		_rat_current_direction = new_direction
+		_apply_rat_direction_sprite()
+
+## Apply the correct sprite texture and flip for current rat direction
+func _apply_rat_direction_sprite() -> void:
+	if not billboard_sprite or not billboard_sprite.sprite:
+		return
+
+	var tex: Texture2D = null
+	var flip_h: bool = false
+
+	match _rat_current_direction:
+		0:  # Forward (toward camera)
+			tex = _rat_tex_forward
+		1:  # Away (from camera)
+			tex = _rat_tex_away
+		2:  # Right
+			tex = _rat_tex_right
+		3:  # Left (flip right sprite)
+			tex = _rat_tex_right
+			flip_h = true
+
+	if tex and tex != billboard_sprite.sprite.texture:
+		billboard_sprite.sprite.texture = tex
+		# Update sprite sheet configuration (all rat directional sprites are single frame)
+		billboard_sprite.sprite.hframes = 4
+		billboard_sprite.sprite.vframes = 1
+		billboard_sprite.h_frames = 4
+		billboard_sprite.v_frames = 1
+		# Recalculate offset for new texture
+		var frame_height: float = tex.get_height()
+		billboard_sprite.sprite.offset = Vector2(0, frame_height / 2.0)
+
+	# Apply horizontal flip
+	billboard_sprite.sprite.flip_h = flip_h
+
 ## Static helper to spawn a billboard sprite enemy
 ## Returns the enemy instance with billboard sprite configured
 ## zone_danger: Zone danger level for stat scaling (1-10, default 1)
@@ -2592,9 +2868,16 @@ static func spawn_billboard_enemy(parent: Node, pos: Vector3, enemy_data_path: S
 	# Set zone danger before adding to scene (so _initialize_from_data uses it)
 	enemy.zone_danger = p_zone_danger
 
-	# Add to scene first (required for _ready to run)
+	# IMPORTANT: Set position BEFORE add_child so _ready() gets the correct spawn_position
+	# This fixes the bug where enemies would walk back to (0,0,0) because spawn_position
+	# was being set to the wrong value
+	enemy.position = pos
+
+	# Add to scene (required for _ready to run)
 	parent.add_child(enemy)
-	enemy.global_position = pos
+
+	# Ensure spawn_position is correctly set after _ready (belt and suspenders)
+	enemy.spawn_position = enemy.global_position
 
 	# Setup billboard sprite (after _ready has run)
 	enemy.call_deferred("setup_billboard_sprite", sprite_texture, h_frames, v_frames)
@@ -2625,9 +2908,14 @@ static func spawn_mesh_enemy(parent: Node, pos: Vector3, enemy_data_path: String
 	# Set zone danger before adding to scene (so _initialize_from_data uses it)
 	enemy.zone_danger = p_zone_danger
 
+	# IMPORTANT: Set position BEFORE add_child so _ready() gets the correct spawn_position
+	enemy.position = pos
+
 	# Add to scene (mesh stays visible - no billboard sprite setup)
 	parent.add_child(enemy)
-	enemy.global_position = pos
+
+	# Ensure spawn_position is correctly set
+	enemy.spawn_position = enemy.global_position
 
 	return enemy
 
@@ -2662,9 +2950,14 @@ static func spawn_skeleton_enemy(parent: Node, pos: Vector3, enemy_data_path: St
 	# Set zone danger before adding to scene (so _initialize_from_data uses it)
 	enemy.zone_danger = p_zone_danger
 
-	# Add to scene first (required for _ready to run)
+	# IMPORTANT: Set position BEFORE add_child so _ready() gets the correct spawn_position
+	enemy.position = pos
+
+	# Add to scene (required for _ready to run)
 	parent.add_child(enemy)
-	enemy.global_position = pos
+
+	# Ensure spawn_position is correctly set
+	enemy.spawn_position = enemy.global_position
 
 	# Setup skeleton billboard sprite with multi-state textures (after _ready has run)
 	enemy.call_deferred("_setup_skeleton_sprites")
@@ -2675,8 +2968,8 @@ static func spawn_skeleton_enemy(parent: Node, pos: Vector3, enemy_data_path: St
 ## Setup skeleton enemy with separate walk and attack sprite sheets
 func _setup_skeleton_sprites() -> void:
 	# Load textures
-	var walk_tex: Texture2D = load("res://Sprite folders grab bag/skeleton_walking.png")
-	var attack_tex: Texture2D = load("res://Sprite folders grab bag/skeleton_attacking.png")
+	var walk_tex: Texture2D = load("res://assets/sprites/enemies/undead/skeleton_walking.png")
+	var attack_tex: Texture2D = load("res://assets/sprites/enemies/undead/skeleton_attacking.png")
 
 	if not walk_tex:
 		push_warning("[EnemyBase] Failed to load skeleton_walking.png")

@@ -26,6 +26,18 @@ var npc_type: String = "quest_giver"  # Can be overridden for specific NPC types
 ## NPC knowledge profile for ConversationSystem (uses generic_villager if not set)
 @export var npc_profile: NPCKnowledgeProfile
 
+## ============================================================================
+## MERCHANT FUNCTIONALITY (Optional)
+## Enable to let this quest giver also sell items
+## ============================================================================
+@export var has_shop: bool = false
+@export var shop_type: String = "general"
+@export var shop_tier: LootTables.LootTier = LootTables.LootTier.UNCOMMON
+
+## Shop inventory: Array of {item_id, price, quantity, quality}
+## Generated automatically when has_shop is true
+var shop_inventory: Array[Dictionary] = []
+
 ## Optional pre-quest dialogue (shown before quest offer when quest is NOT_STARTED)
 ## If set, uses DialogueManager instead of ConversationSystem for this initial dialogue
 @export var dialogue_data: DialogueData
@@ -53,9 +65,9 @@ var billboard: BillboardSprite
 var interaction_area: Area3D
 
 ## Sprite configuration
-var sprite_h_frames: int = 8
-var sprite_v_frames: int = 2
-var sprite_pixel_size: float = 0.0384  # Match man_civilian size
+var sprite_h_frames: int = 1  # Single frame (48x96)
+var sprite_v_frames: int = 1  # Single frame
+var sprite_pixel_size: float = 0.0256  # 96px frame, 2.46m target
 
 ## Dialogue UI reference
 var dialogue_ui: Control = null
@@ -71,6 +83,11 @@ var _is_interacting: bool = false
 ## Legacy quest dialogues removed - use DialogueTree resources instead
 var quest_dialogues := {}
 
+## Health and combat
+var max_health: int = 50
+var current_health: int = 50
+var _is_dead: bool = false
+
 ## Generic dialogue for unknown quests
 var generic_dialogues := {
 	"offer": "I have a task for you, if you're willing.",
@@ -85,6 +102,20 @@ func _ready() -> void:
 	add_to_group("interactable")
 	add_to_group("npcs")
 	add_to_group("quest_givers")
+	add_to_group("attackable")
+
+	# If this NPC also has a shop, add to merchant groups
+	if has_shop:
+		add_to_group("merchants")
+		add_to_group("shops")
+		# Add to specific shop type groups for minimap icons
+		match shop_type:
+			"blacksmith", "basic_blacksmith", "weapon", "armor":
+				add_to_group("blacksmiths")
+			"alchemist":
+				add_to_group("alchemists")
+
+	current_health = max_health
 
 	# Only create visuals/areas if not already present (supports scene instancing)
 	if not get_node_or_null("Billboard"):
@@ -112,6 +143,10 @@ func _ready() -> void:
 	# Check if quest is already active or completed
 	_update_quest_state()
 
+	# Initialize shop inventory if this NPC has a shop
+	if has_shop and shop_inventory.is_empty():
+		_setup_shop_inventory()
+
 ## Create the visual representation (billboard sprite - PS1 style)
 func _create_visual() -> void:
 	# Load fallback texture if none assigned - pick based on gender
@@ -120,19 +155,31 @@ func _create_visual() -> void:
 	var v_frames: int = sprite_v_frames
 	var pixel_size: float = sprite_pixel_size
 
+	# Check ActorRegistry for actor configuration (base ZooRegistry + any patches)
+	# ZooRegistry is the source of truth - scene file values are only fallback
+	if ActorRegistry and not npc_id.is_empty() and ActorRegistry.has_actor(npc_id):
+		var config: Dictionary = ActorRegistry.get_sprite_config(npc_id)
+		if not config.is_empty():
+			var registry_path: String = config.get("sprite_path", "")
+			if not registry_path.is_empty() and ResourceLoader.exists(registry_path):
+				tex = load(registry_path) as Texture2D
+				h_frames = config.get("h_frames", h_frames)
+				v_frames = config.get("v_frames", v_frames)
+				pixel_size = config.get("pixel_size", pixel_size)
+
 	if not tex:
 		if is_female:
 			# Use lady in red sprite for female NPCs
-			tex = load("res://Sprite folders grab bag/new lady in red.png") as Texture2D
-			h_frames = 8
+			tex = load("res://assets/sprites/npcs/civilians/lady_in_red.png") as Texture2D
+			h_frames = 8  # lady_in_red is 8-frame sheet
 			v_frames = 1
-			pixel_size = 0.0182  # PIXEL_SIZE_LADY_RED
+			pixel_size = 0.0256  # 96px frame, 2.46m target
 		else:
 			# Use man_civilian sprite for male NPCs
-			tex = load("res://Sprite folders grab bag/man_civilian.png") as Texture2D
-			h_frames = 8
-			v_frames = 2
-			pixel_size = 0.0384  # PIXEL_SIZE_MAN
+			tex = load("res://assets/sprites/npcs/civilians/man_civilian.png") as Texture2D
+			h_frames = 1  # Single frame (48x96)
+			v_frames = 1
+			pixel_size = 0.0256  # 96px frame, 2.46m target
 
 	if not tex:
 		push_warning("QuestGiver: No sprite texture available for " + display_name)
@@ -531,11 +578,40 @@ const SPAWN_OFFSET_DISTANCE := 3.0  # How far to offset if blocked
 const BEACON_HEIGHT := 4.0  # Height of beacon effect above NPC
 
 
+## Static factory method using ActorRegistry for sprite configuration
+## actor_id: The actor ID from ZooRegistry (e.g., "elder_vorn_thornfield")
+## Falls back to default sprites if actor not found in registry
+static func spawn_from_registry(parent: Node, pos: Vector3, npc_name: String, npc_id: String, actor_id: String, quest_list: Array[String] = [], is_talk_target: bool = false) -> QuestGiver:
+	# Get ActorRegistry autoload (static functions cannot access autoloads directly)
+	var actor_registry: Node = Engine.get_singleton("ActorRegistry") if Engine.has_singleton("ActorRegistry") else null
+	if not actor_registry:
+		actor_registry = parent.get_node_or_null("/root/ActorRegistry")
+
+	# Try to get sprite config from ActorRegistry
+	var sprite_tex: Texture2D = null
+	var h_frames: int = 1
+	var v_frames: int = 1
+	var pixel_size: float = 0.0
+
+	if actor_registry and actor_registry.has_actor(actor_id):
+		var config: Dictionary = actor_registry.get_sprite_config(actor_id)
+		if not config.is_empty():
+			var sprite_path: String = config.get("sprite_path", "")
+			if not sprite_path.is_empty() and ResourceLoader.exists(sprite_path):
+				sprite_tex = load(sprite_path)
+				h_frames = config.get("h_frames", 1)
+				v_frames = config.get("v_frames", 1)
+				pixel_size = config.get("pixel_size", 0.0384)
+
+	return spawn_quest_giver(parent, pos, npc_name, npc_id, sprite_tex, h_frames, v_frames, quest_list, is_talk_target, pixel_size)
+
+
 ## Static factory method
 ## quest_list: Optional array of quest IDs this NPC can give.
 ## is_talk_target: If true, this NPC gives no quests (just a "talk to" objective target).
 ## pixel_size: Size of sprite in world units (0.0 = use default 0.0384)
-static func spawn_quest_giver(parent: Node, pos: Vector3, npc_name: String = "Mysterious Stranger", id: String = "", custom_sprite: Texture2D = null, h_frames: int = 8, v_frames: int = 2, quest_list: Array[String] = [], is_talk_target: bool = false, pixel_size: float = 0.0) -> QuestGiver:
+## actor_id: Optional actor ID for ActorRegistry lookup (e.g., "tharin_ironbeard")
+static func spawn_quest_giver(parent: Node, pos: Vector3, npc_name: String = "Mysterious Stranger", id: String = "", custom_sprite: Texture2D = null, h_frames: int = 8, v_frames: int = 2, quest_list: Array[String] = [], is_talk_target: bool = false, pixel_size: float = 0.0, actor_id: String = "") -> QuestGiver:
 	var npc := QuestGiver.new()
 	npc.display_name = npc_name
 	# Set npc_id - use provided id, or convert name to snake_case
@@ -548,13 +624,40 @@ static func spawn_quest_giver(parent: Node, pos: Vector3, npc_name: String = "My
 		npc.quest_ids = []
 	elif not quest_list.is_empty():
 		npc.quest_ids = quest_list
+
+	# Check ActorRegistry for Zoo patches if actor_id is provided or can be derived
+	var actual_sprite: Texture2D = custom_sprite
+	var actual_h_frames: int = h_frames
+	var actual_v_frames: int = v_frames
+	var actual_pixel_size: float = pixel_size
+
+	# Determine actor_id to check - use explicit ID or derive from npc_id
+	var registry_id: String = actor_id
+	if registry_id.is_empty():
+		registry_id = npc.npc_id
+
+	# Check ActorRegistry for patched sprite
+	var actor_registry: Node = Engine.get_singleton("ActorRegistry") if Engine.has_singleton("ActorRegistry") else null
+	if not actor_registry:
+		actor_registry = parent.get_node_or_null("/root/ActorRegistry")
+
+	if actor_registry and actor_registry.has_actor(registry_id):
+		var config: Dictionary = actor_registry.get_sprite_config(registry_id)
+		if not config.is_empty():
+			var registry_path: String = config.get("sprite_path", "")
+			if not registry_path.is_empty() and ResourceLoader.exists(registry_path):
+				actual_sprite = load(registry_path)
+				actual_h_frames = config.get("h_frames", h_frames)
+				actual_v_frames = config.get("v_frames", v_frames)
+				actual_pixel_size = config.get("pixel_size", pixel_size if pixel_size > 0.0 else 0.0384)
+
 	# Set custom sprite before adding to tree (before _ready)
-	if custom_sprite:
-		npc.sprite_texture = custom_sprite
-		npc.sprite_h_frames = h_frames
-		npc.sprite_v_frames = v_frames
-		if pixel_size > 0.0:
-			npc.sprite_pixel_size = pixel_size
+	if actual_sprite:
+		npc.sprite_texture = actual_sprite
+		npc.sprite_h_frames = actual_h_frames
+		npc.sprite_v_frames = actual_v_frames
+		if actual_pixel_size > 0.0:
+			npc.sprite_pixel_size = actual_pixel_size
 
 	# Find clear ground position to avoid spawning inside trees/obstacles
 	var clear_pos := _find_clear_spawn_position(parent, pos)
@@ -732,3 +835,121 @@ func _on_quest_turnin_ended() -> void:
 
 		# Update state to check for next quest
 		_update_quest_state()
+
+
+## Take damage from attacks
+func take_damage(amount: int, damage_type: Enums.DamageType = Enums.DamageType.PHYSICAL, attacker: Node = null) -> int:
+	if _is_dead:
+		return 0
+
+	var actual_damage: int = mini(amount, current_health)
+	current_health -= actual_damage
+
+	# Visual feedback - flash red
+	if billboard and billboard.sprite:
+		var original_color: Color = billboard.sprite.modulate
+		billboard.sprite.modulate = Color(1.0, 0.3, 0.3)
+		get_tree().create_timer(0.15).timeout.connect(func():
+			if billboard and billboard.sprite and not _is_dead:
+				billboard.sprite.modulate = original_color
+		)
+
+	# Play hurt sound
+	if AudioManager:
+		AudioManager.play_sfx("player_hit")
+
+	# Check for death
+	if current_health <= 0:
+		_die(attacker)
+
+	return actual_damage
+
+
+## Check if dead
+func is_dead() -> bool:
+	return _is_dead
+
+
+## Get armor value (NPCs have minimal armor)
+func get_armor_value() -> int:
+	return 5
+
+
+## Handle death
+func _die(killer: Node = null) -> void:
+	if _is_dead:
+		return
+
+	_is_dead = true
+
+	print("[QuestGiver] %s has been killed" % display_name)
+
+	# Report crime - killing an NPC is murder
+	if killer and killer.is_in_group("player"):
+		var crime_region: String = region_id if not region_id.is_empty() else "unknown"
+		CrimeManager.report_crime(CrimeManager.CrimeType.MURDER, crime_region, [])
+
+	# Close any open dialogue
+	_close_dialogue()
+
+	# Spawn corpse with loot
+	_spawn_corpse()
+
+	# Emit death signal
+	CombatManager.entity_killed.emit(self, killer)
+
+	# Play death sound
+	if AudioManager:
+		AudioManager.play_sfx("enemy_death")
+
+	# Remove from groups
+	remove_from_group("interactable")
+	remove_from_group("npcs")
+	remove_from_group("quest_givers")
+	remove_from_group("attackable")
+	remove_from_group("compass_poi")
+
+	# Unregister from PlayerGPS
+	var effective_id: String = npc_id if not npc_id.is_empty() else name
+	PlayerGPS.unregister_npc(effective_id)
+
+	queue_free()
+
+
+## Spawn a lootable corpse
+func _spawn_corpse() -> void:
+	var corpse: LootableCorpse = LootableCorpse.spawn_corpse(
+		get_parent(),
+		global_position,
+		display_name,
+		npc_id,
+		5  # Level 5 - decent loot for named NPCs
+	)
+
+	# Add some gold and items
+	corpse.gold = randi_range(10, 50)
+
+	# Maybe add some common items
+	if randf() < 0.5:
+		corpse.add_item("health_potion", 1, Enums.ItemQuality.AVERAGE)
+	if randf() < 0.3:
+		corpse.add_item("bread", randi_range(1, 3), Enums.ItemQuality.AVERAGE)
+
+
+## ============================================================================
+## SHOP FUNCTIONALITY
+## ============================================================================
+
+## Setup shop inventory using LootTables
+func _setup_shop_inventory() -> void:
+	if not has_shop:
+		return
+
+	if not LootTables:
+		push_warning("[QuestGiver] LootTables not available for shop inventory")
+		return
+
+	shop_inventory = LootTables.generate_shop_inventory(shop_tier, shop_type)
+	print("[QuestGiver] %s shop initialized with %d items (type: %s, tier: %d)" % [
+		display_name, shop_inventory.size(), shop_type, shop_tier
+	])
